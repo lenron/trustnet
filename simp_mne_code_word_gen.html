@@ -3,7 +3,10 @@
 
 <body>
 
+<script src="wordlist_english.js"></script>
 <script>
+// test wordlist dereference
+console.log(wordListArray[0])
 // import web cryptograpy API
 var crypto = crypto.subtle;
 
@@ -39,15 +42,19 @@ async function digestValues(entropy){
 	const entropyAndChecksum = entropyBinary + checksum;
 	console.log('entropy + checksum: ' + entropyAndChecksum);
 	console.log(entropyAndChecksum.length);
-	const splitArray = new Array;
+	const numberWordArray = new Array;
 	for(var i=0; i < entropyAndChecksum.length; i+=11){
 		console.log(i)
 		console.log(entropyAndChecksum.substring(i,i+11));
-		splitArray.push(entropyAndChecksum.substring(i,i+11));
+		numberWordArray.push(entropyAndChecksum.substring(i,i+11));
 	}
-	console.log(splitArray);
+	console.log(numberWordArray);
+	const wordArray = new Array;
+	for(var n=0; n < numberWordArray.length; n++){
+		wordArray.push(wordListArray[parseInt(numberWordArray[n], 2)]);
+	}
 
-	return entropyAndChecksum;													
+	return wordArray;													
 }
 
 digestValues(rand_entropy).then(digested => console.log(digested))
