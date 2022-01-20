@@ -27,7 +27,7 @@ async function digestValues(entropy){
 	const checksum = hashBinArr[0].substring(0,4);
 	console.log(checksum);
 
-	// convert entropy to binary and add checksum
+
 	console.log(rand_entropy[0].toString(2).padStart(8, '0'));
 	const entropyArray = Array.from(new Uint8Array(entropy));	// Need this since the map to string below doesn't work.
 	console.log(entropyArray);
@@ -39,9 +39,13 @@ async function digestValues(entropy){
 	const entropyAndChecksum = entropyBinary + checksum;
 	console.log('entropy + checksum: ' + entropyAndChecksum);
 	console.log(entropyAndChecksum.length);
-
-
-
+	const splitArray = new Array;
+	for(var i=0; i < entropyAndChecksum.length; i+=11){
+		console.log(i)
+		console.log(entropyAndChecksum.substring(i,i+11));
+		splitArray.push(entropyAndChecksum.substring(i,i+11));
+	}
+	console.log(splitArray);
 
 	return entropyAndChecksum;													
 }
