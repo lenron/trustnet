@@ -4,15 +4,26 @@
 <body>
 
 <script>
-
-/*
- *
- *
- * Generate Code Words from native web cryptography API
- *
- */
+// import web cryptograpy API
+var crypto = crypto.subtle;
 
 // 1. Create custom source of entropy - From getRandomValues
+var ran_array = new Uint8Array(16);
+crypto.getRandomValues(ran_array);
+console.log('random uint8 numbers:')
+for (var i=0; i < ran_array.length; i++){
+	console.log(ran_array[i]);
+}
+
+// 1a. Take SHA256
+async function digestValues(arr){
+	const hashBuffer = await crypto.subtle.digest('SHA-256', arr);
+	const hashArray = Array.from(new Uint8Array(hashBuffer));
+	const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+	return hashHex;
+}
+
+digestValues(ran_array).then(digested => console.log(digested))
 
 // 2. Create a checksum of the random sequence by taking the first few bits of its SHA256 hash.
 
@@ -22,7 +33,6 @@
 
 // 5. Produce 12 to 24 words representing the mnemonic code.
 
-console.log('hello world')
 
 </script>
 
