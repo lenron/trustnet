@@ -8,22 +8,45 @@
 var crypto = crypto.subtle;
 
 // 1. Create custom source of entropy - From getRandomValues
-var ran_array = new Uint8Array(16);
-crypto.getRandomValues(ran_array);
-console.log('random uint8 numbers:')
-for (var i=0; i < ran_array.length; i++){
-	console.log(ran_array[i]);
-}
+var rand_entropy = new Uint8Array(16);
+crypto.getRandomValues(rand_entropy);
+console.log(rand_entropy);
+console.log(rand_entropy[0].toString(2));
+//for (var i=0; i < rand_entropy.length; i++){
+//	console.log(rand_entropy[i]);
+//}
 
 // 1a. Take SHA256
-async function digestValues(arr){
-	const hashBuffer = await crypto.subtle.digest('SHA-256', arr);
-	const hashArray = Array.from(new Uint8Array(hashBuffer));
-	const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-	return hashHex;
+async function digestValues(entropy){
+	//compute checksum
+	const hashBuffer = await crypto.subtle.digest('SHA-256', entropy);					// hash the message
+	console.log(hashBuffer);
+	const hashArray = Array.from(new Uint8Array(hashBuffer));						// convert buffer to byte array
+	const hashBinArr = hashArray.map(b => b.toString(2).padStart(8, '0'));
+	console.log(hashBinArr);
+	const checksum = hashBinArr[0].substring(0,4);
+	console.log(checksum);
+
+	// convert entropy to binary and add checksum
+	console.log(rand_entropy[0].toString(2).padStart(8, '0'));
+	const entropyArray = Array.from(new Uint8Array(entropy));	// Need this since the map to string below doesn't work.
+	console.log(entropyArray);
+	//const entropyBinary = entropyArray.map(b => b.toString(2).padStart(8, '0')).join('');		//convert entropy to binary string
+	const entropyBinaryArr = entropyArray.map(b => b.toString(2).padStart(8, '0'))
+	console.log(entropyBinaryArr);
+	const entropyBinary = entropyBinaryArr.join('');
+	console.log(entropyBinary);
+	const entropyAndChecksum = entropyBinary + checksum;
+	console.log('entropy + checksum: ' + entropyAndChecksum);
+	console.log(entropyAndChecksum.length);
+
+
+
+
+	return entropyAndChecksum;													
 }
 
-digestValues(ran_array).then(digested => console.log(digested))
+digestValues(rand_entropy).then(digested => console.log(digested))
 
 // 2. Create a checksum of the random sequence by taking the first few bits of its SHA256 hash.
 
