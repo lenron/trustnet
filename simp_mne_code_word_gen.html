@@ -1,11 +1,13 @@
 <!DOCTYPE HTML>
 <html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
 
 <body>
 
 <script src="wordlist_english.js"></script>
 <script>
-// test wordlist dereference
+// test wordlist de-reference
 console.log(wordListArray[0])
 // import web cryptograpy API
 var crypto = crypto.subtle;
@@ -13,59 +15,66 @@ var crypto = crypto.subtle;
 // 1. Create custom source of entropy - From getRandomValues
 var rand_entropy = new Uint8Array(16);
 crypto.getRandomValues(rand_entropy);
+console.log('random entropy array:');
 console.log(rand_entropy);
-console.log(rand_entropy[0].toString(2));
-//for (var i=0; i < rand_entropy.length; i++){
-//	console.log(rand_entropy[i]);
-//}
 
-// 1a. Take SHA256
 async function digestValues(entropy){
-	//compute checksum
-	const hashBuffer = await crypto.subtle.digest('SHA-256', entropy);					// hash the message
-	console.log(hashBuffer);
+	// 2. Create a checksum of the random sequence by taking the first few bits of its SHA256 hash.
+	const hashBuffer = await crypto.subtle.digest('SHA-256', entropy);				// hash the message
 	const hashArray = Array.from(new Uint8Array(hashBuffer));						// convert buffer to byte array
+	// map b => b. creates a new array with the results of a provided function
+	// toString(2) changes a number to base 2. Overloaded function.
+	// padStart(8, '0') fills in 0's to up to length 8 if given a string with less than length 8.
 	const hashBinArr = hashArray.map(b => b.toString(2).padStart(8, '0'));
 	console.log(hashBinArr);
+	// substring(0,4) returns a smaller string from index 0 to 4
 	const checksum = hashBinArr[0].substring(0,4);
-	console.log(checksum);
+	console.log('checksum: ' + checksum);
 
-
+	// 3. Add the checksum to the end of the random sequence.
+	// Illustrating some wierdness
+	console.log('This should be an array of binary numbers but fails:');
+	const entropyFail = entropy.map(b => b.toString(2).padStart(8, '0'));
+	console.log(entropyFail);
+	console.log('And yet this works fine:');
 	console.log(rand_entropy[0].toString(2).padStart(8, '0'));
-	const entropyArray = Array.from(new Uint8Array(entropy));	// Need this since the map to string below doesn't work.
+	// Need to convert to an array of no type for it to work
+	const entropyArray = Array.from(new Uint8Array(entropy));
+	console.log('Notice the array is no longer Uint8Array:');
 	console.log(entropyArray);
-	//const entropyBinary = entropyArray.map(b => b.toString(2).padStart(8, '0')).join('');		//convert entropy to binary string
+	console.log('Good output:');
 	const entropyBinaryArr = entropyArray.map(b => b.toString(2).padStart(8, '0'))
 	console.log(entropyBinaryArr);
 	const entropyBinary = entropyBinaryArr.join('');
-	console.log(entropyBinary);
+	console.log('entropy:            ' + entropyBinary);
 	const entropyAndChecksum = entropyBinary + checksum;
 	console.log('entropy + checksum: ' + entropyAndChecksum);
-	console.log(entropyAndChecksum.length);
+	console.log('entropy + checksum length: ' + entropyAndChecksum.length);
+
+	// 4. Divide the sequence into sections of 11 bits, using those to index a dictionary of 2048 predefined words.
 	const numberWordArray = new Array;
 	for(var i=0; i < entropyAndChecksum.length; i+=11){
 		console.log(i)
 		console.log(entropyAndChecksum.substring(i,i+11));
 		numberWordArray.push(entropyAndChecksum.substring(i,i+11));
 	}
+	console.log('Array of 11 bit numbers to be converted: ');
 	console.log(numberWordArray);
 	const wordArray = new Array;
+
+	// 5. Produce 12 to 24 words representing the mnemonic code.
 	for(var n=0; n < numberWordArray.length; n++){
 		wordArray.push(wordListArray[parseInt(numberWordArray[n], 2)]);
 	}
-
+	console.log('Our mnemonic word array: ');
 	return wordArray;													
 }
 
 digestValues(rand_entropy).then(digested => console.log(digested))
 
-// 2. Create a checksum of the random sequence by taking the first few bits of its SHA256 hash.
 
-// 3. Add the checksum to the end of the random sequence.
 
-// 4. Divide the sequence into sections of 11 bits, using those to index a dictionary of 2048 predefined words.
 
-// 5. Produce 12 to 24 words representing the mnemonic code.
 
 
 </script>
