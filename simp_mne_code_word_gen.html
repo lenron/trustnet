@@ -80,7 +80,7 @@ async function computeCodeWords(entropy){
 
 //computeCodeWords(rand_entropy).then(codeWordArray => console.log(codeWordArray))
 
-async function waitFunction() {	
+async function getEntropyBits() {	
 	const codeWordArray = await computeCodeWords(rand_entropy)
 	console.log(codeWordArray);
 
@@ -119,28 +119,64 @@ async function waitFunction() {
 	const wordBitsUint8Array = new Uint8Array(wordBitsArray); //strangely the same as the garbage output above
 	//wordBitsUint8Array = new Uint8Array();
 	//wordBitsUint8Array = wordBitsArray.map(b => b.toString(10));
+	// Keep this to show Len later
 	console.log('wordBitsUint8Array:');
 	console.log(wordBitsUint8Array);
 
 	//use parseInt for next step
+	const wordBitsUint = new Array; //Uint8Array(16);
+	for(var i=0; i < wordBitsArray.length; i++){
+		wordBitsUint.push(parseInt(wordBitsArray[i], 2));
+	}
+	const wordBitsUint8 = new Uint8Array(wordBitsUint);
+	console.log('wordBitsUint8:');
+	console.log(wordBitsUint8);
 	
-	//const hashBuffer = await crypto.subtle.digest('SHA-256', wordBitsUint8Array);
-	//const hashArray = Array.from(new Uint8Array(hashBuffer));
-	//console.log(hashArray);
-	
-
 	// SHA256 Uint array
+	const hashBuffer = await crypto.subtle.digest('SHA-256', wordBitsUint8);
+	const hashArray = Array.from(new Uint8Array(hashBuffer));
+	console.log(hashArray);
 
 	// Convert resulting hash and compare checksum bits
+	const hashBinArr = hashArray.map(b => b.toString(2).padStart(8, '0'));
+	console.log('SHA256 hash of the entropy:');
+	console.log(hashBinArr);
+	// substring(0,4) returns a smaller string from index 0 to 4
+	const checksum_next = hashBinArr[0].substring(0,4);
+	console.log('checksum_next: ' + checksum);
 
-
+	if(!checksum.localeCompare(checksum_next)){
+		console.log('Checksum verified!');
+	}else{
+		console.log('Checksum wrong!');
+	}
+	return wordBitsArray;
 }
 computedCodeWordArray = new Array;
-waitFunction();
 
+async function waitFunction() {	
+	const wordBits = await getEntropyBits();
+	console.log('computed word bits:');
+	console.log(wordBits);
+
+}
+
+waitFunction();
 
 </script>
 
 </body>
 
-</html
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
