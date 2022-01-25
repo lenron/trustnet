@@ -5,21 +5,220 @@
 
 <body>
 
+<script src="wordlist_english.js"></script>
 <script>
+console.log(wordListArray[0])
 // creating an object of cryptograpy API instance
 var crypto = crypto.subtle;
 // 1. Create custom source of entropy - From getRandomValues
-var rand_entropy = new Uint8Array(16);
-crypto.getRandomValues(rand_entropy);
+var entropy128 = new Uint8Array(16);
+window.crypto.getRandomValues(entropy128);
 console.log('128 bits of entropy array:');
-console.log(rand_entropy);
+console.log(entropy128);
 
-compMasters(rand_entropy);
-async function compMasters(entropy){
-
+compMasterKeyAndChainCode(entropy128);
+async function compMasterKeyAndChainCode(entropy128){
+	// Produce keys, using PBKDF2, of 512 bits.
+	const password = ''						// Showing this for transparency into bip39
+	const salt = 'mnemonic' + password		// Specified by bip39
+	salt.normalize('NFKD');
+	//const saltBuff = Buffer.from(salt, "utf-8");
+	const saltBuff = new ArrayBuffer(salt);
+	const seed512 = await window.crypto.subtle.importKey(
+		"raw",
+		entropy128,
+		"PBKDF2",
+		false,
+		["deriveBits"]
+	);
+	const seed512Buffer = await window.crypto.subtle.deriveBits(
+		{
+			"name": "PBKDF2",
+			salt: saltBuff,
+			"iterations": 2048,
+			"hash": "SHA-512"
+		},
+		seed512,
+		512
+	);
+	console.log('seed512 Buffer: ' + seed512Buffer);
+	const seed512ArrayUint8 = Array.from(new Uint8Array(seed512Buffer));
+	const seed512ArrHex = seed512ArrayUint8.map(b => b.toString(16).padStart(2, '0'));
+	console.log('seed512 hex: ' + seed512ArrHex);
+	
+	
+	//console.log('Derived 512 bit key: ' + seed512Array);
 }
+	/*const seed512 = crypto.subtle.deriveKey(	//Returns a CryptoKey object
+		//algorithm: pbkdf2params object
+		{
+			"name": "PBKDF2",
+			salt: salt.normalize('NFKD'),
+			"iterations": 2048,
+			"hash": "SHA-512"
+		},
+									//	"name": "PBKDF2",
+									//	salt: salt.normalize('NFKD'),
+									//	"iterations: 2048,
+									//	"hash": "SHA-512"  //I think this is right...
+		baseKey,					//baseKey: CryptoKey return. includes 'salt'
+		derivedKeyAlgorithm,		//derivedKeyAlgorithm: HMAC-object: HmacKeyGenParams
+									//	name: "HMAC",
+									//	hash: {name: "SHA-512"}
+		extractable,				//extractable: true
+		keyUsages					//keyUsages: deriveBits //I think
+	);
+*/
+//computeCodeWords(entropy128);
+async function computeCodeWords(entropy){
+    // 2. Create a checksum of the random sequence by taking the first few bits of its SHA256 hash.
+    const hashBuffer = await crypto.subtle.digest('SHA-256', entropy);              // hash the message
+    //console.log(hashBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));                       // convert buffer to byte array
+    //console.log(hashArray);
+    //console.log(typeof hashArray);
 
+    var ten = 10
+    //console.log('ten: ' + ten.toString(2));
+    // map b => b. creates a new array with the results of a provided function
+    // toString(2) changes a number to base 2. Overloaded function.
+    // padStart(8, '0') fills in 0's to up to length 8 if given a string with less than length 8.
+    const hashBinArr = hashArray.map(b => b.toString(2).padStart(8, '0'));
+    //console.log('SHA256 hash of the entropy:');
+    //console.log(hashBinArr);
+    // substring(0,4) returns a smaller string from index 0 to 4
+    const checksum = hashBinArr[0].substring(0,4);
+    console.log('checksum: ' + checksum);
 
+    // 3. Add the checksum to the end of the random sequence.
+    // Illustrating some wierdness
+    //console.log('This should be an array of binary numbers but fails:');
+    const entropyFail = entropy.map(b => b.toString(2).padStart(8, '0'));
+    //console.log(entropyFail);
+    //console.log('And yet this works fine:');
+    //console.log(typeof entropy128[0]);
+    //console.log(entropy128[0].toString(2).padStart(8, '0'));
+    // Need to convert to an array of no type for it to work
+    const entropyArray = Array.from(new Uint8Array(entropy));
+    //console.log('Notice the array is no longer Uint8Array:');
+    //console.log(entropyArray);
+    //console.log('Good output:');
+    const entropyBinaryArr = entropyArray.map(b => b.toString(2).padStart(8, '0'));
+    //console.log(entropyBinaryArr);
+    const entropyBinary = entropyBinaryArr.join('');
+    //console.log('entropy:            ' + entropyBinary);
+    const entropyAndChecksum = entropyBinary + checksum;
+    //console.log('entropy + checksum: ' + entropyAndChecksum);
+    //console.log('entropy + checksum length: ' + entropyAndChecksum.length);
+
+    // 4. Divide the sequence into sections of 11 bits, using those to index a dictionary of 2048 predefined words.
+    const numberWordArray = new Array;
+    for(var i=0; i < entropyAndChecksum.length; i+=11){
+        //console.log(i)
+        //console.log(entropyAndChecksum.substring(i,i+11));
+        numberWordArray.push(entropyAndChecksum.substring(i,i+11));
+    }
+    console.log('Array of 11 bit numbers to be converted: ' + numberWordArray);
+    //console.log(numberWordArray);
+
+    // 5. Produce 12 to 24 words representing the mnemonic code.
+    const wordArray = new Array;
+    for(var n=0; n < numberWordArray.length; n++){
+        // parseInt converts a string to a number with the given base.
+        wordArray.push(wordListArray[parseInt(numberWordArray[n], 2)]);
+    }
+    console.log('Our mnemonic word array: ' + wordArray);
+    return wordArray;
+}
+async function getEntropyBits() {
+    const codeWordArray = await computeCodeWords(entropy128)
+    // break it for check
+    //codeWordArray[0] = 'fashionista';
+    //console.log(codeWordArray);
+
+    // Convert to array of 11 bit binary numbers
+    indexArray = new Array;
+    for(var i=0; i < codeWordArray.length; i++){
+        if( wordListArray.indexOf(codeWordArray[i]) < 0){
+            console.log('throw error: Word not found in mnemonic word list!');
+        }else{
+            indexArray.push(wordListArray.indexOf(codeWordArray[i]));
+        }
+    }
+    //console.log('indexArray:');
+    //console.log(indexArray);
+    const binaryIndexArray = indexArray.map(b => b.toString(2).padStart(11, '0'));
+    //console.log('binaryIndexArray: ' + binaryIndexArray);
+    //console.log(binaryIndexArray);
+
+    // Strip off checksum
+    const binaryIndexStr = binaryIndexArray.join('');
+    //console.log('binaryIndexStr:');
+    //console.log(binaryIndexStr);
+    // slice(-4) strips off the last 4 chars of the string.
+    const checksum = binaryIndexStr.slice(-4);
+    //console.log('checksum: ' + checksum);
+    //console.log(checksum);
+    //console.log('binaryIndexStr:');
+    //console.log(binaryIndexStr);
+
+    // Convert remainder word bits to Uint8Array of length 16
+    const wordBitsStr = binaryIndexStr.substring(0, binaryIndexStr.length-4);
+    //console.log('wordBitsStr:');
+    //console.log(wordBitsStr);
+    const wordBitsArray = new Array;
+    for(var i=0; i < wordBitsStr.length; i+=8){
+        //console.log(i)
+        //console.log(wordBitsStr.substring(i,i+8));
+        wordBitsArray.push(wordBitsStr.substring(i,i+8));
+    }
+    //console.log('wordBitsArray:');
+    //console.log(wordBitsArray);
+
+    //const wordBitsUint8Array = new Uint8Array(wordBitsArray); //strangely the same as the garbage output above
+    // Keep this to show Len later
+    //console.log('wordBitsUint8Array:');
+    //console.log(wordBitsUint8Array);
+
+    //use parseInt for next step
+    const entropyBytesArr = new Array; //Uint8Array(16);
+    for(var i=0; i < wordBitsArray.length; i++){
+        entropyBytesArr.push(parseInt(wordBitsArray[i], 2));
+    }
+    const entropyBytesUint8 = new Uint8Array(entropyBytesArr);
+    //console.log('entropyBytesUint8:');
+    //console.log(entropyBytesUint8);
+
+    // SHA256 Uint array
+    const hashBuffer = await crypto.subtle.digest('SHA-256', entropyBytesUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    //console.log(hashArray);
+
+    // Convert resulting hash and compare checksum bits
+    const hashBinArr = hashArray.map(b => b.toString(2).padStart(8, '0'));
+    //console.log('SHA256 hash of the entropy:');
+    //console.log(hashBinArr);
+    // substring(0,4) returns a smaller string from index 0 to 4
+    const checksum_next = hashBinArr[0].substring(0,4);
+    //checksum_next = "1111";
+    //console.log('checksum_next: ' + checksum);
+
+    //localeCompare returns 0 if the strings are equal.
+    //if(!checksum.localeCompare(checksum_next)){
+    //console.log('checksum type: ' + typeof(checksum));
+    //console.log('checksum_next type: ' + typeof(checksum_next));
+    if(checksum == checksum_next){
+        console.log('Checksum verified!');
+    }else{
+        console.log('Checksum wrong!');
+    }
+    return wordBitsArray;
+}
+waitFunction();
+async function waitFunction() {
+    const wordBits = await getEntropyBits();
+    console.log('computed word bits: ' + wordBits);
+}
 
 </script>
 
