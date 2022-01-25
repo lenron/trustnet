@@ -82,17 +82,23 @@ async function computeCodeWords(entropy){
 
 async function getEntropyBits() {	
 	const codeWordArray = await computeCodeWords(rand_entropy)
+	// break it for check
+	//codeWordArray[0] = 'fashionista';
 	console.log(codeWordArray);
 
 	// Convert to array of 11 bit binary numbers
 	indexArray = new Array;
 	for(var i=0; i < codeWordArray.length; i++){
-		indexArray.push(wordListArray.indexOf(codeWordArray[i]));
+		if( wordListArray.indexOf(codeWordArray[i]) < 0){
+			console.log('throw error: Word not found in mnemonic word list!');
+		}else{
+			indexArray.push(wordListArray.indexOf(codeWordArray[i]));
+		}
 	}
 	console.log('indexArray:');
 	console.log(indexArray);
 	const binaryIndexArray = indexArray.map(b => b.toString(2).padStart(11, '0'));
-	console.log('binaryIndexArray:');
+	console.log('binaryIndexArray: ' + binaryIndexArray);
 	console.log(binaryIndexArray);
 
 	// Strip off checksum
@@ -101,8 +107,10 @@ async function getEntropyBits() {
 	console.log(binaryIndexStr);
 	// slice(-4) strips off the last 4 chars of the string.
 	const checksum = binaryIndexStr.slice(-4);
-	console.log('checksum:');
-	console.log(checksum);
+	console.log('checksum: ' + checksum);
+	//console.log(checksum);
+	console.log('binaryIndexStr:');
+	console.log(binaryIndexStr);
 
 	// Convert remainder word bits to Uint8Array of length 16
 	const wordBitsStr = binaryIndexStr.substring(0, binaryIndexStr.length-4);
@@ -116,24 +124,23 @@ async function getEntropyBits() {
 	}
 	console.log('wordBitsArray:');
 	console.log(wordBitsArray);
-	const wordBitsUint8Array = new Uint8Array(wordBitsArray); //strangely the same as the garbage output above
-	//wordBitsUint8Array = new Uint8Array();
-	//wordBitsUint8Array = wordBitsArray.map(b => b.toString(10));
+
+	//const wordBitsUint8Array = new Uint8Array(wordBitsArray); //strangely the same as the garbage output above
 	// Keep this to show Len later
-	console.log('wordBitsUint8Array:');
-	console.log(wordBitsUint8Array);
+	//console.log('wordBitsUint8Array:');
+	//console.log(wordBitsUint8Array);
 
 	//use parseInt for next step
-	const wordBitsUint = new Array; //Uint8Array(16);
+	const entropyBytesArr = new Array; //Uint8Array(16);
 	for(var i=0; i < wordBitsArray.length; i++){
-		wordBitsUint.push(parseInt(wordBitsArray[i], 2));
+		entropyBytesArr.push(parseInt(wordBitsArray[i], 2));
 	}
-	const wordBitsUint8 = new Uint8Array(wordBitsUint);
-	console.log('wordBitsUint8:');
-	console.log(wordBitsUint8);
+	const entropyBytesUint8 = new Uint8Array(entropyBytesArr);
+	console.log('entropyBytesUint8:');
+	console.log(entropyBytesUint8);
 	
 	// SHA256 Uint array
-	const hashBuffer = await crypto.subtle.digest('SHA-256', wordBitsUint8);
+	const hashBuffer = await crypto.subtle.digest('SHA-256', entropyBytesUint8);
 	const hashArray = Array.from(new Uint8Array(hashBuffer));
 	console.log(hashArray);
 
@@ -143,9 +150,14 @@ async function getEntropyBits() {
 	console.log(hashBinArr);
 	// substring(0,4) returns a smaller string from index 0 to 4
 	const checksum_next = hashBinArr[0].substring(0,4);
+	//checksum_next = "1111";
 	console.log('checksum_next: ' + checksum);
 
-	if(!checksum.localeCompare(checksum_next)){
+	//localeCompare returns 0 if the strings are equal.
+	//if(!checksum.localeCompare(checksum_next)){
+	console.log('checksum type: ' + typeof(checksum));
+	console.log('checksum_next type: ' + typeof(checksum_next));
+	if(checksum == checksum_next){
 		console.log('Checksum verified!');
 	}else{
 		console.log('Checksum wrong!');
