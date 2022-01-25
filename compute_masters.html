@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+
+<body>
+
+<script>
+// creating an object of cryptograpy API instance
+var crypto = crypto.subtle;
+// 1. Create custom source of entropy - From getRandomValues
+var rand_entropy = new Uint8Array(16);
+crypto.getRandomValues(rand_entropy);
+console.log('128 bits of entropy array:');
+console.log(rand_entropy);
+
+compMasters(rand_entropy);
+async function compMasters(entropy){
+
+}
+
+
+
+</script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
