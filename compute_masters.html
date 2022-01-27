@@ -16,21 +16,45 @@ window.crypto.getRandomValues(entropy128);
 console.log('128 bits of entropy array:');
 console.log(entropy128);
 
+
+
 compMasterKeyAndChainCode(entropy128);
 async function compMasterKeyAndChainCode(entropy128){
+	var mnemonicSentence = await computeCodeWords(entropy128);
+	mnemonicSentence = mnemonicSentence.join(' ');			//This is DEFINITELY the 'password'
+	console.log('mnemonic sentence: ' + mnemonicSentence);
 	// Produce keys, using PBKDF2, of 512 bits.
 	const password = ''						// Showing this for transparency into bip39
-	const salt = 'mnemonic' + password		// Specified by bip39
-	salt.normalize('NFKD');
-	//const saltBuff = Buffer.from(salt, "utf-8");
+	var salt = 'mnemonic' + password		// Specified by bip39 - DEFINITELY the 'salt'
+	// These should DEFINITELY be correct
+	salt = salt.normalize('NFKD', 'utf8');
+	mnemonicSentence = mnemonicSentence.normalize('NFKD', 'utf8');
+	var pass = new TextEncoder().encode(mnemonicSentence);
+	console.log('salt normalized: ' + salt);
+	console.log('saltnorm type: ' + typeof salt);
+/*
+	const saltArr = new Array();
+	for (var i = 0; i < salt.length; i++) {
+		//saltArr.push(salt.substring(i).charCodeAt(0).toString(2));
+		saltArr.push(parseInt(salt.charCodeAt(i).toString(2), 2));
+	}
+	console.log("saltArr: " + saltArr);
+	console.log("type of saltArr[0]: " + typeof saltArr[0]);
+	const saltBuff = new ArrayBuffer(saltArr);
+*/
+	const mneBuff = new ArrayBuffer(mnemonicSentence);
 	const saltBuff = new ArrayBuffer(salt);
-	const seed512 = await window.crypto.subtle.importKey(
+	//const key = crypto.subtle.pbkdf2(mneBuff, saltBuff, 2048, 64, 'sha512');
+	//console.log('key: ' + key);
+	//console.log('saltBuff: ' + saltBuff);
+	const seed512key = await window.crypto.subtle.importKey(
 		"raw",
-		entropy128,
+		mneBuff,				//The 'password' which is the mnemonic phrase (with a space delimiter)
 		"PBKDF2",
-		false,
-		["deriveBits"]
+		false,					//KDF keys must be 'false'
+		["deriveBits", "deriveKey"]
 	);
+/*
 	const seed512Buffer = await window.crypto.subtle.deriveBits(
 		{
 			"name": "PBKDF2",
@@ -38,37 +62,52 @@ async function compMasterKeyAndChainCode(entropy128){
 			"iterations": 2048,
 			"hash": "SHA-512"
 		},
-		seed512,
+		seed512key,
 		512
 	);
 	console.log('seed512 Buffer: ' + seed512Buffer);
 	const seed512ArrayUint8 = Array.from(new Uint8Array(seed512Buffer));
+	console.log('seed512ArrayUint8: ' + seed512ArrayUint8);
 	const seed512ArrHex = seed512ArrayUint8.map(b => b.toString(16).padStart(2, '0'));
 	console.log('seed512 hex: ' + seed512ArrHex);
-	
-	
-	//console.log('Derived 512 bit key: ' + seed512Array);
-}
-	/*const seed512 = crypto.subtle.deriveKey(	//Returns a CryptoKey object
+*/
+	const seed512keyDerived = await window.crypto.subtle.deriveKey(	//Returns a CryptoKey object
 		//algorithm: pbkdf2params object
 		{
 			"name": "PBKDF2",
-			salt: salt.normalize('NFKD'),
+			salt: saltBuff,
 			"iterations": 2048,
 			"hash": "SHA-512"
 		},
-									//	"name": "PBKDF2",
-									//	salt: salt.normalize('NFKD'),
-									//	"iterations: 2048,
-									//	"hash": "SHA-512"  //I think this is right...
-		baseKey,					//baseKey: CryptoKey return. includes 'salt'
-		derivedKeyAlgorithm,		//derivedKeyAlgorithm: HMAC-object: HmacKeyGenParams
-									//	name: "HMAC",
-									//	hash: {name: "SHA-512"}
-		extractable,				//extractable: true
-		keyUsages					//keyUsages: deriveBits //I think
+		seed512key,					//baseKey: CryptoKey return. includes 'salt'
+		{							//derivedKeyAlgorithm: HMAC-object: HmacKeyGenParams
+			name: "HMAC",
+			hash: {name: "SHA-512"},
+			length: 512
+		},
+		true,				//extractable: true
+		["sign", "verify"]		//keyUsages: deriveBits //I think
 	);
-*/
+
+	const seed512Buffer = await window.crypto.subtle.deriveBits(
+		{
+			"name": "PBKDF2",
+			salt: saltBuff,
+			"iterations": 2048,
+			"hash": "SHA-512"
+		},
+		seed512keyDerived,
+		512
+	);
+	console.log('seed512 Buffer: ' + seed512Buffer);
+	const seed512ArrayUint8 = Array.from(new Uint8Array(seed512Buffer));
+	console.log('seed512ArrayUint8: ' + seed512ArrayUint8);
+	const seed512ArrHex = seed512ArrayUint8.map(b => b.toString(16).padStart(2, '0'));
+	console.log('seed512 hex: ' + seed512ArrHex);
+	
+	//console.log('Derived 512 bit key: ' + seed512Array);
+}
+
 //computeCodeWords(entropy128);
 async function computeCodeWords(entropy){
     // 2. Create a checksum of the random sequence by taking the first few bits of its SHA256 hash.
@@ -127,7 +166,9 @@ async function computeCodeWords(entropy){
         // parseInt converts a string to a number with the given base.
         wordArray.push(wordListArray[parseInt(numberWordArray[n], 2)]);
     }
-    console.log('Our mnemonic word array: ' + wordArray);
+    //console.log('Our mnemonic word array: ' + wordArray);
+	const words = wordArray.join(' ');
+    console.log('Our mnemonic word array: ' + words);
     return wordArray;
 }
 async function getEntropyBits() {
