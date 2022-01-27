@@ -23,83 +23,32 @@ async function compMasterKeyAndChainCode(entropy128){
 	var mnemonicSentence = await computeCodeWords(entropy128);
 	mnemonicSentence = mnemonicSentence.join(' ');			//This is DEFINITELY the 'password'
 	console.log('mnemonic sentence: ' + mnemonicSentence);
-	// Produce keys, using PBKDF2, of 512 bits.
 	const password = ''						// Showing this for transparency into bip39
-	var salt = 'mnemonic' + password		// Specified by bip39 - DEFINITELY the 'salt'
-	// These should DEFINITELY be correct
-	salt = salt.normalize('NFKD', 'utf8');
-	mnemonicSentence = mnemonicSentence.normalize('NFKD', 'utf8');
-	var pass = new TextEncoder().encode(mnemonicSentence);
-	console.log('salt normalized: ' + salt);
-	console.log('saltnorm type: ' + typeof salt);
-/*
-	const saltArr = new Array();
-	for (var i = 0; i < salt.length; i++) {
-		//saltArr.push(salt.substring(i).charCodeAt(0).toString(2));
-		saltArr.push(parseInt(salt.charCodeAt(i).toString(2), 2));
-	}
-	console.log("saltArr: " + saltArr);
-	console.log("type of saltArr[0]: " + typeof saltArr[0]);
-	const saltBuff = new ArrayBuffer(saltArr);
-*/
-	const mneBuff = new ArrayBuffer(mnemonicSentence);
-	const saltBuff = new ArrayBuffer(salt);
-	//const key = crypto.subtle.pbkdf2(mneBuff, saltBuff, 2048, 64, 'sha512');
-	//console.log('key: ' + key);
-	//console.log('saltBuff: ' + saltBuff);
+	const salt = 'mnemonic' + password		// Specified by bip39 - DEFINITELY the 'salt'
+	console.log('salt: ' + salt);
+	const saltBuffer = new TextEncoder().encode(salt);
+	const arrayBufferKey = new TextEncoder().encode(mnemonicSentence);
+
+
+
 	const seed512key = await window.crypto.subtle.importKey(
 		"raw",
-		mneBuff,				//The 'password' which is the mnemonic phrase (with a space delimiter)
+		arrayBufferKey,		//The 'password' which is the mnemonic phrase (with a space delimiter)
 		"PBKDF2",
-		false,					//KDF keys must be 'false'
+		false,				//KDF keys must be 'false'
 		["deriveBits", "deriveKey"]
 	);
-/*
+
 	const seed512Buffer = await window.crypto.subtle.deriveBits(
 		{
 			"name": "PBKDF2",
-			salt: saltBuff,
+			salt: saltBuffer,
 			"iterations": 2048,
 			"hash": "SHA-512"
 		},
 		seed512key,
 		512
 	);
-	console.log('seed512 Buffer: ' + seed512Buffer);
-	const seed512ArrayUint8 = Array.from(new Uint8Array(seed512Buffer));
-	console.log('seed512ArrayUint8: ' + seed512ArrayUint8);
-	const seed512ArrHex = seed512ArrayUint8.map(b => b.toString(16).padStart(2, '0'));
-	console.log('seed512 hex: ' + seed512ArrHex);
-*/
-	const seed512keyDerived = await window.crypto.subtle.deriveKey(	//Returns a CryptoKey object
-		//algorithm: pbkdf2params object
-		{
-			"name": "PBKDF2",
-			salt: saltBuff,
-			"iterations": 2048,
-			"hash": "SHA-512"
-		},
-		seed512key,					//baseKey: CryptoKey return. includes 'salt'
-		{							//derivedKeyAlgorithm: HMAC-object: HmacKeyGenParams
-			name: "HMAC",
-			hash: {name: "SHA-512"},
-			length: 512
-		},
-		true,				//extractable: true
-		["sign", "verify"]		//keyUsages: deriveBits //I think
-	);
-
-	const seed512Buffer = await window.crypto.subtle.deriveBits(
-		{
-			"name": "PBKDF2",
-			salt: saltBuff,
-			"iterations": 2048,
-			"hash": "SHA-512"
-		},
-		seed512keyDerived,
-		512
-	);
-	console.log('seed512 Buffer: ' + seed512Buffer);
 	const seed512ArrayUint8 = Array.from(new Uint8Array(seed512Buffer));
 	console.log('seed512ArrayUint8: ' + seed512ArrayUint8);
 	const seed512ArrHex = seed512ArrayUint8.map(b => b.toString(16).padStart(2, '0'));
