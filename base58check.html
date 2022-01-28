@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<body>
+<script src="wordlist_english.js"></script>
+<script>
+console.log(wordListArray[0])
+
+// Set of base58 chars
+const base58 = [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+];
+console.log('1: ' + base58[0]);
+console.log('check A: ' + base58[9]);
+// set of base58 chars looks to be working. moving on...
+
+// can't read len's perl code, moving to python implementation I found:
+// https://rosettacode.org/wiki/Base58Check_encoding#Python
+//result = '';
+//num = 60;
+//r = num % 58;
+//console.log('r, should be 2: ' + r);
+
+//check this number is correct:
+console.log('0x61: ' + Number('0x61'));
+console.log('0x61: ' + convert_to_base58(Number('0x61')));
+console.log('0x10c8511e ' + convert_to_base58(Number('0x10c8511e')));
+function convert_to_base58(num){
+	result = '';
+	var r = ''
+	var sb = '';
+	while(num > 0){
+		r = num % 58;
+		sb = sb + base58[r];
+		num = Math.floor(num/58);
+		console.log('num: ' + num);
+	}
+	return sb.split('').reverse().join('');;
+}
+//Looks like the converter works!~
+
+
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
