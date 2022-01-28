@@ -19,6 +19,14 @@ async function testPhrase() {
 	}else{
 		console.log('Verification of mnemonic phrase failed!');
 	}
+	const seed = await computeSeed512(phrase);
+	console.log('computed 512 bit seed in hex: ' + seed);
+}
+
+function buf2hex(buffer) { // buffer is an ArrayBuffer
+  return [...new Uint8Array(buffer)]
+      .map(x => x.toString(16).padStart(2, '0'))
+      .join('');
 }
 
 function numberArrToBinaryStrArr(numberArray){
@@ -28,6 +36,55 @@ function numberArrToBinaryStrArr(numberArray){
 async function get256HashArray(entropy){
 	const hashBuffer = await crypto.subtle.digest('SHA-256', entropy);		// hash the message
 	return Array.from(new Uint8Array(hashBuffer));								// convert buffer to byte array
+}
+
+async function computeSeed512(mnemonicPhrase, in_password){
+	if( typeof password !== 'undefined'){
+		password = in_password;
+	}else{
+		password = '';
+	}
+    const salt = 'mnemonic' + password;
+	console.log(salt);
+    const normsalt = salt.normalize('NFKD', 'utf8');
+    // For PBKDF2 to work properly, inputs must be in uint8 ArrayBuffer format.
+    const saltArrayBuffer = new TextEncoder().encode(normsalt);
+    const phraseArrayBuffer = new TextEncoder().encode(mnemonicPhrase);
+
+    // Construct pbkdf2params object.
+    const pbkdf2params_object =
+        {
+            "name": "PBKDF2",       // Identifies this as a pbkdf2params object.
+            salt: saltArrayBuffer,      // Cryptographic salt.
+            "iterations": 2048,     // Number of iterations.
+            "hash": "SHA-512"       // Hash digest algorithm identifier.
+        };
+    //CryptoKey object needed for deriveBits() to perform PBKDF2.
+    const pbkdf2_cryptokey = await crypto.subtle.importKey(
+        //Format of data. Raw is used for HMAC keys.
+        "raw",
+        //Raw key supplied as ArrayBuffer.
+        phraseArrayBuffer,
+        // Dictionary object defining the type of key to import.
+        "PBKDF2",
+        // W3C requires this to be 'false' for PBKDF2.
+        false,
+        //How the key will be used.
+        ["deriveBits"]
+
+    );
+
+    //ArrayBuffer holding 512 bits produced from PBKDF2.
+    const derived_512_bits_from_PBKDF2 = await crypto.subtle.deriveBits(
+        //Specific algorithm. In our case: Pbkdf2Params dictionary object.
+        pbkdf2params_object,
+        //CryptoKey object. For PBKDF2, comes from importKey().
+        pbkdf2_cryptokey,
+        //The number of bits to derive.
+        512
+    );
+
+    return buf2hex(derived_512_bits_from_PBKDF2);
 }
 
 // Generate a mnemonic phrase with entropy generated from the subtlecrypto library.
