@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<body>
+<script>
+
+//Form salt according to BIP-39.
+const optional_password = '';
+
+//Aaron's code.  This salt is in line with BIP-39, but breaks PBKDF2 function below.
+var broken_salt1 = 'mnemonic' + optional_password;
+//Normalize appears to do nothing.
+var broken_salt2 = broken_salt1.normalize('NFKD', 'utf8');
+console.log(broken_salt1);
+console.log(broken_salt2);
+console.log("Is the normalized salt the same?  ");
+console.log(broken_salt1 == broken_salt2);
+
+//Old salt works fine, but isn't valid for BIP-39.
+var old_salt = window.crypto.getRandomValues(new Uint8Array(16));
+console.log(old_salt);
+
+//Moving forward: try to create new salt in line with BIP-39
+
+//Tried this line:
+// const saltBuffer = Buffer.from(salt(normalize(password)), 'utf8');
+//from: https://github.com/bitcoinjs/bip39/blob/master/src/index.js
+//but results in error, because Buffer.from is a nodejs function: https://www.w3schools.com/nodejs/met_buffer_from.asp
+//produces error when saltBuffer is in our pbkdf2params object:
+//const saltBuffer = Buffer.from(salt, 'utf8');
+
+//Time to look closer at the Web Cryptography structure of a salt...
+
+//But before that deep-dive, first, how did Ian Coleman do it?
+//What? He used Buffer.from() too! How does it work in the browser for him?
+//Internet: how can Buffer.from() be used in the browser?
+//Stack: https://stackoverflow.com/questions/56237161/how-can-i-use-node-js-buffer-library-in-client-side-javascript
+//Use feross library: https://github.com/feross/buffer
+
+//Current plan:
+//Use feross library to get Buffer.from to work in browser.
+//Verify that our PBKDF2 function below is now once again unbroken.
+//Then, remove the feross library, and do what we need without this external library.
+
+//If this plan is unworkable, continue forth in deep dive on salt.
+
+//https://w3c.github.io/webcrypto/#hkdf-operations shows salt value
+//clicking on "contents of" brings us here: https://w3c.github.io/webcrypto/#concept-contents-of-arraybuffer
+//this informs of of an ArrayBuffer of contiguous bytes
+//which is "is equal to the result of getting a copy of the bytes held data"
+//which brings us here: https://webidl.spec.whatwg.org/#dfn-get-buffer-source-copy
+//which looks like its browser level code (not javascript) fancily saying its just an ArrayBuffer of bytes.
+
+//So how to convert our string above to an ArrayBuffer of bytes?
+//stack: https://stackoverflow.com/questions/6965107/converting-between-strings-and-arraybuffers
+//Use TextEncoder for utf-8 encoding.
+//So we try this, and PBKDF2 runs.
+
+//Put salt in ArrayBuffer as utf-8.
+const saltArrayBuffer = new TextEncoder().encode(broken_salt2);
+console.log ("salty array:");
+console.log (saltArrayBuffer);
+
+const bip_39_salt = saltArrayBuffer;
+
+
+//Let's try the same thing with ArrayBuffer Key.
+//Use learnmeabitcoin example words for comparison of output: https://learnmeabitcoin.com/technical/mnemonic
+const learnmewords = "punch shock entire north file identify";
+const learnmewordsArrayBuffer = new TextEncoder().encode(learnmewords);
+arraybufferkey = learnmewordsArrayBuffer;
+
+
+
+//example arraybuffer used as key, not real
+//var random = window.crypto.getRandomValues(new Uint8Array(16));
+//arraybufferkey = random.buffer;
+
+
+const pbkdf2params_object =
+	{
+		"name": "PBKDF2",
+		salt: bip_39_salt,
+		"iterations": 2048,
+		"hash": "SHA-512"
+	}
+
+async function crypto_api_work() {
+	//CryptoKey object needed for deriveBits() to perform PBKDF2.
+	const pbkdf2_cryptokey = await crypto.subtle.importKey(
+		//Format of data. Raw is used for HMAC keys.
+		"raw",
+		//Raw key supplied as ArrayBuffer.
+		arraybufferkey,
+		//Algorithm dictionary object. Do we want an HmacImportParams object, or PBKDF2 as a string here?  Presumably PBKDF2.
+		"PBKDF2",
+		//Should the key be extractable for exportKey()?  I don't think so.
+		false,
+		//How should the key be used?  Probably deriveBits(), and maybe deriveKey().
+		["deriveBits"]
+
+	);
+
+	//ArrayBuffer holding 512 bits produced from PBKDF2.
+	const derived_512_bits_from_PBKDF2 = await crypto.subtle.deriveBits(
+		//Specific algorithm. In our case: Pbkdf2Params dictionary object.
+		pbkdf2params_object,
+		//CryptoKey object. For PBKDF2, comes from importKey().
+		pbkdf2_cryptokey,
+		//The number of bits to derive.
+		512 
+	);
+
+	console.log("512 bits from PBKDF2:");
+	console.log(derived_512_bits_from_PBKDF2);
+
+	console.log(buf2hex(derived_512_bits_from_PBKDF2));
+
+}
+
+function buf2hex(buffer) { // buffer is an ArrayBuffer
+  return [...new Uint8Array(buffer)]
+	  .map(x => x.toString(16).padStart(2, '0'))
+	  .join('');
+}
+
+crypto_api_work();
+
+
+</script>
+</body>
+</html>
