@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+
+<body>
+
+<script src="wordlist_english.js"></script>
+<script src="crypto.js"></script>
+<script>
+console.log(wordListArray[0])
+
+testPhrase();
+async function testPhrase() {
+	// Get string a string of the mnemonic sentence.
+	const phrase = await computeMnemonicPhrase();
+	console.log('Mnemonic Phrase: ' + phrase);
+	if(verifyMnemonicPhrase(phrase)){
+		console.log('Mnemonic phrase verified!');
+	}else{
+		console.log('Verification of mnemonic phrase failed!');
+	}
+	const seed = await computeSeed512(phrase);
+	console.log('computed 512 bit seed in hex: ' + seed);
+}
+
+
+</script>
+
+</body>
+
+</html>
