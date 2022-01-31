@@ -42,6 +42,7 @@ function convert_to_base58(num){
 
 
 function base58check(payload_data, versionByte){
+// From the bitcoin wiki: https://en.bitcoin.it/wiki/Base58Check_encoding
 //Take the version byte and payload bytes, and concatenate them together (bytewise).
 //Take the first four bytes of SHA256(SHA256(results of step 1))
 //Concatenate the results of step 1 and the results of step 2 together (bytewise).
