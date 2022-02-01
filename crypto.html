@@ -35,7 +35,7 @@ function numberArrToBinaryStrArr(numberArray){
 
 async function get256HashArray(entropy){
 	const hashBuffer = await crypto.subtle.digest('SHA-256', entropy);		// hash the message
-	return Array.from(new Uint8Array(hashBuffer));								// convert buffer to byte array
+	return Array.from(new Uint8Array(hashBuffer));							// convert buffer to byte array
 }
 
 async function computeSeed512(mnemonicPhrase, in_password){
@@ -55,7 +55,7 @@ async function computeSeed512(mnemonicPhrase, in_password){
     const pbkdf2params_object =
         {
             "name": "PBKDF2",       // Identifies this as a pbkdf2params object.
-            salt: saltArrayBuffer,      // Cryptographic salt.
+            salt: saltArrayBuffer,	// Cryptographic salt.
             "iterations": 2048,     // Number of iterations.
             "hash": "SHA-512"       // Hash digest algorithm identifier.
         };
