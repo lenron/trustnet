@@ -42,11 +42,26 @@ function convert_to_base58(num){
 //Looks like the converter works!~
 
 
+// Testing with known inputs:
+// mnemonic phrase: 'neglect time recycle convince produce tiny blue girl senior sense damage uniform'
+// 512 bit seed: 969dd291ec4af4df61193c2b5ff3f3f5e1c46fe2564f6e286d5c45020e1b1783f10b11bbb8d0e9422fb0adb90ffa16f0b6d01aa765ec3734a0cc4ce3c5291861
+// xprv from ian computer: xprv9s21ZrQH143K3mc3aZGAZfkkouBXKVPG3EyDTvFRhsjmVCwqZcShTiVXqXV4uuDLKbMcFa7nhgnWyJ8dSpymvBxPigtVdQf6hh9w2QQr8b8
+seed512 = '969dd291ec4af4df61193c2b5ff3f3f5e1c46fe2564f6e286d5c45020e1b1783f10b11bbb8d0e9422fb0adb90ffa16f0b6d01aa765ec3734a0cc4ce3c5291861'
 
+
+// First take the left 256 bits (64 byte halves in this case)
+left256_hex = seed512.substring(0,64);
+console.log('left 256 bits in hex: ' + left256_hex);
+console.log('length of left256 in byte halves: ' + left256_hex.length);
+
+payload = left256_hex;
+version = '0488ADE4';
+console.log('computed xprv key without prefix: ' + base58check(payload, version));
 // From https://en.bitcoin.it/wiki/BIP_0032
 // base58check function. Version bytes according to BIP32 for:
-// xpriv:	0x0488ADE4
+// xprv:	0x0488ADE4
 // xpub:	0x0488B21E
+// Takes hex string as input for now.
 function base58check(payload_data, versionByte){
 	
 
