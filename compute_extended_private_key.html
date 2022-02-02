@@ -25,43 +25,83 @@ computeChecksum(input);
 // taking the first 4 bytes: dc7a3ddb
 // Success! Now we know our computeChecksum function works. Moving on...
 // 
+// Next step, figure out what exactly is going on in the HMAC function.
+// In section 1, also at https://learnmeabitcoin.com/technical/extended-keys#serialization
+// Like the salt for PBKDF2, HMAC-SHA512 wants a key. In bitcoin's case: 'Bitcoin seed'
+// I found a subtlecrypto implementation here 
+// https://stackoverflow.com/questions/47329132/how-to-get-hmac-with-crypto-web-api
 
+// Try data computed at the same learnme serialization site:
+// private key: 1a0000814dafc5a3695629bf458c3d2f90f0e995d1bb5dbb7c1dd6c50fdde720
+// chain code:  a5877bb24b78d82af212fae3474dafe275383c8ad6929d1e41b0058d89129aba
+seed = '571ae597480e9fa150f8d972b6ca27ad9f456bc9c98e41f5d2d15a136f1a549e1cf0dc6cf77441e1b07f3fff32001d3a25f78c4ef8fd4ace10642a41cfefc60f';
+hmac_sha512(seed);
 
+// Success. 
 
+async function hmac_sha512(data){
+	// Encode the key.
+	const key = 'Bitcoin seed';
+	const key_enc = new TextEncoder().encode(key);
+
+	// Encode the hex data
+	const data_encoded = hex_string_to_ArrayBuffer(data);
+
+	const imported_key = await crypto.subtle.importKey(
+	    "raw", // raw format of the key - should be Uint8Array
+		key_enc, 
+		{ // algorithm details
+			name: "HMAC",
+			hash: {name: "SHA-512"}
+		},
+		false, // export = false
+		["sign"] // what this key can do
+	);
+
+	const signature = await crypto.subtle.sign(
+        "HMAC",
+        imported_key,
+        data_encoded
+    );
+	console.log('signature: ' + buf2hex(signature));
+}
 
 async function computeChecksum(payload) {
 
-	// Code from previous draft
+	// Encode payload data into ArrayBuffer.
+	const hexArrayBuffer = hex_string_to_ArrayBuffer(payload);
 
-    // convert to hex str array
-    const pay_and_pre_hex_str_array = new Array;
-    for(var i=0; i <payload.length; i+=2){
-        // I think this might be where the error is.
-        pay_and_pre_hex_str_array.push(payload.substring(i, i+2));
-        //console.log(
-    }
-    console.log('hex string array: ' + pay_and_pre_hex_str_array);
-
-    const pay_and_pre_bytes_arr = new Array;
-    for(var i=0; i < pay_and_pre_hex_str_array.length; i++){
-        pay_and_pre_bytes_arr.push(parseInt(pay_and_pre_hex_str_array[i], 16));
-    }
-    console.log('number array: ' + pay_and_pre_bytes_arr);
-
-    const pay_and_pre_uint8 = new Uint8Array(pay_and_pre_bytes_arr);
-    console.log('pay_and_pre_uint8: ' + pay_and_pre_uint8);
-
-    // Still getting the error with this input somehow!
-    //var entropy = new Uint8Array(16);
-    //crypto.getRandomValues(entropy);
-
-    const hashBuffer256 = await crypto.subtle.digest('SHA-256', pay_and_pre_uint8);
+    const hashBuffer256 = await crypto.subtle.digest('SHA-256', hexArrayBuffer);
     const double256 = await crypto.subtle.digest('SHA-256', hashBuffer256);
     const hashArray = Array.from(new Uint8Array(double256));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     console.log(hashHex);
     return hashHex;	
+}
+
+// This function could probably be condensed one more line.
+function hex_string_to_ArrayBuffer(hexString){
+
+    // convert to hex str array
+    const hexStringArray = new Array;
+    for(var i=0; i < hexString.length; i+=2){
+        // I think this might be where the error is.
+        hexStringArray.push(hexString.substring(i, i+2));
+        //console.log(
+    }
+    //console.log('hex string array: ' + hexStringArray);
+
+    const hexBytesArray = new Array;
+    for(var i=0; i < hexStringArray.length; i++){
+        hexBytesArray.push(parseInt(hexStringArray[i], 16));
+    }
+    //console.log('number array: ' + hexBytesArray);
+
+    const hexArrayBuffer = new Uint8Array(hexBytesArray);
+    //console.log('pay_and_pre_uint8: ' + hexArrayBuffer);
+
+	return hexArrayBuffer;
 }
 
 
