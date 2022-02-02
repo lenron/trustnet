@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+
+<body>
+
+<script src="wordlist_english.js"></script>
+<script src="crypto.js"></script>
+<script>
+console.log(wordListArray[0])
+
+// I found some code and direction which looks promising at
+// https://learnmeabitcoin.com/technical/extended-keys#serialization
+// the xprv prefix is the same as on ian's generator.
+
+// Let's see if we can compute the same checksum that is computed here
+// https://learnmeabitcoin.com/technical/checksum
+
+input = '0488ade4000000000000000000a5877bb24b78d82af212fae3474dafe275383c8ad6929d1e41b0058d89129aba001a0000814dafc5a3695629bf458c3d2f90f0e995d1bb5dbb7c1dd6c50fdde720';
+expected = 'dc7a3ddb';
+computeChecksum(input);
+
+// result: dc7a3ddb32f066e669065b8b5f7a57cb9f59c7256f8b8aac22a7db663e5079d8
+// taking the first 4 bytes: dc7a3ddb
+// Success! Now we know our computeChecksum function works. Moving on...
+// 
+
+
+
+
+async function computeChecksum(payload) {
+
+	// Code from previous draft
+
+    // convert to hex str array
+    const pay_and_pre_hex_str_array = new Array;
+    for(var i=0; i <payload.length; i+=2){
+        // I think this might be where the error is.
+        pay_and_pre_hex_str_array.push(payload.substring(i, i+2));
+        //console.log(
+    }
+    console.log('hex string array: ' + pay_and_pre_hex_str_array);
+
+    const pay_and_pre_bytes_arr = new Array;
+    for(var i=0; i < pay_and_pre_hex_str_array.length; i++){
+        pay_and_pre_bytes_arr.push(parseInt(pay_and_pre_hex_str_array[i], 16));
+    }
+    console.log('number array: ' + pay_and_pre_bytes_arr);
+
+    const pay_and_pre_uint8 = new Uint8Array(pay_and_pre_bytes_arr);
+    console.log('pay_and_pre_uint8: ' + pay_and_pre_uint8);
+
+    // Still getting the error with this input somehow!
+    //var entropy = new Uint8Array(16);
+    //crypto.getRandomValues(entropy);
+
+    const hashBuffer256 = await crypto.subtle.digest('SHA-256', pay_and_pre_uint8);
+    const double256 = await crypto.subtle.digest('SHA-256', hashBuffer256);
+    const hashArray = Array.from(new Uint8Array(double256));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    console.log(hashHex);
+    return hashHex;	
+}
+
+
+</script>
+
+</body>
+
+</html>
