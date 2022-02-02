@@ -90,8 +90,8 @@ async function base58check(payload_data, versionByte){
 		//console.log(typeof preAndPayArray[i]);
 	}
 */
-	const 256_hash_buffer = await crypto.subtle.digest('SHA-256', buffer);
-	//const dbl_256_hash_buffer = await crypto.subtle.digest('SHA-256', 256_hash_buffer);
+	const hashBuffer256 = await crypto.subtle.digest('SHA-256', buffer);
+	//const dbl_256_hash_buffer = await crypto.subtle.digest('SHA-256', hashBuffer256);
 	//const hashArray = Array.from(new Uint8Array(256_hash_buffer));
   	//const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   	//return hashHex;

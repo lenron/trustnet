@@ -2,23 +2,23 @@
 <html>
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <meta content="utf-8" http-equiv="encoding">
-
 <body>
-
-<script src="wordlist_english.js"></script>
-<script src="crypto.js"></script>
 <script>
-console.log(wordListArray[0])
 
-testDoubleSha256();
-async function testDoubleSha256() {
+input = '0488ade4000000000000000000a5877bb24b78d82af212fae3474dafe275383c8ad6929d1e41b0058d89129aba001a0000814dafc5a3695629bf458c3d2f90f0e995d1bb5dbb7c1dd6c50fdde720';
+testDoubleSha256(input);
+async function testDoubleSha256(payload) {
+
 	// Hard code for testing
-	const payload_and_prefix = '0488ade4969dd291ec4af4df61193c2b5ff3f3f5e1c46fe2564f6e286d5c45020e1b1783';
+	//const payload_and_prefix = "0488ade4969dd291ec4af4df61193c2b5ff3f3f5e1c46fe2564f6e286d5c45020e1b1783f10b11bbb8d0e9422fb0adb90ffa16f0b6d01aa765ec3734a0cc4ce3c5291861";
+	// seed512raw = "969dd291ec4af4df61193c2b5ff3f3f5e1c46fe2564f6e286d5c45020e1b1783f10b11bbb8d0e9422fb0adb90ffa16f0b6d01aa765ec3734a0cc4ce3c5291861";
 
 	// convert to hex str array
 	const pay_and_pre_hex_str_array = new Array;
-	for(var i=0; i <payload_and_prefix.length; i+=2){
-		pay_and_pre_hex_str_array.push(payload_and_prefix.substring(i, i+2));
+	for(var i=0; i <payload.length; i+=2){
+		// I think this might be where the error is.
+		pay_and_pre_hex_str_array.push(payload.substring(i, i+2));
+		//console.log(
 	}
 	console.log('hex string array: ' + pay_and_pre_hex_str_array);
 
@@ -29,17 +29,44 @@ async function testDoubleSha256() {
 	console.log('number array: ' + pay_and_pre_bytes_arr);
 
 	const pay_and_pre_uint8 = new Uint8Array(pay_and_pre_bytes_arr);
+	console.log('pay_and_pre_uint8: ' + pay_and_pre_uint8);
 
-/*
-    const 256_hash_buffer = await crypto.subtle.digest('SHA-256', pay_and_pre_uint8);
-    //const dbl_256_hash_buffer = await crypto.subtle.digest('SHA-256', 256_hash_buffer);
-    const hashArray = Array.from(new Uint8Array(256_hash_buffer));
+	// Still getting the error with this input somehow!
+	//var entropy = new Uint8Array(16);
+	//crypto.getRandomValues(entropy);
+
+    const hashBuffer256 = await crypto.subtle.digest('SHA-256', pay_and_pre_uint8);
+    const double256 = await crypto.subtle.digest('SHA-256', hashBuffer256);
+    const hashArray = Array.from(new Uint8Array(double256));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     //return hashHex;
     console.log(hashHex);
-*/
 
+	return hashHex;
 }
+
+const base58 = [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+];
+
+function convert_to_base58(num){
+    result = '';
+    var r = ''
+    var sb = '';
+    while(num > 0){
+        r = num % 58;
+        sb = sb + base58[r];
+        num = Math.floor(num/58);
+        //console.log('num: ' + num);
+    }
+    return sb.split('').reverse().join('');
+}
+
+convert = '0488ade4969dd291ec4af4df61193c2b5ff3f3f5e1c46fe2564f6e286d5c45020e1b1783f10b11bbb8d0e9422fb0adb90ffa16f0b6d01aa765ec3734a0cc4ce3c529186171b4e223';
+//console.log('xprv: ' + convert_to_base58(Number('0x' + convert)));
+// 
+console.log(convert_to_base58(Number('0x' + '')));
+
 /*
 	const buffer = new Uint8Array(36);
     for(var i=0; i < payload_and_prefix.length; i+=2){
@@ -48,7 +75,5 @@ async function testDoubleSha256() {
 	console.log('buffer: ' + buffer);
 */
 </script>
-
 </body>
-
 </html>
