@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+
+<body>
+
+<script src="js_include_files/wordlist_english.js"></script>
+<script>
+console.log(wordListArray[1])
+
+async function run_async (){
+
+}
+
+// Takes no inputs
+// Returns array of mnemonic sentence, seed, xprv respectively
+async function mnemonic_gen_to_xprv (){
+
+
+
+	const return_arr = [];
+	return return_arr;
+
+}
+
+async function compute_xprv_key(chain, key){
+	console.log('chain: ' + chain);
+	console.log('key: ' + key);
+	// Prepend 00 for private keys
+	const priv_key = '00' + key;
+
+	// Start the base58 encoded key with 'xprv'
+	const version = '0488ade4';
+
+	// For Master root extended private key, we start at 0 for several values.
+	const depth = '00';
+	const index = '00000000';
+	const fingerprint = '00000000';
+
+	const serialized = version + depth + fingerprint + index + chain + priv_key;
+	console.log('serialized: ' + serialized);
+	const checksum_long = await computeChecksum(serialized);
+	const checksum = checksum_long.substring(0,8);
+	console.log('checksum: ' + checksum);
+	var extended_private_key = encode_b58(serialized + checksum);
+	console.log('the xprv: ' + extended_private_key);
+}
+
+function encode_b58(hex_number) {
+    // Set of base58 chars
+    const base58 = [1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+
+    // Convert hex string into a number for processing.
+    // Default numbers in java are computed to only 16 significant digits.
+    var num = BigInt(Number.MAX_SAFE_INTEGER);
+    var input = '0x' + hex_number;
+    num = BigInt(input);
+
+    var remainder = '';
+    // Create empty string to hold encoded base58 chars.
+    var encoded_buffer = '';
+    while(num > 0){
+        // The remainder represents the next base58 digit.
+        remainder = num % BigInt(58);
+        // Add the corresponding base58 digit on the left of our encoded string.
+        encoded_buffer = base58[remainder] + encoded_buffer;
+        // integer division
+        num = num/BigInt(58);
+    }
+
+    // Bitcoin spec requires us to convert leading zero pairs to 1's.
+    // When converted to a number, leading zeros are ignored.
+    // Thus we can convert them to 1's from the original hex string and
+    // attach them after the initial base58 encoding.
+    var num_leading_zero_pairs = 0;
+    const regex = /^00/g;
+    while (hex_number.match(regex)){
+        hex_number = hex_number.substring(2);
+        num_leading_zero_pairs++;
+    }
+    for(i=num_leading_zero_pairs; i > 0; i--){
+        encoded_buffer = '1' + encoded_buffer;
+    }
+
+    return encoded_buffer;
+}
+
+async function hmac_sha512(data){
+	// Encode the key.
+	const key = 'Bitcoin seed';
+	const key_enc = new TextEncoder().encode(key);
+
+	// Encode the hex data
+	const data_encoded = hex_string_to_ArrayBuffer(data);
+
+	const imported_key = await crypto.subtle.importKey(
+	    "raw", // raw format of the key - should be Uint8Array
+		key_enc, 
+		{ // algorithm details
+			name: "HMAC",
+			hash: {name: "SHA-512"}
+		},
+		false, // export = false
+		["sign"] // what this key can do
+	);
+
+	const signature = await crypto.subtle.sign(
+        "HMAC",
+        imported_key,
+        data_encoded
+    );
+	console.log('signature: ' + buf2hex(signature));
+}
+
+async function computeChecksum(payload) {
+
+	// Encode payload data into ArrayBuffer.
+	const hexArrayBuffer = hex_string_to_ArrayBuffer(payload);
+
+    const hashBuffer256 = await crypto.subtle.digest('SHA-256', hexArrayBuffer);
+    const double256 = await crypto.subtle.digest('SHA-256', hashBuffer256);
+    const hashArray = Array.from(new Uint8Array(double256));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    console.log(hashHex);
+    return hashHex;	
+}
+
+// This function could probably be condensed one more line.
+function hex_string_to_ArrayBuffer(hexString){
+
+    // convert to hex str array
+    const hexStringArray = new Array;
+    for(var i=0; i < hexString.length; i+=2){
+        // I think this might be where the error is.
+        hexStringArray.push(hexString.substring(i, i+2));
+        //console.log(
+    }
+    //console.log('hex string array: ' + hexStringArray);
+
+    const hexBytesArray = new Array;
+    for(var i=0; i < hexStringArray.length; i++){
+        hexBytesArray.push(parseInt(hexStringArray[i], 16));
+    }
+    //console.log('number array: ' + hexBytesArray);
+
+    const hexArrayBuffer = new Uint8Array(hexBytesArray);
+    //console.log('pay_and_pre_uint8: ' + hexArrayBuffer);
+
+	return hexArrayBuffer;
+}
+
+
+</script>
+
+</body>
+
+</html>
