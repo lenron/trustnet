@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+
+<body>
+
+<script src="wordlist_english.js"></script>
+<script src="crypto.js"></script>
+<script>
+console.log(wordListArray[1]);
+
+encode_this = '00123456789abcdef';
+//encode_this = '0093ce48570b55c42c2af816aeaba06cfee1224faebb6127fe';
+console.log('base58 encode: ' + encode_b58(encode_this));
+
+console.log('big number: ' + Number(12345678901234567890))
+function encode_b58(hex_number) {
+	// Set of base58 chars
+	const base58 = [1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+
+	// Convert hex string into a number for processing.
+	//var num = Number('0x' + hex_number);
+	var num = BigInt(Number.MAX_SAFE_INTEGER);
+	input = '0x' + hex_number;
+	num = BigInt(input);
+
+    var remainder = '';
+	// Create empty string to hold encoded base58 chars.
+    var encoded_buffer = '';
+    while(num > 0){
+        remainder = num % BigInt(58);
+        //encoded_buffer = encoded_buffer + base58[remainder];
+        encoded_buffer = base58[remainder] + encoded_buffer;
+		//console.log('remainder: ' + remainder + ' decoded: ' + base58[remainder]);
+		// integer division
+		//console.log('chambered integer division: ' + num + '/58');
+		//console.log('float division:             ' + num/58);
+        //num = Math.floor(num/BigInt(58));
+		num = num/BigInt(58);
+		//console.log('result of integer division: ' + num);
+        //console.log('num: ' + num);
+    }
+
+	// We need to convert leading zeros to 1's
+	var num_leading_zero_pairs = 0;
+	const regex = /^00/g;
+	while (hex_number.match(regex)){
+		hex_number = hex_number.substring(2);
+		
+		num_leading_zero_pairs++;
+	}
+	console.log('no leading zeros string: ' + hex_number);
+	console.log('lead zero pairs: ' + num_leading_zero_pairs);
+
+	for(i=num_leading_zero_pairs; i > 0; i--){
+		encoded_buffer = '1' + encoded_buffer;
+	}
+
+
+	// Reverses the encoded_buffer and returns it.
+    //return encoded_buffer.split('').reverse().join('');
+    return encoded_buffer;
+
+
+
+
+}
+
+
+</script>
+
+</body>
+
+</html>
