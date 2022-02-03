@@ -10,17 +10,30 @@
 <script>
 console.log(wordListArray[1]);
 
-encode_this = '00123456789abcdef';
-//encode_this = '0093ce48570b55c42c2af816aeaba06cfee1224faebb6127fe';
+//encode_this = '00123456789abcdef';
+encode_this = '0093ce48570b55c42c2af816aeaba06cfee1224faebb6127fe';
 console.log('base58 encode: ' + encode_b58(encode_this));
+console.log('expecting:     1EUXSxuUVy2PC5enGXR1a3yxbEjNWMHuem');
 
-console.log('big number: ' + Number(12345678901234567890))
+encode_this = '000111d38e5fc9071ffcd20b4a763cc9ae4f252bb4e48fd66a835e252ada93ff480d6dd43dc62a641155a5';
+console.log('base58 encode: ' + encode_b58(encode_this));
+console.log('expecting:     123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz');
+
+encode_this = '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff';
+console.log('base58 encode: ' + encode_b58(encode_this));
+console.log('expecting: 1cWB5HCBdLjAuqGGReWE3R3CguuwSjw6RHn39s2yuDRTS5NsBgNiFpWgAnEx6VQi8csexkgYw3mdYrMHr8x9i7aEwP8kZ7vccXWqKDvGv3u1GxFKPuAkn8JCPPGDMf3vMMnbzm6Nh9zh1gcNsMvH3ZNLmP5fSG6DGbbi2tuwMWPthr4boWwCxf7ewSgNQeacyozhKDDQQ1qL5fQFUW52QKUZDZ5fw3KXNQJMcNTcaB723LchjeKun7MuGW5qyCBZYzA1KjofN1gYBV3NqyhQJ3Ns746GNuf9N2pQPmHz4xpnSrrfCvy6TVVz5d4PdrjeshsWQwpZsZGzvbdAdN8MKV5QsBDY');
+
+
+encode_this = '00eb15231dfceb60925886b67d065299925915aeb172c06647';
+console.log('base58 encode: ' + encode_b58(encode_this));
+console.log('expecting:     1NS17iag9jJgTHD1VXjvLCEnZuQ3rJDE9L');
+
 function encode_b58(hex_number) {
 	// Set of base58 chars
 	const base58 = [1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
 
 	// Convert hex string into a number for processing.
-	//var num = Number('0x' + hex_number);
+	// Default numbers in java are computed to only 16 significant digits.
 	var num = BigInt(Number.MAX_SAFE_INTEGER);
 	input = '0x' + hex_number;
 	num = BigInt(input);
@@ -29,42 +42,29 @@ function encode_b58(hex_number) {
 	// Create empty string to hold encoded base58 chars.
     var encoded_buffer = '';
     while(num > 0){
+		// The remainder represents the next base58 digit.
         remainder = num % BigInt(58);
-        //encoded_buffer = encoded_buffer + base58[remainder];
+        // Add the corresponding base58 digit on the left of our encoded string.
         encoded_buffer = base58[remainder] + encoded_buffer;
-		//console.log('remainder: ' + remainder + ' decoded: ' + base58[remainder]);
 		// integer division
-		//console.log('chambered integer division: ' + num + '/58');
-		//console.log('float division:             ' + num/58);
-        //num = Math.floor(num/BigInt(58));
 		num = num/BigInt(58);
-		//console.log('result of integer division: ' + num);
-        //console.log('num: ' + num);
     }
 
-	// We need to convert leading zeros to 1's
+	// Bitcoin spec requires us to convert leading zero pairs to 1's.
+	// When converted to a number, leading zeros are ignored.
+	// Thus we can convert them to 1's from the original hex string and 
+	// attach them after the initial base58 encoding.
 	var num_leading_zero_pairs = 0;
 	const regex = /^00/g;
 	while (hex_number.match(regex)){
 		hex_number = hex_number.substring(2);
-		
 		num_leading_zero_pairs++;
 	}
-	console.log('no leading zeros string: ' + hex_number);
-	console.log('lead zero pairs: ' + num_leading_zero_pairs);
-
 	for(i=num_leading_zero_pairs; i > 0; i--){
 		encoded_buffer = '1' + encoded_buffer;
 	}
 
-
-	// Reverses the encoded_buffer and returns it.
-    //return encoded_buffer.split('').reverse().join('');
     return encoded_buffer;
-
-
-
-
 }
 
 
