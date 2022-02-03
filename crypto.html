@@ -38,6 +38,8 @@ async function get256HashArray(entropy){
 	return Array.from(new Uint8Array(hashBuffer));							// convert buffer to byte array
 }
 
+// Takes a mnemonic sentence and possibly a password as input.
+// Outputs the computed seed in a hex string.
 async function computeSeed512(mnemonicPhrase, in_password){
 	if( typeof password !== 'undefined'){
 		password = in_password;
