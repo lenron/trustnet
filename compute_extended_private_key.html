@@ -5,8 +5,8 @@
 
 <body>
 
-<script src="wordlist_english.js"></script>
-<script src="crypto.js"></script>
+<script src="js_include_files/wordlist_english.js"></script>
+<script src="js_include_files/crypto.js"></script>
 <script>
 console.log(wordListArray[0])
 
@@ -17,11 +17,11 @@ console.log(wordListArray[0])
 // Let's see if we can compute the same checksum that is computed here
 // https://learnmeabitcoin.com/technical/checksum
 
-/*
+
 const input = '0488ade4000000000000000000a5877bb24b78d82af212fae3474dafe275383c8ad6929d1e41b0058d89129aba001a0000814dafc5a3695629bf458c3d2f90f0e995d1bb5dbb7c1dd6c50fdde720';
 const expected = 'dc7a3ddb';
 computeChecksum(input);
-*/
+
 
 // result: dc7a3ddb32f066e669065b8b5f7a57cb9f59c7256f8b8aac22a7db663e5079d8
 // taking the first 4 bytes: dc7a3ddb
@@ -37,10 +37,10 @@ computeChecksum(input);
 // private key: 1a0000814dafc5a3695629bf458c3d2f90f0e995d1bb5dbb7c1dd6c50fdde720
 // chain code:  a5877bb24b78d82af212fae3474dafe275383c8ad6929d1e41b0058d89129aba
 
-/*
+
 const seed = '571ae597480e9fa150f8d972b6ca27ad9f456bc9c98e41f5d2d15a136f1a549e1cf0dc6cf77441e1b07f3fff32001d3a25f78c4ef8fd4ace10642a41cfefc60f';
 hmac_sha512(seed);
-*/
+
 
 // Success. Now putting it all together. Test vectors from same website.
 // version:     0488ade4     # puts "xprv" or "xpub" at the start after encoding to base58
@@ -57,11 +57,11 @@ hmac_sha512(seed);
 // serialized: 0488ade4000000000000000000a5877bb24b78d82af212fae3474dafe275383c8ad6929d1e41b0058d89129aba001a0000814dafc5a3695629bf458c3d2f90f0e995d1bb5dbb7c1dd6c50fdde720
 // base58 encoded with checksum:
 // xprv9s21ZrQH143K3hwbAy5RxkLkJv3SFYrE41zDnjftuadT4KGX9WTXPiwP67CsKJn2yDsyu96DxkWEfCn3fCUbjqhSa7Pi55yUd4xWDxurbdc
-/*
+
 chain_code = 'a5877bb24b78d82af212fae3474dafe275383c8ad6929d1e41b0058d89129aba';
 private_key = '1a0000814dafc5a3695629bf458c3d2f90f0e995d1bb5dbb7c1dd6c50fdde720';
 compute_xprv_key(chain_code, private_key);
-*/
+
 // Works. Check with computed mnemonic values:
 // mnemonic = 'neglect time recycle convince produce tiny blue girl senior sense damage uniform'
 // seed = '969dd291ec4af4df61193c2b5ff3f3f5e1c46fe2564f6e286d5c45020e1b1783f10b11bbb8d0e9422fb0adb90ffa16f0b6d01aa765ec3734a0cc4ce3c5291861'
