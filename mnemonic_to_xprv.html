@@ -9,8 +9,8 @@
 <script>
 console.log(wordListArray[1])
 
-run_async();
-async function run_async (){
+run_mne_to_xprv_test();
+async function run_mne_to_xprv_test (){
 	var computed_values = new Array();
 	computed_values = await mnemonic_gen_to_xprv();
 	console.log('mnemonic sentence: ' + computed_values[0]);
@@ -19,7 +19,7 @@ async function run_async (){
 }
 
 // Takes no inputs
-// Returns array of mnemonic sentence, seed, xprv respectively
+// Returns array containing mnemonic sentence, seed, xprv respectively
 async function mnemonic_gen_to_xprv (){
 
 	const mne_sentence = await computeMnemonicPhrase();
@@ -51,8 +51,6 @@ async function mnemonic_gen_to_xprv (){
 // Takes hex strings as input.
 // Outputs the xprv key encoded in base58.
 async function compute_xprv_key(chain, key){
-	//console.log('chain: ' + chain);
-	//console.log('key: ' + key);
 	// Prepend 00 for private keys
 	const priv_key = '00' + key;
 
@@ -113,15 +111,26 @@ function encode_b58(hex_number) {
     return encoded_buffer;
 }
 
-// Takes hex string as input and outputs a hex string.
-async function hmac_sha512(data){
-	// Encode the key.
-	const key = 'Bitcoin seed';
-	const key_enc = new TextEncoder().encode(key);
+// Takes hex string(s) as input and outputs a hex string.
+// Performs the HMAC-SHA512 hash.
+async function hmac_sha512(data, key){
+	// If no key is given, we are computing the root extended private key
+	if (typeof key == 'undefined'){
+		console.log('here');
+		// Encode the key.
+		const key = 'Bitcoin seed';
+		var key_enc = new TextEncoder().encode(key);
+		console.log(key);
+	}else{
+		console.log('1here');
+		// Any other input should be a hex string.
+		var key_enc = hex_string_to_ArrayBuffer(key);
+	}
 
 	// Encode the hex data
 	const data_encoded = hex_string_to_ArrayBuffer(data);
 
+	//CryptoKey object needed for deriveBits() to perform PBKDF2.
 	const imported_key = await crypto.subtle.importKey(
 	    "raw", // raw format of the key - should be Uint8Array
 		key_enc, 
@@ -133,6 +142,7 @@ async function hmac_sha512(data){
 		["sign"] // what this key can do
 	);
 
+	// Perform the HMAC-SHA512 hash
 	const signature = await crypto.subtle.sign(
         "HMAC",
         imported_key,
@@ -147,10 +157,10 @@ async function computeChecksum(payload) {
 	// Encode payload data into ArrayBuffer.
 	const hexArrayBuffer = hex_string_to_ArrayBuffer(payload);
 
+	// Bitcoin base58check uses a double sha-256 hash.
     const hashBuffer256 = await crypto.subtle.digest('SHA-256', hexArrayBuffer);
     const double256 = await crypto.subtle.digest('SHA-256', hashBuffer256);
-    const hashArray = Array.from(new Uint8Array(double256));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+	hashHex = buf2hex(double256);
 
     return hashHex;	
 }
@@ -308,23 +318,12 @@ async function get256HashArray(entropy){
 // This function could probably be condensed one more line.
 function hex_string_to_ArrayBuffer(hexString){
 
-    // convert to hex str array
-    const hexStringArray = new Array;
-    for(var i=0; i < hexString.length; i+=2){
-        // I think this might be where the error is.
-        hexStringArray.push(hexString.substring(i, i+2));
-        //console.log(
-    }
-    //console.log('hex string array: ' + hexStringArray);
-
+    // convert to a number array representing the hex bytes.
     const hexBytesArray = new Array;
-    for(var i=0; i < hexStringArray.length; i++){
-        hexBytesArray.push(parseInt(hexStringArray[i], 16));
+    for(var i=0; i < hexString.length; i+=2){
+        hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
     }
-    //console.log('number array: ' + hexBytesArray);
-
     const hexArrayBuffer = new Uint8Array(hexBytesArray);
-    //console.log('pay_and_pre_uint8: ' + hexArrayBuffer);
 
 	return hexArrayBuffer;
 }
