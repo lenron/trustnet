@@ -5,10 +5,12 @@
 
 <body>
 
-<script src="wordlist_english.js"></script>
+<script src="js_include_files/wordlist_english.js"></script>
 <script>
-console.log(wordListArray[0])
+console.log(wordListArray[1]);
 
+// This breaks the below test for some reason.
+/*
 testPhrase();
 async function testPhrase() {
 	// Get string a string of the mnemonic sentence.
@@ -21,6 +23,179 @@ async function testPhrase() {
 	}
 	const seed = await computeSeed512(phrase);
 	console.log('computed 512 bit seed in hex: ' + seed);
+}
+*/
+run_mne_to_xprv_test();
+async function run_mne_to_xprv_test (){
+    var computed_values = new Array();
+    computed_values = await mnemonic_gen_to_xprv();
+    console.log('mnemonic sentence: ' + computed_values[0]);
+    console.log('512 bit seed: ' + computed_values[1]);
+    console.log('root extended private key: ' + computed_values[2]);
+}
+
+// Takes no inputs
+// Returns array containing mnemonic sentence, seed, xprv respectively
+async function mnemonic_gen_to_xprv (){
+
+    const mne_sentence = await computeMnemonicPhrase();
+
+    if( verifyMnemonicPhrase(mne_sentence)){
+        console.log('mnemonic sentence verified!');
+    }else{
+        console.log('mnemonic sentence INVALID!');
+    }
+
+    seed512_hex = await computeSeed512(mne_sentence);
+    hmac_sha512_hashed_seed = await hmac_sha512(seed512_hex);
+    private_key_256 = hmac_sha512_hashed_seed.substring(0,64);
+    chain_code = hmac_sha512_hashed_seed.substring(64,128);
+    //console.log('hashed seed: ' + hmac_sha512_hashed_seed);
+    //console.log('private key: ' + private_key_256);
+    //console.log('chain code: ' + chain_code);
+
+    xprv_key = await compute_xprv_key(chain_code, private_key_256);
+
+    var return_arr = new Array();
+    return_arr[0] = mne_sentence;
+    return_arr[1] = seed512_hex;
+    return_arr[2] = xprv_key;
+
+    return return_arr;
+}
+
+// Takes hex strings as input.
+// Outputs the xprv key encoded in base58.
+async function compute_xprv_key(chain, key){
+    // Prepend 00 for private keys
+    const priv_key = '00' + key;
+
+    // Start the base58 encoded key with 'xprv'
+    const version = '0488ade4';
+
+    // For Master root extended private key, we start at 0 for several values.
+    const depth = '00';
+    const index = '00000000';
+    const fingerprint = '00000000';
+
+    const serialized = version + depth + fingerprint + index + chain + priv_key;
+    //console.log('serialized: ' + serialized);
+    const checksum_long = await computeChecksum(serialized);
+    const checksum = checksum_long.substring(0,8);
+    //console.log('checksum: ' + checksum);
+    var extended_private_key = encode_b58(serialized + checksum);
+    //console.log('the xprv: ' + extended_private_key);
+    return extended_private_key;
+}
+
+// Converts an inputted hex string into a base58 encoded number.
+// This function is for bitcoin, so leading '00's will be converted to a 1.
+function encode_b58(hex_number) {
+    // Set of base58 chars
+    const base58 = [1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+
+    // Convert hex string into a number for processing.
+    // Default numbers in java are computed to only 16 significant digits.
+    var num = BigInt(Number.MAX_SAFE_INTEGER);
+    // 0x tells BigInt that the hex_number is in hexadecimal
+    input = '0x' + hex_number;
+    num = BigInt(input);
+
+    // explain why this works as a number base conversion.
+    // We use a math trick to convert the number into base 58 that involves taking the remainder
+    // of a modulus operation and integer division.
+    var remainder = '';
+    // Create empty string to hold encoded base58 chars.
+    var encoded_buffer = '';
+    while(num > 0){
+        // The remainder represents the next base58 digit.
+        remainder = num % BigInt(58);
+        // Add the corresponding base58 digit on the left of our encoded string.
+        encoded_buffer = base58[remainder] + encoded_buffer;
+        // integer division
+        num = num/BigInt(58);
+    }
+
+    // Bitcoin spec requires us to convert leading zero pairs to 1's.
+    // When converted to a number, leading zeros are ignored.
+    // Thus we can convert them to 1's from the original hex string and
+    // attach them after the initial base58 encoding.
+    var num_leading_zero_pairs = 0;
+    const regex = /^00/g;
+    while (hex_number.match(regex)){
+        hex_number = hex_number.substring(2);
+        num_leading_zero_pairs++;
+    }
+    for(i=num_leading_zero_pairs; i > 0; i--){
+        encoded_buffer = '1' + encoded_buffer;
+    }
+
+    return encoded_buffer;
+}
+
+// Takes hex string(s) as input and outputs a hex string.
+// Performs the HMAC-SHA512 hash.
+async function hmac_sha512(data, key){
+    // If no key is given, we are computing the root extended private key
+    if (typeof key == 'undefined'){
+        // Encode the key.
+        const key = 'Bitcoin seed';
+        var key_enc = new TextEncoder().encode(key);
+    }else{
+        // Any other input should be a hex string.
+        var key_enc = hex_string_to_ArrayBuffer(key);
+    }
+
+    // Encode the hex data
+    const data_encoded = hex_string_to_ArrayBuffer(data);
+
+    //CryptoKey object needed for deriveBits() to perform PBKDF2.
+    const imported_key = await crypto.subtle.importKey(
+        "raw", // raw format of the key - should be Uint8Array
+        key_enc,
+        { // algorithm details
+            name: "HMAC",
+            hash: {name: "SHA-512"}
+        },
+        false, // export = false
+        ["sign"] // what this key can do
+    );
+
+    // Perform the HMAC-SHA512 hash
+    const signature = await crypto.subtle.sign(
+        "HMAC",
+        imported_key,
+        data_encoded
+    );
+    return buf2hex(signature);
+}
+
+
+// Takes hex string as input and outputs a hex string.
+async function computeChecksum(payload) {
+
+    // Encode payload data into ArrayBuffer.
+    const hexArrayBuffer = hex_string_to_ArrayBuffer(payload);
+
+    // Bitcoin base58check uses a double sha-256 hash.
+    const hashBuffer256 = await crypto.subtle.digest('SHA-256', hexArrayBuffer);
+    const double256 = await crypto.subtle.digest('SHA-256', hashBuffer256);
+    hashHex = buf2hex(double256);
+
+    return hashHex;
+}
+
+// This function converts a hex string into an ArrayBuffer for hash processing.
+function hex_string_to_ArrayBuffer(hexString){
+
+    // convert to a number array representing the hex bytes.
+    const hexBytesArray = new Array;
+    for(var i=0; i < hexString.length; i+=2){
+        hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
+    }
+    const hexArrayBuffer = new Uint8Array(hexBytesArray);
+
+    return hexArrayBuffer;
 }
 
 function buf2hex(buffer) { // buffer is an ArrayBuffer
@@ -47,7 +222,6 @@ async function computeSeed512(mnemonicPhrase, in_password){
 		password = '';
 	}
     const salt = 'mnemonic' + password;
-	console.log(salt);
     const normsalt = salt.normalize('NFKD', 'utf8');
     // For PBKDF2 to work properly, inputs must be in uint8 ArrayBuffer format.
     const saltArrayBuffer = new TextEncoder().encode(normsalt);
