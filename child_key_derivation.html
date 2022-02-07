@@ -29,21 +29,49 @@ async function test_keygen(){
 async function derive_hardened_child_private_key_and_chain_code(parent_chain_code, parent_private_key) {
 	// index of hardened keys must be between 2^31 and 2^32 - 1
 	// starts at m/2147483648
+	// I think this will have to be computed 
 	const index = 2147483648;
+
+	// The order of the elliptic curve defined in secp256k1 is a constant.
+	const n_order_hex = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
+	// To do any number processing in native javascript, we have to use a BigInt.
+	var n_order_int = BigInt('0x' + n_order_hex);
+
 	// index must be in hex string for concatenation
 	index_hex = index.toString(16).padStart(2, '0');
 	console.log('index_hex: ' + index_hex);
 
+	// use test values from learnme to make sure we're doing this right.
+	parent_chain_code = '463223aac10fb13f291a1bc76bc26003d98da661cb76df61e750c139826dea8b';
+	parent_private_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
 
 	// set up HMAC hash 
 	const data = '00' + parent_private_key + index_hex;
 	const key = parent_chain_code;
 
-	const intermediate_key = hmac_sha512(data, key);
+	const intermediate_key = await hmac_sha512(data, key);
 	console.log('intermediate_key: ' + intermediate_key);
-	// test results on monday!
+	const ikey_left = intermediate_key.substring(0,64);
+    const child_chain_code = intermediate_key.substring(64,128);
 
+	// Check if chain code is valid.
+	// I'm not sure why this check is important. I suspect there is a math reason.
+	// Warning text from learnmeabitcoin ruby code.
+	if (BigInt('0x' + child_chain_code) >= n_order_int){
+		throw 'Chain code is greater than the order of the curve. Try the next index.';
+	}
 
+	// Use scalar addition here
+	var child_private_key_int = BigInt(Number.MAX_SAFE_INTEGER);
+	child_private_key_int = (BigInt('0x' + ikey_left) + BigInt('0x' + parent_private_key)) % n_order_int;
+	child_private_key_hex = num2hex(child_private_key_int);
+	console.log('computed private key: ' + child_private_key_hex);
+	
+
+}
+
+function num2hex(integer){
+	return integer.toString(16).padStart(2, '0')
 }
 
 
