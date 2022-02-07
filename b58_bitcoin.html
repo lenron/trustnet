@@ -44,6 +44,7 @@ function encode_b58(hex_number) {
 	// explain why this works as a number base conversion.
 	// We use a math trick to convert the number into base 58 that involves taking the remainder
 	// of a modulus operation and integer division.
+	// Apparently instantiating this as an empty string doesn't cause any javascript problems.
     var remainder = '';
 	// Create empty string to hold encoded base58 chars.
     var encoded_buffer = '';
