@@ -36,11 +36,13 @@ async function test_keygen(){
 
 }
 
+
 // Takes parent private key and chain code and computes child key and chain code.
 // index input is a number, both parent inputs are hex strings.
 // I'm setting this function up to have the capability to derive public as well as private
 // child keys.  Indexes 2^31 to 2^32-1 will derive hardened children keys (able to derive child
 // private keys). Indexes 0 to 2^31-1 will derive normal children keys.
+// output array[0] == child key, output array[1] == child chain code.
 async function derive_child_key(parent_chain_code, parent_key, index) {
 	// index of hardened keys must be between 2^31 and 2^32 - 1
 	// starts at m/2147483648
@@ -75,10 +77,6 @@ async function derive_child_key(parent_chain_code, parent_key, index) {
 		// Recalculate using the next index.
 	}
 
-
-	
-	console.log('first two chars in key: ' + key.substring(0,2));
-
 	// Use scalar addition here
 	var child_key_int = BigInt(Number.MAX_SAFE_INTEGER);
 	child_key_int = (BigInt('0x' + ikey_left) + BigInt('0x' + parent_key)) % n_order_int;
@@ -97,7 +95,8 @@ function num2hex(integer){
 
 // Takes hex strings as input.
 // Outputs the xprv key encoded in base58.
-async function compute_extended_key(chain, key, depth, index, fingerprint){
+// For Master root extended private key, we start at 0 for several values.
+async function compute_extended_key(chain, key, depth = '00', index = '00000000', fingerprint = '00000000'){
 	var version = '';
 	// Check if key is private
 	if( key.substring(0,2) == '00'){
@@ -106,11 +105,6 @@ async function compute_extended_key(chain, key, depth, index, fingerprint){
 	}else{	// key is public, start encoded str with xpub
     	version = '0488B21E';
 	}
-
-    // For Master root extended private key, we start at 0 for several values.
-    depth = '00';
-    index = '00000000';
-    fingerprint = '00000000';
 
     const serialized = version + depth + fingerprint + index + chain + key;
     console.log('serialized: ' + serialized);
