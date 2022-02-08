@@ -21,6 +21,9 @@ async function test_keygen(){
 	const hashed_seed = await hmac_sha512(seed);
 	const private_key = hashed_seed.substring(0,64);
 	const chain_code = hashed_seed.substring(64,128);
+	const root_private_key = await compute_extended_key(chain_code, '00' + private_key);
+	console.log('root extended private key: ' + root_private_key);
+
 	// use test values from learnme to make sure we're doing this right.
 	//parent_chain_code = '463223aac10fb13f291a1bc76bc26003d98da661cb76df61e750c139826dea8b';
 	//parent_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
@@ -72,6 +75,10 @@ async function derive_child_key(parent_chain_code, parent_key, index) {
 		// Recalculate using the next index.
 	}
 
+
+	
+	console.log('first two chars in key: ' + key.substring(0,2));
+
 	// Use scalar addition here
 	var child_key_int = BigInt(Number.MAX_SAFE_INTEGER);
 	child_key_int = (BigInt('0x' + ikey_left) + BigInt('0x' + parent_key)) % n_order_int;
@@ -86,6 +93,78 @@ async function derive_child_key(parent_chain_code, parent_key, index) {
 
 function num2hex(integer){
 	return integer.toString(16).padStart(2, '0')
+}
+
+// Takes hex strings as input.
+// Outputs the xprv key encoded in base58.
+async function compute_extended_key(chain, key, depth, index, fingerprint){
+	var version = '';
+	// Check if key is private
+	if( key.substring(0,2) == '00'){
+		// key is private, starte encoded str with xprv
+    	version = '0488ADE4';
+	}else{	// key is public, start encoded str with xpub
+    	version = '0488B21E';
+	}
+
+    // For Master root extended private key, we start at 0 for several values.
+    depth = '00';
+    index = '00000000';
+    fingerprint = '00000000';
+
+    const serialized = version + depth + fingerprint + index + chain + key;
+    console.log('serialized: ' + serialized);
+    const checksum_long = await computeChecksum(serialized);
+    const checksum = checksum_long.substring(0,8);
+    //console.log('checksum: ' + checksum);
+    var extended_key = encode_b58(serialized + checksum);
+    //console.log('the xprv: ' + extended_private_key);
+    return extended_key;
+}
+
+// Converts an inputted hex string into a base58 encoded number.
+// This function is for bitcoin, so leading '00's will be converted to a 1.
+function encode_b58(hex_number) {
+    // Set of base58 chars
+    const base58 = [1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+
+    // Convert hex string into a number for processing.
+    // Default numbers in java are computed to only 16 significant digits.
+    var num = BigInt(Number.MAX_SAFE_INTEGER);
+    // 0x tells BigInt that the hex_number is in hexadecimal
+    input = '0x' + hex_number;
+    num = BigInt(input);
+
+    // explain why this works as a number base conversion.
+    // We use a math trick to convert the number into base 58 that involves taking the remainder
+    // of a modulus operation and integer division.
+    var remainder = '';
+    // Create empty string to hold encoded base58 chars.
+    var encoded_buffer = '';
+    while(num > 0){
+        // The remainder represents the next base58 digit.
+        remainder = num % BigInt(58);
+        // Add the corresponding base58 digit on the left of our encoded string.
+        encoded_buffer = base58[remainder] + encoded_buffer;
+        // integer division
+        num = num/BigInt(58);
+    }
+
+    // Bitcoin spec requires us to convert leading zero pairs to 1's.
+    // When converted to a number, leading zeros are ignored.
+    // Thus we can convert them to 1's from the original hex string and
+    // attach them after the initial base58 encoding.
+    var num_leading_zero_pairs = 0;
+    const regex = /^00/g;
+    while (hex_number.match(regex)){
+        hex_number = hex_number.substring(2);
+        num_leading_zero_pairs++;
+    }
+    for(i=num_leading_zero_pairs; i > 0; i--){
+        encoded_buffer = '1' + encoded_buffer;
+    }
+
+    return encoded_buffer;
 }
 
 
@@ -109,7 +188,7 @@ async function mnemonic_gen_to_xprv (){
     //console.log('private key: ' + private_key_256);
     //console.log('chain code: ' + chain_code);
 
-    xprv_key = await compute_xprv_key(chain_code, private_key_256);
+    xprv_key = await compute_extended_key(chain_code, private_key_256);
 
     var return_arr = new Array();
     return_arr[0] = mne_sentence;
