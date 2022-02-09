@@ -56,28 +56,35 @@ async function test_keygen(){
 }
 
 async function getAddress(public_key){
+	// run a SHA256 hash on the public key
 	const pubkey_buf = hex_string_to_ArrayBuffer(public_key);
     const hashBuffer256 = await crypto.subtle.digest('SHA-256', pubkey_buf);
-	const pubkey_256 = buf2hex(hashBuffer256);
-	console.log('hashed, ready for ripemd160: ' + pubkey_256);
+	const pubkey_uint8_arr = new Uint8Array(hashBuffer256);
+	//const pubkey_256 = buf2hex(hashBuffer256);
+	console.log('hashed, ready for ripemd160: ' + pubkey_uint8_arr);
+
+	//const pubkey_uint8_arr = new Uint8Array();
+	//for(i=0; i<=pubkey_2
+
+	// Take the result of the SHA256 hash and run a ripemd160 hash on it.
 	// ripemd160 takes Uint8Array and returns a Uint8Array.
-	const pubkey_h160_uint8 = await noble.ripemd160(pubkey_256);
+	const pubkey_h160_uint8 = await noble.ripemd160(pubkey_uint8_arr);
 	console.log('ripemd160 return array: ' + pubkey_h160_uint8);
-	//const pubkey_h160 = numberArrToBinaryStrArr(pubkey_h160_uint8);
-	//const pubkey_h160 = numArrToHexStrArr(pubkey_h160_uint8);
+	// convert uint8 array to a 2 digit (1 byte) hex array.
 	var pubkey_h160 = new Array;
 	for(i=0; i < pubkey_h160_uint8.length; i++){
 		pubkey_h160.push(pubkey_h160_uint8[i].toString(16).padStart(2, '0'));
 	}
 	console.log('pubkey_h160: ' + pubkey_h160.join(''));
+
 	// compute a checksum of data that includes the prefix
 	const data = '00' + pubkey_h160.join('');
 	const checksum = await computeChecksum(data);
 	console.log('checksum: ' + checksum);
+
 	const payload = data + checksum;
 	console.log('payload: ' + payload);
 	
-	//return encode_b58(data + checksum);
 	return encode_b58(payload);
 
 }
