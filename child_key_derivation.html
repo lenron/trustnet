@@ -6,13 +6,19 @@
 <body>
 
 <script src="js_include_files/wordlist_english.js"></script>
+<script src="js_include_files/crypto.js"></script>
+<script src="js_include_files/noble-secp256k1.js"></script>
+<script src="js_include_files/noble-hashes.js"></script>
 <script>
 // Ability check
 console.log(wordListArray[1])
+var secp = nobleSecp256k1;
+var noble = nobleHashes;
 
 test_keygen();
 async function test_keygen(){
 
+	//var private_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
 	// Generate a key we know is valid
 	const sentence = await computeMnemonicPhrase();
 	console.log('mnemonic sentence: ' + sentence);
@@ -33,14 +39,46 @@ async function test_keygen(){
 	console.log('computed child key: ' + results_array[0]);
 	console.log('computed chain code: ' + results_array[1]);
 
+	// check secp
+	// 'true' option returns a compressed public key.
+	//const public_key = await secp.getPublicKey(private_key, true);
+	//console.log('public key: ' + public_key);
+
+	//const address = await getAddress(public_key);
+	//console.log('address of master pubkey: ' + address);
+
+	// getting an 'Error: Expected 32 bytes of private key' error here sometimes.
+	const pubkey_child = await secp.getPublicKey(results_array[0], true);
+	console.log('public child key: ' + pubkey_child);
+	const address_child = await getAddress(pubkey_child);
+	console.log('address of child pubkey: ' + address_child);
 
 }
 
-async function getAddress(key){
-
-}
-
-async function get_public_key(private_key){
+async function getAddress(public_key){
+	const pubkey_buf = hex_string_to_ArrayBuffer(public_key);
+    const hashBuffer256 = await crypto.subtle.digest('SHA-256', pubkey_buf);
+	const pubkey_256 = buf2hex(hashBuffer256);
+	console.log('hashed, ready for ripemd160: ' + pubkey_256);
+	// ripemd160 takes Uint8Array and returns a Uint8Array.
+	const pubkey_h160_uint8 = await noble.ripemd160(pubkey_256);
+	console.log('ripemd160 return array: ' + pubkey_h160_uint8);
+	//const pubkey_h160 = numberArrToBinaryStrArr(pubkey_h160_uint8);
+	//const pubkey_h160 = numArrToHexStrArr(pubkey_h160_uint8);
+	var pubkey_h160 = new Array;
+	for(i=0; i < pubkey_h160_uint8.length; i++){
+		pubkey_h160.push(pubkey_h160_uint8[i].toString(16).padStart(2, '0'));
+	}
+	console.log('pubkey_h160: ' + pubkey_h160.join(''));
+	// compute a checksum of data that includes the prefix
+	const data = '00' + pubkey_h160.join('');
+	const checksum = await computeChecksum(data);
+	console.log('checksum: ' + checksum);
+	const payload = data + checksum;
+	console.log('payload: ' + payload);
+	
+	//return encode_b58(data + checksum);
+	return encode_b58(payload);
 
 }
 
@@ -118,9 +156,7 @@ async function compute_extended_key(chain, key, depth = '00', index = '00000000'
 
     const serialized = version + depth + fingerprint + index + chain + key;
     console.log('serialized: ' + serialized);
-    const checksum_long = await computeChecksum(serialized);
-    const checksum = checksum_long.substring(0,8);
-    //console.log('checksum: ' + checksum);
+    const checksum = await computeChecksum(serialized);
     var extended_key = encode_b58(serialized + checksum);
     //console.log('the xprv: ' + extended_private_key);
     return extended_key;
@@ -336,7 +372,7 @@ async function computeSeed512(mnemonicPhrase, in_password){
     return buf2hex(derived_512_bits_from_PBKDF2);
 }
 
-// Takes hex string as input and outputs a hex string.
+// Takes hex string as input and outputs a hex string of 4 bytes.
 async function computeChecksum(payload) {
 
     // Encode payload data into ArrayBuffer.
@@ -347,7 +383,8 @@ async function computeChecksum(payload) {
     const double256 = await crypto.subtle.digest('SHA-256', hashBuffer256);
     hashHex = buf2hex(double256);
 
-    return hashHex;
+    return hashHex.substring(0,8);
+    //return checksum;
 }
 
 // This function converts a hex string into an ArrayBuffer for hash processing.
@@ -363,6 +400,7 @@ function hex_string_to_ArrayBuffer(hexString){
     return hexArrayBuffer;
 }
 
+// takes a buffer as input and returns a hex string
 function buf2hex(buffer) { // buffer is an ArrayBuffer
   return [...new Uint8Array(buffer)]
       .map(x => x.toString(16).padStart(2, '0'))
@@ -372,6 +410,7 @@ function buf2hex(buffer) { // buffer is an ArrayBuffer
 function numberArrToBinaryStrArr(numberArray){
     return numberArray.map(b => b.toString(2).padStart(8, '0'));
 }
+
 
 async function get256HashArray(entropy){
     const hashBuffer = await crypto.subtle.digest('SHA-256', entropy);      // hash the message
