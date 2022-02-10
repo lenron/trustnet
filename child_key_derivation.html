@@ -2,9 +2,7 @@
 <html>
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <meta content="utf-8" http-equiv="encoding">
-
 <body>
-
 <script src="js_include_files/wordlist_english.js"></script>
 <script src="js_include_files/crypto.js"></script>
 <script src="js_include_files/noble-secp256k1.js"></script>
@@ -60,11 +58,7 @@ async function getAddress(public_key){
 	const pubkey_buf = hex_string_to_ArrayBuffer(public_key);
     const hashBuffer256 = await crypto.subtle.digest('SHA-256', pubkey_buf);
 	const pubkey_uint8_arr = new Uint8Array(hashBuffer256);
-	//const pubkey_256 = buf2hex(hashBuffer256);
 	console.log('hashed, ready for ripemd160: ' + pubkey_uint8_arr);
-
-	//const pubkey_uint8_arr = new Uint8Array();
-	//for(i=0; i<=pubkey_2
 
 	// Take the result of the SHA256 hash and run a ripemd160 hash on it.
 	// ripemd160 takes Uint8Array and returns a Uint8Array.
