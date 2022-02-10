@@ -6,17 +6,17 @@
 <script src="js_include_files/wordlist_english.js"></script>
 <script src="js_include_files/crypto.js"></script>
 <script src="js_include_files/noble-secp256k1.js"></script>
-<script src="js_include_files/noble-hashes.js"></script>
+<script src="js_include_files/noble-ripemd160.js"></script>
 <script>
 // Ability check
-console.log(wordListArray[1])
-var secp = nobleSecp256k1;
-var noble = nobleHashes;
+console.log('test mnemonic word list: ' + wordListArray[1])
+let secp = nobleSecp256k1;
+let noble = nobleHashes;
 
 test_keygen();
 async function test_keygen(){
 
-	//var private_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
+	//let private_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
 	// Generate a key we know is valid
 	const sentence = await computeMnemonicPhrase();
 	console.log('mnemonic sentence: ' + sentence);
@@ -53,36 +53,63 @@ async function test_keygen(){
 
 }
 
+// getAddress takes a public key in a hex string as input and
+// returns a base58 encoded P2PKH (prefix 1) address.
 async function getAddress(public_key){
 	// run a SHA256 hash on the public key
 	const pubkey_buf = hex_string_to_ArrayBuffer(public_key);
     const hashBuffer256 = await crypto.subtle.digest('SHA-256', pubkey_buf);
 	const pubkey_uint8_arr = new Uint8Array(hashBuffer256);
-	console.log('hashed, ready for ripemd160: ' + pubkey_uint8_arr);
 
 	// Take the result of the SHA256 hash and run a ripemd160 hash on it.
 	// ripemd160 takes Uint8Array and returns a Uint8Array.
 	const pubkey_h160_uint8 = await noble.ripemd160(pubkey_uint8_arr);
-	console.log('ripemd160 return array: ' + pubkey_h160_uint8);
 	// convert uint8 array to a 2 digit (1 byte) hex array.
-	var pubkey_h160 = new Array;
+	let pubkey_h160 = new Array;
 	for(i=0; i < pubkey_h160_uint8.length; i++){
 		pubkey_h160.push(pubkey_h160_uint8[i].toString(16).padStart(2, '0'));
 	}
-	console.log('pubkey_h160: ' + pubkey_h160.join(''));
 
 	// compute a checksum of data that includes the prefix
 	const data = '00' + pubkey_h160.join('');
 	const checksum = await computeChecksum(data);
-	console.log('checksum: ' + checksum);
-
 	const payload = data + checksum;
-	console.log('payload: ' + payload);
-	
 	return encode_b58(payload);
-
 }
 
+// Convert an input of Uint8Array to a returned 
+
+
+//Convert hex string to array of unsigned 8-bit integers and return the ArrayBuffer.
+//A compressed 33 byte secp public key will return a 256 bit ArrayBuffer number.
+//From: https://gist.github.com/don/871170d88cf6b9007f7663fdbc23fe09
+function hexStringToArrayBuffer(hexString) {
+    // remove the leading 0x (modified this from original for ECC public keys).
+    hexString = hexString.replace(/^0./, '');
+
+    // ensure even number of characters
+    if (hexString.length % 2 != 0) {
+        console.log('WARNING: expecting an even number of characters in the hexString');
+    }
+
+    // check for some non-hex characters
+    let bad = hexString.match(/[G-Z\s]/i);
+    if (bad) {
+        console.log('WARNING: found non-hex characters', bad);
+    }
+
+    // split the string into pairs of octets
+    let pairs = hexString.match(/[\dA-F]{2}/gi);
+
+    // convert the octets to integers
+    let integers = pairs.map(function(s) {
+        return parseInt(s, 16);
+    });
+    let array = new Uint8Array(integers);
+
+    //The buffer method called here returns the ArrayBuffer.
+    return array.buffer;
+}
 
 
 
@@ -101,7 +128,7 @@ async function derive_child_key(parent_chain_code, parent_key, index) {
 	// The order of the elliptic curve defined in secp256k1 is a constant.
 	const n_order_hex = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
 	// To do any number processing in native javascript, we have to use a BigInt.
-	var n_order_int = BigInt('0x' + n_order_hex);
+	let n_order_int = BigInt('0x' + n_order_hex);
 
 	// index must be in hex string for concatenation
 	index_hex = num2hex(index);
@@ -119,6 +146,8 @@ async function derive_child_key(parent_chain_code, parent_key, index) {
 	console.log('intermediate_key: ' + intermediate_key);
 	const ikey_left = intermediate_key.substring(0,64);
     const child_chain_code = intermediate_key.substring(64,128);
+	console.log('ikey left:  ' + ikey_left);
+	console.log('chain code: ' + child_chain_code);
 
 	// BIP 32 specifies that derived chain codes >= the order (n) are invalid.
 	if (BigInt('0x' + child_chain_code) >= n_order_int){
@@ -127,11 +156,19 @@ async function derive_child_key(parent_chain_code, parent_key, index) {
 	}
 
 	// Use scalar addition here
-	var child_key_int = BigInt(Number.MAX_SAFE_INTEGER);
+	let child_key_int = BigInt(Number.MAX_SAFE_INTEGER);
 	child_key_int = (BigInt('0x' + ikey_left) + BigInt('0x' + parent_key)) % n_order_int;
 	child_key_hex = num2hex(child_key_int);
-
-	var children_keys = new Array;
+/*
+	if (child_key_hex.length != 64){
+		children_keys[0] = '0' + child_key_hex;
+		console.log('\n\n\n\n\n\n\n\n\n\n\n');
+	}else{
+		children_keys[0] = child_key_hex;
+	}
+*/
+	
+	let children_keys = new Array;
 	children_keys[0] = child_key_hex;
 	children_keys[1] = child_chain_code;
 	
@@ -139,14 +176,14 @@ async function derive_child_key(parent_chain_code, parent_key, index) {
 }
 
 function num2hex(integer){
-	return integer.toString(16).padStart(2, '0')
+	return integer.toString(16);//.padStart(2, '0')
 }
 
 // Takes hex strings as input.
 // Outputs the xprv key encoded in base58.
 // For Master root extended private key, we start at 0 for several values.
 async function compute_extended_key(chain, key, depth = '00', index = '00000000', fingerprint = '00000000'){
-	var version = '';
+	let version = '';
 	// Check if key is private
 	if( key.substring(0,2) == '00'){
 		// key is private, starte encoded str with xprv
@@ -158,7 +195,7 @@ async function compute_extended_key(chain, key, depth = '00', index = '00000000'
     const serialized = version + depth + fingerprint + index + chain + key;
     console.log('serialized: ' + serialized);
     const checksum = await computeChecksum(serialized);
-    var extended_key = encode_b58(serialized + checksum);
+    let extended_key = encode_b58(serialized + checksum);
     //console.log('the xprv: ' + extended_private_key);
     return extended_key;
 }
@@ -171,7 +208,7 @@ function encode_b58(hex_number) {
 
     // Convert hex string into a number for processing.
     // Default numbers in java are computed to only 16 significant digits.
-    var num = BigInt(Number.MAX_SAFE_INTEGER);
+    let num = BigInt(Number.MAX_SAFE_INTEGER);
     // 0x tells BigInt that the hex_number is in hexadecimal
     input = '0x' + hex_number;
     num = BigInt(input);
@@ -179,9 +216,9 @@ function encode_b58(hex_number) {
     // explain why this works as a number base conversion.
     // We use a math trick to convert the number into base 58 that involves taking the remainder
     // of a modulus operation and integer division.
-    var remainder = '';
+    let remainder = '';
     // Create empty string to hold encoded base58 chars.
-    var encoded_buffer = '';
+    let encoded_buffer = '';
     while(num > 0){
         // The remainder represents the next base58 digit.
         remainder = num % BigInt(58);
@@ -195,7 +232,7 @@ function encode_b58(hex_number) {
     // When converted to a number, leading zeros are ignored.
     // Thus we can convert them to 1's from the original hex string and
     // attach them after the initial base58 encoding.
-    var num_leading_zero_pairs = 0;
+    let num_leading_zero_pairs = 0;
     const regex = /^00/g;
     while (hex_number.match(regex)){
         hex_number = hex_number.substring(2);
@@ -231,7 +268,7 @@ async function mnemonic_gen_to_xprv (){
 
     xprv_key = await compute_extended_key(chain_code, private_key_256);
 
-    var return_arr = new Array();
+    let return_arr = new Array();
     return_arr[0] = mne_sentence;
     return_arr[1] = seed512_hex;
     return_arr[2] = xprv_key;
@@ -246,7 +283,7 @@ async function verifyMnemonicPhrase(phrase){
 
     // Convert to array of 11 bit binary numbers
     indexArray = new Array;
-    for(var i=0; i < phraseArray.length; i++){
+    for(let i=0; i < phraseArray.length; i++){
         if( wordListArray.indexOf(phraseArray[i]) < 0){
             console.warn('Word: ' + phraseArray[i] + ' not found in mnemonic word list!');
             return false;
@@ -264,13 +301,13 @@ async function verifyMnemonicPhrase(phrase){
     // Remove checksum bits from the bits that represent the mnemonic phrase.
     const wordBitsStr = binaryIndexStr.substring(0, binaryIndexStr.length-4);
     const wordBitsArray = new Array;
-    for(var i=0; i < wordBitsStr.length; i+=8){
+    for(let i=0; i < wordBitsStr.length; i+=8){
         wordBitsArray.push(wordBitsStr.substring(i,i+8));
     }
 
     // Convert the 8-bit word strings into numbers.
     const entropyNumberArr = new Array;
-    for(var i=0; i < wordBitsArray.length; i++){
+    for(let i=0; i < wordBitsArray.length; i++){
         entropyNumberArr.push(parseInt(wordBitsArray[i], 2));
     }
 
@@ -293,7 +330,7 @@ async function verifyMnemonicPhrase(phrase){
 // Returns a string of mnemonic words delimited by a single space.
 async function computeMnemonicPhrase(){
     // Create array of 16 randomly generated 8-bit integers.
-    var rand_entropy = new Uint8Array(16);
+    let rand_entropy = new Uint8Array(16);
     crypto.getRandomValues(rand_entropy);
 
     // Create checksum from SHA-256 hash, using the first 4 bits.
@@ -309,13 +346,13 @@ async function computeMnemonicPhrase(){
 
     // Divide the resulting sequence into sections of 11 bits.
     const numberWordArray = new Array;
-    for(var i=0; i < entropyAndChecksum.length; i+=11){
+    for(let i=0; i < entropyAndChecksum.length; i+=11){
         numberWordArray.push(entropyAndChecksum.substring(i,i+11));
     }
 
     // Produce 12 words representing the mnemonic code.
     const wordArray = new Array;
-    for(var n=0; n < numberWordArray.length; n++){
+    for(let n=0; n < numberWordArray.length; n++){
         // Use the 11-bit numbers to index an array of 2048 predefined words.
         wordArray.push(wordListArray[parseInt(numberWordArray[n], 2)]);
     }
@@ -382,7 +419,17 @@ async function computeChecksum(payload) {
     // Bitcoin base58check uses a double sha-256 hash.
     const hashBuffer256 = await crypto.subtle.digest('SHA-256', hexArrayBuffer);
     const double256 = await crypto.subtle.digest('SHA-256', hashBuffer256);
+/*
+	test = new Uint8Array(double256);
+	console.log('buffer output: ' + test);
+	test_hex = new Array;
+	for(i=0; i<test.length; i++){
+		test_hex.push(test[i].toString(16).padStart(2, '0'));
+	}
+	console.log('test_hex: ' + test_hex);
+*/
     hashHex = buf2hex(double256);
+	//console.log('buf2hex output: ' + hashHex);
 
     return hashHex.substring(0,8);
     //return checksum;
@@ -393,7 +440,7 @@ function hex_string_to_ArrayBuffer(hexString){
 
     // convert to a number array representing the hex bytes.
     const hexBytesArray = new Array;
-    for(var i=0; i < hexString.length; i+=2){
+    for(let i=0; i < hexString.length; i+=2){
         hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
     }
     const hexArrayBuffer = new Uint8Array(hexBytesArray);
@@ -422,28 +469,33 @@ async function get256HashArray(entropy){
 // Performs the HMAC-SHA512 hash.
 async function hmac_sha512(data, key){
     // If no key is given, we are computing the root extended private key
+	let key_enc;
     if (typeof key == 'undefined'){
         // Encode the key.
         const key = 'Bitcoin seed';
-        var key_enc = new TextEncoder().encode(key);
+        key_enc = new TextEncoder().encode(key);
     }else{
         // Any other input should be a hex string.
-        var key_enc = hex_string_to_ArrayBuffer(key);
+        key_enc = hex_string_to_ArrayBuffer(key);
     }
 
     // Encode the hex data
     const data_encoded = hex_string_to_ArrayBuffer(data);
+	
+	//set up hmac algorithm object
+	hmac_algorithm_obj = 
+	{
+		name: "HMAC",
+		hash: {name: "SHA-512"}
+	}
 
     //CryptoKey object needed for deriveBits() to perform PBKDF2.
     const imported_key = await crypto.subtle.importKey(
         "raw", // raw format of the key - should be Uint8Array
         key_enc,
-        { // algorithm details
-            name: "HMAC",
-            hash: {name: "SHA-512"}
-        },
+		hmac_algorithm_obj,
         false, // export = false
-        ["sign"] // what this key can do
+        ["sign", "verify"] // what this key can do
     );
 
     // Perform the HMAC-SHA512 hash
@@ -452,6 +504,14 @@ async function hmac_sha512(data, key){
         imported_key,
         data_encoded
     );
+	console.log('signature: ' + new Uint8Array(signature));
+	const result = crypto.subtle.verify(hmac_algorithm_obj, imported_key, signature, key_enc);
+	if(result){
+		console.log('signature verified');
+	}else{
+		console.log('INVALID SIGNATURE');
+	}
+
     return buf2hex(signature);
 }
 
