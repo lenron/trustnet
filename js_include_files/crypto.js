@@ -76,7 +76,6 @@ async function compute_extended_key(chain, key, depth = '00', index = '00000000'
     }
 
     const serialized = version + depth + fingerprint + index + chain + key;
-    console.log('serialized: ' + serialized);
     const checksum = await computeChecksum(serialized);
     let extended_key = encode_b58(serialized + checksum);
     return extended_key;

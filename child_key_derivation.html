@@ -33,9 +33,14 @@ async function test_keygen(){
 	//parent_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
 
 	// use index 2^31 or greater to derive hardened child.
-	const results_array = await derive_child_key(chain_code, private_key, 2**31);
-	console.log('computed child key: ' + results_array[0]);
-	console.log('computed chain code: ' + results_array[1]);
+	const results_array = await derive_child_key(chain_code, private_key, 2**31+1);
+	console.log('child key m/1h: ' + results_array[0]);
+	console.log('chain code m/1h: ' + results_array[1]);
+
+	// derive depth 2 keys (m/1h/2h
+	const results_array_depth2 = await derive_child_key(results_array[1], results_array[0], 2);
+	console.log('child key m/1h/2h: ' + results_array_depth2[0]);
+	console.log('chain code m/1h/2h: ' + results_array_depth2[1]);
 
 	// check secp
 	// 'true' option returns a compressed public key.
@@ -45,11 +50,16 @@ async function test_keygen(){
 	//const address = await getAddress(public_key);
 	//console.log('address of master pubkey: ' + address);
 
-	// getting an 'Error: Expected 32 bytes of private key' error here sometimes.
+	//depth1
 	const pubkey_child = await secp.getPublicKey(results_array[0], true);
-	console.log('public child key: ' + pubkey_child);
+	console.log('public child key depth1: ' + pubkey_child);
 	const address_child = await getAddress(pubkey_child);
-	console.log('address of child pubkey: ' + address_child);
+	console.log('address of child pubkey depth1: ' + address_child);
+	//depth 2
+	const pubkey_child_d2 = await secp.getPublicKey(results_array_depth2[0], true);
+	console.log('public child key depth2: ' + pubkey_child_d2);
+	const address_child_d2 = await getAddress(pubkey_child_d2);
+	console.log('address of child pubkey depth2: ' + address_child_d2);
 
 }
 
@@ -72,22 +82,23 @@ async function derive_child_key(parent_chain_code, parent_key, index) {
 
 	// index must be in hex string for concatenation
 	index_hex = num2hex(index);
-	console.log('index_hex: ' + index_hex);
+	//console.log('index_hex: ' + index_hex);
 
 	// use test values from learnme to make sure we're doing this right.
 	//parent_chain_code = '463223aac10fb13f291a1bc76bc26003d98da661cb76df61e750c139826dea8b';
 	//parent_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
 
 	// set up HMAC hash 
+	// add '00' for private keys
 	const data = '00' + parent_key + index_hex;
 	const key = parent_chain_code;
 
 	const intermediate_key = await hmac_sha512(data, key);
-	console.log('intermediate_key: ' + intermediate_key);
+	//console.log('intermediate_key: ' + intermediate_key);
 	const ikey_left = intermediate_key.substring(0,64);
     const child_chain_code = intermediate_key.substring(64,128);
-	console.log('ikey left:  ' + ikey_left);
-	console.log('chain code: ' + child_chain_code);
+	//console.log('ikey left:  ' + ikey_left);
+	//console.log('chain code: ' + child_chain_code);
 
 	// BIP 32 specifies that derived chain codes >= the order (n) are invalid.
 	if (BigInt('0x' + child_chain_code) >= n_order_int){
