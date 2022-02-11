@@ -1,27 +1,220 @@
 
+
+// Convert an input of Uint8Array to a returned hex string
+function uint8ArrayToHexString(uint8_array){
+    // convert uint8 array to a 2 digit (1 byte) hex array.
+    let hex_array = new Array;
+    for(i=0; i < uint8_array.length; i++){
+        hex_array.push(uint8_array[i].toString(16).padStart(2, '0'));
+    }
+    return hex_array.join('');
+}
+
+// inputs an integer number and converts to a hex string.
+function num2hex(integer){
+    return integer.toString(16);
+}
+
+// This function converts a hex string into an ArrayBuffer for hash processing.
+function hex_string_to_ArrayBuffer(hexString){
+    // convert to a number array representing the hex bytes.
+    const hexBytesArray = new Array;
+    for(let i=0; i < hexString.length; i+=2){
+        hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
+    }
+    return new Uint8Array(hexBytesArray);
+}
+
+// takes a buffer as input and returns a hex string
 function buf2hex(buffer) { // buffer is an ArrayBuffer
   return [...new Uint8Array(buffer)]
       .map(x => x.toString(16).padStart(2, '0'))
       .join('');
 }
 
+// Takes an array of 256 bit numbers and converts each to a binary string.
 function numberArrToBinaryStrArr(numberArray){
 	return numberArray.map(b => b.toString(2).padStart(8, '0'));
 }
 
+// Takes a Uint8Array and returns a typeless array object
 async function get256HashArray(entropy){
 	const hashBuffer = await crypto.subtle.digest('SHA-256', entropy);		// hash the message
-	return Array.from(new Uint8Array(hashBuffer));								// convert buffer to byte array
+	return Array.from(new Uint8Array(hashBuffer));							// convert buffer to byte array
 }
 
+// getAddress takes a public key in a hex string as input and
+// returns a base58 encoded P2PKH (prefix 1) address.
+async function getAddress(public_key){
+    // run a SHA256 hash on the public key
+    const pubkey_buf = hex_string_to_ArrayBuffer(public_key);
+    const hashBuffer256 = await crypto.subtle.digest('SHA-256', pubkey_buf);
+    const pubkey_uint8_arr = new Uint8Array(hashBuffer256);
+
+    // Take the result of the SHA256 hash and run a ripemd160 hash on it.
+    // ripemd160 takes Uint8Array and returns a Uint8Array.
+    const pubkey_h160_uint8 = await noble.ripemd160(pubkey_uint8_arr);
+    const pubkey_h160_hexstr = uint8ArrayToHexString(pubkey_h160_uint8);
+
+    const data = '00' + pubkey_h160_hexstr;
+    const checksum = await computeChecksum(data);
+    const payload = data + checksum;
+    return encode_b58(payload);
+}
+
+// Takes hex strings as input.
+// Outputs the xprv key encoded in base58.
+// For Master root extended private key, we start at 0 for several values.
+async function compute_extended_key(chain, key, depth = '00', index = '00000000', fingerprint = '00000000'){
+    let version = '';
+    // Check if key is private
+    if( key.substring(0,2) == '00'){
+        // key is private, starte encoded str with xprv
+        version = '0488ADE4';
+    }else{  // key is public, start encoded str with xpub
+        version = '0488B21E';
+    }
+
+    const serialized = version + depth + fingerprint + index + chain + key;
+    console.log('serialized: ' + serialized);
+    const checksum = await computeChecksum(serialized);
+    let extended_key = encode_b58(serialized + checksum);
+    return extended_key;
+}
+
+// Converts an inputted hex string into a base58 encoded number.
+// This function is for bitcoin, so leading '00's will be converted to a 1.
+function encode_b58(hex_number) {
+    // Set of base58 chars
+    const base58 = [1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+
+    // Convert hex string into a number for processing.
+    // Default numbers in java are computed to only 16 significant digits.
+    let num = BigInt(Number.MAX_SAFE_INTEGER);
+    // 0x tells BigInt that the hex_number is in hexadecimal
+    input = '0x' + hex_number;
+    num = BigInt(input);
+
+    // We use a math trick to convert the number into base 58 that involves taking the remainder
+    // of a modulus operation and integer division.
+    let remainder = '';
+    // Create empty string to hold encoded base58 chars.
+    let encoded_buffer = '';
+    while(num > 0){
+        // The remainder represents the next base58 digit.
+        remainder = num % BigInt(58);
+        // Add the corresponding base58 digit on the left of our encoded string.
+        encoded_buffer = base58[remainder] + encoded_buffer;
+        // integer division
+        num = num/BigInt(58);
+    }
+
+    // Bitcoin spec requires us to convert leading zero pairs to 1's.
+    // When converted to a number, leading zeros are ignored.
+    // Thus we can convert them to 1's from the original hex string and
+    // attach them after the initial base58 encoding.
+    let num_leading_zero_pairs = 0;
+    const regex = /^00/g;
+    while (hex_number.match(regex)){
+        hex_number = hex_number.substring(2);
+        num_leading_zero_pairs++;
+    }
+    for(i=num_leading_zero_pairs; i > 0; i--){
+        encoded_buffer = '1' + encoded_buffer;
+    }
+    return encoded_buffer;
+}
+
+// Takes no inputs
+// Returns array containing mnemonic sentence, seed, xprv respectively
+async function mnemonic_gen_to_xprv (){
+
+    const mne_sentence = await computeMnemonicPhrase();
+    if( verifyMnemonicPhrase(mne_sentence)){
+        console.log('mnemonic sentence verified!');
+    }else{
+        console.log('mnemonic sentence INVALID!');
+    }
+
+    seed512_hex = await computeSeed512(mne_sentence);
+    hmac_sha512_hashed_seed = await hmac_sha512(seed512_hex);
+    private_key_256 = hmac_sha512_hashed_seed.substring(0,64);
+    chain_code = hmac_sha512_hashed_seed.substring(64,128);
+    xprv_key = await compute_extended_key(chain_code, private_key_256);
+
+    let return_arr = new Array();
+    return_arr[0] = mne_sentence;
+    return_arr[1] = seed512_hex;
+    return_arr[2] = xprv_key;
+
+    return return_arr;
+}
+
+// Takes hex string as input and outputs a hex string of 4 bytes.
+async function computeChecksum(payload) {
+
+    // Encode payload data into ArrayBuffer.
+    const hexArrayBuffer = hex_string_to_ArrayBuffer(payload);
+
+    // Bitcoin base58check uses a double sha-256 hash.
+    const hashBuffer256 = await crypto.subtle.digest('SHA-256', hexArrayBuffer);
+    const double256 = await crypto.subtle.digest('SHA-256', hashBuffer256);
+    hashHex = buf2hex(double256);
+    return hashHex.substring(0,8);
+}
+
+// Takes hex string(s) as input and outputs a hex string.
+// Performs the HMAC-SHA512 hash.
+async function hmac_sha512(data, key){
+    // If no key is given, we are computing the root extended private key
+    let key_enc;
+    if (typeof key == 'undefined'){
+        // Encode the key.
+        const key = 'Bitcoin seed';
+        key_enc = new TextEncoder().encode(key);
+    }else{
+        // Any other input should be a hex string.
+        key_enc = hex_string_to_ArrayBuffer(key);
+    }
+
+    // Encode the hex data
+    const data_encoded = hex_string_to_ArrayBuffer(data);
+
+    //set up hmac algorithm object
+    hmac_algorithm_obj =
+    {
+        name: "HMAC",
+        hash: {name: "SHA-512"}
+    }
+
+    //CryptoKey object needed for deriveBits() to perform PBKDF2.
+    const imported_key = await crypto.subtle.importKey(
+        "raw", // raw format of the key - should be Uint8Array
+        key_enc,
+        hmac_algorithm_obj,
+        false, // export = false
+        ["sign", "verify"] // what this key can do
+    );
+
+    // Perform the HMAC-SHA512 hash
+    const signature = await crypto.subtle.sign(
+        "HMAC",
+        imported_key,
+        data_encoded
+    );
+
+    return buf2hex(signature);
+}
+
+// Takes a mnemonic sentence and possibly a password as input.
+// Outputs the computed seed in a hex string.
 async function computeSeed512(mnemonicPhrase, in_password){
-	if( typeof password !== 'undefined'){
-		password = in_password;
-	}else{
-		password = '';
-	}
+    if( typeof password !== 'undefined'){
+        password = in_password;
+    }else{
+        password = '';
+    }
     const salt = 'mnemonic' + password;
-	console.log(salt);
     const normsalt = salt.normalize('NFKD', 'utf8');
     // For PBKDF2 to work properly, inputs must be in uint8 ArrayBuffer format.
     const saltArrayBuffer = new TextEncoder().encode(normsalt);
@@ -31,7 +224,7 @@ async function computeSeed512(mnemonicPhrase, in_password){
     const pbkdf2params_object =
         {
             "name": "PBKDF2",       // Identifies this as a pbkdf2params object.
-            salt: saltArrayBuffer,      // Cryptographic salt.
+            salt: saltArrayBuffer,  // Cryptographic salt.
             "iterations": 2048,     // Number of iterations.
             "hash": "SHA-512"       // Hash digest algorithm identifier.
         };
@@ -97,54 +290,53 @@ async function computeMnemonicPhrase(){
     return wordArray.join(' ');
 }
 
-// I can't think of a reason we would need to extract the entropy bits from the mnemonic phrase.
-// Besides verification. Returns true if verified, false otherwise.
+// Returns true if verified, false otherwise.
 async function verifyMnemonicPhrase(phrase){
-	const phraseArray = phrase.split(' ');
+    const phraseArray = phrase.split(' ');
 
-	// Convert to array of 11 bit binary numbers
-	indexArray = new Array;
-	for(var i=0; i < phraseArray.length; i++){
-		if( wordListArray.indexOf(phraseArray[i]) < 0){
-			console.warn('Word: ' + phraseArray[i] + ' not found in mnemonic word list!');
-			return false;
-		}else{
-			indexArray.push(wordListArray.indexOf(phraseArray[i]));
-		}
-	}
-	// Convert to an array of binary strings.
-	const binaryIndexArray = indexArray.map(b => b.toString(2).padStart(11, '0'));
+    // Convert to array of 11 bit binary numbers
+    indexArray = new Array;
 
-	// Strip off checksum.
-	const binaryIndexStr = binaryIndexArray.join('');
-	// Capture checksum bits.
-	const checksum = binaryIndexStr.slice(-4);
-	// Remove checksum bits from the bits that represent the mnemonic phrase.
-	const wordBitsStr = binaryIndexStr.substring(0, binaryIndexStr.length-4);
-	const wordBitsArray = new Array;
-	for(var i=0; i < wordBitsStr.length; i+=8){
-		wordBitsArray.push(wordBitsStr.substring(i,i+8));
-	}
+    for(let i=0; i < phraseArray.length; i++){
+        if( wordListArray.indexOf(phraseArray[i]) < 0){
+            console.warn('Word: ' + phraseArray[i] + ' not found in mnemonic word list!');
+            return false;
+        }else{
+            indexArray.push(wordListArray.indexOf(phraseArray[i]));
+        }
+    }
+    // Convert to an array of binary strings.
+    const binaryIndexArray = indexArray.map(b => b.toString(2).padStart(11, '0'));
 
-	// Convert the 8-bit word strings into numbers.
-	const entropyNumberArr = new Array;
-	for(var i=0; i < wordBitsArray.length; i++){
-		entropyNumberArr.push(parseInt(wordBitsArray[i], 2));
-	}
+    // Strip off checksum.
+    const binaryIndexStr = binaryIndexArray.join('');
+    // Capture checksum bits.
+    const checksum = binaryIndexStr.slice(-4);
+    // Remove checksum bits from the bits that represent the mnemonic phrase.
+    const wordBitsStr = binaryIndexStr.substring(0, binaryIndexStr.length-4);
+    const wordBitsArray = new Array;
+    for(let i=0; i < wordBitsStr.length; i+=8){
+        wordBitsArray.push(wordBitsStr.substring(i,i+8));
+    }
 
-	// Take the SHA-256 hash of the resulting numbers.
-	const entropyBytesUint8 = new Uint8Array(entropyNumberArr);
-	const hashArray = await get256HashArray(entropyBytesUint8);
+    // Convert the 8-bit word strings into numbers.
+    const entropyNumberArr = new Array;
+    for(let i=0; i < wordBitsArray.length; i++){
+        entropyNumberArr.push(parseInt(wordBitsArray[i], 2));
+    }
 
-	// Convert resulting hash and compare checksum bits
-	const hashBinArr = numberArrToBinaryStrArr(hashArray);
-	// The checksum is represented by the first 4 bits of the hash.
-	const checksum_verify = hashBinArr[0].substring(0,4);
-	if(checksum == checksum_verify){
-		return true;
-	}else{
-		return false;
-	}
+    // Take the SHA-256 hash of the resulting numbers.
+    const entropyBytesUint8 = new Uint8Array(entropyNumberArr);
+    const hashArray = await get256HashArray(entropyBytesUint8);
+
+    // Convert resulting hash and compare checksum bits
+    const hashBinArr = numberArrToBinaryStrArr(hashArray);
+    // The checksum is represented by the first 4 bits of the hash.
+    const checksum_verify = hashBinArr[0].substring(0,4);
+    if(checksum == checksum_verify){
+        return true;
+    }else{
+        return false;
+    }
 }
-
 
