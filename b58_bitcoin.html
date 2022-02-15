@@ -5,10 +5,7 @@
 
 <body>
 
-<script src="js_include_files/wordlist_english.js"></script>
-<script src="js_include_files/crypto.js"></script>
 <script>
-console.log(wordListArray[1]);
 
 //encode_this = '00123456789abcdef';
 encode_this = '0093ce48570b55c42c2af816aeaba06cfee1224faebb6127fe';
@@ -28,50 +25,63 @@ encode_this = '00eb15231dfceb60925886b67d065299925915aeb172c06647';
 console.log('base58 encode: ' + encode_b58(encode_this));
 console.log('expecting:     1NS17iag9jJgTHD1VXjvLCEnZuQ3rJDE9L');
 
-// Converts an inputted hex string into a base58 encoded number.
-// This function is for bitcoin, so leading '00's will be converted to a 1.
+// Base58 encode an string of bytes (represented in hexadecimal).
+// This function is for Bitcoin, so leading '00' bytes will be converted to 1's.
 function encode_b58(hex_number) {
-	// Set of base58 chars
+	// Set of base58 chars (Note: there is no '0','O','I' or 'l').
 	const base58 = [1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+	//Take input string of hexadecimal bytes and convert it to a base 10
+	//decimal number. BigInt needed as regular JS numbers are too small.
+	var num = BigInt('0x' + hex_number);
+	//Our very large number will be repeatedly divided by 58.
+	const fifty8 = BigInt(58);
+	//The remainder of this division will be a number (0-57).
+	var remainder;
+	//Each remainder's value maps to a character in our base58 array, and
+	//the string of these characters becomes our Base58 encoded output.
+	var b58_encoded_buffer = '';
+	//We move from: Hex Bytes -> Decimal Number -> Base58 Encoded string.
+	//To move through each place value of a base58 number, we continue to
+	//divide by 58, until the integer number rounds down to 0.
+	while (num > 0) {
+		//The modulus operator returns our remainder, which depends on
+		//the least significant digit in our BigInt converted input.
+		//For example: if we were doing modulo 2 division, all odd
+		//numbers - regardless of how long they are - would return a
+		//remainder of 1, because the least significant digit is odd.
+        	remainder = num % fifty8;
 
-	// Convert hex string into a number for processing.
-	// Default numbers in java are computed to only 16 significant digits.
-	var num = BigInt(Number.MAX_SAFE_INTEGER);
-	// 0x tells BigInt that the hex_number is in hexadecimal
-	input = '0x' + hex_number;
-	num = BigInt(input);
+		//Thus, we're encoding the right most (lowest place value)
+		//digits first, and so each subsequently encoded character
+		//needs to be added to the left of our encoded buffer
+		//so that the beginning & end of our input string/bytes aligns
+		//with the beginning & end of our Base58 encoded output.
+		b58_encoded_buffer = base58[remainder] + b58_encoded_buffer;
 
-	// explain why this works as a number base conversion.
-	// We use a math trick to convert the number into base 58 that involves taking the remainder
-	// of a modulus operation and integer division.
-	// Apparently instantiating this as an empty string doesn't cause any javascript problems.
-    var remainder = '';
-	// Create empty string to hold encoded base58 chars.
-    var encoded_buffer = '';
-    while(num > 0){
-		// The remainder represents the next base58 digit.
-        remainder = num % BigInt(58);
-        // Add the corresponding base58 digit on the left of our encoded string.
-        encoded_buffer = base58[remainder] + encoded_buffer;
-		// integer division
+		//Dividing by 58 gives us our quotient (rounded down to the
+		//nearest integer), and moves us over one base58 place value,
+		//ready for the next round of b58 division/mapping/encoding.
 		num = num/BigInt(58);
-    }
+	}
 
-	// Bitcoin spec requires us to convert leading zero pairs to 1's.
-	// When converted to a number, leading zeros are ignored.
-	// Thus we can convert them to 1's from the original hex string and 
-	// attach them after the initial base58 encoding.
-	var num_leading_zero_pairs = 0;
-	const regex = /^00/g;
-	while (hex_number.match(regex)){
+	//When we convert our byte-based hex input into a base 10 number, we
+	//lose the leading zero bytes in the converted decimal number.
+	//For example, if our hex input converted into the decimal number
+	//000017, this number would be reduced automatically to 17 in base10,
+	//and so we'd lose the leading zeros, which aren't important
+	//when doing base 10 math, but are important in preserving the
+	//information held in our original input value. So, in order to not
+	//lose the leading zeros, we count them, and then prepend them (as
+	//1's, which is their corresponding base58 value) to the beginning
+	//of our Base58 encoded output string.
+	while ( hex_number.match(/^00/) ){
+		//For each leading zero byte, add a '1' to the encoded output.
+		b58_encoded_buffer = '1' + b58_encoded_buffer;
+		//And remove the leading zero byte, and test for another.
 		hex_number = hex_number.substring(2);
-		num_leading_zero_pairs++;
-	}
-	for(i=num_leading_zero_pairs; i > 0; i--){
-		encoded_buffer = '1' + encoded_buffer;
 	}
 
-    return encoded_buffer;
+	return b58_encoded_buffer;
 }
 
 
