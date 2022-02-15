@@ -33,15 +33,16 @@ async function test_keygen(){
 	//parent_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
 
 	//depth1
-	// use index 2^31 or greater to derive hardened child.
-	const results_array = await derive_child_key(chain_code, private_key, 2**31+1);
-	console.log('child key m/1h: ' + results_array[0]);
-	console.log('chain code m/1h: ' + results_array[1]);
+	const pubkey_master = await secp.getPublicKey(private_key);
+	const results_array = await derive_child_key(chain_code, private_key, 2);
+	console.log('child key m/1: ' + results_array[0]);
+	console.log('chain code m/1: ' + results_array[1]);
 	const pubkey_child = await secp.getPublicKey(results_array[0], true);
 	console.log('public child key depth1: ' + pubkey_child);
 	const address_child = await getAddress(pubkey_child);
-	console.log('address of hardened child pubkey depth1: ' + address_child);
-
+	//const address_child = await getAddress(results_array[0]);
+	
+	console.log('address of normal child pubkey depth1: ' + address_child);
 	//depth 2
 	// derive depth 2 keys (m/1h/2h)
 	const results_array_depth2 = await derive_child_key(results_array[1], results_array[0], 2**31+2);
@@ -61,11 +62,13 @@ async function test_keygen(){
 	const pubkey_child_d2_nc = await secp.getPublicKey(results_array_depth2[0], true);
 	console.log('public key depth 2 non-compressed?: ' + pubkey_child_d2_nc);
 	//const results_normchild =  await derive_child_key(results_array_depth2[1], pubkey_child_d2_nc, 3);
-
+/*
 	//try known values
-	//parent_cc = 
-
-
+	parent_cc = '463223aac10fb13f291a1bc76bc26003d98da661cb76df61e750c139826dea8b';
+	parent_pubkey_t = '0252c616d91a2488c1fd1f0f172e98f7d1f6e51f8f389b2f8d632a8b490d5f6da9';
+	parent_privkey_t = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
+	const results_normchild = await derive_child_key(parent_cc, parent_privkey_t, 3, parent_pubkey_t);
+*/
 	const results_normchild = await derive_child_key(results_array_depth2[1], results_array_depth2[0], 3, pubkey_child_d2_nc);
     //console.log('child key m/1h/2h/3: ' + results_normchild[0]);
     //console.log('chain code m/1h/2h/3: ' + results_normchild[1]);
@@ -91,7 +94,8 @@ async function test_keygen(){
 // output array[0] == child key, output array[1] == child chain code.
 // hardened derivation (using incoming private keys) requires a '00' prefix on the key
 // default to normal derivation with no prefix (f_private = '').
-async function derive_child_key(parent_chain_code, parent_privkey, index, parent_pubkey = '') {
+//async function derive_child_key(parent_chain_code, parent_privkey, index, parent_pubkey = '') {
+async function derive_child_key(parent_chain_code, parent_privkey, index) {
 	// index of hardened keys must be between 2^31 and 2^32 - 1
 	// starts at m/2147483648
 	// I think this will have to be computed 
@@ -103,28 +107,32 @@ async function derive_child_key(parent_chain_code, parent_privkey, index, parent
 	let n_order_int = BigInt('0x' + n_order_hex);
 
 	// index must be in hex string for concatenation
-	index_hex = num2hex(index);
+	index_hex = num2hex(index).padStart(8, '0');
 	//console.log('index_hex: ' + index_hex);
 
 	// use test values from learnme to make sure we're doing this right.
 	//parent_chain_code = '463223aac10fb13f291a1bc76bc26003d98da661cb76df61e750c139826dea8b';
 	//parent_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
 
+	const key = parent_chain_code;
 	// set up HMAC hash 
 	// add '00' for private keys
 	//const data = '00' + parent_key + index_hex;
+	let intermediate_key = '';
 	let data = '';
-	if(parent_pubkey === ''){
+	if(index >= 2**31){
 		// derive hardened child with parent private key
 		data = '00' + parent_privkey + index_hex;
-		console.log('no pubkey, compute hardended children');
+		console.log('index is greater than 2**31, compute hardended children');
 	}else{
+		let parent_pubkey = await secp.getPublicKey(parent_privkey, true);
 		data = parent_pubkey + index_hex;
-		console.log('found pubkey, compute normal children');
+		console.log('index is less than 2**31, compute normal children');
 	}
-	const key = parent_chain_code;
+	console.log('data: ' + data);
+	console.log('key: ' + key);
 
-	const intermediate_key = await hmac_sha512(data, key);
+	intermediate_key = await hmac_sha512(data, key);
 	//console.log('intermediate_key: ' + intermediate_key);
 	const ikey_left = intermediate_key.substring(0,64);
     const child_chain_code = intermediate_key.substring(64,128);
@@ -138,6 +146,7 @@ async function derive_child_key(parent_chain_code, parent_privkey, index, parent
 
 	// Use scalar addition here
 	let child_key_int = BigInt(Number.MAX_SAFE_INTEGER);
+	//child_key_int = (BigInt('0x' + ikey_left) + BigInt('0x' + parent_pubkey)) % n_order_int;
 	child_key_int = (BigInt('0x' + ikey_left) + BigInt('0x' + parent_privkey)) % n_order_int;
 	let child_key_hex = num2hex(child_key_int);
 
