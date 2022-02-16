@@ -43,6 +43,63 @@ async function get256HashArray(entropy){
 	return Array.from(new Uint8Array(hashBuffer));							// convert buffer to byte array
 }
 
+// This overloaded function derives both child normal and hardened keys based on
+// the inputted index. This follows the bip32 spec for CKD functions.
+// Parent chain code and privkey are hex string inputs, index is a number.
+// Indexes from 0 to 2**31-1 will derive normal children while 2**31 to 2**32-1
+// will derive hardened children.
+// Outputs will be a 2 deep array: index 0: child key, index 1: child chain code.
+async function derive_child_privkey(parent_chain_code, parent_privkey, index) {
+    // The order of the elliptic curve defined in secp256k1 is a constant.
+    const n_order_hex = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
+    // In order to do the non hashing math in this function, we need to use a BigInt
+    // to preserve all significant digits.
+    let n_order_int = BigInt('0x' + n_order_hex);
+    // index must be in hex string for concatenation
+    index_hex = num2hex(index).padStart(8, '0');
+    const key = parent_chain_code;
+    let intermediate_key = '';
+    let data = '';
+    // check if we're deriving a hardened or normal set of keys.
+    console.log('inputted index: ' + index);
+    if(index >= 2**31){
+        // derive hardened child with parent private key
+        data = '00' + parent_privkey + index_hex;
+        console.log('index is greater than 2**31, compute hardended children');
+    }else{
+        // derive normal children
+        let parent_pubkey = await secp.getPublicKey(parent_privkey, true);
+        data = parent_pubkey + index_hex;
+        console.log('index is less than 2**31, compute normal children');
+    }
+    //console.log('data: ' + data);
+    //console.log('key: ' + key);
+
+    intermediate_key = await hmac_sha512(data, key);
+    const ikey_left = intermediate_key.substring(0,64);
+    const child_chain_code = intermediate_key.substring(64,128);
+
+    // BIP 32 specifies that derived chain codes >= the order (n) are invalid.
+    // The probability of this is lower than 1 in 2**127.
+    if (BigInt('0x' + child_chain_code) >= n_order_int){
+        throw 'Chain code is greater than the order of the curve. Try the next index.';
+    }
+
+    // Use scalar addition here
+    let child_key_int = BigInt(Number.MAX_SAFE_INTEGER);
+    child_key_int = (BigInt('0x' + ikey_left) + BigInt('0x' + parent_privkey)) % n_order_int;
+    let child_key_hex = num2hex(child_key_int);
+
+    // Make sure the key is 32 bytes!
+    child_key_hex = child_key_hex.padStart(64, '0');
+
+    let children_keys = new Array;
+    children_keys[0] = child_key_hex;
+    children_keys[1] = child_chain_code;
+
+    return children_keys;
+}
+
 // getAddress takes a public key in a hex string as input and
 // returns a base58 encoded P2PKH (prefix 1) address.
 async function getAddress(public_key){
