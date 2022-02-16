@@ -21,132 +21,78 @@ async function test_keygen(){
 	const sentence = await computeMnemonicPhrase();
 	console.log('mnemonic sentence: ' + sentence);
 	const seed = await computeSeed512(sentence);
-	console.log('seed: ' + seed);
+	//console.log('seed: ' + seed);
 	const hashed_seed = await hmac_sha512(seed);
 	const private_key = hashed_seed.substring(0,64);
 	const chain_code = hashed_seed.substring(64,128);
 	const root_private_key = await compute_extended_key(chain_code, '00' + private_key);
 	console.log('root extended private key: ' + root_private_key);
 
-	// use test values from learnme to make sure we're doing this right.
-	//parent_chain_code = '463223aac10fb13f291a1bc76bc26003d98da661cb76df61e750c139826dea8b';
-	//parent_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
-
 	//depth1
 	const pubkey_master = await secp.getPublicKey(private_key);
-	const results_array = await derive_child_key(chain_code, private_key, 2);
-	console.log('child key m/1: ' + results_array[0]);
-	console.log('chain code m/1: ' + results_array[1]);
+	const results_array = await derive_child_privkey(chain_code, private_key, 2);
 	const pubkey_child = await secp.getPublicKey(results_array[0], true);
-	console.log('public child key depth1: ' + pubkey_child);
 	const address_child = await getAddress(pubkey_child);
-	//const address_child = await getAddress(results_array[0]);
-	
-	console.log('address of normal child pubkey depth1: ' + address_child);
+	console.log('address of child key depth1: ' + address_child);
 	//depth 2
-	// derive depth 2 keys (m/1h/2h)
-	const results_array_depth2 = await derive_child_key(results_array[1], results_array[0], 2**31+2);
-	console.log('child key m/1h/2h: ' + results_array_depth2[0]);
-	console.log('chain code m/1h/2h: ' + results_array_depth2[1]);
+	const results_array_depth2 = await derive_child_privkey(results_array[1], results_array[0], 2**31+2);
 	const pubkey_child_d2 = await secp.getPublicKey(results_array_depth2[0], true);
-	console.log('public child key depth2: ' + pubkey_child_d2);
 	const address_child_d2 = await getAddress(pubkey_child_d2);
-	console.log('address of hardened child pubkey depth2: ' + address_child_d2);
+	console.log('address of child key depth2: ' + address_child_d2);
 
 	// depth 3
-	// test computing non-hardened child (m/1h/2h/3)
-	// derive public key first
-	//const pubkey_child_d2 = await secp.getPublicKey(results_array_depth2[0], true);
-	console.log('depth 3 inputs:');
-	console.log('chain code: ' + results_array_depth2[1]);
 	const pubkey_child_d2_nc = await secp.getPublicKey(results_array_depth2[0], true);
-	console.log('public key depth 2 non-compressed?: ' + pubkey_child_d2_nc);
-	//const results_normchild =  await derive_child_key(results_array_depth2[1], pubkey_child_d2_nc, 3);
-/*
-	//try known values
-	parent_cc = '463223aac10fb13f291a1bc76bc26003d98da661cb76df61e750c139826dea8b';
-	parent_pubkey_t = '0252c616d91a2488c1fd1f0f172e98f7d1f6e51f8f389b2f8d632a8b490d5f6da9';
-	parent_privkey_t = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
-	const results_normchild = await derive_child_key(parent_cc, parent_privkey_t, 3, parent_pubkey_t);
-*/
-	const results_normchild = await derive_child_key(results_array_depth2[1], results_array_depth2[0], 3, pubkey_child_d2_nc);
-    //console.log('child key m/1h/2h/3: ' + results_normchild[0]);
-    //console.log('chain code m/1h/2h/3: ' + results_normchild[1]);
+	const results_normchild = await derive_child_privkey(results_array_depth2[1], results_array_depth2[0], 3);
 	const pubkey_child_d3 = await secp.getPublicKey(results_normchild[0], true);
-	console.log('public child key depth3: ' + pubkey_child_d3);
 	const address_child_d3 = await getAddress(pubkey_child_d3);
-	console.log('address of NORMAL child pubkey depth3: ' + address_child_d3);
+	console.log('address of child key depth3: ' + address_child_d3);
 
-	// check secp
-	// 'true' option returns a compressed public key.
-	//const public_key = await secp.getPublicKey(private_key, true);
-	//console.log('public key: ' + public_key);
-
-	//const address = await getAddress(public_key);
-	//console.log('address of master pubkey: ' + address);
 }
 
-// Takes parent private key and chain code and computes child key and chain code.
-// index input is a number, both parent inputs are hex strings.
-// I'm setting this function up to have the capability to derive public as well as private
-// child keys.  Indexes 2^31 to 2^32-1 will derive hardened children keys (able to derive child
-// private keys). Indexes 0 to 2^31-1 will derive normal children keys.
-// output array[0] == child key, output array[1] == child chain code.
-// hardened derivation (using incoming private keys) requires a '00' prefix on the key
-// default to normal derivation with no prefix (f_private = '').
-//async function derive_child_key(parent_chain_code, parent_privkey, index, parent_pubkey = '') {
-async function derive_child_key(parent_chain_code, parent_privkey, index) {
-	// index of hardened keys must be between 2^31 and 2^32 - 1
-	// starts at m/2147483648
-	// I think this will have to be computed 
-	//const index = 2147483648;
-
+// This overloaded function derives both child normal and hardened keys based on
+// the inputted index. This follows the bip32 spec for CKD functions.
+// Parent chain code and privkey are hex string inputs, index is a number.
+// Indexes from 0 to 2**31-1 will derive normal children while 2**31 to 2**32-1
+// will derive hardened children.
+// Outputs will be a 2 deep array: index 0: child key, index 1: child chain code.
+async function derive_child_privkey(parent_chain_code, parent_privkey, index) {
 	// The order of the elliptic curve defined in secp256k1 is a constant.
 	const n_order_hex = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
-	// To do any number processing in native javascript, we have to use a BigInt.
+	// In order to do the non hashing math in this function, we need to use a BigInt
+	// to preserve all significant digits. 
 	let n_order_int = BigInt('0x' + n_order_hex);
-
 	// index must be in hex string for concatenation
 	index_hex = num2hex(index).padStart(8, '0');
-	//console.log('index_hex: ' + index_hex);
-
-	// use test values from learnme to make sure we're doing this right.
-	//parent_chain_code = '463223aac10fb13f291a1bc76bc26003d98da661cb76df61e750c139826dea8b';
-	//parent_key = 'f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9';
-
 	const key = parent_chain_code;
-	// set up HMAC hash 
-	// add '00' for private keys
-	//const data = '00' + parent_key + index_hex;
 	let intermediate_key = '';
 	let data = '';
+	// check if we're deriving a hardened or normal set of keys.
+	console.log('inputted index: ' + index);
 	if(index >= 2**31){
 		// derive hardened child with parent private key
 		data = '00' + parent_privkey + index_hex;
 		console.log('index is greater than 2**31, compute hardended children');
 	}else{
+		// derive normal children
 		let parent_pubkey = await secp.getPublicKey(parent_privkey, true);
 		data = parent_pubkey + index_hex;
 		console.log('index is less than 2**31, compute normal children');
 	}
-	console.log('data: ' + data);
-	console.log('key: ' + key);
+	//console.log('data: ' + data);
+	//console.log('key: ' + key);
 
 	intermediate_key = await hmac_sha512(data, key);
-	//console.log('intermediate_key: ' + intermediate_key);
 	const ikey_left = intermediate_key.substring(0,64);
     const child_chain_code = intermediate_key.substring(64,128);
-	//console.log('ikey left:  ' + ikey_left);
-	//console.log('chain code: ' + child_chain_code);
 
 	// BIP 32 specifies that derived chain codes >= the order (n) are invalid.
+	// The probability of this is lower than 1 in 2**127.
 	if (BigInt('0x' + child_chain_code) >= n_order_int){
 		throw 'Chain code is greater than the order of the curve. Try the next index.';
 	}
 
 	// Use scalar addition here
 	let child_key_int = BigInt(Number.MAX_SAFE_INTEGER);
-	//child_key_int = (BigInt('0x' + ikey_left) + BigInt('0x' + parent_pubkey)) % n_order_int;
 	child_key_int = (BigInt('0x' + ikey_left) + BigInt('0x' + parent_privkey)) % n_order_int;
 	let child_key_hex = num2hex(child_key_int);
 
