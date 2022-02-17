@@ -62,6 +62,7 @@ async function derive_child_privkey(parent_chain_code, parent_privkey, index) {
     let data = '';
     // check if we're deriving a hardened or normal set of keys.
     console.log('inputted index: ' + index);
+	console.log('index hex: ' + index_hex);
     if(index >= 2**31){
         // derive hardened child with parent private key
         data = '00' + parent_privkey + index_hex;

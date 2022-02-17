@@ -16,7 +16,7 @@ let noble = nobleHashes;
 
 test_keygen();
 async function test_keygen(){
-
+/*
 	// Generate a key we know is valid
 	const sentence = await computeMnemonicPhrase();
 	console.log('mnemonic sentence: ' + sentence);
@@ -44,9 +44,28 @@ async function test_keygen(){
 	const address_child_d3 = await getAddress(pubkey_child_d3);
 	console.log('address of child key depth3: ' + address_child_d3);
 */
-	let 
 	// testing code as I build
-	node_keypair = await derive_key_tree('cat dog tree', 'm/43h/3/1000h/2000/4000/10000h');
+	let m_sentence = await computeMnemonicPhrase();
+	//node_keypair = await derive_key_tree('cat dog tree', 'm/43h/3/1000h/2000/4000/10000h');
+	node_keypair = await derive_key_tree(m_sentence, 'm/43h/3/1000h/2000/4000/10000h/2000000000');
+	// THIS WORKS!
+	//node_keypair = await derive_key_tree(m_sentence, 'm/43h/3/1000h');
+	// THIS DOES NOT WORK!
+	//node_keypair = await derive_key_tree(m_sentence, 'm/43h/3/1000h/2000');
+	// THIS DOES NOT WORK!
+	//node_keypair = await derive_key_tree(m_sentence, 'm/1000h/2000');
+	// THIS DOES NOT WORK ==> check CKD function
+	//node_keypair = await derive_key_tree(m_sentence, 'm/9/10/100/1000');
+	// THIS WORKS!
+	//node_keypair = await derive_key_tree(m_sentence, 'm/4000h');
+
+	// large index values for normal children appear to fail while hardened pass.
+	// normal values with indexes of more than 1 digit fail.
+	
+	//node_keypair = await derive_key_tree(m_sentence, 'm/0h/1h/1/4/5h/6');
+	//node_keypair = await derive_key_tree(m_sentence, 'm/10000h/1');
+	let address = await get_address_from_keypair(node_keypair);
+	console.log('result address: ' + address);
 }
 
 // Takes a key tree derivation notation string, like m/31h/2345/1h,
@@ -61,11 +80,17 @@ async function derive_key_tree(mnemonic, key_tree_str){
 	// how do we know the root key? derive from a mnemonic sentence.
 	// first build an array with the key index corresponding to the arr index.
 	// use regex.
-	let keypair_arr = new Array;
 	let tree_index_arr = new Array;
 
 	console.log('input- mnemonic: ' + mnemonic);
 	console.log('input- key_tree_str: ' + key_tree_str);
+	
+	// check validity of the mnemonic
+	if( await verifyMnemonicPhrase(mnemonic) ){
+		console.log('mnemonic phrase verified!');
+	}else{
+		console.log('mnemonic phrase INVALID!');
+	}
 
 	// load array to process index values
 	tree_index_arr = key_tree_str.split('/');
@@ -76,7 +101,7 @@ async function derive_key_tree(mnemonic, key_tree_str){
 
 	// convert hardened notation into numbers and check if valid
 	for(i=1; i < tree_index_arr.length; i++){
-		console.log('i: ' + i + ' tree index: ' + tree_index_arr[i]);
+//		console.log('i: ' + i + ' tree index: ' + tree_index_arr[i]);
 		//test = tree_index_arr[i];
 		if( /[^0-9h]/.test(tree_index_arr[i]) ){
 			console.log('Detected invalid key tree character!');
@@ -86,24 +111,47 @@ async function derive_key_tree(mnemonic, key_tree_str){
 			tree_index_arr[i] = parseInt(index) + 2**31;
 		// continue, normal index is in proper form
 		}else if( /^[0-9]+$/.test(tree_index_arr[i]) ){
-		// the 'h' is in the wrong spot 
-		}else{
+			//index_n = tree_index_arr[i].match(/^([0-9]+)$/);
+			tree_index_arr[i] = parseInt(tree_index_arr[i]);
+		}else{// the 'h' is in the wrong spot 
 			console.log('key tree is invalid!');
 		}
-		console.log('resulting index value: ' + tree_index_arr[i]);
+//		console.log('resulting index value: ' + tree_index_arr[i]);
 	}
 
-	// process through key tree and fill keypair_arr for potential future need
-
-
-    let children_keys = new Array;
-    //children_keys[0] = child_privkey_hex;
-    //children_keys[1] = child_chain_code;
-
-    return children_keys;
+	// build keypair array
+	let keypair_arr = new Array;
+	// start with root master key
+	keypair_arr.push(await get_root_keypair(mnemonic));
+	console.log('root extended key: ' + await compute_extended_key(keypair_arr[0][1], '00' + keypair_arr[0][0]));
+	// compute and store the rest
+	for(j=1; j < tree_index_arr.length; j++){
+		keypair_arr.push(await derive_child_privkey(keypair_arr[j-1][1], keypair_arr[j-1][0], tree_index_arr[j]));
+	}
+//	console.log('built keypair_arr:' + keypair_arr);
+//	console.log('target keypair:' + keypair_arr[tree_index_arr.length-1]);	
+	
+    return keypair_arr[tree_index_arr.length-1];
 }
 
+async function get_address_from_keypair(keypair){
+	const pubkey_child = await secp.getPublicKey(keypair[0], true);
+    const address_child = await getAddress(pubkey_child);
+	return address_child;
+}
 
+async function get_root_keypair(mnemonic){
+
+	const seed = await computeSeed512(mnemonic);
+    const hashed_seed = await hmac_sha512(seed);
+    const root_privkey = hashed_seed.substring(0,64);
+    const root_chain_code = hashed_seed.substring(64,128);
+
+    let root_keys = new Array;
+    root_keys[0] = root_privkey;
+    root_keys[1] = root_chain_code;
+    return root_keys;
+}
 
 
 </script>
