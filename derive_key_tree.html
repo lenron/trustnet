@@ -46,10 +46,43 @@ async function test_keygen(){
 
 }
 
-async function derive_key_tree(){
+// Takes a key tree derivation notation string, like m/31h/2345/1h,
+// and a mnemonic sentence for the seed.
+// and returns the keypair at that tree location.
+async function derive_key_tree(mnemonic, key_tree_str){
+	// Decode the key tree, associating an index with each level
+	// build an array where the array index matches the depth level
+	// each index returns a 2 deep array with 0th returning privkey
+	// and 1st returning chain code.
+	//
+	// how do we know the root key? derive from a mnemonic sentence.
+	// first build an array with the key index corresponding to the arr index.
+	// use regex.
+	let key_index_arr = new Array;
+
+	// make sure we're starting with 'm' and in the proper format
+	if( mnemonic.match(/^m\/[0-9]+h?/){
+		// root index is always 0
+		key_index_arr.push(0);
+		// strip of the m
+		mnemonic = mnemonic.substring(1);
+		// strip off each index and move to the next in the mnemonic str.
+		while( mnemonic.match(/^\/([0-9]+h?)/ ){
+			// convert the h into 2**31 added to the number.
+			if
+
+		}
+
+	}else{
+		throw('derivation tree string formatted incorrectly.');
+	}
 
 
+    let children_keys = new Array;
+    //children_keys[0] = child_privkey_hex;
+    //children_keys[1] = child_chain_code;
 
+    return children_keys;
 }
 
 
