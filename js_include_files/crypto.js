@@ -186,7 +186,7 @@ function encode_b58(hex_number) {
 async function mnemonic_gen_to_xprv (){
 
     const mne_sentence = await computeMnemonicPhrase();
-    if( verifyMnemonicPhrase(mne_sentence)){
+    if( await verifyMnemonicPhrase(mne_sentence)){
         console.log('mnemonic sentence verified!');
     }else{
         console.log('mnemonic sentence INVALID!');
@@ -389,7 +389,7 @@ async function verifyMnemonicPhrase(phrase){
     const hashBinArr = numberArrToBinaryStrArr(hashArray);
     // The checksum is represented by the first 4 bits of the hash.
     const checksum_verify = hashBinArr[0].substring(0,4);
-    if(checksum == checksum_verify){
+    if(checksum.localeCompare(checksum_verify) === 0){
         return true;
     }else{
         return false;
