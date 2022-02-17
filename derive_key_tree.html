@@ -26,7 +26,7 @@ async function test_keygen(){
 	const chain_code = hashed_seed.substring(64,128);
 	const root_private_key = await compute_extended_key(chain_code, '00' + private_key);
 	console.log('root extended private key: ' + root_private_key);
-
+/*
 	//depth1
 	const results_array = await derive_child_privkey(chain_code, private_key, 2);
 	const pubkey_child = await secp.getPublicKey(results_array[0], true);
@@ -43,7 +43,10 @@ async function test_keygen(){
 	const pubkey_child_d3 = await secp.getPublicKey(results_normchild[0], true);
 	const address_child_d3 = await getAddress(pubkey_child_d3);
 	console.log('address of child key depth3: ' + address_child_d3);
-
+*/
+	let 
+	// testing code as I build
+	node_keypair = await derive_key_tree('cat dog tree', 'm/43h/3/1000h/2000/4000/10000h');
 }
 
 // Takes a key tree derivation notation string, like m/31h/2345/1h,
@@ -58,24 +61,39 @@ async function derive_key_tree(mnemonic, key_tree_str){
 	// how do we know the root key? derive from a mnemonic sentence.
 	// first build an array with the key index corresponding to the arr index.
 	// use regex.
-	let key_index_arr = new Array;
+	let keypair_arr = new Array;
+	let tree_index_arr = new Array;
 
-	// make sure we're starting with 'm' and in the proper format
-	if( mnemonic.match(/^m\/[0-9]+h?/){
-		// root index is always 0
-		key_index_arr.push(0);
-		// strip of the m
-		mnemonic = mnemonic.substring(1);
-		// strip off each index and move to the next in the mnemonic str.
-		while( mnemonic.match(/^\/([0-9]+h?)/ ){
-			// convert the h into 2**31 added to the number.
-			if
+	console.log('input- mnemonic: ' + mnemonic);
+	console.log('input- key_tree_str: ' + key_tree_str);
 
-		}
-
-	}else{
-		throw('derivation tree string formatted incorrectly.');
+	// load array to process index values
+	tree_index_arr = key_tree_str.split('/');
+	// this function should only work on private keys
+	if( tree_index_arr[0] != 'm' ){
+		console.log('invalid key tree format!');
 	}
+
+	// convert hardened notation into numbers and check if valid
+	for(i=1; i < tree_index_arr.length; i++){
+		console.log('i: ' + i + ' tree index: ' + tree_index_arr[i]);
+		//test = tree_index_arr[i];
+		if( /[^0-9h]/.test(tree_index_arr[i]) ){
+			console.log('Detected invalid key tree character!');
+		// convert hardened index to number for easier use
+		} else if( /^[0-9]+h$/.test(tree_index_arr[i]) ){
+			index = tree_index_arr[i].match(/^([0-9]+)h$/);
+			tree_index_arr[i] = parseInt(index) + 2**31;
+		// continue, normal index is in proper form
+		}else if( /^[0-9]+$/.test(tree_index_arr[i]) ){
+		// the 'h' is in the wrong spot 
+		}else{
+			console.log('key tree is invalid!');
+		}
+		console.log('resulting index value: ' + tree_index_arr[i]);
+	}
+
+	// process through key tree and fill keypair_arr for potential future need
 
 
     let children_keys = new Array;
