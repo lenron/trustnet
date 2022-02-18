@@ -104,20 +104,49 @@ async function derive_child_privkey(parent_chain_code, parent_privkey, index) {
 // getAddress takes a public key in a hex string as input and
 // returns a base58 encoded P2PKH (prefix 1) address.
 async function getAddress(public_key){
-    // run a SHA256 hash on the public key
-    const pubkey_buf = hex_string_to_ArrayBuffer(public_key);
-    const hashBuffer256 = await crypto.subtle.digest('SHA-256', pubkey_buf);
-    const pubkey_uint8_arr = new Uint8Array(hashBuffer256);
-
-    // Take the result of the SHA256 hash and run a ripemd160 hash on it.
-    // ripemd160 takes Uint8Array and returns a Uint8Array.
-    const pubkey_h160_uint8 = await noble.ripemd160(pubkey_uint8_arr);
-    const pubkey_h160_hexstr = uint8ArrayToHexString(pubkey_h160_uint8);
-
+	// first run a hash160
+	const pubkey_h160_hexstr = await hash160(public_key);
+	
     const data = '00' + pubkey_h160_hexstr;
     const checksum = await computeChecksum(data);
     const payload = data + checksum;
     return encode_b58(payload);
+}
+
+// takes a hex string as input
+// returns a hex string
+async function hash160(hex_input){
+    // run a SHA256 hash on the input
+    const input_buffer = hex_string_to_ArrayBuffer(hex_input);
+    const hashed_buffer_256 = await crypto.subtle.digest('SHA-256', input_buffer);
+    const input_uint8_arr = new Uint8Array(hashed_buffer_256);
+    // Take the result of the SHA256 hash and run a ripemd160 hash on it.
+    // ripemd160 takes Uint8Array and returns a Uint8Array.
+    const input_h160_uint8 = await noble.ripemd160(input_uint8_arr);
+    return uint8ArrayToHexString(input_h160_uint8);
+}
+
+// inputs a keypair with privkey at index zero
+// outputs an address of the public key
+async function get_address_from_keypair(keypair){
+    const pubkey_child = await secp.getPublicKey(keypair[0], true);
+    const address_child = await getAddress(pubkey_child);
+    return address_child;
+}
+
+// takes a valid mnemonic as input
+// outputs the root master privkey pair
+async function get_root_keypair(mnemonic){
+
+    const seed = await computeSeed512(mnemonic);
+    const hashed_seed = await hmac_sha512(seed);
+    const root_privkey = hashed_seed.substring(0,64);
+    const root_chain_code = hashed_seed.substring(64,128);
+
+    let root_keys = new Array;
+    root_keys[0] = root_privkey;
+    root_keys[1] = root_chain_code;
+    return root_keys;
 }
 
 // Takes hex strings as input.
