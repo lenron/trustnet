@@ -51,10 +51,12 @@ async function get256HashArray(entropy){
 // Outputs will be a 2 deep array: index 0: child key, index 1: child chain code.
 async function derive_child_privkey(parent_chain_code, parent_privkey, index) {
     // The order of the elliptic curve defined in secp256k1 is a constant.
-    const n_order_hex = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
+    //const n_order_hex = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
     // In order to do the non hashing math in this function, we need to use a BigInt
     // to preserve all significant digits.
-    let n_order_int = BigInt('0x' + n_order_hex);
+    //let n_order_int = BigInt('0x' + n_order_hex);
+	// pull from known upkept library for consistency
+    let n_order_int = secp.CURVE.n;
     // index must be in hex string for concatenation
     index_hex = num2hex(index).padStart(8, '0');
     const key = parent_chain_code;
