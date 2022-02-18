@@ -49,7 +49,7 @@ function encode_b58(hex_number) {
 		//For example: if we were doing modulo 2 division, all odd
 		//numbers - regardless of how long they are - would return a
 		//remainder of 1, because the least significant digit is odd.
-       	remainder = num % fifty8;
+		remainder = num % fifty8;
 
 		//Thus, we're encoding the right most (lowest place value)
 		//digits first, and so each subsequently encoded character
