@@ -151,7 +151,8 @@ async function get_root_keypair(mnemonic){
 
 // Takes hex strings as input.
 // Outputs the xprv key encoded in base58.
-// For Master root extended private key, we start at 0 for several values.
+// For Master root extended keys, we start at 0 for several values.
+// Default to root extended key (public and private)
 async function serialize_key(chain, key, depth = '00', index = '00000000', fingerprint = '00000000'){
     let version = '';
     // Check if key is private

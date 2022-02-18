@@ -48,9 +48,17 @@ async function test_keygen(){
 	let m_sentence = await computeMnemonicPhrase();
 	//node_keypair = await derive_key_tree('cat dog tree', 'm/43h/3/1000h/2000/4000/10000h');
 	//node_keypair = await derive_key_tree(m_sentence, 'm/43h/3/1000h/2000/4000/10000h/2000000000');
-	node_keypair = await derive_key_tree(m_sentence, 'm/43h');
+/*
+	node_keypair = await derive_key_tree(m_sentence, 'm/3h');
 	let address = await get_address_from_keypair(node_keypair);
 	console.log('result address: ' + address);
+*/
+	node_keyset = await derive_key_tree(m_sentence, 'm/0h');
+	console.log('node privkey: ' + node_keyset[0]);
+	console.log('node chain code: ' + node_keyset[1]);
+	console.log('node address: ' + node_keyset[2]);
+	console.log('node xpriv: ' + node_keyset[3]);
+	console.log('node xpub: ' + node_keyset[4]);
 }
 
 // Takes a key tree derivation notation string, like m/31h/2345/1h,
@@ -112,16 +120,76 @@ async function derive_key_tree(mnemonic, key_tree_str){
 	let keypair_arr = new Array;
 	// start with root master key
 	keypair_arr.push(await get_root_keypair(mnemonic));
-	console.log('root extended key: ' + await compute_extended_key(keypair_arr[0][1], '00' + keypair_arr[0][0]));
+	console.log('root extended key: ' + await serialize_key(keypair_arr[0][1], '00' + keypair_arr[0][0]));
 	// compute and store the rest
 	for(j=1; j < tree_index_arr.length; j++){
 		keypair_arr.push(await derive_child_privkey(keypair_arr[j-1][1], keypair_arr[j-1][0], tree_index_arr[j]));
 	}
+
+	// these should be numbers
+	const depth = tree_index_arr.length-1;
+	const return_index = tree_index_arr[depth];
+	// compute with parent private key
+	const parent_pubkey = await secp.getPublicKey(keypair_arr[depth-1][0]);
+	const hash160_parent = await hash160(parent_pubkey);
+	const fingerprint = hash160_parent.substring(0,8);
+	const return_privkey = keypair_arr[depth][0];
+	const return_chain = keypair_arr[depth][1];
+	const return_pubkey = await secp.getPublicKey(return_privkey, true);
+	const return_address = await getAddress(return_pubkey);
+
+	const depth_hex = num2hex(depth).padStart(2, '0');
+	const index_hex = num2hex(return_index).padStart(8, '0');
+
+	// chain, key, depth, index, fingerprint
+	const return_xpriv = await serialize_key(return_chain, '00' + return_privkey, depth_hex, index_hex, fingerprint);
+	const return_xpub = await serialize_key(return_chain, return_pubkey, depth_hex, index_hex, fingerprint);
+
+	// build full keyset array (privkey, chain code, address, xpriv, xpub)
+	let full_keyset_arr = new Array;
+	full_keyset_arr[0] = return_privkey;
+	full_keyset_arr[1] = return_chain;
+	full_keyset_arr[2] = return_address;
+	full_keyset_arr[3] = return_xpriv;
+	full_keyset_arr[4] = return_xpub;
+	return full_keyset_arr;
+
 //	console.log('built keypair_arr:' + keypair_arr);
 //	console.log('target keypair:' + keypair_arr[tree_index_arr.length-1]);	
-	
-    return keypair_arr[tree_index_arr.length-1];
+//    return keypair_arr[tree_index_arr.length-1];
 }
+
+/*
+	// build full keyset array (privkey, chain code, address, xpriv, xpub)
+	let full_keyset_arr = new Array;
+	// start with root master key
+	const root_keypair = await get_root_keypair(mnemonic);
+	const root_pubkey = await secp.getPublicKey(root_keypair[0], true);
+	const root_address = await getAddress(root_pubkey);
+	const root_xpriv = await serialize_key(root_keypair[1], '00' + root_keypair[0]);
+	const root_xpub = await serialize_key(root_keypair[1], root_pubkey);
+	let root_keyset_arr = new Array;
+	root_keyset_arr[0] = root_keypair;
+	root_keyset_arr[1] = root_pubkey;
+	root_keyset_arr[2] = root_address;
+	root_keyset_arr[3] = root_xpriv;
+	root_keyset_arr[4] = root_xpub;
+
+	full_keyset_arr.push( root_keyset_arr );
+	
+	for(j=1; j < tree_index_arr.length; j++){
+
+		curr_keypair = await get_root_keypair(mnemonic);
+		curr_pubkey = await secp.getPublicKey(root_keypair[0], true);
+		curr_address = await getAddress(root_pubkey);
+		curr_xpriv = await serialize_key(root_keypair[1], '00' + root_keypair[0]);
+		curr_xpub = await serialize_key(root_keypair[1], root_pubkey);
+
+
+        keypair_arr.push(await derive_child_privkey(keypair_arr[j-1][1], keypair_arr[j-1][0], tree_index_arr[j]));
+    }
+*/
+
 
 </script>
 
