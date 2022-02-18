@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<body>
+<script src="js_include_files/wordlist_english.js"></script>
+<script src="js_include_files/crypto.js"></script>
+<script src="js_include_files/noble-secp256k1.js"></script>
+<script src="js_include_files/noble-ripemd160.js"></script>
+<script>
+// Ability check
+console.log('test mnemonic word list: ' + wordListArray[1])
+// objects to use 3rd party functions
+let secp = nobleSecp256k1;
+let noble = nobleHashes;
+
+test_keygen();
+async function test_keygen(){
+/*
+	// Generate a key we know is valid
+	const sentence = await computeMnemonicPhrase();
+	console.log('mnemonic sentence: ' + sentence);
+	const seed = await computeSeed512(sentence);
+	const hashed_seed = await hmac_sha512(seed);
+	const private_key = hashed_seed.substring(0,64);
+	const chain_code = hashed_seed.substring(64,128);
+	const root_private_key = await compute_extended_key(chain_code, '00' + private_key);
+	console.log('root extended private key: ' + root_private_key);
+*/
+
+
+}
+
+async function extend_key(){
+
+
+}
+
+</script>
+
+</body>
+
+</html>
