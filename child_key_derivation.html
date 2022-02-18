@@ -23,7 +23,7 @@ async function test_keygen(){
 	const hashed_seed = await hmac_sha512(seed);
 	const private_key = hashed_seed.substring(0,64);
 	const chain_code = hashed_seed.substring(64,128);
-	const root_private_key = await compute_extended_key(chain_code, '00' + private_key);
+	const root_private_key = await serialize_key(chain_code, '00' + private_key);
 	console.log('root extended private key: ' + root_private_key);
 
 	//depth1

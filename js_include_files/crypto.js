@@ -152,7 +152,7 @@ async function get_root_keypair(mnemonic){
 // Takes hex strings as input.
 // Outputs the xprv key encoded in base58.
 // For Master root extended private key, we start at 0 for several values.
-async function compute_extended_key(chain, key, depth = '00', index = '00000000', fingerprint = '00000000'){
+async function serialize_key(chain, key, depth = '00', index = '00000000', fingerprint = '00000000'){
     let version = '';
     // Check if key is private
     if( key.substring(0,2) == '00'){
@@ -226,7 +226,7 @@ async function mnemonic_gen_to_xprv (){
     hmac_sha512_hashed_seed = await hmac_sha512(seed512_hex);
     private_key_256 = hmac_sha512_hashed_seed.substring(0,64);
     chain_code = hmac_sha512_hashed_seed.substring(64,128);
-    xprv_key = await compute_extended_key(chain_code, private_key_256);
+    xprv_key = await serialize_key(chain_code, private_key_256);
 
     let return_arr = new Array();
     return_arr[0] = mne_sentence;
