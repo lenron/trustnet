@@ -48,22 +48,6 @@ async function test_keygen(){
 	let m_sentence = await computeMnemonicPhrase();
 	//node_keypair = await derive_key_tree('cat dog tree', 'm/43h/3/1000h/2000/4000/10000h');
 	node_keypair = await derive_key_tree(m_sentence, 'm/43h/3/1000h/2000/4000/10000h/2000000000');
-	// THIS WORKS!
-	//node_keypair = await derive_key_tree(m_sentence, 'm/43h/3/1000h');
-	// THIS DOES NOT WORK!
-	//node_keypair = await derive_key_tree(m_sentence, 'm/43h/3/1000h/2000');
-	// THIS DOES NOT WORK!
-	//node_keypair = await derive_key_tree(m_sentence, 'm/1000h/2000');
-	// THIS DOES NOT WORK ==> check CKD function
-	//node_keypair = await derive_key_tree(m_sentence, 'm/9/10/100/1000');
-	// THIS WORKS!
-	//node_keypair = await derive_key_tree(m_sentence, 'm/4000h');
-
-	// large index values for normal children appear to fail while hardened pass.
-	// normal values with indexes of more than 1 digit fail.
-	
-	//node_keypair = await derive_key_tree(m_sentence, 'm/0h/1h/1/4/5h/6');
-	//node_keypair = await derive_key_tree(m_sentence, 'm/10000h/1');
 	let address = await get_address_from_keypair(node_keypair);
 	console.log('result address: ' + address);
 }
@@ -97,6 +81,10 @@ async function derive_key_tree(mnemonic, key_tree_str){
 	// this function should only work on private keys
 	if( tree_index_arr[0] != 'm' ){
 		console.log('invalid key tree format!');
+	}
+	// can only compute depth to 255 values past root
+	if( tree_index_arr.length > 255){
+		console.log('key tree invalid! max depth is 256');
 	}
 
 	// convert hardened notation into numbers and check if valid
