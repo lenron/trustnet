@@ -47,7 +47,8 @@ async function test_keygen(){
 	// testing code as I build
 	let m_sentence = await computeMnemonicPhrase();
 	//node_keypair = await derive_key_tree('cat dog tree', 'm/43h/3/1000h/2000/4000/10000h');
-	node_keypair = await derive_key_tree(m_sentence, 'm/43h/3/1000h/2000/4000/10000h/2000000000');
+	//node_keypair = await derive_key_tree(m_sentence, 'm/43h/3/1000h/2000/4000/10000h/2000000000');
+	node_keypair = await derive_key_tree(m_sentence, 'm/43h');
 	let address = await get_address_from_keypair(node_keypair);
 	console.log('result address: ' + address);
 }
@@ -121,26 +122,6 @@ async function derive_key_tree(mnemonic, key_tree_str){
 	
     return keypair_arr[tree_index_arr.length-1];
 }
-
-async function get_address_from_keypair(keypair){
-	const pubkey_child = await secp.getPublicKey(keypair[0], true);
-    const address_child = await getAddress(pubkey_child);
-	return address_child;
-}
-
-async function get_root_keypair(mnemonic){
-
-	const seed = await computeSeed512(mnemonic);
-    const hashed_seed = await hmac_sha512(seed);
-    const root_privkey = hashed_seed.substring(0,64);
-    const root_chain_code = hashed_seed.substring(64,128);
-
-    let root_keys = new Array;
-    root_keys[0] = root_privkey;
-    root_keys[1] = root_chain_code;
-    return root_keys;
-}
-
 
 </script>
 
