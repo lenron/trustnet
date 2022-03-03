@@ -13,8 +13,12 @@ console.log('test mnemonic word list: ' + wordListArray[1])
 let secp = nobleSecp256k1;
 let noble = nobleHashes;
 
-test_keygen();
-async function test_keygen(){
+async function auto_generate(){
+	//document.getElementById('mnemonic_input_box').value = 'hello world!';
+
+	let generated_mnemonic = await computeMnemonicPhrase();
+	document.getElementById('mnemonic_input_box').value = generated_mnemonic;
+	
 
 }
 
@@ -23,6 +27,28 @@ async function test_keygen(){
 <h1>Simple Bitcoin Address Generator</h1>
 </center>
 <h2>Start with a mnemonic sentence:</h2>
+<br>
+<div>
+Auto-Generate:
+	<button type="button" onclick="auto_generate()">Generate</button>
+<br>
+OR
+<br>
+Input your own!
+	<input type="text" id="mnemonic_input_box" style="width: 750px; border-width: 1px; padding: 5px; font-family: courier"></input>
+	<button type="button" onclick="">Go!</button>
+<br>
+</div>
+<br><br>
+<div>
+Bip44 Notation
+	<input type="text" id="bip44_box"></input>
+<br>
+Extended Private Key
+	<input type="text" id="result_prvkey_box" style="width: 500px; border-width: 1px; padding: 5px; font-family: courier"></input>
+<br>
+Address
+	<input type="text" id="result_address_box" style="width: 500px; border-width: 1px; padding: 5px; font-family: courier"></input>
 </center>
 </body>
 </html>
