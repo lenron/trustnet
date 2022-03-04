@@ -18,13 +18,8 @@ test_keygen();
 async function test_keygen(){
 	// testing code as I build
 	let m_sentence = await computeMnemonicPhrase();
-	//node_keyset = await derive_key_tree('cat dog tree', 'm/43h/3/1000h/20h00/4000/10000h');
-	//node_keyset = await derive_key_tree('cat dog tree', 'm8/43h/3/1000h/2000/4000/10000h');
-	//node_keyset = await derive_key_tree('cat dog tree', 'm8/43h/3/1000h/2000/4000/10000h');
-	//node_keyset = await derive_key_tree('cat dog tree', 'm/43h/3/1000h/2000/4000/10000h');
-	node_keyset = await derive_key_tree(m_sentence, 'm/43h/3/1000h/2000/4000/10000h/1');
-	//node_keyset = await derive_key_tree(m_sentence, 'm/0');
-	//node_keyset = await derive_key_tree(m_sentence, 'm/0h');
+	//node_keyset = await derive_key_tree('m/43h/3/1000h/2000/4000/10000h/1', m_sentence);
+	node_keyset = await derive_key_tree('m/0', m_sentence, 'gobeavs');
 	console.log('node privkey: ' + node_keyset[0]);
 	console.log('node chain code: ' + node_keyset[1]);
 	console.log('node address: ' + node_keyset[2]);
