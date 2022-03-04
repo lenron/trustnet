@@ -409,11 +409,12 @@ async function hmac_sha512(data, key){
 // Takes a mnemonic sentence and possibly a password as input.
 // Outputs the computed seed in a hex string.
 async function computeSeed512(mnemonicPhrase, in_password){
-    if( typeof password !== 'undefined'){
+    if( typeof in_password !== 'undefined'){
         password = in_password;
     }else{
         password = '';
     }
+	console.log('password: ' + password);
     const salt = 'mnemonic' + password;
     const normsalt = salt.normalize('NFKD', 'utf8');
     // For PBKDF2 to work properly, inputs must be in uint8 ArrayBuffer format.

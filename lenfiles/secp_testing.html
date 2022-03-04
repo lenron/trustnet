@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+	</head>
+
+	<h1>secp256k1 noble testing</h1>
+
+
+	<script src="./noble-secp256k1.js"></script>
+	<script>
+		'use strict';
+		var secp = nobleSecp256k1;
+
+/* ENCRYPTION PLAN Take 256-bit key from compressed (33 bytes - 1st byte) shared secret from ECDH
+SHA-512 this key, generating two new keys: EncryptKey and HMACKey
+So hash plaintext for integrity of message
+Prepend hash to plaintext and AES-CBC encrypt with random 16-byte IV and EncryptKey
+generate HMAC from the (IV + encrypted message) with HMACKey
+sign HMAC with EC private key
+Send (IV + Encryped Message + Signed HMAC)
+
+inspired by: https://security.stackexchange.com/questions/63132/when-to-use-hmac-alongside-aes
+*/
+
+
+
+
+(async () => {
+	var privateKeyAlice = "7163725400bfa940708b417d28ac26d79357c59795395df3e29bc7bbe750be3c";
+	var privateKeyBob   = "8a345b147d8ad61ec1bf757ccb2b024f6c50ec400e04632e8217a0453f0095bd";
+	var publicKeyAlice = secp.getPublicKey(privateKeyAlice, true);
+	var publicKeyBob   = secp.getPublicKey(privateKeyBob);
+	console.log("Alice public key: " + publicKeyAlice);
+	console.log("Bob public key:   " + publicKeyBob);
+	var sharedSecretAlice = secp.getSharedSecret(privateKeyAlice, publicKeyBob, true);
+	var sharedSecretBob   = secp.getSharedSecret(privateKeyBob, publicKeyAlice, true);
+
+	console.log("Secret calculated by Alice: " + sharedSecretAlice);
+	console.log("Secret calculated by Bob:   " + sharedSecretBob);
+
+	//Acquire encrypt and HMAC keys from ECDH shared secret public key.
+	const secretKeys = await generate_encrypt_and_hmac_keys_from_ecdh_shared_key(sharedSecretAlice);
+
+	const messageAlice = "I love you, Alice";
+	//Store message in a Uint8Array for window.crypto processing.
+	const encodedMessageAlice = new TextEncoder().encode(messageAlice);
+
+	const aes_256_encrypted = await AES_256_CBC_encrypt (encodedMessageAlice, secretKeys.encrypt);
+	console.log(aes_256_encrypted.encrypted_message);
+	console.log(aes_256_encrypted.iv);
+
+
+})();
+
+//Encrypts a plaintext message with AES-256-CBC with the given key.
+//Plaintext message is an ArrayBuffer.
+//Key is a CryptoKey object.
+//Encrypted message is an ArrayBuffer.
+async function AES_256_CBC_encrypt (plaintext_message, key) {
+	const aes_256_iv = generate_AES_256_CBC_IV();
+	const ciphertext = await window.crypto.subtle.encrypt(
+		{ name: "AES-CBC", iv: aes_256_iv  },
+		key,
+		plaintext_message
+	);
+	return { encrypted_message: ciphertext, iv: aes_256_iv };
+}
+
+//Take our secp256k1 ECDH 33 byte shared secret public key.
+//Convert to 32 byte array buffer, sha512 hash, and return two 32 byte Uint8Array keys.
+//Key 1 for encryption, Key 2 for generation of HMAC.
+async function generate_encrypt_and_hmac_keys_from_ecdh_shared_key (sharedSecretKey) {
+	//Check to ensure that input appears to be a 33-byte hex compressed public key.
+	if (sharedSecretKey.length != 66) {
+		console.log('WARNING: provided shared secret is not compressed hex public key');
+	}
+	//Array buffer holds 32 bytes, with each index being one byte.
+	const sharedSecretArrayBuffer = hexStringToArrayBuffer(sharedSecretKey);
+	const sha512SharedSecret = await window.crypto.subtle.digest('SHA-512', sharedSecretArrayBuffer);
+	const encryptKey32ByteArrayBuffer = sha512SharedSecret.slice(0, 32);
+	const hmacKey32ByteArrayBuffer = sha512SharedSecret.slice(32, 64);
+
+	//Converts ArrayBuffer keys into CryptoKey objects.
+	const encrypt_CryptoKey = await crypto.subtle.importKey(
+		"raw",
+		encryptKey32ByteArrayBuffer,
+		"AES-CBC",
+		false, //Key is not extractable. Already shared through ECDH.
+		["encrypt", "decrypt"] //Approved for encryption/decryption.
+	);
+	const hmac_CryptoKey = await crypto.subtle.importKey(
+		"raw",
+		hmacKey32ByteArrayBuffer,
+		"AES-CBC",
+		false, //Key is not extractable. Already shared through ECDH.
+		["encrypt", "decrypt"] //Approved for encryption/decryption.
+	);
+
+	return { encrypt: encrypt_CryptoKey, hmac: hmac_CryptoKey };
+}
+
+//Generate a random 16 byte IV for use with AES-256-CBC encryption.
+function generate_AES_256_CBC_IV() {
+	return window.crypto.getRandomValues(new Uint8Array(16))
+}
+
+//Convert hex string to array of unsigned 8-bit integers and return the ArrayBuffer.
+//A compressed 33 byte secp public key will return a 256 bit ArrayBuffer number.
+//From: https://gist.github.com/don/871170d88cf6b9007f7663fdbc23fe09
+function hexStringToArrayBuffer(hexString) {
+    // remove the leading 0x (modified this from original for ECC public keys).
+    hexString = hexString.replace(/^0./, ''); 
+    
+    // ensure even number of characters
+    if (hexString.length % 2 != 0) {
+        console.log('WARNING: expecting an even number of characters in the hexString');
+    }
+    
+    // check for some non-hex characters
+    var bad = hexString.match(/[G-Z\s]/i);
+    if (bad) {
+        console.log('WARNING: found non-hex characters', bad);    
+    }
+    
+    // split the string into pairs of octets
+    var pairs = hexString.match(/[\dA-F]{2}/gi);
+    
+    // convert the octets to integers
+    var integers = pairs.map(function(s) {
+        return parseInt(s, 16);
+    });
+    var array = new Uint8Array(integers);
+
+    //The buffer method called here returns the ArrayBuffer.
+    return array.buffer;
+}
+
+function printIntegersFromArrayBuffer (arrayBuffer) {
+	const integerArray = new Uint8Array(arrayBuffer);
+	console.log(integerArray);
+}
+
+
+
+
+
+
+
+
+/*
+		//Paul Miller example code
+		// Common.js and ECMAScript Modules (ESM)
+(async () => {
+  // You pass either a hex string, or Uint8Array
+  const privateKey = "6b911fd37cdf5c81d4c0adb1ab7fa822ed253ab0ad9aa18d77257c88b29b718e";
+  const messageHash = "a33321f98e4ff1c283c76998f14f57447545d339b3db534c6d886decb4209f28";
+  const publicKey = secp.getPublicKey(privateKey);
+console.log("public key: " + publicKey);
+  const signature = await secp.sign(messageHash, privateKey);
+console.log("signed message hash: " + signature);
+  const isSigned = secp.verify(signature, messageHash, publicKey);
+console.log("verify signature: " + isSigned);
+  // Canonical signatures
+  const signatureC = await secp.sign(messageHash, privateKey, { canonical: true });
+console.log("canonical signature: " + signatureC);
+  const canonicalalsoisSigned = secp.verify(signatureC, messageHash, publicKey);
+console.log("canonical signature verify: " + canonicalalsoisSigned);
+
+  // Supports Schnorr signatures
+  const rpub = secp.schnorr.getPublicKey(privateKey);
+  const rsignature = await secp.schnorr.sign(messageHash, privateKey);
+  const risSigned = await secp.schnorr.verify(rsignature, messageHash, rpub);
+})();
+*/
+	</script>
+</html>
+
+
+
