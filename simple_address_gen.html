@@ -3,6 +3,35 @@
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <meta content="utf-8" http-equiv="encoding">
 <body>
+
+<center>
+<h1>Simple Bitcoin Address Generator</h1>
+</center>
+<h2>Start with a mnemonic sentence:</h2>
+<br>
+<div>
+Auto-Generate:
+	<button id='gen_button' type="button" onclick="auto_generate()">Generate</button>
+<br>
+OR
+<br>
+Input your own!
+	<input type="text" id="mnemonic_input_box" style="width: 750px; border-width: 1px; padding: 5px; font-family: courier"></input>
+	<button id='go_button' type="button" onclick="go_user_input()">Go!</button>
+<br>
+</div>
+<br><br>
+<div id='result_div' style='display: none;'>
+Bip44 Notation
+	<input type="text" id="bip44_box" style=""></input>
+<br>
+Extended Private Key
+	<input type="text" id="result_prvkey_box" style="width: 500px; border-width: 1px; padding: 5px; font-family: courier"></input>
+<br>
+Address
+	<input type="text" id="result_address_box" style="width: 500px; border-width: 1px; padding: 5px; font-family: courier"></input>
+</div>
+
 <script src="js_include_files/wordlist_english.js"></script>
 <script src="js_include_files/crypto.js"></script>
 <script src="js_include_files/noble-secp256k1.js"></script>
@@ -13,42 +42,45 @@ console.log('test mnemonic word list: ' + wordListArray[1])
 let secp = nobleSecp256k1;
 let noble = nobleHashes;
 
+function disable_inputs(){
+	document.getElementById('gen_button').setAttribute('disabled', true);
+	document.getElementById('go_button').setAttribute('disabled', true);
+	document.getElementById('mnemonic_input_box').setAttribute('disabled', true);
+}
+
 async function auto_generate(){
 	//document.getElementById('mnemonic_input_box').value = 'hello world!';
-
 	let generated_mnemonic = await computeMnemonicPhrase();
 	document.getElementById('mnemonic_input_box').value = generated_mnemonic;
-	
+	document.getElementById('result_div').style.display = 'inline';
+	disable_inputs();
+
+}
+async function go_user_input(){
+	let mnemonic = document.getElementById('mnemonic_input_box').value;
+	document.getElementById('result_div').style.display = 'inline';
+	disable_inputs();
+
 
 }
 
 </script>
-<center>
-<h1>Simple Bitcoin Address Generator</h1>
-</center>
-<h2>Start with a mnemonic sentence:</h2>
-<br>
-<div>
-Auto-Generate:
-	<button type="button" onclick="auto_generate()">Generate</button>
-<br>
-OR
-<br>
-Input your own!
-	<input type="text" id="mnemonic_input_box" style="width: 750px; border-width: 1px; padding: 5px; font-family: courier"></input>
-	<button type="button" onclick="">Go!</button>
-<br>
-</div>
-<br><br>
-<div>
-Bip44 Notation
-	<input type="text" id="bip44_box"></input>
-<br>
-Extended Private Key
-	<input type="text" id="result_prvkey_box" style="width: 500px; border-width: 1px; padding: 5px; font-family: courier"></input>
-<br>
-Address
-	<input type="text" id="result_address_box" style="width: 500px; border-width: 1px; padding: 5px; font-family: courier"></input>
-</center>
+
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
