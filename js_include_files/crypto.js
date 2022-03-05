@@ -154,6 +154,58 @@ async function derive_key_tree(key_tree_str, mnemonic, passphrase){
     return full_keyset_arr;
 }
 
+/*
+function usage:
+let err = check_tree_input(key_tree_str);
+if( err !== ''){
+    console.log('error: ' + err);
+}else{
+    console.log('no error detected: ' + err);
+}
+*/
+// returns error value on fail. returns empty string on success.
+// takes a bip32 tree derivation string as input eg m/0h/1
+function check_tree_input(key_tree_str){
+    let tree_index_arr = new Array;
+    // load array to process index values
+    tree_index_arr = key_tree_str.split('/');
+    // this function should only work on private keys
+    if( tree_index_arr[0] != 'm' ){
+        return 'invalid key tree format!';
+    }
+    // can only compute depth to 255 values past root
+    if( tree_index_arr.length > 255){
+        return 'key tree invalid! max depth is 256';
+    }
+
+    // convert hardened notation into numbers and check if valid
+    for(i=1; i < tree_index_arr.length; i++){
+        if( /[^0-9h]/.test(tree_index_arr[i]) ){
+            return 'Detected invalid key tree character!';
+        // convert hardened index to number for easier use
+        // do not exceed index limit
+        } else if( /^[0-9]+h$/.test(tree_index_arr[i]) ){
+            index = tree_index_arr[i].match(/^([0-9]+)h$/);
+            if( parseInt(index) < 2**31 ){
+                tree_index_arr[i] = parseInt(index) + 2**31;
+            }else{
+                return 'Error: index cannot exceed 2**31-1!';
+            }
+        // continue, normal index is in proper form
+        // do not exceed index limit
+        }else if( /^[0-9]+$/.test(tree_index_arr[i]) ){
+            if( parseInt(tree_index_arr[i]) < 2**31 ){
+                tree_index_arr[i] = parseInt(tree_index_arr[i]);
+            }else{
+                return 'Error: index cannot exceed 2**31-1!';
+            }
+        }else{// the 'h' is in the wrong spot
+            return 'key tree is invalid!';
+        }
+    }
+    return '';
+}
+
 // This overloaded function derives both child normal and hardened keys based on
 // the inputted index. This follows the bip32 spec for CKD functions.
 // Parent chain code and privkey are hex string inputs, index is a number.
