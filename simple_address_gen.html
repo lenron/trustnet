@@ -28,8 +28,9 @@ Optional Seed Passphrase
 <br><br>
 <div id='result_div' style='display: none;'>
 Bip32 Notation
-	<input type="text" id="bip32_box" style=""></input>
-	<button type='button' id='bip32_button' onclick='update_output()'>Update</button>
+	<input type="text" id="bip32_box" style="" value='m/0'></input>
+	<button type='button' id='bip32_button' onclick='generate_results()'>Update</button>
+	<label id='bip32_validity_label'><label> 
 <br>
 Extended Private Key
 	<input type="text" id="result_prvkey_box" style="width: 550px; border-width: 1px; padding: 5px; font-family: courier"></input>
@@ -79,14 +80,30 @@ async function go_user_input(){
 	}
 }
 async function generate_results(){
+	document.getElementById('result_div').style.display = 'inline';
 	let mnemonic = document.getElementById('mnemonic_input_box').value;
 	let passphrase =  document.getElementById('seed_pw').value;
-	const tree_str = 'm/0';
+	let tree_str =  document.getElementById('bip32_box').value;
+
+	let err = check_tree_input(tree_str);
+	if( err !== ''){
+		console.log('error: ' + err);
+		document.getElementById('bip32_validity_label').innerHTML = err;
+	}else{
+		console.log('no error detected: ' + err);
+/*
+		result_array = await derive_key_tree(tree_str, mnemonic, passphrase);
+		document.getElementById('bip32_box').value = tree_str;
+		document.getElementById('result_prvkey_box').value = result_array[0];
+		document.getElementById('result_address_box').value = result_array[2];
+*/	
+	}	
 
 	result_array = await derive_key_tree(tree_str, mnemonic, passphrase);
 	document.getElementById('bip32_box').value = tree_str;
 	document.getElementById('result_prvkey_box').value = result_array[0];
 	document.getElementById('result_address_box').value = result_array[2];
+
 }
 
 </script>
