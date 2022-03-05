@@ -19,7 +19,11 @@ Input your own (12 words please)!
 	<input type="text" id="mnemonic_input_box" style="width: 700px; border-width: 1px; padding: 5px; font-family: courier"></input>
 	<button id='go_button' type="button" onclick="go_user_input()">Go!</button>
 <br>
+Optional Seed Passphrase
+	<input type='text' id='seed_pw'></input>
+<br>
 </div>
+
 <div id='valididy_div'><label id='validity_label'>label</label></div>
 <br><br>
 <div id='result_div' style='display: none;'>
@@ -48,6 +52,7 @@ function disable_inputs(){
 	document.getElementById('gen_button').setAttribute('disabled', true);
 	document.getElementById('go_button').setAttribute('disabled', true);
 	document.getElementById('mnemonic_input_box').setAttribute('disabled', true);
+	document.getElementById('seed_pw').setAttribute('disabled', true);
 }
 
 async function auto_generate(){
@@ -75,9 +80,10 @@ async function go_user_input(){
 }
 async function generate_results(){
 	let mnemonic = document.getElementById('mnemonic_input_box').value;
+	let passphrase =  document.getElementById('seed_pw').value;
 	const tree_str = 'm/0';
 
-	result_array = await derive_key_tree(mnemonic, tree_str);
+	result_array = await derive_key_tree(tree_str, mnemonic, passphrase);
 	document.getElementById('bip32_box').value = tree_str;
 	document.getElementById('result_prvkey_box').value = result_array[0];
 	document.getElementById('result_address_box').value = result_array[2];
