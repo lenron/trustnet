@@ -26,11 +26,11 @@ Optional Seed Passphrase
 
 <div id='valididy_div'><label id='validity_label'>label</label></div>
 <br><br>
-<div id='result_div' style='display: none;'>
+<div id='result_div' style='display: inline;'>
 Bip32 Notation
 	<input type="text" id="bip32_box" style="" value='m/0'></input>
 	<button type='button' id='bip32_button' onclick='generate_results()'>Update</button>
-	<label id='bip32_validity_label'><label> 
+	<label id='bip32_validity_label'></label> 
 <br>
 Extended Private Key
 	<input type="text" id="result_prvkey_box" style="width: 550px; border-width: 1px; padding: 5px; font-family: courier"></input>
@@ -89,21 +89,27 @@ async function generate_results(){
 	if( err !== ''){
 		console.log('error: ' + err);
 		document.getElementById('bip32_validity_label').innerHTML = err;
+/*
+		document.getElementById('bip32_box').value = '';
+		document.getElementById('result_prvkey_box').value = '';
+		document.getElementById('result_address_box').value = '';
+*/
 	}else{
 		console.log('no error detected: ' + err);
-/*
+		console.log('tree_str: ' + tree_str + ' mnemonic: ' + mnemonic);
 		result_array = await derive_key_tree(tree_str, mnemonic, passphrase);
 		document.getElementById('bip32_box').value = tree_str;
 		document.getElementById('result_prvkey_box').value = result_array[0];
 		document.getElementById('result_address_box').value = result_array[2];
-*/	
 	}	
 
+/*
 	result_array = await derive_key_tree(tree_str, mnemonic, passphrase);
 	document.getElementById('bip32_box').value = tree_str;
 	document.getElementById('result_prvkey_box').value = result_array[0];
 	document.getElementById('result_address_box').value = result_array[2];
 
+*/	
 }
 
 </script>
