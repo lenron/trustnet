@@ -24,9 +24,40 @@ Optional Seed Passphrase
 <br>
 </div>
 
-<div id='valididy_div'><label id='validity_label'>label</label></div>
-<br><br>
-<div id='result_div' style='display: inline;'>
+<div id='valididy_div'>
+	<label id='validity_label'>validity label</label>
+</div>
+<br>
+<div id='advanced_buttons' style='display: none'>
+	<button id='advanced_button' type='button' onclick='show_advanced()'>Show Advanced Datapath</button>
+	<button id='hide_advanced_button' type='button' onclick='hide_advanced()'>Hide Advanced Datapath</button>
+</div>
+
+<div id='advanced_div' style='display: none'>
+<br>
+Seed<input type="text" id="seed" style="width: 550px; border-width: 1px; padding: 5px; font-family: courier"></input>
+<br>
+Root Private Key<input type="text" id="root_prv" style="width: 550px; border-width: 1px; padding: 5px; font-family: courier"></input>
+Serialized Root Private Key<input type="text" id="ser_root_prv"></input> 
+<br>
+	<div id='first_child'>
+		<br>
+		Computing Hardened Child (private key - child private key)
+		<br>
+		Index<input type='text' id='child_index'></input>
+		<br>
+		Child Private Key<input type='text' id='child_prv'></input>
+		Serialized Child Private Key<input type='text' id='child_xprv'></input>
+		<br>
+		Child Public Key<input type='text' id='child_pub'></input>
+		<br>
+		Child Address<input type='text' id='child_address'></input>
+	</div>
+<br>
+</div>
+
+<br>
+<div id='result_div' style='display: none'>
 Bip32 Notation
 	<input type="text" id="bip32_box" style="" value='m/0'></input>
 	<button type='button' id='bip32_button' onclick='generate_results()'>Update</button>
@@ -45,7 +76,7 @@ Address
 <script src="js_include_files/noble-ripemd160.js"></script>
 <script>
 // Ability check
-console.log('test mnemonic word list: ' + wordListArray[1])
+console.log('test mnemonic word list: ' + wordListArray[1]);
 let secp = nobleSecp256k1;
 let noble = nobleHashes;
 
@@ -61,6 +92,7 @@ async function auto_generate(){
 	let generated_mnemonic = await computeMnemonicPhrase();
 	document.getElementById('mnemonic_input_box').value = generated_mnemonic;
 	document.getElementById('validity_label').innerHTML = 'Mnemonic sentence VALID. ';
+	document.getElementById('advanced_buttons').style.display = 'inline';
 	document.getElementById('result_div').style.display = 'inline';
 	disable_inputs();
 	generate_results();
@@ -70,6 +102,7 @@ async function go_user_input(){
 	let mnemonic = document.getElementById('mnemonic_input_box').value;
 	if( await verifyMnemonicPhrase(mnemonic) ){
 		document.getElementById('validity_label').innerHTML = 'Mnemonic sentence VALID. ';
+		document.getElementById('advanced_buttons').style.display = 'inline';
 		document.getElementById('result_div').style.display = 'inline';
 		disable_inputs();
 		generate_results();
@@ -89,11 +122,6 @@ async function generate_results(){
 	if( err !== ''){
 		console.log('error: ' + err);
 		document.getElementById('bip32_validity_label').innerHTML = err;
-/*
-		document.getElementById('bip32_box').value = '';
-		document.getElementById('result_prvkey_box').value = '';
-		document.getElementById('result_address_box').value = '';
-*/
 	}else{
 		console.log('no error detected: ' + err);
 		console.log('tree_str: ' + tree_str + ' mnemonic: ' + mnemonic);
@@ -103,13 +131,15 @@ async function generate_results(){
 		document.getElementById('result_address_box').value = result_array[2];
 	}	
 
-/*
-	result_array = await derive_key_tree(tree_str, mnemonic, passphrase);
-	document.getElementById('bip32_box').value = tree_str;
-	document.getElementById('result_prvkey_box').value = result_array[0];
-	document.getElementById('result_address_box').value = result_array[2];
+}
 
-*/	
+async function hide_advanced(){
+	document.getElementById('advanced_div').style.display = 'none';
+}
+
+async function show_advanced(){
+	document.getElementById('advanced_div').style.display = 'inline';
+
 }
 
 </script>
