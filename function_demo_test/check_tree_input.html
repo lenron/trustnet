@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<body>
+<script src="js_include_files/wordlist_english.js"></script>
+<script src="js_include_files/crypto.js"></script>
+<script src="js_include_files/noble-secp256k1.js"></script>
+<script src="js_include_files/noble-ripemd160.js"></script>
+<script>
+// Ability check
+console.log('test mnemonic word list: ' + wordListArray[1])
+// objects to use 3rd party functions
+let secp = nobleSecp256k1;
+let noble = nobleHashes;
+
+//let key_tree_str = 'm/0';
+let key_tree_str = 'm/2222222222222222222222222220';
+
+let err = check_tree_input(key_tree_str);
+if( err !== ''){
+	console.log('error: ' + err);
+}else{
+	console.log('no error detected: ' + err);
+}
+
+/*
+function usage:
+let err = check_tree_input(key_tree_str);
+if( err !== ''){
+	console.log('error: ' + err);
+}else{
+	console.log('no error detected: ' + err);
+}
+*/
+// returns error value on fail. returns empty string on success.
+// takes a bip32 tree derivation string as input eg m/0h/1
+function check_tree_input(key_tree_str){
+	let tree_index_arr = new Array;
+	// load array to process index values
+    tree_index_arr = key_tree_str.split('/');
+    // this function should only work on private keys
+    if( tree_index_arr[0] != 'm' ){
+        return 'invalid key tree format!';
+    }
+    // can only compute depth to 255 values past root
+    if( tree_index_arr.length > 255){
+        return 'key tree invalid! max depth is 256';
+    }
+
+    // convert hardened notation into numbers and check if valid
+    for(i=1; i < tree_index_arr.length; i++){
+        if( /[^0-9h]/.test(tree_index_arr[i]) ){
+            return 'Detected invalid key tree character!';
+        // convert hardened index to number for easier use
+        // do not exceed index limit
+        } else if( /^[0-9]+h$/.test(tree_index_arr[i]) ){
+            index = tree_index_arr[i].match(/^([0-9]+)h$/);
+            if( parseInt(index) < 2**31 ){
+                tree_index_arr[i] = parseInt(index) + 2**31;
+            }else{
+                return 'Error: index cannot exceed 2**31-1!';
+            }
+        // continue, normal index is in proper form
+        // do not exceed index limit
+        }else if( /^[0-9]+$/.test(tree_index_arr[i]) ){
+            if( parseInt(tree_index_arr[i]) < 2**31 ){
+                tree_index_arr[i] = parseInt(tree_index_arr[i]);
+            }else{
+                return 'Error: index cannot exceed 2**31-1!';
+            }
+        }else{// the 'h' is in the wrong spot
+            return 'key tree is invalid!';
+        }
+    }
+	return '';
+}
+
+</script>
+
+</body>
+
+</html>
