@@ -322,7 +322,7 @@ async function serialize_key(chain, key, depth = '00', index = '00000000', finge
     let version = '';
     // Check if key is private
     if( key.substring(0,2) == '00'){
-        // key is private, starte encoded str with xprv
+        // key is private, start encoded str with xprv
         version = '0488ADE4';
     }else{  // key is public, start encoded str with xpub
         version = '0488B21E';
@@ -392,7 +392,7 @@ async function mnemonic_gen_to_xprv (){
     hmac_sha512_hashed_seed = await hmac_sha512(seed512_hex);
     private_key_256 = hmac_sha512_hashed_seed.substring(0,64);
     chain_code = hmac_sha512_hashed_seed.substring(64,128);
-    xprv_key = await serialize_key(chain_code, private_key_256);
+    xprv_key = await serialize_key(chain_code, '00' + private_key_256);
 
     let return_arr = new Array();
     return_arr[0] = mne_sentence;

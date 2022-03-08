@@ -35,18 +35,21 @@ Optional Seed Passphrase
 
 <div id='advanced_div' style='display: none'>
 <br>
-Seed<input type="text" id="seed" style="width: 550px; border-width: 1px; padding: 5px; font-family: courier"></input>
+Seed<input type="text" id="seed" style="width: 1100px; border-width: 1px; padding: 5px; font-family: courier"></input>
 <br>
-Root Private Key<input type="text" id="root_prv" style="width: 550px; border-width: 1px; padding: 5px; font-family: courier"></input>
-Serialized Root Private Key<input type="text" id="ser_root_prv"></input> 
+Root Private Key<input type="text" id="root_prv" style="width: 250px; border-width: 1px; padding: 5px; font-family: courier"></input>
+Root Chain Code<input type="text" id="root_chain" style="width: 250px; border-width: 1px; padding: 5px; font-family: courier"></input>
+<br>
+Serialized Root Private Key<input type="text" id="root_xprv" style='width: 1000px;'></input> 
 <br>
 	<div id='first_child'>
 		<br>
-		Computing Hardened Child (private key - child private key)
+		Computing First (depth 1) Hardened Child (private key - child private key)
 		<br>
-		Index<input type='text' id='child_index'></input>
+		Index (hardened, starting at 2^21 + input)<input type='text' id='child_index' value='0'></input>
 		<br>
 		Child Private Key<input type='text' id='child_prv'></input>
+		Child Chain Code<input type='text' id='child_chain'></input>
 		Serialized Child Private Key<input type='text' id='child_xprv'></input>
 		<br>
 		Child Public Key<input type='text' id='child_pub'></input>
@@ -59,7 +62,7 @@ Serialized Root Private Key<input type="text" id="ser_root_prv"></input>
 <br>
 <div id='result_div' style='display: none'>
 Bip32 Notation
-	<input type="text" id="bip32_box" style="" value='m/0'></input>
+	<input type="text" id="bip32_box" style="" value='m/0h'></input>
 	<button type='button' id='bip32_button' onclick='generate_results()'>Update</button>
 	<label id='bip32_validity_label'></label> 
 <br>
@@ -130,7 +133,6 @@ async function generate_results(){
 		document.getElementById('result_prvkey_box').value = result_array[0];
 		document.getElementById('result_address_box').value = result_array[2];
 	}	
-
 }
 
 async function hide_advanced(){
@@ -138,8 +140,36 @@ async function hide_advanced(){
 }
 
 async function show_advanced(){
+	//show the contents of the div
 	document.getElementById('advanced_div').style.display = 'inline';
-
+	// grab seed input values
+	let mnemonic = document.getElementById('mnemonic_input_box').value;
+	let passphrase =  document.getElementById('seed_pw').value;
+	//compute and show seed
+	let seed = await computeSeed512(mnemonic, passphrase);
+	document.getElementById('seed').value = seed;
+	//compute and show root prvkey and chain code
+	let root_keypair = await get_root_keypair(mnemonic, passphrase);
+	document.getElementById('root_prv').value = root_keypair[0];
+	document.getElementById('root_chain').value = root_keypair[1];
+	//compute and show master serialized (xprv) key
+	let root_xprv = await serialize_key(root_keypair[1], '00' + root_keypair[0]);
+	document.getElementById('root_xprv').value = root_xprv;
+	
+	//show child key datas
+	let index_in = document.getElementById('child_index').value;
+	index = parseInt(index_in) + 2**31;
+	console.log('index: ' + index);
+	let child_keypair = await derive_child_privkey(root_keypair[1], root_keypair[0], index);
+	document.getElementById('child_prv').value = child_keypair[0];
+	document.getElementById('child_chain').value = child_keypair[1];
+	let child_xprv = await serialize_key(child_keypair[1], '00' + child_keypair[0]);
+	document.getElementById('child_xprv').value = child_xprv;
+	let child_pub = await secp.getPublicKey(child_keypair[0], true);
+	document.getElementById('child_pub').value = child_pub;
+	let child_address = await getAddress(child_pub);
+	document.getElementById('child_address').value = child_address;
+	
 }
 
 </script>
