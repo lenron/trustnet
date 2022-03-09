@@ -1,13 +1,63 @@
 <!DOCTYPE HTML>
 <html>
+<head>
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <meta content="utf-8" http-equiv="encoding">
-<body>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
 
+* {
+	background-color: black;
+	color: #03A062;
+	font-family: 'Khula', sans-serif;
+}
+
+input[type='text'] {
+	background-color: darkgrey;
+	color: darkred;
+}
+
+input[type='text'][disabled] {
+	background-color: #202020;
+}
+
+#overlay {
+  position: fixed;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,1);
+  z-index: 2;
+  cursor: pointer;
+}
+
+</style>
+</head>
+
+<body>
+<div id='overlay' class='overlay' onclick='hide_overlay()'>
+	<p>This website exists to help both coders and otherwise understand how a bitcoin wallet and its keys and addresses are generated from a mnemonic sentence.  Additionally, how from a single seed a near limitless number of private keys, as well as their corresponding public keys and addresses, can be generated.</p>
+	<p>The site is intended to be as transparent with the dataflow as possible, showing all of the most important datas and no more. Compared to Ian Coleman's website, the intent is to be more simple and focused while revealing more of what is going on under the hood.</p>
+	<p>Also below is a link to the native javascript library that powers this site.</p>
+	<a id='ian_link' href='https://iancoleman.io/bip39/'>Ian's Site</a>
+	<br>
+	<a id='js_link' href='file:///location_of_crypto.js'>The Native Javascript Library This Website Uses</a>
+	<br><br>
+	<p>Click anywhere to dismiss this overlay.</p>
+</div>
+
+<div class='header' style='display: flex; justify-content: flex-end'>
+	<a id='info_link' href='#' onclick='show_overlay();return false;'>Description of this site</a>
+</div>
 <center>
 <h1>Simple Bitcoin Address Generator</h1>
 </center>
 <h2>Start with a mnemonic sentence:</h2>
+
 <br>
 <div>
 Auto-Generate:
@@ -16,7 +66,7 @@ Auto-Generate:
 OR
 <br>
 Input your own (12 words please)!
-	<input type="text" id="mnemonic_input_box" style="width: 700px; border-width: 1px; padding: 5px; font-family: courier"></input>
+	<input type="text" id="mnemonic_input_box" style="width: 700px;"></input>
 	<button id='go_button' type="button" onclick="go_user_input()">Go!</button>
 <br>
 Optional Seed Passphrase
@@ -35,12 +85,13 @@ Optional Seed Passphrase
 
 <div id='advanced_div' style='display: none'>
 <br>
-Seed<input type="text" id="seed" style="width: 1100px; border-width: 1px; padding: 5px; font-family: courier"></input>
+Seed<input type="text" id="seed" style="width: 1000px;"></input>
 <br>
-Root Private Key<input type="text" id="root_prv" style="width: 250px; border-width: 1px; padding: 5px; font-family: courier"></input>
-Root Chain Code<input type="text" id="root_chain" style="width: 250px; border-width: 1px; padding: 5px; font-family: courier"></input>
+Root Private Key <input type="text" id="root_prv" style="width: 500px;"></input>
 <br>
-Serialized Root Private Key<input type="text" id="root_xprv" style='width: 1000px;'></input> 
+Root Chain Code <input type="text" id="root_chain" style="width: 500px;"></input>
+<br>
+Serialized Root Private Key<input type="text" id="root_xprv" style='width: 900px;'></input> 
 <br>
 	<div id='first_child'>
 		<br>
@@ -48,13 +99,14 @@ Serialized Root Private Key<input type="text" id="root_xprv" style='width: 1000p
 		<br>
 		Index (hardened, starting at 2^21 + input)<input type='text' id='child_index' value='0'></input>
 		<br>
-		Child Private Key<input type='text' id='child_prv'></input>
-		Child Chain Code<input type='text' id='child_chain'></input>
-		Serialized Child Private Key<input type='text' id='child_xprv'></input>
+		Child Private Key<input type='text' id='child_prv' style='width: 500px'></input>
+		Child Chain Code<input type='text' id='child_chain' style='width: 500px'></input>
 		<br>
-		Child Public Key<input type='text' id='child_pub'></input>
+		Serialized Child Private Key<input type='text' id='child_xprv' style='width: 900px'></input>
 		<br>
-		Child Address<input type='text' id='child_address'></input>
+		Child Public Key<input type='text' id='child_pub' style='width: 500px;'></input>
+		<br>
+		Child Address<input type='text' id='child_address' style='width: 300px;'></input>
 	</div>
 <br>
 </div>
@@ -67,10 +119,10 @@ Bip32 Notation
 	<label id='bip32_validity_label'></label> 
 <br>
 Extended Private Key
-	<input type="text" id="result_prvkey_box" style="width: 550px; border-width: 1px; padding: 5px; font-family: courier"></input>
+	<input type="text" id="result_prvkey_box" style="width: 550px;"></input>
 <br>
 Address
-	<input type="text" id="result_address_box" style="width: 300px; border-width: 1px; padding: 5px; font-family: courier"></input>
+	<input type="text" id="result_address_box" style="width: 300px;"></input>
 </div>
 
 <script src="js_include_files/wordlist_english.js"></script>
@@ -82,6 +134,14 @@ Address
 console.log('test mnemonic word list: ' + wordListArray[1]);
 let secp = nobleSecp256k1;
 let noble = nobleHashes;
+
+function show_overlay(){
+	document.getElementById("overlay").style.display = "block";
+}
+
+function hide_overlay(){
+	document.getElementById("overlay").style.display = "none";
+}
 
 function disable_inputs(){
 	document.getElementById('gen_button').setAttribute('disabled', true);
