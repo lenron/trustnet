@@ -81,12 +81,12 @@ async function derive_key_tree(key_tree_str, mnemonic, passphrase){
 
     // convert hardened notation into numbers and check if valid
     for(i=1; i < tree_index_arr.length; i++){
-        if( /[^0-9h]/.test(tree_index_arr[i]) ){
+        if( /[^0-9']/.test(tree_index_arr[i]) ){
             console.log('Detected invalid key tree character!');
         // convert hardened index to number for easier use
         // do not exceed index limit
-        } else if( /^[0-9]+h$/.test(tree_index_arr[i]) ){
-            index = tree_index_arr[i].match(/^([0-9]+)h$/);
+        } else if( /^[0-9]+'$/.test(tree_index_arr[i]) ){
+            index = tree_index_arr[i].match(/^([0-9]+)'$/);
             if( parseInt(index) < 2**31 ){
                 tree_index_arr[i] = parseInt(index) + 2**31;
             }else{
@@ -180,12 +180,12 @@ function check_tree_input(key_tree_str){
 
     // convert hardened notation into numbers and check if valid
     for(i=1; i < tree_index_arr.length; i++){
-        if( /[^0-9h]/.test(tree_index_arr[i]) ){
+        if( /[^0-9']/.test(tree_index_arr[i]) ){
             return 'Detected invalid key tree character!';
         // convert hardened index to number for easier use
         // do not exceed index limit
-        } else if( /^[0-9]+h$/.test(tree_index_arr[i]) ){
-            index = tree_index_arr[i].match(/^([0-9]+)h$/);
+        } else if( /^[0-9]+'$/.test(tree_index_arr[i]) ){
+            index = tree_index_arr[i].match(/^([0-9]+)'$/);
             if( parseInt(index) < 2**31 ){
                 tree_index_arr[i] = parseInt(index) + 2**31;
             }else{
