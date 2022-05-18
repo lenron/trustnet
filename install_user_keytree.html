@@ -33,7 +33,21 @@ async function install_user_keytree(){
 	// test mnemonic validity console.log error phrases to be handled differently.
     if( await verifyMnemonicPhrase(mnemonic) ){
 		console.log('Mnemonic verified.');
-		
+		const seed = await computeSeed512(mnemonic, password);
+		console.log('computed seed: ' + seed);
+		// Save seed in browser 
+		if (typeof(Storage) !== "undefined") {
+			if (localStorage.seed) {
+				console.log('Overwriting previously saved seed. Old seed: ' + localStorage.seed);
+				localStorage.seed = seed;
+			} else {
+				console.log('Saving seed for the first time.');
+				localStorage.seed = seed;
+			}
+			 "You have clicked the button " + localStorage.clickcount + " time(s).";
+		} else {
+			console.log("Sorry, your browser does not support web storage...");
+		}
     }else if( mnemonic.split(' ').length != 12){
         console.log('This generator only takes mnemonic sentences of 12 words.');
     }else{
@@ -41,8 +55,6 @@ async function install_user_keytree(){
     }
 
 
-	const seed = await computeSeed512(mnemonic, password);
-	console.log('computed seed: ' + seed);
 
 
 }
