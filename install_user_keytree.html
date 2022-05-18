@@ -30,7 +30,19 @@ let noble = nobleHashes;
 async function install_user_keytree(){
 	const mnemonic = document.getElementById('mnemonic').value;
 	const password = document.getElementById('password').value;
+	// test mnemonic validity console.log error phrases to be handled differently.
+    if( await verifyMnemonicPhrase(mnemonic) ){
+		console.log('Mnemonic verified.');
+		
+    }else if( mnemonic.split(' ').length != 12){
+        console.log('This generator only takes mnemonic sentences of 12 words.');
+    }else{
+        console.log('Mnemonic sentence INVALID! Please enter a valid phrase');
+    }
 
+
+	const seed = await computeSeed512(mnemonic, password);
+	console.log('computed seed: ' + seed);
 
 
 }
@@ -38,7 +50,6 @@ async function install_user_keytree(){
 async function compute_mnemonic(){
 	const computed_mnemonic = await computeMnemonicPhrase();
 	document.getElementById('computed_mnemonic').value = computed_mnemonic;
-
 }
 
 </script>
