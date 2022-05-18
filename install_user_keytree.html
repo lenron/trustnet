@@ -3,10 +3,17 @@
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <meta content="utf-8" http-equiv="encoding">
 <body>
+	<label>Computed mnemonic:</label>
+	<input type='text' id='computed_mnemonic' style='width: 700px;'></input>
+	<input type='button' id='compute_mnemonic' onclick='compute_mnemonic()' value='Compute Mnemonic'></input><br><br>
 	<label>Enter mnemonic:</label>
-	<input type='text' id='mnemonic'></input><br>
+	<input type='text' id='mnemonic' style='width: 700px;'></input><br>
+	<label>Enter password:</label>
+	<input type='text' id='password'></input>
+	<input type='button' id='go_mnemonic' onclick='install_user_keytree()' value='Save Mnemonic'></input><br><br>
 	<label>Enter message:</label>
-	<input type='text' id='message'></input><br>
+	<input type='text' id='message'></input>
+	<input type='button' id='go_message' onclick='send_message()' value='Send Message'></input><br>
 
 <script src="js_include_files/wordlist_english.js"></script>
 <script src="js_include_files/crypto.js"></script>
@@ -19,11 +26,18 @@ console.log('test mnemonic word list: ' + wordListArray[1])
 let secp = nobleSecp256k1;
 let noble = nobleHashes;
 
-install_user_keytree();
+//install_user_keytree();
 async function install_user_keytree(){
+	const mnemonic = document.getElementById('mnemonic').value;
+	const password = document.getElementById('password').value;
 
 
 
+}
+
+async function compute_mnemonic(){
+	const computed_mnemonic = await computeMnemonicPhrase();
+	document.getElementById('computed_mnemonic').value = computed_mnemonic;
 
 }
 
