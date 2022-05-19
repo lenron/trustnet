@@ -56,6 +56,8 @@ input[type='text'][disabled] {
 	<input type='text' id='secret_alice' style='width: 550px;' disabled='true'></input><br>
 	<label>Shared secret Bob private key + Alice public key:</label><br>
 	<input type='text' id='secret_bob' style='width: 550px;' disabled='true'></input><br><br>
+	<label>IV:</label><br>
+	<input type='text' id='iv' style='width: 550px;' disabled='true'></input><br><br>
 	<label>Encrypted message from Alice sent over the internet and received by Bob:</label><br>
 	<input type='text' id='encrypted_message' style='width: 550px;'></input><br>
 	<label>Message decrypted by Bob:</label><br>
@@ -107,14 +109,27 @@ async function send_message(){
 
 	const aes_encrypted = await AES_256_CBC_encrypt (encoded_message_alice, encrypt_and_hmac_keys.encrypt);
 	console.log('encrypted message: ' + aes_encrypted.encrypted_message);
+	document.getElementById('iv').value = aes_encrypted.iv;
 
 	const plaintext_encrypted_msg = new TextDecoder().decode(aes_encrypted.encrypted_message);
 	document.getElementById('encrypted_message').value = plaintext_encrypted_msg;
+
+	const returned = await decrypt_message(aes_encrypted.encrypted_message, aes_encrypted.iv);
 }
 
 // in this function decrypt from bob's point of view
-async function decrypt_message(){
+async function decrypt_message(encrypted_message, iv){
+	const secret_bob = document.getElementById('secret_bob').value;
 
+	const encrypt_and_hmac_keys = await gen_encrypt_and_hmac_keys(secret_bob);
+
+	//const encrypted_message = document.getElementById('encrypted_message').value;
+	//const iv = document.getElementById('iv').value;
+	//const encoded_encrypted_message = new TextEncoder().encode(encrypted_message);
+	const decrypted_message = await AES_256_CBC_decrypt (encrypted_message, encrypt_and_hmac_keys.encrypt, iv);
+	const decrypted_message_decoded = new TextDecoder().decode(decrypted_message);
+	document.getElementById('decrypted_message').value = decrypted_message_decoded;
+	return 0;
 }
 
 // inspired by Len's function
@@ -148,6 +163,21 @@ async function gen_encrypt_and_hmac_keys( sharedSecretKey ){
 
     return { encrypt: encrypt_CryptoKey, hmac: hmac_CryptoKey };
 
+}
+
+//Decrypts a plaintext message with AES-256-CBC with the given key.
+//Encrypted message is an ArrayBuffer.
+//Key is a CryptoKey object.
+//aes_256_iv is ...
+//Decrypted message is an ArrayBuffer.
+async function AES_256_CBC_decrypt (encrypted_message, key, aes_256_iv) {
+    //const aes_256_iv = generate_AES_256_CBC_IV();
+    const plaintext = await window.crypto.subtle.decrypt(
+        { name: "AES-CBC", iv: aes_256_iv  },
+        key,
+        encrypted_message
+    );
+    return plaintext;
 }
 
 //Encrypts a plaintext message with AES-256-CBC with the given key.
