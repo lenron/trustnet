@@ -2,18 +2,52 @@
 <html>
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <meta content="utf-8" http-equiv="encoding">
+<style>
+* {
+    background-color: black;
+    color: #03A062;
+    font-family: 'Khula', sans-serif;
+}
+
+input[type='text'] {
+    background-color: darkgrey;
+    color: darkred;
+}
+
+input[type='button'] {
+	background-color: grey;
+	color: yellow;
+}
+
+input[type='text'][disabled] {
+    background-color: #202020;
+}
+
+</style>
 <body>
 	<label>Computed mnemonic:</label>
-	<input type='text' id='computed_mnemonic' style='width: 700px;'></input>
-	<input type='button' id='compute_mnemonic' onclick='compute_mnemonic()' value='Compute Mnemonic'></input><br><br>
+	<input type='text' id='computed_mnemonic' style='width: 550px;' disabled='true'></input>
+	<input type='button' id='compute_mnemonic' onclick='compute_mnemonic()' value='Compute Mnemonic'>
+	</input><br>
+	<label>Computed seed:</label>
+	<input type='text' id='computed_seed' style='width: 550px;' disabled='true'></input>
+	<br><br>
 	<label>Enter mnemonic:</label>
-	<input type='text' id='mnemonic' style='width: 700px;'></input><br>
-	<label>Enter password:</label>
-	<input type='text' id='password'></input>
-	<input type='button' id='go_mnemonic' onclick='install_user_keytree()' value='Save Mnemonic'></input><br><br>
-	<label>Enter message:</label>
-	<input type='text' id='message'></input>
-	<input type='button' id='go_message' onclick='send_message()' value='Send Message'></input><br>
+	<input type='text' id='mnemonic' style='width: 550px;'></input>
+	<input type='button' id='go_mnemonic' onclick='install_user_keytree()' value='Save Mnemonic'>
+	</input><br>
+	<label>Currently saved seed:</label>
+	<input type='text' id='current_seed' style='width: 550px;' disabled='true'></input><br>
+	<br>
+	<label>Enter message from Alice:</label>
+	<input type='text' id='message' style='width: 550px;'></input>
+	<br>
+	<input type='button' id='go_message' onclick='send_message()' value='Send Message'></input>
+	<br><br>
+	<label>Encrypted message from Alice sent over the internet and received by Bob:</label><br>
+	<input type='text' id='encrypted_message' style='width: 550px;'></input><br>
+	<label>Message decrypted by Bob:</label>
+	<input type='text' id='message' style='width: 550px;'></input>
 
 <script src="js_include_files/wordlist_english.js"></script>
 <script src="js_include_files/crypto.js"></script>
@@ -26,14 +60,25 @@ console.log('test mnemonic word list: ' + wordListArray[1])
 let secp = nobleSecp256k1;
 let noble = nobleHashes;
 
-//install_user_keytree();
+async function send_message(){
+
+
+}
+
+async function decrypt_message(){
+
+
+}
+
+// outputs seed which is saved to localStorage.
 async function install_user_keytree(){
 	const mnemonic = document.getElementById('mnemonic').value;
-	const password = document.getElementById('password').value;
+	//const password = document.getElementById('password').value;
 	// test mnemonic validity console.log error phrases to be handled differently.
     if( await verifyMnemonicPhrase(mnemonic) ){
 		console.log('Mnemonic verified.');
-		const seed = await computeSeed512(mnemonic, password);
+		//const seed = await computeSeed512(mnemonic, password); add pw later.
+		const seed = await computeSeed512(mnemonic);
 		console.log('computed seed: ' + seed);
 		// Save seed in browser 
 		if (typeof(Storage) !== "undefined") {
@@ -44,24 +89,21 @@ async function install_user_keytree(){
 				console.log('Saving seed for the first time.');
 				localStorage.seed = seed;
 			}
-			 "You have clicked the button " + localStorage.clickcount + " time(s).";
 		} else {
 			console.log("Sorry, your browser does not support web storage...");
 		}
+		document.getElementById('current_seed').value = localStorage.seed;
     }else if( mnemonic.split(' ').length != 12){
         console.log('This generator only takes mnemonic sentences of 12 words.');
     }else{
         console.log('Mnemonic sentence INVALID! Please enter a valid phrase');
     }
-
-
-
-
 }
 
 async function compute_mnemonic(){
 	const computed_mnemonic = await computeMnemonicPhrase();
 	document.getElementById('computed_mnemonic').value = computed_mnemonic;
+	document.getElementById('computed_seed').value = await computeSeed512(computed_mnemonic);
 }
 
 </script>
