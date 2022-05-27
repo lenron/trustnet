@@ -116,7 +116,11 @@ async function send_message(){
 	document.getElementById('iv').value = aes_encrypted.iv;
 	
 	// [IV + C]HMAC = M
-	const hmac_signature_over_aes_encrypted = await compute_HMAC_SHA256_signature( );
+	const hmac_signature_of_aes_encrypted = await compute_HMAC_SHA256_signature(aes_encrypted.encrypted_message, encrypt_and_hmac_keys.hmac);
+
+	// concatenate before sending over internet
+	// IV + C + M
+	
 
 	// decode in order to pull viewable data out of ArrayBuffer
 	const plaintext_encrypted_msg = new TextDecoder().decode(aes_encrypted.encrypted_message);
@@ -165,9 +169,9 @@ async function gen_encrypt_and_hmac_keys( sharedSecretKey ){
     const hmac_CryptoKey = await crypto.subtle.importKey(
         "raw",
         hmacKey32ByteArrayBuffer,
-        "AES-CBC",
+        {name:"HMAC", hash: {name:"SHA-256"}},
         false, //Key is not extractable. Already shared through ECDH.
-        ["encrypt", "decrypt"] //Approved for encryption/decryption.
+        ["sign", "verify"] //Approved for encryption/decryption.
     );
 
     return { encrypt: encrypt_CryptoKey, hmac: hmac_CryptoKey };
@@ -180,7 +184,6 @@ async function gen_encrypt_and_hmac_keys( sharedSecretKey ){
 //aes_256_iv is ...
 //Decrypted message is an ArrayBuffer.
 async function AES_256_CBC_decrypt (encrypted_message, key, aes_256_iv) {
-    //const aes_256_iv = generate_AES_256_CBC_IV();
     const plaintext = await window.crypto.subtle.decrypt(
         { name: "AES-CBC", iv: aes_256_iv  },
         key,
@@ -204,6 +207,8 @@ async function AES_256_CBC_encrypt (plaintext_message, key) {
 }
 
 // Produce HMAC signature 
+// data is the data to be hashed/signed
+// key is the key in which is doing the signing
 async function compute_HMAC_SHA256_signature (data, key){
 	const signature = await window.crypto.subtle.sign(
 		"HMAC",
