@@ -107,13 +107,22 @@ async function send_message(){
 	const message_alice = document.getElementById('message').value;
 	const encoded_message_alice = new TextEncoder().encode(message_alice);
 
+	// aes_encrypted.encrypted_message is C
+	// aes_encrypted.iv is IV
+	// encrypt_and_hmac_keys.encrypt is Ke
+	// encrypt_and_hmac_keys.hmac is Km
 	const aes_encrypted = await AES_256_CBC_encrypt (encoded_message_alice, encrypt_and_hmac_keys.encrypt);
 	console.log('encrypted message: ' + aes_encrypted.encrypted_message);
 	document.getElementById('iv').value = aes_encrypted.iv;
+	
+	// [IV + C]HMAC = M
+	const hmac_signature_over_aes_encrypted = await compute_HMAC_SHA256_signature( );
 
+	// decode in order to pull viewable data out of ArrayBuffer
 	const plaintext_encrypted_msg = new TextDecoder().decode(aes_encrypted.encrypted_message);
 	document.getElementById('encrypted_message').value = plaintext_encrypted_msg;
 
+	// start decrypt
 	const returned = await decrypt_message(aes_encrypted.encrypted_message, aes_encrypted.iv);
 }
 
@@ -193,6 +202,18 @@ async function AES_256_CBC_encrypt (plaintext_message, key) {
     );
     return { encrypted_message: ciphertext, iv: aes_256_iv };
 }
+
+// Produce HMAC signature 
+async function compute_HMAC_SHA256_signature (data, key){
+	const signature = await window.crypto.subtle.sign(
+		"HMAC",
+		key,
+		data
+	);
+	return signature;
+}
+
+
 
 //Generate a random 16 byte IV for use with AES-256-CBC encryption.
 function generate_AES_256_CBC_IV() {
