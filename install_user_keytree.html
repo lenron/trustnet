@@ -103,7 +103,6 @@ async function send_message(){
 	// in this function encrypt from alice's point of view
 	// get both keys for ease of using function already provied by Len
 	const encrypt_and_hmac_keys = await gen_encrypt_and_hmac_keys(secret_alice);
-
 	const message_alice = document.getElementById('message').value;
 	const encoded_message_alice = new TextEncoder().encode(message_alice);
 
