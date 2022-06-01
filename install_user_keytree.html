@@ -78,10 +78,6 @@ input[type='text'][disabled] {
 	<input type='text' id='decrypted_message' style='width: 550px;'></input>
 
 
-<br><br>
-	<label>Encrypted message from Alice sent over the internet and received by Bob:</label><br>
-	<input type='text' id='encrypted_message' style='width: 550px;'></input><br>
-
 <script src="js_include_files/wordlist_english.js"></script>
 <script src="js_include_files/crypto.js"></script>
 <script src="js_include_files/noble-secp256k1.js"></script>
@@ -106,6 +102,7 @@ async function send_message(){
 	// super simple implementation to start with, proof of sanity check
 	// so, implement all bob stuff here and move later
 	// use different key tree indexes which I think should work
+	// compute different bob keys for each send
 	const bob_mnemonic = await computeMnemonicPhrase();
 	const bob_keys = await derive_key_tree('m/1', bob_mnemonic);
 	const bob_prv = bob_keys[0];
@@ -131,23 +128,41 @@ async function send_message(){
 	// encrypt_and_hmac_keys.hmac is Km
 	const aes_encrypted = await AES_256_CBC_encrypt (encoded_message_alice, encrypt_and_hmac_keys.encrypt);
 	console.log('encrypted message: ' + aes_encrypted.encrypted_message);
-	document.getElementById('iv').value = aes_encrypted.iv;
+	document.getElementById('alice_iv').value = aes_encrypted.iv;
 	
 	// [IV + C]HMAC = M
 	const hmac_signature_of_aes_encrypted = await compute_HMAC_SHA256_signature(aes_encrypted.encrypted_message, encrypt_and_hmac_keys.hmac);
 
 	// concatenate before sending over internet
 	// IV + C + M
+	// first convert everything to hex strings and show for clarity
+	const iv_hex = buf2hex(aes_encrypted.iv);
+	const c_hex = buf2hex(aes_encrypted.encrypted_message);
+	const m_hex = buf2hex(hmac_signature_of_aes_encrypted);
+	document.getElementById('alice_iv').value = iv_hex;
+	document.getElementById('alice_c').value = c_hex;
+	document.getElementById('alice_m').value = m_hex;
+	console.log('iv length' + iv_hex.length); //32
+	console.log('m length' + m_hex.length);		//64
 	
 	// plaintext(IV+C+M)
+	const alice_sent_payload = iv_hex + c_hex + m_hex;
+	document.getElementById('alice_plaintext').value = alice_sent_payload;
 
-	// 
+	// send message to bob
+	const bob_received_payload = alice_sent_payload;
+	document.getElementById('bob_plaintext').value = bob_received_payload;
+	const iv_hex_bob = bob_received_payload.slice(0, 32);
+	const c_hex_bob = bob_received_payload.slice(32, -64);
+	const m_hex_bob = bob_received_payload.slice(-64);
+	document.getElementById('bob_iv').value = iv_hex_bob;
+	document.getElementById('bob_c').value = c_hex_bob;
+	document.getElementById('bob_m').value = m_hex_bob;
 
-	// decode in order to pull viewable data out of ArrayBuffer
-	const plaintext_encrypted_msg = new TextDecoder().decode(aes_encrypted.encrypted_message);
-	document.getElementById('encrypted_message').value = plaintext_encrypted_msg;
+
 
 	// start decrypt
+	// keep for sanity/confidence
 	const returned = await decrypt_message(aes_encrypted.encrypted_message, aes_encrypted.iv);
 }
 
