@@ -56,12 +56,31 @@ input[type='text'][disabled] {
 	<input type='text' id='secret_alice' style='width: 550px;' disabled='true'></input><br>
 	<label>Shared secret Bob private key + Alice public key:</label><br>
 	<input type='text' id='secret_bob' style='width: 550px;' disabled='true'></input><br><br>
-	<label>IV:</label><br>
-	<input type='text' id='iv' style='width: 550px;' disabled='true'></input><br><br>
-	<label>Encrypted message from Alice sent over the internet and received by Bob:</label><br>
-	<input type='text' id='encrypted_message' style='width: 550px;'></input><br>
+	<label>Alice composed message:</label><br>
+	<label>IV (Salt):</label><br>
+	<input type='text' id='alice_iv' style='width: 550px;' disabled='true'></input><br>
+	<label>C (AES encrypted message):</label><br>
+	<input type='text' id='alice_c' style='width: 550px;' disabled='true'></input><br>
+	<label>M (HMAC Signature):</label><br>
+	<input type='text' id='alice_m' style='width: 550px;' disabled='true'></input><br>
+	<label>Alice plaintext to Bob:</label><br>
+	<input type='text' id='alice_plaintext' style='width: 550px;' disabled='true'></input><br><br>
+	<label>Bob decoded message:</label><br>
+	<label>Bob plaintext received by Alice:</label><br>
+	<input type='text' id='bob_plaintext' style='width: 550px;' disabled='true'></input><br>
+	<label>IV (Salt):</label><br>
+	<input type='text' id='bob_iv' style='width: 550px;' disabled='true'></input><br>
+	<label>C (AES encrypted message):</label><br>
+	<input type='text' id='bob_c' style='width: 550px;' disabled='true'></input><br>
+	<label>M (HMAC Signature):</label><br>
+	<input type='text' id='bob_m' style='width: 550px;' disabled='true'></input><br>
 	<label>Message decrypted by Bob:</label><br>
 	<input type='text' id='decrypted_message' style='width: 550px;'></input>
+
+
+<br><br>
+	<label>Encrypted message from Alice sent over the internet and received by Bob:</label><br>
+	<input type='text' id='encrypted_message' style='width: 550px;'></input><br>
 
 <script src="js_include_files/wordlist_english.js"></script>
 <script src="js_include_files/crypto.js"></script>
@@ -120,6 +139,9 @@ async function send_message(){
 	// concatenate before sending over internet
 	// IV + C + M
 	
+	// plaintext(IV+C+M)
+
+	// 
 
 	// decode in order to pull viewable data out of ArrayBuffer
 	const plaintext_encrypted_msg = new TextDecoder().decode(aes_encrypted.encrypted_message);
