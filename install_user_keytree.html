@@ -131,6 +131,7 @@ async function send_message(){
 	document.getElementById('alice_iv').value = aes_encrypted.iv;
 	
 	// [IV + C]HMAC = M
+	// alice hmac
 	const hmac_signature_of_aes_encrypted = await compute_HMAC_SHA256_signature(aes_encrypted.encrypted_message, encrypt_and_hmac_keys.hmac);
 
 	// concatenate before sending over internet
@@ -159,6 +160,15 @@ async function send_message(){
 	document.getElementById('bob_c').value = c_hex_bob;
 	document.getElementById('bob_m').value = m_hex_bob;
 
+	// re-buffer values as needed 
+	// verify by computing M using IV and C and comparing to the received M
+	// (M.bob = M)?
+	// bob hmac
+	// C
+	const bob_encrypted_message = 
+	// M.bob = HMAC[IV + C]
+	const bob_m = compute_HMAC_SHA256_signature(aes_encrypted.encrypted_message, encrypt_and_hmac_keys.hmac);
+	
 
 
 	// start decrypt
