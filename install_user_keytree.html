@@ -76,6 +76,7 @@ input[type='text'][disabled] {
 	<input type='text' id='bob_m' style='width: 550px;' disabled='true'></input><br><br>
 	<label>Bob computed M (HMAC Signature):</label><br>
 	<input type='text' id='bob_computed_m' style='width: 550px;' disabled='true'></input><br>
+	<label id='hmac_valid'></label><br>
 
 
 
@@ -179,18 +180,21 @@ async function send_message(){
 	const bob_m_buf = await compute_HMAC_SHA256_signature(c_buf_bob, bob_encrypt_and_hmac_keys.hmac);
 	const bob_m = buf2hex(bob_m_buf);
 	document.getElementById('bob_computed_m').value = bob_m;
-	//if( 
-	
-
-
-	// start decrypt
-	// keep for sanity/confidence
-	const returned = await decrypt_message(aes_encrypted.encrypted_message, aes_encrypted.iv);
+	// check for message authenticity
+	if( bob_m === m_hex_bob ){
+		document.getElementById('hmac_valid').innerHTML = 'VALID';
+	}else{
+		document.getElementById('hmac_valid').innerHTML = 'INVALID';
+	}
+	// decrypt authenticated message
+	const iv_buf_bob = hex_string_to_ArrayBuffer(iv_hex_bob);
+	//const c_buf_bob = hex_string_to_ArrayBuffer(c_buf_bob);
+	const returned = await decrypt_message(secret_bob, c_buf_bob, iv_buf_bob);
 }
 
 // in this function decrypt from bob's point of view
-async function decrypt_message(encrypted_message, iv){
-	const secret_bob = document.getElementById('secret_bob').value;
+async function decrypt_message(secret_bob, encrypted_message, iv){
+	//const secret_bob = document.getElementById('secret_bob').value;
 
 	const encrypt_and_hmac_keys = await gen_encrypt_and_hmac_keys(secret_bob);
 
