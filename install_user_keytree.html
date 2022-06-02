@@ -73,7 +73,13 @@ input[type='text'][disabled] {
 	<label>C (AES encrypted message):</label><br>
 	<input type='text' id='bob_c' style='width: 550px;' disabled='true'></input><br>
 	<label>M (HMAC Signature):</label><br>
-	<input type='text' id='bob_m' style='width: 550px;' disabled='true'></input><br>
+	<input type='text' id='bob_m' style='width: 550px;' disabled='true'></input><br><br>
+	<label>Bob computed M (HMAC Signature):</label><br>
+	<input type='text' id='bob_computed_m' style='width: 550px;' disabled='true'></input><br>
+
+
+
+<br><br>
 	<label>Message decrypted by Bob:</label><br>
 	<input type='text' id='decrypted_message' style='width: 550px;'></input>
 
@@ -153,6 +159,7 @@ async function send_message(){
 	// send message to bob
 	const bob_received_payload = alice_sent_payload;
 	document.getElementById('bob_plaintext').value = bob_received_payload;
+	// slice up message
 	const iv_hex_bob = bob_received_payload.slice(0, 32);
 	const c_hex_bob = bob_received_payload.slice(32, -64);
 	const m_hex_bob = bob_received_payload.slice(-64);
@@ -165,9 +172,14 @@ async function send_message(){
 	// (M.bob = M)?
 	// bob hmac
 	// C
-	const bob_encrypted_message = 
+	// get bob keys
+	const bob_encrypt_and_hmac_keys = await gen_encrypt_and_hmac_keys(secret_bob);
 	// M.bob = HMAC[IV + C]
-	const bob_m = compute_HMAC_SHA256_signature(aes_encrypted.encrypted_message, encrypt_and_hmac_keys.hmac);
+	const c_buf_bob = hex_string_to_ArrayBuffer(c_hex_bob);
+	const bob_m_buf = await compute_HMAC_SHA256_signature(c_buf_bob, bob_encrypt_and_hmac_keys.hmac);
+	const bob_m = buf2hex(bob_m_buf);
+	document.getElementById('bob_computed_m').value = bob_m;
+	//if( 
 	
 
 
