@@ -106,7 +106,6 @@ async function send_message(){
 	const alice_pub = secp.getPublicKey(alice_prv, true);
 	document.getElementById('alice_prv').value = alice_prv;
 	document.getElementById('alice_pub').value = alice_pub;
-//
 
 // Set up receiver
 	// super simple implementation to start with, proof of sanity check
@@ -119,106 +118,118 @@ async function send_message(){
 	const bob_pub = secp.getPublicKey(bob_prv, true);
 	document.getElementById('bob_prv').value = bob_prv;
 	document.getElementById('bob_pub').value = bob_pub;
-	// 
+	// get shared secrets
 	const secret_bob = secp.getSharedSecret(bob_prv, alice_pub, true);
 	const secret_alice = secp.getSharedSecret(alice_prv, bob_pub, true);
 	document.getElementById('secret_alice').value = secret_alice;
 	document.getElementById('secret_bob').value = secret_bob;
-//
 
 
 // Send Message
-	// Set up packet in order IV + C + M where
+	// Set up plaintext message to send over internet
+	// plaintext message = in order (IV + C + M) where
 	// IV is salt for the encryption C
 	// C is the encrypted message data
 	// M is the HMAC signature 
+	// generate keys for AES encryption and HMAC signature for alice
+	const encrypt_and_hmac_keys_alice = await gen_encrypt_and_hmac_keys(secret_alice);
 
-	// generate keys for AES encryption and HMAC signature
-	const encrypt_and_hmac_keys = await gen_encrypt_and_hmac_keys(secret_alice);
 	// grab the message from user input
 	const message_alice = document.getElementById('message').value;
 	const encoded_message_alice = new TextEncoder().encode(message_alice);
-
-	// aes_encrypted.encrypted_message is C
-	// aes_encrypted.iv is IV
-	// encrypt_and_hmac_keys.encrypt is Ke
-	// encrypt_and_hmac_keys.hmac is Km
-	const aes_encrypted = await AES_256_CBC_encrypt (encoded_message_alice, encrypt_and_hmac_keys.encrypt);
+	const aes_encrypted = await AES_256_CBC_encrypt (encoded_message_alice, encrypt_and_hmac_keys_alice.encrypt);
 	console.log('encrypted message: ' + aes_encrypted.encrypted_message);
 	document.getElementById('alice_iv').value = aes_encrypted.iv;
 	
 	// [IV + C]HMAC = M
 	// alice hmac
-	const hmac_signature_of_aes_encrypted = await compute_HMAC_SHA256_signature(aes_encrypted.encrypted_message, encrypt_and_hmac_keys.hmac);
+	const hmac_signature_of_aes_encrypted = await compute_HMAC_SHA256_signature(aes_encrypted.encrypted_message, encrypt_and_hmac_keys_alice.hmac);
 
+//construct plaintext message before sending over internet
 	// concatenate before sending over internet
-	// IV + C + M
 	// first convert everything to hex strings and show for clarity
 	const iv_hex = buf2hex(aes_encrypted.iv);
 	const c_hex = buf2hex(aes_encrypted.encrypted_message);
 	const m_hex = buf2hex(hmac_signature_of_aes_encrypted);
+	// show in html for process visibility
 	document.getElementById('alice_iv').value = iv_hex;
 	document.getElementById('alice_c').value = c_hex;
 	document.getElementById('alice_m').value = m_hex;
 	console.log('iv length' + iv_hex.length); //32
 	console.log('m length' + m_hex.length);		//64
 	
-	// plaintext(IV+C+M)
+	// plaintext_message = (IV + C + M)
 	const alice_sent_payload = iv_hex + c_hex + m_hex;
 	document.getElementById('alice_plaintext').value = alice_sent_payload;
-//
 
-	// send message to bob
+// send message to bob 
 	const bob_received_payload = alice_sent_payload;
 
-// Receive message
-	document.getElementById('bob_plaintext').value = bob_received_payload;
-	// We know the size of the IV and HMAC signature M. 
-	// Variable length encrypted message C can then be derived.
-	const iv_hex_bob = bob_received_payload.slice(0, 32);
-	const c_hex_bob = bob_received_payload.slice(32, -64);
-	const m_hex_bob = bob_received_payload.slice(-64);
-	document.getElementById('bob_iv').value = iv_hex_bob;
-	document.getElementById('bob_c').value = c_hex_bob;
-	document.getElementById('bob_m').value = m_hex_bob;
-
-	// re-buffer values as needed 
-	// verify by computing M using IV and C and comparing to the received M
-	// (M.bob = M)?
-	// bob hmac
-	// C
-
-// Check message authenticity
 	// get bob keys
 	const bob_encrypt_and_hmac_keys = await gen_encrypt_and_hmac_keys(secret_bob);
-	// M.bob = HMAC[IV + C]
-	const c_buf_bob = hex2buf(c_hex_bob);
-	const bob_m_buf = await compute_HMAC_SHA256_signature(c_buf_bob, bob_encrypt_and_hmac_keys.hmac);
-	const bob_m = buf2hex(bob_m_buf);
-	document.getElementById('bob_computed_m').value = bob_m;
-	// check for message authenticity
-	if( bob_m === m_hex_bob ){
+// Receive message
+	// split received message for processing
+	const message_obj = split_message(bob_received_payload);
+	// show in html for process visibility
+	document.getElementById('bob_plaintext').value = bob_received_payload;
+	document.getElementById('bob_iv').value = message_obj.iv;
+	document.getElementById('bob_c').value = message_obj.encrypted_message;
+	document.getElementById('bob_m').value = message_obj.signature;
+
+// Check message authenticity
+	// Compute HMAC signature and compare to received signature
+	const result = await check_message_authenticity(message_obj.signature, bob_encrypt_and_hmac_keys.hmac, message_obj.encrypted_message);
+	if( result === 1){
 		document.getElementById('hmac_valid').innerHTML = 'VALID';
 	}else{
 		document.getElementById('hmac_valid').innerHTML = 'INVALID';
 	}
-//
-	// decrypt authenticated message
-	const iv_buf_bob = hex2buf(iv_hex_bob);
-	//const c_buf_bob = hex2buf(c_buf_bob);
-	//const returned = await decrypt_message(, c_buf_bob, iv_buf_bob);
-	const authenticated_decrypted_message = await decrypt_message(c_buf_bob, bob_encrypt_and_hmac_keys.encrypt, iv_buf_bob);
-	document.getElementById('decrypted_message').value = authenticated_decrypted_message;;
+
+// decrypt authenticated message
+	const authed_decrypted_message = await decrypt_message(message_obj.encrypted_message, bob_encrypt_and_hmac_keys.encrypt, message_obj.iv);
+	document.getElementById('decrypted_message').value = authed_decrypted_message;;
+}
+
+// input is a compiled plaintext message
+// returns an associative array containing the iv, encrypted message, and hmac signature
+function split_message(message){
+	// We know the size of the IV and HMAC signature M. 
+	// Variable length encrypted message C can then be derived.
+	const iv = message.slice(0, 32);
+	const encrypted_message = message.slice(32, -64);
+	const signature = message.slice(-64);
+    return { iv: iv, encrypted_message: encrypted_message, signature: signature};
+}
+
+// compute a HMAC signature and compare to a received one to check authenticity of a message
+// inputs:
+// rcvd_sig is a hex string
+// hmac_key is a cryptoKey object
+// encrypted_message is a hex string
+// outputs: 1 if the message is authentic, 0 if it is invalid
+async function check_message_authenticity(rcvd_sig, hmac_key, encrypted_message){
+console.log(encrypted_message);
+	const encrypted_message_buf = hex2buf(encrypted_message);
+	const computed_sig = buf2hex(await compute_HMAC_SHA256_signature(encrypted_message_buf, hmac_key));
+	// bottom line for html visibility, remove when add to crypto.js
+	document.getElementById('bob_computed_m').value = computed_sig;
+	// compare received signature to computed signature
+	if( rcvd_sig === computed_sig ){
+		return 1;
+	}else{
+		return 0;
+	}
 }
 
 // decrypt AES encrypted message using cryptoKey aes_key and iv
-// encrypted_message is an ArrayBuffer
+// encrypted_message is a hex string
 // aes_key is a crypteoKey object
 // iv is a hex string
 // output is a string
 async function decrypt_message(encrypted_message, aes_key, iv){
-	
-	const decrypted_message = await AES_256_CBC_decrypt (encrypted_message, aes_key, iv);
+	const encrypted_message_buf = hex2buf(encrypted_message);
+	const iv_buf = hex2buf(iv);
+	const decrypted_message = await AES_256_CBC_decrypt (encrypted_message_buf, aes_key, iv_buf);
 	const decrypted_message_decoded = new TextDecoder().decode(decrypted_message);
 	return decrypted_message_decoded;
 }
