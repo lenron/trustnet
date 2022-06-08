@@ -124,11 +124,11 @@ async function hmac_sha512(data, key){
 	}else{
 		console.log('1here');
 		// Any other input should be a hex string.
-		var key_enc = hex_string_to_ArrayBuffer(key);
+		var key_enc = hex2buf(key);
 	}
 
 	// Encode the hex data
-	const data_encoded = hex_string_to_ArrayBuffer(data);
+	const data_encoded = hex2buf(data);
 
 	//CryptoKey object needed for deriveBits() to perform PBKDF2.
 	const imported_key = await crypto.subtle.importKey(
@@ -155,7 +155,7 @@ async function hmac_sha512(data, key){
 async function computeChecksum(payload) {
 
 	// Encode payload data into ArrayBuffer.
-	const hexArrayBuffer = hex_string_to_ArrayBuffer(payload);
+	const hexArrayBuffer = hex2buf(payload);
 
 	// Bitcoin base58check uses a double sha-256 hash.
     const hashBuffer256 = await crypto.subtle.digest('SHA-256', hexArrayBuffer);
@@ -316,7 +316,7 @@ async function get256HashArray(entropy){
 
 
 // This function could probably be condensed one more line.
-function hex_string_to_ArrayBuffer(hexString){
+function hex2buf(hexString){
 
     // convert to a number array representing the hex bytes.
     const hexBytesArray = new Array;

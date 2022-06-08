@@ -16,7 +16,7 @@ function num2hex(integer){
 }
 
 // This function converts a hex string into an ArrayBuffer for hash processing.
-function hex_string_to_ArrayBuffer(hexString){
+function hex2buf(hexString){
     // convert to a number array representing the hex bytes.
     const hexBytesArray = new Array;
     for(let i=0; i < hexString.length; i+=2){
@@ -282,7 +282,7 @@ async function getAddress(public_key){
 // returns a hex string
 async function hash160(hex_input){
     // run a SHA256 hash on the input
-    const input_buffer = hex_string_to_ArrayBuffer(hex_input);
+    const input_buffer = hex2buf(hex_input);
     const hashed_buffer_256 = await crypto.subtle.digest('SHA-256', input_buffer);
     const input_uint8_arr = new Uint8Array(hashed_buffer_256);
     // Take the result of the SHA256 hash and run a ripemd160 hash on it.
@@ -406,7 +406,7 @@ async function mnemonic_gen_to_xprv (){
 async function computeChecksum(payload) {
 
     // Encode payload data into ArrayBuffer.
-    const hexArrayBuffer = hex_string_to_ArrayBuffer(payload);
+    const hexArrayBuffer = hex2buf(payload);
 
     // Bitcoin base58check uses a double sha-256 hash.
     const hashBuffer256 = await crypto.subtle.digest('SHA-256', hexArrayBuffer);
@@ -426,11 +426,11 @@ async function hmac_sha512(data, key){
         key_enc = new TextEncoder().encode(key);
     }else{
         // Any other input should be a hex string.
-        key_enc = hex_string_to_ArrayBuffer(key);
+        key_enc = hex2buf(key);
     }
 
     // Encode the hex data
-    const data_encoded = hex_string_to_ArrayBuffer(data);
+    const data_encoded = hex2buf(data);
 
     //set up hmac algorithm object
     hmac_algorithm_obj =
