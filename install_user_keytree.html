@@ -98,8 +98,10 @@ let noble = nobleHashes;
 async function send_message(){
 
 // Set up sender
+	// for visibility and testing, compute alice keys here and move to a 'sender' later
 	const message = document.getElementById('message').value;
 	// hardcode key level for testing, use mnemonic until derive_key_tree function is changed
+	// need to change derive_key_tree to accept seed moving forward
 	mnemonic = document.getElementById('current_mnemonic').value;
 	const alice_keys = await derive_key_tree('m/0', mnemonic);
 	const alice_prv = alice_keys[0];
@@ -108,10 +110,8 @@ async function send_message(){
 	document.getElementById('alice_pub').value = alice_pub;
 
 // Set up receiver
-	// super simple implementation to start with, proof of sanity check
-	// so, implement all bob stuff here and move later
-	// use different key tree indexes which I think should work
-	// compute different bob keys for each send
+	// so, implement all bob stuff here and move to a 'receiver' later
+	// compute different bob keys for each send to simulate ethereal keys
 	const bob_mnemonic = await computeMnemonicPhrase();
 	const bob_keys = await derive_key_tree('m/1', bob_mnemonic);
 	const bob_prv = bob_keys[0];
@@ -136,34 +136,22 @@ async function send_message(){
 
 	// grab the message from user input
 	const message_alice = document.getElementById('message').value;
-	const encoded_message_alice = new TextEncoder().encode(message_alice);
-	const aes_encrypted = await AES_256_CBC_encrypt (encoded_message_alice, encrypt_and_hmac_keys_alice.encrypt);
+
+	// AES encrypt the message using alice's encryption key
+	const aes_encrypted = await aes_256_CBC_encrypt (message_alice, encrypt_and_hmac_keys_alice.encrypt);
 	console.log('encrypted message: ' + aes_encrypted.encrypted_message);
 	document.getElementById('alice_iv').value = aes_encrypted.iv;
 	
+	// compute hmac signature
 	// [IV + C]HMAC = M
-	// alice hmac
 	const hmac_signature_of_aes_encrypted = await compute_HMAC_SHA256_signature(aes_encrypted.encrypted_message, encrypt_and_hmac_keys_alice.hmac);
 
 //construct plaintext message before sending over internet
-	// concatenate before sending over internet
-	// first convert everything to hex strings and show for clarity
-	const iv_hex = buf2hex(aes_encrypted.iv);
-	const c_hex = buf2hex(aes_encrypted.encrypted_message);
-	const m_hex = buf2hex(hmac_signature_of_aes_encrypted);
-	// show in html for process visibility
-	document.getElementById('alice_iv').value = iv_hex;
-	document.getElementById('alice_c').value = c_hex;
-	document.getElementById('alice_m').value = m_hex;
-	console.log('iv length' + iv_hex.length); //32
-	console.log('m length' + m_hex.length);		//64
-	
-	// plaintext_message = (IV + C + M)
-	const alice_sent_payload = iv_hex + c_hex + m_hex;
-	document.getElementById('alice_plaintext').value = alice_sent_payload;
+	const alice_payload = compile_plaintext_payload(aes_encrypted.iv, aes_encrypted.encrypted_message, hmac_signature_of_aes_encrypted);
+	document.getElementById('alice_plaintext').value = alice_payload;
 
 // send message to bob 
-	const bob_received_payload = alice_sent_payload;
+	const bob_received_payload = alice_payload;
 
 	// get bob keys
 	const bob_encrypt_and_hmac_keys = await gen_encrypt_and_hmac_keys(secret_bob);
@@ -188,6 +176,22 @@ async function send_message(){
 // decrypt authenticated message
 	const authed_decrypted_message = await decrypt_message(message_obj.encrypted_message, bob_encrypt_and_hmac_keys.encrypt, message_obj.iv);
 	document.getElementById('decrypted_message').value = authed_decrypted_message;;
+}
+
+// inputs are ArrayBuffers
+// output is a hex string
+function compile_plaintext_payload(iv, message, signature){
+	// concatenate before sending over internet
+	// first convert everything to hex strings and show for clarity
+	const iv_hex = buf2hex(iv);
+	const message_hex = buf2hex(message);
+	const signature_hex = buf2hex(signature);
+	// show in html for process visibility -- remove when migrate function to crypto.js
+	document.getElementById('alice_iv').value = iv_hex;
+	document.getElementById('alice_c').value = message_hex;
+	document.getElementById('alice_m').value = signature_hex;
+	// plaintext_message = (IV + C + M)
+	return (iv_hex + message_hex + signature_hex);
 }
 
 // input is a compiled plaintext message
@@ -287,12 +291,13 @@ async function AES_256_CBC_decrypt (encrypted_message, key, aes_256_iv) {
 //Plaintext message is an ArrayBuffer.
 //Key is a CryptoKey object.
 //Encrypted message is an ArrayBuffer.
-async function AES_256_CBC_encrypt (plaintext_message, key) {
+async function aes_256_CBC_encrypt (plaintext_message, key) {
+	const plaintext_message_enc =  new TextEncoder().encode(plaintext_message);
     const aes_256_iv = generate_AES_256_CBC_IV();
     const ciphertext = await window.crypto.subtle.encrypt(
         { name: "AES-CBC", iv: aes_256_iv  },
         key,
-        plaintext_message
+        plaintext_message_enc
     );
     return { encrypted_message: ciphertext, iv: aes_256_iv };
 }
