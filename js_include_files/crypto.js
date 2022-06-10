@@ -301,14 +301,18 @@ async function get_address_from_keypair(keypair){
 }
 
 // takes a valid seed as input
+// passphrase is an optional string
 // outputs the root master privkey pair
-async function get_root_keypair(seed, passphrase){
+async function get_root_keypair(seed){
 
-	// ***********************************
-	// Need check that seed is valid here
-	// ***********************************
-	// ***********************************
-	// ***********************************
+	// make sure seed length is 128 and 0-9,abcdef
+	let non_hex = seed.match(/[^\dA-F]/gi);
+	if(non_hex){
+		throw('Found non-hex characters!' + non_hex);
+	}
+	if(seed.length !== 128){
+		throw('Seed length is not 128 characters long!');
+	}
 
     const hashed_seed = await hmac_sha512(seed);
     const root_privkey = hashed_seed.substring(0,64);
