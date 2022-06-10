@@ -101,8 +101,8 @@ async function send_message(){
 	// for visibility and testing, compute alice keys here and move to a 'sender' later
 	const message = document.getElementById('message').value;
 	// hardcode key level for testing, use mnemonic until derive_key_tree function is changed
-	const seed = document.getElementById('current_seed').value;
-	const alice_keys = await derive_key_tree('m/0', seed);
+	const alice_seed = document.getElementById('current_seed').value;
+	const alice_keys = await derive_key_tree('m/0', alice_seed);
 	const alice_prv = alice_keys[0];
 	const alice_pub = secp.getPublicKey(alice_prv, true);
 	document.getElementById('alice_prv').value = alice_prv;
@@ -112,7 +112,8 @@ async function send_message(){
 	// so, implement all bob stuff here and move to a 'receiver' later
 	// compute different bob keys for each send to simulate ethereal keys
 	const bob_mnemonic = await computeMnemonicPhrase();
-	const bob_keys = await derive_key_tree('m/1', bob_mnemonic);
+	const bob_seed = await computeSeed512(bob_mnemonic);
+	const bob_keys = await derive_key_tree('m/1', bob_seed);
 	const bob_prv = bob_keys[0];
 	const bob_pub = secp.getPublicKey(bob_prv, true);
 	document.getElementById('bob_prv').value = bob_prv;
