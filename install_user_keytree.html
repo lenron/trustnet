@@ -101,9 +101,8 @@ async function send_message(){
 	// for visibility and testing, compute alice keys here and move to a 'sender' later
 	const message = document.getElementById('message').value;
 	// hardcode key level for testing, use mnemonic until derive_key_tree function is changed
-	// need to change derive_key_tree to accept seed moving forward
-	mnemonic = document.getElementById('current_mnemonic').value;
-	const alice_keys = await derive_key_tree('m/0', mnemonic);
+	const seed = document.getElementById('current_seed').value;
+	const alice_keys = await derive_key_tree('m/0', seed);
 	const alice_prv = alice_keys[0];
 	const alice_pub = secp.getPublicKey(alice_prv, true);
 	document.getElementById('alice_prv').value = alice_prv;

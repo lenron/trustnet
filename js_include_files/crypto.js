@@ -46,27 +46,28 @@ async function get256HashArray(entropy){
 // Takes a key tree derivation notation string, like m/31h/2345/1h,
 // and a mnemonic sentence for the seed.
 // returns an array with index 0:privkey, 1:chain code, 2:address, 3:xprv and 4:xpub
-async function derive_key_tree(key_tree_str, mnemonic, passphrase){
+async function derive_key_tree(key_tree_str, seed, passphrase){
     // Decode the key tree, associating an index with each level.
     // build an array where the array index matches the depth level
     // each index returns a 2 deep array with 0th returning privkey
     // and 1st returning chain code.
     //
-    // how do we know the root key? derive from a mnemonic sentence.
+    // how do we know the root key? derive from a seed sentence.
     // first build an array with the key index corresponding to the arr index.
     // use regex.
     let tree_index_arr = new Array;
 
     // for show
-    console.log('input- mnemonic: ' + mnemonic);
+    console.log('input- seed: ' + seed);
     console.log('input- key_tree_str: ' + key_tree_str);
 
-    // check validity of the mnemonic
-    if( await verifyMnemonicPhrase(mnemonic) ){
-        console.log('mnemonic phrase verified!');
-    }else{
-        console.log('mnemonic phrase INVALID!');
-    }
+    // check validity of the seed
+	// remove when seed check is done in get_root_keypair()
+    //if( await verifyMnemonicPhrase(seed) ){
+        //console.log('seed phrase verified!');
+    //}else{
+        //console.log('seed phrase INVALID!');
+    //}
 
     // load array to process index values
     tree_index_arr = key_tree_str.split('/');
@@ -112,7 +113,7 @@ async function derive_key_tree(key_tree_str, mnemonic, passphrase){
     // like mathematical induction proof. 1. can compute n 2. can compute n+1
     let keypair_arr = new Array;
     // start with root master key
-    keypair_arr.push(await get_root_keypair(mnemonic, passphrase));
+    keypair_arr.push(await get_root_keypair(seed, passphrase));
     console.log('root extended key: ' + await serialize_key(keypair_arr[0][1], '00' + keypair_arr[0][0]));
     // compute and store the rest
     for(j=1; j < tree_index_arr.length; j++){
@@ -299,11 +300,16 @@ async function get_address_from_keypair(keypair){
     return address_child;
 }
 
-// takes a valid mnemonic as input
+// takes a valid seed as input
 // outputs the root master privkey pair
-async function get_root_keypair(mnemonic, passphrase){
+async function get_root_keypair(seed, passphrase){
 
-    const seed = await computeSeed512(mnemonic, passphrase);
+	// ***********************************
+	// Need check that seed is valid here
+	// ***********************************
+	// ***********************************
+	// ***********************************
+
     const hashed_seed = await hmac_sha512(seed);
     const root_privkey = hashed_seed.substring(0,64);
     const root_chain_code = hashed_seed.substring(64,128);
@@ -493,7 +499,6 @@ async function computeSeed512(mnemonicPhrase, in_password){
         false,
         //How the key will be used.
         ["deriveBits"]
-
     );
 
     //ArrayBuffer holding 512 bits produced from PBKDF2.

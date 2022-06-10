@@ -210,7 +210,7 @@ async function show_advanced(){
 	let seed = await computeSeed512(mnemonic, passphrase);
 	document.getElementById('seed').value = seed;
 	//compute and show root prvkey and chain code
-	let root_keypair = await get_root_keypair(mnemonic, passphrase);
+	let root_keypair = await get_root_keypair(seed, passphrase);
 	document.getElementById('root_prv').value = root_keypair[0];
 	document.getElementById('root_chain').value = root_keypair[1];
 	//compute and show master serialized (xprv) key
