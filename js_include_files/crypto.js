@@ -468,6 +468,9 @@ async function hmac_sha512(data, key){
     return buf2hex(signature);
 }
 
+// this follows bip-whatever bitcoin stuff
+// every function that is based on a bitcoin or whatever bip needs to have 
+// the source bip as a description
 // Takes a mnemonic sentence and possibly a password as input.
 // Outputs the computed seed in a hex string.
 async function computeSeed512(mnemonicPhrase, in_password){
