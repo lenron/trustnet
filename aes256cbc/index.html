@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Crypto Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+
+	<div>
+	   <h1>Hex64 Decode/Encode</h1>
+	</div>
+	<div id='encode64pane'>
+		<div style="display: flex; flex-direction: column; border-style: inset;">
+			<div style="display: flex;">
+				<div style="display: flex; flex-direction: column;">
+					<label>Raw:</label>
+					<input id="raw_64encode_text" style="width: 200px;"></input>
+				</div>
+				<div>
+					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
+				</div>
+				<div style="display: flex; flex-direction: column;">
+					<label>64 Encoded:</label>
+					<input id="encoded64_text" style="width: 200px;"></input>
+				</div>
+			</div>
+			<button id='encode64' onclick="encode64()" style="width: 80px">Encode 64</button>
+		</div>
+		<br>
+		<div style="display: flex; flex-direction: column; border-style: inset;">
+			<div style="display: flex;">
+				<div style="display: flex; flex-direction: column;">
+					<label>64 Encoded:</label>
+					<input id="raw_64encoded_text" style="width: 200px;"></input>
+				</div>
+				<div>
+					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
+				</div>
+				<div style="display: flex; flex-direction: column;">
+					<label>64 Decoded:</label>
+					<input id="decoded64_text" style="width: 200px;"></input>
+				</div>
+			</div>
+			<button id='decode64' onclick="decode64()" style="width: 100px">Decode 64</button>
+		</div>
+	</div>
+
+
+	<div>
+	   <h1>Openssl Encode/Decode</h1>
+	</div>
+	<div id='fast_encode_test_pane'>
+		<div style="display: flex; flex-direction: column; border-style: inset;">
+			<div style="display: flex;">
+				<div style="display: flex; flex-direction: column;">
+					<label>Raw Text:</label>
+					<input id="raw_quicktest" style="width: 200px;"></input>
+				</div>
+				<div>
+					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
+				</div>
+				<div style="display: flex; flex-direction: column;">
+					<label>Ciphertext:</label>
+					<input id="decoded_quicktest" style="width: 200px;"></input>
+				</div>
+			</div>
+			<button id='quickencode' onclick="quickencode()" style="width: 100px">Quick Encode</button>
+		</div>
+	</div>
+
+
+<br><br>
+
+	<div>
+	   <h1>Setup AES-256-CBC</h1>
+	</div>
+	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset;">
+		<div style="display: flex; flex-direction: row;">
+			<div style="margin: 5px;"> 
+				<div style="display: flex; flex-direction: column;">
+					<div style="display: flex; flex-direction: column;">
+						<label>Plaintext:</label>
+						<input id="enter_plaintext" style="width: 200px;"></input>
+					</div>
+					<div style="display: flex;">
+						<div style="display: flex; flex-direction: column;">
+							<label>Initialization Vector (IV):</label>
+							<input id="enter_iv" style="width: 200px;"></input>
+						</div>
+						<div style="display: flex; align-items: flex-end;">
+							<button id='gen_iv' onclick="genIv()" style="width: 100px">Generate IV</button>
+						</div>
+					</div>
+				</div>
+			</div> 
+
+
+			<div style="margin: 5px;"> 
+				<div style="display: flex; flex-direction: column;">
+					<div style="display: flex; flex-direction: column;">
+						<label>Password:</label>
+						<input id="enter_password" style="width: 200px;"></input>
+					</div>
+					<div style="display: flex; flex-direction: column;">
+						<label>Iterations:</label>
+						<input id="enter_iterations" style="width: 200px;"></input>
+					</div>
+					<div style="display: flex; flex-direction: column;">
+						<label>Hash:</label>
+						<input id="enter_hash" style="width: 200px;" value="SHA256"></input>
+					</div>
+					<div style="display: flex;">
+						<div style="display: flex; flex-direction: column;">
+							<label>Salt:</label>
+							<input id="enter_salt" style="width: 200px;"></input>
+						</div>
+						<div style="display: flex; align-items: flex-end;">
+							<button id='gen_salt' onclick="genSalt()" style="width: 100px">Generate Salt</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div>
+			<button id='encrypt_cbc' onclick="encryptCbc()" style="width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Encrypted Output:</label>
+			<input id='encrypt_output' style="width: 400px;">
+		</div>
+	</div>
+
+
+
+
+
+</body>
+</html>
+
+<script>
+
+	function encode64(){
+		let raw_text = document.getElementById("raw_64encode_text").value;
+		console.log("Encoding the string: '" + raw_text + "'");
+		const encoded64 = btoa(raw_text);
+		console.log("Encoded string: '" + encoded64 + "'");
+		document.getElementById("encoded64_text").value = encoded64;
+		document.getElementById("raw_64encoded_text").value = encoded64;
+	}
+
+	function decode64(){
+		let decoded_text = document.getElementById("raw_64encoded_text").value;
+		console.log("Decoding the string: '" + decoded_text + "'");
+		const decoded64 = atob(decoded_text);
+		console.log("Decoded string: '" + decoded64 + "'");
+		document.getElementById("decoded64_text").value = decoded64;
+	}
+
+</script>
+
+
+
+
+
+
