@@ -17,14 +17,14 @@
 			<div style="display: flex;">
 				<div style="display: flex; flex-direction: column;">
 					<label>Raw:</label>
-					<input id="raw_64encode_text" style="width: 200px;"></input>
+					<input id="raw_64encode_text" style="width: 400px;"></input>
 				</div>
 				<div>
 					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
 				</div>
 				<div style="display: flex; flex-direction: column;">
 					<label>64 Encoded:</label>
-					<input id="encoded64_text" style="width: 200px;"></input>
+					<input id="encoded64_text" style="width: 400px;"></input>
 				</div>
 			</div>
 			<button id='encode64' onclick="encode64()" style="width: 80px">Encode 64</button>
@@ -34,45 +34,20 @@
 			<div style="display: flex;">
 				<div style="display: flex; flex-direction: column;">
 					<label>64 Encoded:</label>
-					<input id="raw_64encoded_text" style="width: 200px;"></input>
+					<input id="raw_64encoded_text" style="width: 400px;"></input>
 				</div>
 				<div>
 					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
 				</div>
 				<div style="display: flex; flex-direction: column;">
 					<label>64 Decoded:</label>
-					<input id="decoded64_text" style="width: 200px;"></input>
+					<input id="decoded64_text" style="width: 400px;"></input>
 				</div>
 			</div>
 			<button id='decode64' onclick="decode64()" style="width: 100px">Decode 64</button>
 		</div>
 	</div>
 
-
-	<div>
-	   <h1>Openssl Encode/Decode</h1>
-	</div>
-	<div id='fast_encode_test_pane'>
-		<div style="display: flex; flex-direction: column; border-style: inset;">
-			<div style="display: flex;">
-				<div style="display: flex; flex-direction: column;">
-					<label>Raw Text:</label>
-					<input id="raw_quicktest" style="width: 200px;"></input>
-				</div>
-				<div>
-					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
-				</div>
-				<div style="display: flex; flex-direction: column;">
-					<label>Ciphertext:</label>
-					<input id="decoded_quicktest" style="width: 200px;"></input>
-				</div>
-			</div>
-			<button id='quickencode' onclick="quickencode()" style="width: 100px">Quick Encode</button>
-		</div>
-	</div>
-
-
-<br><br>
 
 	<div>
 	   <h1>Setup AES-256-CBC</h1>
@@ -83,12 +58,12 @@
 				<div style="display: flex; flex-direction: column;">
 					<div style="display: flex; flex-direction: column;">
 						<label>Plaintext:</label>
-						<input id="enter_plaintext" style="width: 200px;"></input>
+						<input id="enter_plaintext" style="width: 400px;"></input>
 					</div>
 					<div style="display: flex;">
 						<div style="display: flex; flex-direction: column;">
 							<label>Initialization Vector (IV):</label>
-							<input id="enter_iv" style="width: 200px;"></input>
+							<input id="enter_iv" style="width: 400px;"></input>
 						</div>
 						<div style="display: flex; align-items: flex-end;">
 							<button id='gen_iv' onclick="genIv()" style="width: 100px">Generate IV</button>
@@ -110,7 +85,7 @@
 					</div>
 					<div style="display: flex; flex-direction: column;">
 						<label>Hash:</label>
-						<input id="enter_hash" style="width: 200px;" value="SHA256"></input>
+						<input id="enter_hash" style="width: 200px;" value="SHA-256"></input>
 					</div>
 					<div style="display: flex;">
 						<div style="display: flex; flex-direction: column;">
@@ -125,22 +100,85 @@
 			</div>
 		</div>
 		<div>
-			<button id='encrypt_cbc' onclick="encryptCbc()" style="width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
+			<button id='encrypt_cbc' onclick="encryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Encrypted Output:</label>
-			<input id='encrypt_output' style="width: 400px;">
+			<input id='encrypted_output' style="width: 400px;">
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Openssl Output:</label>
+			<input id='openssl_output' style="width: 400px;">
 		</div>
 	</div>
 
-
-
-
-
 </body>
 </html>
-
 <script>
+
+	function getKeyMaterial() {
+		const password = document.getElementById("enter_password").value;
+		const enc = new TextEncoder();
+		return window.crypto.subtle.importKey(
+			"raw",
+			enc.encode(password),
+			"PBKDF2",
+			false,
+			["deriveBits", "deriveKey"],
+		);
+	}
+
+	async function encryptCbc() {
+		const plaintext = new TextEncoder().encode(document.getElementById("enter_plaintext").value);
+		const salt = hex2buf(document.getElementById("enter_salt").value);
+		const iv = hex2buf(document.getElementById("enter_iv").value);
+		const iter = Number(document.getElementById("enter_iterations").value);
+		const digest_hash = document.getElementById("enter_hash").value;
+		const keyMaterial = await getKeyMaterial();
+		const key = await window.crypto.subtle.deriveKey(
+			{
+				name: "PBKDF2",
+				salt,
+				iterations: iter,
+				hash: digest_hash,
+			},
+			keyMaterial,
+			{ name: "AES-CBC", length: 256 },
+			true,
+			["encrypt", "decrypt"],
+		);
+		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv }, key, plaintext);
+		const result = buf2hex(encrypted_result); 
+		document.getElementById("encrypted_output").value = result;
+		document.getElementById("openssl_output").value = "Salted__" + result;
+	}
+
+	function genIv(){
+		var iv = crypto.getRandomValues(new Uint8Array(16));
+		document.getElementById("enter_iv").value = buf2hex(iv).toUpperCase();	
+	}
+
+	function genSalt(){
+		var salt = crypto.getRandomValues(new Uint8Array(8));
+		document.getElementById("enter_salt").value = buf2hex(salt).toUpperCase();	
+	}
+
+	function buf2hex(buffer) { // buffer is an ArrayBuffer
+		return [...new Uint8Array(buffer)]
+			.map(x => x.toString(16).padStart(2, '0'))
+			.join('');
+	}
+	 // This function converts a hex string into an ArrayBuffer for hash processing.
+	function hex2buf(hexString){
+		// convert to a number array representing the hex bytes.
+		const hexBytesArray = new Array;
+		for(var i=0; i < hexString.length; i+=2){
+			hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
+		}
+		const hexArrayBuffer = new Uint8Array(hexBytesArray);
+		return hexArrayBuffer;
+	}
+
 
 	function encode64(){
 		let raw_text = document.getElementById("raw_64encode_text").value;
