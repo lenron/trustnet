@@ -99,6 +99,12 @@
 				</div>
 			</div>
 		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Key Data:</label>
+			<input id='key_output' style="width: 400px;">
+			<button id='get_key' onclick="getKey()" style="width: 100px; margin: 5px;">Get Key</button>
+		</div>
+<br>
 		<div>
 			<button id='encrypt_cbc' onclick="encryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
 		</div>
@@ -115,6 +121,14 @@
 </body>
 </html>
 <script>
+
+	async function getKey(){
+		const key = await getKeyMaterial();	
+		const exported = await window.crypto.subtle.exportKey("raw", key);
+		const exportedKeyBuffer = new Uint8Array(exported);
+		const bits = buf2hex(exportedKeyBuffer);
+		document.getElementById("key_output").value = bits;
+	}
 
 	function getKeyMaterial() {
 		const password = document.getElementById("enter_password").value;
@@ -135,6 +149,23 @@
 		const iter = Number(document.getElementById("enter_iterations").value);
 		const digest_hash = document.getElementById("enter_hash").value;
 		const keyMaterial = await getKeyMaterial();
+
+		// Show the derived bits
+		const derived_bits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				salt,
+				iterations: iter,
+				hash: digest_hash,
+			},
+			keyMaterial,
+			256,
+		);
+		const exportedKeyBuffer = new Uint8Array(derived_bits);
+		const bits = buf2hex(exportedKeyBuffer);
+		document.getElementById("key_output").value = bits;
+
+		// Set up key for use in aes cbc digest
 		const key = await window.crypto.subtle.deriveKey(
 			{
 				name: "PBKDF2",
