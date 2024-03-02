@@ -53,26 +53,8 @@
 	   <h1>Setup AES-256-CBC</h1>
 	</div>
 	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset;">
+
 		<div style="display: flex; flex-direction: row;">
-			<div style="margin: 5px;"> 
-				<div style="display: flex; flex-direction: column;">
-					<div style="display: flex; flex-direction: column;">
-						<label>Plaintext:</label>
-						<input id="enter_plaintext" style="width: 400px;"></input>
-					</div>
-					<div style="display: flex;">
-						<div style="display: flex; flex-direction: column;">
-							<label>Initialization Vector (IV):</label>
-							<input id="enter_iv" style="width: 400px;"></input>
-						</div>
-						<div style="display: flex; align-items: flex-end;">
-							<button id='gen_iv' onclick="genIv()" style="width: 100px">Generate IV</button>
-						</div>
-					</div>
-				</div>
-			</div> 
-
-
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
 					<div style="display: flex; flex-direction: column;">
@@ -89,20 +71,49 @@
 					</div>
 					<div style="display: flex;">
 						<div style="display: flex; flex-direction: column;">
-							<label>Salt:</label>
+							<label>Salt(hex):</label>
 							<input id="enter_salt" style="width: 200px;"></input>
-						</div>
-						<div style="display: flex; align-items: flex-end;">
-							<button id='gen_salt' onclick="genSalt()" style="width: 100px">Generate Salt</button>
 						</div>
 					</div>
 				</div>
 			</div>
+			<div style="margin: 5px;"> 
+				<div style="display: flex; flex-direction: column; height: 100%;">
+					<div style="display: flex; flex-direction: column;">
+						<label>Plaintext:</label>
+						<input id="enter_plaintext" style="width: 400px;"></input>
+					</div>
+					<div style="display: flex;">
+						<div style="display: flex; flex-direction: column;">
+							<label>Initialization Vector (IV) (hex):</label>
+							<input id="enter_iv" style="width: 400px;"></input>
+						</div>
+					</div>
+					<div style="display: flex; height: 100%; width: 100%; flex-direction: column; justify-content: center; align-items: center;">
+						<button id='gen_iv' onclick="genSaltIv()" style="width: 200px">Generate Salt & IV</button>
+					</div>
+				</div>
+			</div> 
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Key Data:</label>
-			<input id='key_output' style="width: 400px;">
-			<button id='get_key' onclick="getKey()" style="width: 100px; margin: 5px;">Get Key</button>
+			<label>Key Data - deriveBits:</label>
+			<input id='key_output_derive' style="width: 600px;">
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Key Data - exportKey:</label>
+			<input id='key_output_export' style="width: 600px;">
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Key Data - Key + IV:</label>
+			<input id='key_output_full' style="width: 600px;">
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Key Data - Key:</label>
+			<input id='key_output_key' style="width: 600px;">
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Key Data - IV:</label>
+			<input id='key_output_iv' style="width: 600px;">
 		</div>
 <br>
 		<div>
@@ -110,25 +121,25 @@
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Encrypted Output:</label>
-			<input id='encrypted_output' style="width: 400px;">
+			<input id='encrypted_output' style="width: 600px;">
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Encrypted Output (base 64):</label>
+			<input id='encrypted_output64' style="width: 600px;">
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Encrypted Output (base 64 direct function):</label>
+			<input id='encrypted_output64_function' style="width: 600px;">
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Openssl Output:</label>
-			<input id='openssl_output' style="width: 400px;">
+			<input id='openssl_output' style="width: 600px;">
 		</div>
 	</div>
 
 </body>
 </html>
 <script>
-
-	async function getKey(){
-		const key = await getKeyMaterial();	
-		const exported = await window.crypto.subtle.exportKey("raw", key);
-		const exportedKeyBuffer = new Uint8Array(exported);
-		const bits = buf2hex(exportedKeyBuffer);
-		document.getElementById("key_output").value = bits;
-	}
 
 	function getKeyMaterial() {
 		const password = document.getElementById("enter_password").value;
@@ -143,11 +154,33 @@
 	}
 
 	async function encryptCbc() {
-		const plaintext = new TextEncoder().encode(document.getElementById("enter_plaintext").value);
-		const salt = hex2buf(document.getElementById("enter_salt").value);
-		const iv = hex2buf(document.getElementById("enter_iv").value);
+		const plaintext = document.getElementById("enter_plaintext").value;
+		const inputtext_encoded = new TextEncoder().encode( plaintext );
+//var plaintextbytes=new Uint8Array(inputtext_encoded);
+var inputbytes = new Uint8Array(inputtext_encoded);
+let single_newline = new Uint8Array(1);
+single_newline[0] = 10;
+const plaintextbytes_buf = concatBuffer(inputbytes, single_newline);
+let plaintextbytes = new Uint8Array(plaintextbytes_buf);
+const decoder = new TextDecoder();
+const input_string = decoder.decode(plaintextbytes);
+console.log("plaintext: " + input_string);
+
+const plaintext64 = _arrayBufferToBase64(plaintextbytes);
+console.log("plaintext 64: " + plaintext64);
+console.log(plaintextbytes);
+		const salt_in = document.getElementById("enter_salt").value;
+		const iv_in = document.getElementById("enter_iv").value;
 		const iter = Number(document.getElementById("enter_iterations").value);
 		const digest_hash = document.getElementById("enter_hash").value;
+
+		// Automatically generate Salt & IV if neither is provided.
+		if( !(salt_in || iv_in) ){
+			genSaltIv();
+		}
+		salt = hex2buf(document.getElementById("enter_salt").value);
+		iv = hex2buf(document.getElementById("enter_iv").value);
+
 		const keyMaterial = await getKeyMaterial();
 
 		// Show the derived bits
@@ -159,37 +192,95 @@
 				hash: digest_hash,
 			},
 			keyMaterial,
-			256,
+			384,
 		);
-		const exportedKeyBuffer = new Uint8Array(derived_bits);
-		const bits = buf2hex(exportedKeyBuffer);
-		document.getElementById("key_output").value = bits;
+		const derivedKeyBuffer = new Uint8Array(derived_bits);
+		const full_key = buf2hex(derivedKeyBuffer);
+		document.getElementById("key_output_full").value = full_key.toUpperCase();
 
-		// Set up key for use in aes cbc digest
-		const key = await window.crypto.subtle.deriveKey(
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+		const key_key = buf2hex(keybytes);
+		const key_iv = buf2hex(ivbytes);
+		document.getElementById("key_output_key").value = key_key.toUpperCase();
+		document.getElementById("key_output_iv").value = key_iv.toUpperCase();
+
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
 			{
-				name: "PBKDF2",
-				salt,
-				iterations: iter,
-				hash: digest_hash,
-			},
-			keyMaterial,
-			{ name: "AES-CBC", length: 256 },
-			true,
-			["encrypt", "decrypt"],
+				name: 'AES-CBC', 
+				length: 256
+			}, 
+			false, 
+			['encrypt']
 		);
-		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv }, key, plaintext);
+		//const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, inputtext_encoded);
+		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
+
+		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
+/*
+		const dec = new TextDecoder();
+		const encrypted_string = dec.decode(encrypted_result);
+*/
+		cipherbytes = new Uint8Array(encrypted_result);
+		let encrypted_string = _arrayBufferToBase64(cipherbytes);
+		document.getElementById("encrypted_output").value = encrypted_string;
+		//const encrypted64 = btoa( encrypted_string );
+		//document.getElementById("encrypted_output64").value = encrypted64;
+
+		const const_salt = "Salted__";
+		const salt64 = new TextEncoder().encode(const_salt);
+		// Convert only the encrypted message to base 64.
+		const result = _arrayBufferToBase64(encrypted_result); 
+		document.getElementById("encrypted_output64_function").value = result;
+
+		// Combine constant salt, random salt, and encrypted result as array buffers,
+		// then convert to base64.
+		const two_salts = concatBuffer(salt64, salt);
+		const output = concatBuffer(two_salts, cipherbytes);
+		const out64 = _arrayBufferToBase64(output);
+		document.getElementById("openssl_output").value = out64;
+
+
+
+/*
+		const const_salt = "Salted__";
+		const magic_salt = btoa( const_salt );
+		const salt64 = _arrayBufferToBase64(salt);
+		const result = _arrayBufferToBase64(encrypted_result); 
+		document.getElementById("encrypted_output").value = result;
+		document.getElementById("openssl_output").value = magic_salt + salt64  + result;
+
+???END
 		const result = buf2hex(encrypted_result); 
 		document.getElementById("encrypted_output").value = result;
 		document.getElementById("openssl_output").value = "Salted__" + result;
+*/
 	}
 
-	function genIv(){
+function concatBuffer(buffer1, buffer2) {
+  var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+  tmp.set(new Uint8Array(buffer1), 0);
+  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+  return tmp.buffer;
+};
+
+
+
+function _arrayBufferToBase64( buffer ) {
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+}
+
+	function genSaltIv(){
 		var iv = crypto.getRandomValues(new Uint8Array(16));
 		document.getElementById("enter_iv").value = buf2hex(iv).toUpperCase();	
-	}
-
-	function genSalt(){
 		var salt = crypto.getRandomValues(new Uint8Array(8));
 		document.getElementById("enter_salt").value = buf2hex(salt).toUpperCase();	
 	}
