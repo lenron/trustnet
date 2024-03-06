@@ -33,7 +33,120 @@ input[type='text'][disabled] {
 </style>
 
 <body>
+	<div>
+	   <h1>AES-256-CBC Encryption</h1>
+	</div>
+	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset;">
+		<div style="display: flex; flex-direction: row;">
+			<div style="margin: 5px;"> 
+				<div style="display: flex; flex-direction: column;">
+					<div style="margin: 1px; display: flex; flex-direction: column;">
+						<label>Plaintext:</label>
+						<input id="enter_plaintext" style="width: 600px;"></input>
+					</div>
+					<div style="margin: 0px; display: flex; flex-direction: row;"> 
+							<div style="margin-right: 5px; display: flex; flex-direction: column;">
+								<div style="margin: 1px; display: flex; flex-direction: column;">
+									<label>Password:</label>
+									<input id="enter_password" style="width: 400px;"></input>
+								</div>
+								<div style="margin: 1px; display: flex; flex-direction: column;">
+									<label>Salt (hex):</label>
+									<input id="enter_salt" style="width: 400px;"></input>
+								</div>
+							</div>
+							<div style="display: flex; flex-direction: column;">
+								<div style="margin: 1px; display: flex; flex-direction: column;">
+									<label>Iterations:</label>
+									<input id="enter_iterations" style="width: 186px;" value="10000"></input>
+								</div>
+								<div style="margin: 1px; display: flex; flex-direction: column;">
+									<label>Hash:</label>
+									<input id="enter_hash" style="width: 186px;" value="SHA-256"></input>
+								</div>
+							</div>
+					</div>
+				</div>
+			</div> 
+		</div>
+		<div>
+			<button id='encrypt_cbc' onclick="encryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
+		</div>
+		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+			<label>Key Data (hex) - Key + IV:</label>
+			<input id='key_output_full' style="width: 600px;">
+		</div>
+		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+			<label>Key Data (hex) - Key:</label>
+			<input id='key_output_key' style="width: 600px;">
+		</div>
+		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+			<label>Key Data (hex) - IV:</label>
+			<input id='key_output_iv' style="width: 600px;">
+		</div>
+		<div style="margin: 1px;">
+			<b>OpenSSL derives the key and IV using the same PBKDF2 digest.</b>
+		</div>
+		<div style="margin: 1px;">
+			<b>The first 256 bits are used as key, the last 128 are used for IV.</b>
+		</div>
+<br>
+		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+			<label>Encrypted Output:</label>
+			<input id='encrypted_output' style="width: 600px;">
+		</div>
+		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+			<label>Encrypted Output (base 64):</label>
+			<input id='encrypted_output64' style="width: 600px;">
+		</div>
+		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+			<label>OpenSSL Output:</label>
+			<input id='openssl_output' style="width: 600px;">
+		</div>
+		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+			<label>OpenSSL Output (base 64):</label>
+			<input id='openssl_output64' style="width: 600px;">
+		</div>
+	</div>
 
+
+	<div>
+	   <h1>AES-256-CBC Decryption</h1>
+	</div>
+	<div id='decrypt_pane' style="display: flex; flex-direction: column; border-style: inset;">
+		<div style="display: flex; flex-direction: row;">
+			<div style="margin: 5px;"> 
+				<div style="display: flex; flex-direction: column;">
+					<div style="margin: 1px; display: flex; flex-direction: column;">
+						<label>OpenSSL Input:</label>
+						<input id="openssl_input" style="width: 600px;"></input>
+					</div>
+					<div style="margin: 0px; display: flex; flex-direction: row;"> 
+							<div style="margin-right: 5px; display: flex; flex-direction: column;">
+								<div style="margin: 1px; display: flex; flex-direction: column;">
+									<label>Password:</label>
+									<input id="enter_password" style="width: 400px;"></input>
+								</div>
+								<div style="margin: 1px; display: flex; flex-direction: column;">
+									<label>Salt (hex):</label>
+									<input id="enter_salt" style="width: 400px;"></input>
+								</div>
+							</div>
+							<div style="display: flex; flex-direction: column;">
+								<div style="margin: 1px; display: flex; flex-direction: column;">
+									<label>Iterations:</label>
+									<input id="enter_iterations" style="width: 186px;" value="10000"></input>
+								</div>
+								<div style="margin: 1px; display: flex; flex-direction: column;">
+									<label>Hash:</label>
+									<input id="enter_hash" style="width: 186px;" value="SHA-256"></input>
+								</div>
+							</div>
+					</div>
+				</div>
+			</div> 
+		</div>
+	</div>
 
 	<div>
 	   <h1>Hex64 Decode/Encode</h1>
@@ -73,84 +186,7 @@ input[type='text'][disabled] {
 			<button id='decode64' onclick="decode64()" style="width: 100px">Decode 64</button>
 		</div>
 	</div>
-
-
-	<div>
-	   <h1>AES-256-CBC Encryption</h1>
-	</div>
-	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset;">
-
-		<div style="display: flex; flex-direction: row;">
-			<div style="margin: 5px;"> 
-				<div style="display: flex; flex-direction: column;">
-					<div style="margin: 1px; display: flex; flex-direction: column;">
-						<label>Plaintext:</label>
-						<input id="enter_plaintext" style="width: 600px;"></input>
-					</div>
-					<div style="margin: 0px; display: flex; flex-direction: row;"> 
-							<div style="margin-right: 5px; display: flex; flex-direction: column;">
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Password:</label>
-									<input id="enter_password" style="width: 400px;"></input>
-								</div>
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Salt (hex):</label>
-									<input id="enter_salt" style="width: 400px;"></input>
-								</div>
-							</div>
-							<div style="display: flex; flex-direction: column;">
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Iterations:</label>
-									<input id="enter_iterations" style="width: 186px;" value="10000"></input>
-								</div>
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Hash:</label>
-									<input id="enter_hash" style="width: 186px;" value="SHA-256"></input>
-								</div>
-							</div>
-					</div>
-				</div>
-			</div> 
-		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
-			<label>Key Data (hex) - Key + IV:</label>
-			<input id='key_output_full' style="width: 600px;">
-		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
-			<label>Key Data (hex) - Key:</label>
-			<input id='key_output_key' style="width: 600px;">
-		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
-			<label>Key Data (hex) - IV:</label>
-			<input id='key_output_iv' style="width: 600px;">
-		</div>
-		<div style="margin: 1px;">
-			<b>Openssl derives the key and IV using the same PBKDF2 digest.</b>
-		</div>
-		<div style="margin: 1px;">
-			<b>The first 256 bits are used as key, the last 128 are used for IV.</b>
-		</div>
-<br>
-		<div>
-			<button id='encrypt_cbc' onclick="encryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
-		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
-			<label>Encrypted Output:</label>
-			<input id='encrypted_output' style="width: 600px;">
-		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
-			<label>Encrypted Output (base 64):</label>
-			<input id='encrypted_output64' style="width: 600px;">
-		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
-			<label>Openssl Output:</label>
-			<input id='openssl_output' style="width: 600px;">
-		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
-			<label>Openssl Output (base 64):</label>
-			<input id='openssl_output64' style="width: 600px;">
-		</div>
-	</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 </body>
 </html>
@@ -189,8 +225,17 @@ input[type='text'][disabled] {
 		const iter = Number(document.getElementById("enter_iterations").value);
 		const digest_hash = document.getElementById("enter_hash").value;
 
+		// Check if we need to generate a salt.
+		let salt_input = document.getElementById("enter_salt").value;
+		let salt;
+		if( salt_input ){
+			salt = hex2buf(salt_input);
+		}else{
+			salt = window.crypto.getRandomValues(new Uint8Array(8));
+			document.getElementById("enter_salt").value = buf2hex(salt).toUpperCase();
+		}
+
 		// Prepare inputs for digest.
-		salt = hex2buf(document.getElementById("enter_salt").value);
 		const keyMaterial = await getKeyMaterial();
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
@@ -209,7 +254,7 @@ input[type='text'][disabled] {
 		const full_key = buf2hex(derivedKeyBuffer);
 		document.getElementById("key_output_full").value = full_key.toUpperCase();
 
-		// Openssl derives the key and IV using the same PBKDF2 digest.
+		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
 		const keybytes = derivedKeyBuffer.slice(0, 32);
 		const ivbytes = derivedKeyBuffer.slice(32);
