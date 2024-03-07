@@ -118,31 +118,50 @@ input[type='text'][disabled] {
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
 					<div style="margin: 1px; display: flex; flex-direction: column;">
-						<label>OpenSSL Input:</label>
-						<input id="openssl_input" style="width: 600px;"></input>
+						<label>OpenSSL Encrypted String-- Ready for Decrypt:</label>
+						<input id="decrypt_input" style="width: 600px;"></input>
 					</div>
-					<div style="margin: 0px; display: flex; flex-direction: row;"> 
+					<div style="margin: 0px; display: flex; flex-direction: column;"> 
 							<div style="margin-right: 5px; display: flex; flex-direction: column;">
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Password:</label>
-									<input id="enter_password" style="width: 400px;"></input>
-								</div>
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Salt (hex):</label>
-									<input id="enter_salt" style="width: 400px;"></input>
+									<input id="decrypt_password" style="width: 410px;"></input>
 								</div>
 							</div>
-							<div style="display: flex; flex-direction: column;">
+							<div style="display: flex; flex-direction: row;">
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Iterations:</label>
-									<input id="enter_iterations" style="width: 186px;" value="10000"></input>
+									<input id="decrypt_iterations" style="width: 200px;" value="10000"></input>
 								</div>
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Hash:</label>
-									<input id="enter_hash" style="width: 186px;" value="SHA-256"></input>
+									<input id="decrypt_hash" style="width: 200px;" value="SHA-256"></input>
 								</div>
 							</div>
 					</div>
+				</div>
+				<div>
+					<button id='decrypt_cbc' onclick="decryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Decrypt AES-256-CBC</button>
+				</div>
+				<div style="margin: 5px; display: flex; flex-direction: column;">
+					<label>Extracted Salt (hex):</label>
+					<input id="decrypt_salt" style="width: 400px;"></input>
+				</div>
+				<div style="display: flex; flex-direction: column; margin: 5px;">
+					<label>Extracted Key Data (hex) - Key + IV:</label>
+					<input id='decrypt_fullkey' style="width: 600px;">
+				</div>
+				<div style="display: flex; flex-direction: column; margin: 5px;">
+					<label>Extracted Key Data (hex) - Key:</label>
+					<input id='decrypt_key' style="width: 600px;">
+				</div>
+				<div style="display: flex; flex-direction: column; margin: 5px;">
+					<label>Extracted Key Data (hex) - IV:</label>
+					<input id='decrypt_iv' style="width: 600px;">
+				</div>
+				<div style="display: flex; flex-direction: column; margin: 5px;">
+					<label>OpenSSL Decrypted Output:</label>
+					<input id='decrypt_output' style="width: 600px;">
 				</div>
 			</div> 
 		</div>
@@ -278,13 +297,11 @@ input[type='text'][disabled] {
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
 		cipherbytes = new Uint8Array(encrypted_result);
-
-		const encrypted_string = dec.decode(encrypted_result);
-		document.getElementById("encrypted_output").value = encrypted_string;
-
 		const result = _arrayBufferToBase64(encrypted_result); 
 		const encrypted_string64 = _arrayBufferToBase64(cipherbytes);
 		document.getElementById("encrypted_output64").value = encrypted_string64;
+		const encrypted_string = btoa(encrypted_string64);
+		document.getElementById("encrypted_output").value = encrypted_string;
 
 		// Combine constant salt, random salt, and encrypted result as array buffers, then convert to base64.
 		const const_salt = "Salted__";
@@ -292,10 +309,10 @@ input[type='text'][disabled] {
 		const two_salts = concatBuffer(salt64, salt);
 		const encrypted_output_buf = concatBuffer(two_salts, cipherbytes);
 
-		const out = dec.decode(encrypted_output_buf); 
-		document.getElementById("openssl_output").value = out;
 		const out64 = _arrayBufferToBase64(encrypted_output_buf);
 		document.getElementById("openssl_output64").value = out64;
+		const out = atob(out64);
+		document.getElementById("openssl_output").value = out;
 	}
 
 	function concatBuffer(buffer1, buffer2) {
