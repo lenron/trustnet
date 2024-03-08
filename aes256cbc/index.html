@@ -206,6 +206,17 @@ input[type='text'][disabled] {
 			<button id='decode64' onclick="decode64()" style="width: 100px; margin: 5px;">Decode 64</button>
 		</div>
 	</div>
+	<div>
+		<h3>OpenSSL Equivalent Commands</h3>
+	</div>
+	<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
+		<label>Encode:</label>
+		<b>openssl enc -aes-256-cbc -e -p -pbkdf2 -in &lt;plaintext file&gt; -out &lt;encoded file&gt;</b>
+		<br>
+		<label>Decode:</label>
+		<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
+	</div>
+
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 </body>
