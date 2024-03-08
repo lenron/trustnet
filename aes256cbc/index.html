@@ -160,7 +160,7 @@ input[type='text'][disabled] {
 					<input id='decrypt_iv' style="width: 600px;">
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
-					<label>OpenSSL Decrypted Output:</label>
+					<label>OpenSSL Decrypted Output (plaintext):</label>
 					<input id='decrypt_output' style="width: 600px;">
 				</div>
 			</div> 
@@ -211,8 +211,8 @@ input[type='text'][disabled] {
 </html>
 <script>
 
-	function getKeyMaterial() {
-		const password = document.getElementById("enter_password").value;
+	function getKeyMaterial(password) {
+		//const password = document.getElementById("enter_password").value;
 		const enc = new TextEncoder();
 		return window.crypto.subtle.importKey(
 			"raw",
@@ -221,6 +221,88 @@ input[type='text'][disabled] {
 			false,
 			["deriveBits", "deriveKey"],
 		);
+	}
+
+function base64ToArrayBuffer(base64) {
+    var binaryString = atob(base64);
+    var bytes = new Uint8Array(binaryString.length);
+    for (var i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+
+	async function decryptCbc() {
+		// Get input.
+		const ciphertext = document.getElementById("decrypt_input").value;
+		// Convert string to Uint8Array.
+		//const inputbytes = new TextEncoder().encode(ciphertext);
+		const ciphertext64 = btoa(ciphertext);
+		const inputbytes = base64ToArrayBuffer(ciphertext64);
+
+
+		// ciphertext is now in a form that is ready to give to the encryption function.
+		const ciphertextbytes = new Uint8Array(inputbytes);
+		const dec = new TextDecoder();
+		const input_string = dec.decode(ciphertextbytes);
+		console.log("ciphertext: " + input_string);
+		console.log(ciphertextbytes);
+		const iter = Number(document.getElementById("decrypt_iterations").value);
+		const digest_hash = document.getElementById("decrypt_hash").value;
+		const salt = ciphertextbytes.slice(8,16);
+		document.getElementById("decrypt_salt").value = buf2hex(salt).toUpperCase();
+
+		// Prepare inputs for digest.
+		const pass = document.getElementById("decrypt_password").value;
+		const keyMaterial = await getKeyMaterial(pass);
+
+		// Use the key derivation function PBKDF2 to derive bits that will 
+		// be used to create the cryptoKey object needed for the main digest.
+		const derived_bits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				salt,
+				iterations: iter,
+				hash: digest_hash,
+			},
+			keyMaterial,
+			384,
+		);
+		const derivedKeyBuffer = new Uint8Array(derived_bits);
+		const full_key = buf2hex(derivedKeyBuffer);
+		document.getElementById("decrypt_fullkey").value = full_key.toUpperCase();
+
+		// OpenSSL derives the key and IV using the same PBKDF2 digest.
+		// The first 256 bits are used as key, the last 128 are used for IV.
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+		const key_key = buf2hex(keybytes);
+		const key_iv = buf2hex(ivbytes);
+		document.getElementById("decrypt_key").value = key_key.toUpperCase();
+		document.getElementById("decrypt_iv").value = key_iv.toUpperCase();
+
+		// Extract the encrypted phrase from OpenSSL input
+		const cipherbytesphrase = ciphertextbytes.slice(16);
+
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				name: 'AES-CBC', 
+				length: 256
+			}, 
+			false, 
+			['decrypt']
+		);
+
+		// The 'make it go' main digest call.
+		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
+		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
+		plaintextbytes = new Uint8Array(decrypted_result);
+		const decrypted_string = new TextDecoder().decode( plaintextbytes );
+		document.getElementById("decrypt_output").value = decrypted_string;
+		console.log("Decrypted output: " + decrypted_string);
 	}
 
 	async function encryptCbc() {
@@ -255,7 +337,8 @@ input[type='text'][disabled] {
 		}
 
 		// Prepare inputs for digest.
-		const keyMaterial = await getKeyMaterial();
+		const pass = document.getElementById("enter_password").value;
+		const keyMaterial = await getKeyMaterial(pass);
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
 		// be used to create the cryptoKey object needed for the main digest.
