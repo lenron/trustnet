@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Crypto Demo</title>
+    <title>OpenSSL Enc/Dec</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -33,10 +33,12 @@ input[type='text'][disabled] {
 </style>
 
 <body>
+	   <h1>OpenSSL Equivalent AES-256-CBC Encryption/Decryption using PBKDF2</h1>
+
 	<div>
-	   <h1>AES-256-CBC Encryption</h1>
+	   <h3>AES-256-CBC Encryption</h3>
 	</div>
-	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset;">
+	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: row;">
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
@@ -72,15 +74,15 @@ input[type='text'][disabled] {
 		<div>
 			<button id='encrypt_cbc' onclick="encryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
 		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Key Data (hex) - Key + IV:</label>
-			<input id='key_output_full' style="width: 600px;">
+			<input id='key_output_full' style="width: 800px;">
 		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Key Data (hex) - Key:</label>
 			<input id='key_output_key' style="width: 600px;">
 		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Key Data (hex) - IV:</label>
 			<input id='key_output_iv' style="width: 600px;">
 		</div>
@@ -91,19 +93,19 @@ input[type='text'][disabled] {
 			<b>The first 256 bits are used as key, the last 128 are used for IV.</b>
 		</div>
 <br>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Encrypted Output:</label>
 			<input id='encrypted_output' style="width: 600px;">
 		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Encrypted Output (base 64):</label>
 			<input id='encrypted_output64' style="width: 600px;">
 		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>OpenSSL Output:</label>
 			<input id='openssl_output' style="width: 600px;">
 		</div>
-		<div style="margin: 1px; display: flex; flex-direction: column; margin: 5px;">
+		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>OpenSSL Output (base 64):</label>
 			<input id='openssl_output64' style="width: 600px;">
 		</div>
@@ -111,9 +113,9 @@ input[type='text'][disabled] {
 
 
 	<div>
-	   <h1>AES-256-CBC Decryption</h1>
+	   <h3>AES-256-CBC Decryption</h3>
 	</div>
-	<div id='decrypt_pane' style="display: flex; flex-direction: column; border-style: inset;">
+	<div id='decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: row;">
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
@@ -149,7 +151,7 @@ input[type='text'][disabled] {
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>Extracted Key Data (hex) - Key + IV:</label>
-					<input id='decrypt_fullkey' style="width: 600px;">
+					<input id='decrypt_fullkey' style="width: 800px;">
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>Extracted Key Data (hex) - Key:</label>
@@ -168,41 +170,40 @@ input[type='text'][disabled] {
 	</div>
 
 	<div>
-	   <h1>Hex64 Decode/Encode</h1>
+	   <h3>Hex64 Decode/Encode</h3>
 	</div>
-	<div id='encode64pane'>
-		<div style="display: flex; flex-direction: column; border-style: inset;">
+	<div id='encode64pane' style='width: fit-content; border-style: inset;'>
+		<div style="display: flex; flex-direction: column;">
 			<div style="display: flex;">
-				<div style="display: flex; flex-direction: column;">
+				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>Raw:</label>
 					<input id="raw_64encode_text" style="width: 400px;"></input>
 				</div>
 				<div>
 					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
 				</div>
-				<div style="display: flex; flex-direction: column;">
+				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>64 Encoded:</label>
 					<input id="encoded64_text" style="width: 400px;"></input>
 				</div>
 			</div>
-			<button id='encode64' onclick="encode64()" style="width: 80px">Encode 64</button>
+			<button id='encode64' onclick="encode64()" style="width: 80px; margin: 5px;">Encode 64</button>
 		</div>
-		<br>
-		<div style="display: flex; flex-direction: column; border-style: inset;">
+		<div style="display: flex; flex-direction: column;">
 			<div style="display: flex;">
-				<div style="display: flex; flex-direction: column;">
+				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>64 Encoded:</label>
 					<input id="raw_64encoded_text" style="width: 400px;"></input>
 				</div>
 				<div>
 					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
 				</div>
-				<div style="display: flex; flex-direction: column;">
+				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>64 Decoded:</label>
 					<input id="decoded64_text" style="width: 400px;"></input>
 				</div>
 			</div>
-			<button id='decode64' onclick="decode64()" style="width: 100px">Decode 64</button>
+			<button id='decode64' onclick="decode64()" style="width: 100px; margin: 5px;">Decode 64</button>
 		</div>
 	</div>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -212,7 +213,6 @@ input[type='text'][disabled] {
 <script>
 
 	function getKeyMaterial(password) {
-		//const password = document.getElementById("enter_password").value;
 		const enc = new TextEncoder();
 		return window.crypto.subtle.importKey(
 			"raw",
@@ -330,6 +330,9 @@ input[type='text'][disabled] {
 		const pass = document.getElementById("enter_password").value;
 		const keyMaterial = await getKeyMaterial(pass);
 
+		// Propagate password to decrypt for ease of use.
+		document.getElementById("decrypt_password").value = pass;
+
 		// Use the key derivation function PBKDF2 to derive bits that will 
 		// be used to create the cryptoKey object needed for the main digest.
 		const derived_bits = await window.crypto.subtle.deriveBits(
@@ -386,6 +389,7 @@ input[type='text'][disabled] {
 		document.getElementById("openssl_output64").value = out64;
 		const out = atob(out64);
 		document.getElementById("openssl_output").value = out;
+		document.getElementById("decrypt_input").value = out;
 	}
 
 	function concatBuffer(buffer1, buffer2) {
