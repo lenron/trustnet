@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>OpenSSL Enc/Dec</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<style>
+* {
+    font-family: 'Khula', sans-serif;
+}
+/*
+input {
+	background-color: lightgrey;
+}
+
+input[type='text'] {
+    background-color: darkgrey;
+    color: darkred;
+}
+
+input[type='button'] {
+	background-color: grey;
+	color: yellow;
+}
+
+input[type='text'][disabled] {
+    background-color: #202020;
+}
+*/
+</style>
+
+<body>
+	   <h1>Compartmentalized Secure Storage</h1>
+
+	<div>
+	   <h3>Encryption</h3>
+	</div>
+	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+		<div style="display: flex; flex-direction: row;">
+			<div style="margin: 5px;"> 
+				<div style="display: flex; flex-direction: column;">
+					<div style="margin: 1px; display: flex; flex-direction: column;">
+						<label>Plaintext:</label>
+						<input id="enter_plaintext" style="width: 600px;"></input>
+					</div>
+					<div style="margin: 0px; display: flex; flex-direction: row;"> 
+							<div style="margin-right: 5px; display: flex; flex-direction: column;">
+								<div style="margin: 1px; display: flex; flex-direction: column;">
+									<label>Password:</label>
+									<input id="enter_password" style="width: 400px;"></input>
+								</div>
+							</div>
+					</div>
+				</div>
+			</div> 
+		</div>
+		<div>
+			<button id='encrypt_cbc' onclick="encryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
+		</div>
+	</div>
+
+	<div>
+	   <h3>Hex64 Decode/Encode</h3>
+	</div>
+	<div id='encode64pane' style='width: fit-content; border-style: inset;'>
+		<div style="display: flex; flex-direction: column;">
+			<div style="display: flex;">
+				<div style="display: flex; flex-direction: column; margin: 5px;">
+					<label>Raw:</label>
+					<input id="raw_64encode_text" style="width: 400px;"></input>
+				</div>
+				<div>
+					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
+				</div>
+				<div style="display: flex; flex-direction: column; margin: 5px;">
+					<label>64 Encoded:</label>
+					<input id="encoded64_text" style="width: 400px;"></input>
+				</div>
+			</div>
+			<button id='encode64' onclick="encode64()" style="width: 80px; margin: 5px;">Encode 64</button>
+		</div>
+		<div style="display: flex; flex-direction: column;">
+			<div style="display: flex;">
+				<div style="display: flex; flex-direction: column; margin: 5px;">
+					<label>64 Encoded:</label>
+					<input id="raw_64encoded_text" style="width: 400px;"></input>
+				</div>
+				<div>
+					<span style='font-size:40px; margin: 4px;'>&#8680;</span>
+				</div>
+				<div style="display: flex; flex-direction: column; margin: 5px;">
+					<label>64 Decoded:</label>
+					<input id="decoded64_text" style="width: 400px;"></input>
+				</div>
+			</div>
+			<button id='decode64' onclick="decode64()" style="width: 100px; margin: 5px;">Decode 64</button>
+		</div>
+	</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+</body>
+</html>
+<script>
+
+
+	function concatBuffer(buffer1, buffer2) {
+	  var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+	  tmp.set(new Uint8Array(buffer1), 0);
+	  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+	  return tmp.buffer;
+	};
+
+	function buf2hex(buffer) { // buffer is an ArrayBuffer
+		return [...new Uint8Array(buffer)]
+			.map(x => x.toString(16).padStart(2, '0'))
+			.join('');
+	}
+	 // This function converts a hex string into an ArrayBuffer for hash processing.
+	function hex2buf(hexString){
+		// convert to a number array representing the hex bytes.
+		const hexBytesArray = new Array;
+		for(var i=0; i < hexString.length; i+=2){
+			hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
+		}
+		const hexArrayBuffer = new Uint8Array(hexBytesArray);
+		return hexArrayBuffer;
+	}
+
+	function base64ToArrayBuffer(base64) {
+		var binaryString = atob(base64);
+		var bytes = new Uint8Array(binaryString.length);
+		for (var i = 0; i < binaryString.length; i++) {
+			bytes[i] = binaryString.charCodeAt(i);
+		}
+		return bytes.buffer;
+	}
+
+	function _arrayBufferToBase64( buffer ) {
+		var binary = '';
+		var bytes = new Uint8Array( buffer );
+		var len = bytes.byteLength;
+		for (var i = 0; i < len; i++) {
+			binary += String.fromCharCode( bytes[ i ] );
+		}
+		return window.btoa( binary );
+	}
+
+	function encode64(){
+		let raw_text = document.getElementById("raw_64encode_text").value;
+		console.log("Encoding the string: '" + raw_text + "'");
+		const encoded64 = btoa(raw_text);
+		console.log("Encoded string: '" + encoded64 + "'");
+		document.getElementById("encoded64_text").value = encoded64;
+		document.getElementById("raw_64encoded_text").value = encoded64;
+	}
+
+	function decode64(){
+		let decoded_text = document.getElementById("raw_64encoded_text").value;
+		console.log("Decoding the string: '" + decoded_text + "'");
+		const decoded64 = atob(decoded_text);
+		console.log("Decoded string: '" + decoded64 + "'");
+		document.getElementById("decoded64_text").value = decoded64;
+	}
+
+</script>
+
+
+
+
+
+
