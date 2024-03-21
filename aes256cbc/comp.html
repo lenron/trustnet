@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>OpenSSL Enc/Dec</title>
+    <title>Compartmentalized Secure Storage</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -47,18 +47,22 @@ input[type='text'][disabled] {
 						<input id="enter_plaintext" style="width: 600px;"></input>
 					</div>
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
-							<div style="margin-right: 5px; display: flex; flex-direction: column;">
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Password:</label>
-									<input id="enter_password" style="width: 400px;"></input>
-								</div>
+						<div style="margin-right: 5px; display: flex; flex-direction: column;">
+							<div style="margin: 1px; display: flex; flex-direction: column;">
+								<label>Password:</label>
+								<input id="enter_password" style="width: 400px;"></input>
 							</div>
+						</div>
 					</div>
 				</div>
 			</div> 
 		</div>
 		<div>
-			<button id='encrypt_cbc' onclick="encryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
+			<button id='compartmentalize' onclick="compartmentalize()" style="background-color: lightgreen; width: 200px; margin: 5px;">Compartmentalize</button>
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Output:</label>
+			<input id='output' style="width: 600px;">
 		</div>
 	</div>
 
@@ -105,6 +109,59 @@ input[type='text'][disabled] {
 </html>
 <script>
 
+	function prepPtext(plaintext) {
+		console.log("plaintext input: " + plaintext);
+		// Count chars.
+		const num_chars = plaintext.length;
+		console.log("number chars: " + num_chars);
+
+		// Form 'countstring'.
+		const countstring = num_chars + ':' + plaintext;
+		console.log("assembled countstring: " + countstring);
+
+		// Convert to binary (Uint8Array).
+		const countstring_binary = new TextEncoder().encode(countstring);
+		console.log("countstring in binary array: " + countstring_binary);
+
+		const all_1s = new Uint8Array(10);
+		for (let index = 0; index < all_1s.length; index++) {
+			all_1s[index] = 255;
+		}
+		console.log("test value all 1's in binary array: " + all_1s);
+
+		let xor_result = new Uint8Array(10);
+		for (let i = 0; i < all_1s.length; i++) {
+			xor_result[i] = all_1s[i] ^ countstring_binary[i];
+		}
+		console.log("XOR test result binary array: " + xor_result);
+		for (let i = 0; i < all_1s.length; i++) {
+			xor_result[i] = xor_result[i] ^ all_1s[i];
+		}
+		console.log("XOR test INVERSE result binary array: " + xor_result);
+
+
+	}
+
+	function getHash2k(pass) {
+		// Convert to binary.
+
+		// Take SHA256.
+
+		// Append SHA256 of Hash(n-1)
+
+
+	}
+
+	function compartmentalize() {
+		const plaintext = document.getElementById("enter_plaintext").value;
+		const password = document.getElementById("enter_password").value;
+
+		prepPtext(plaintext);
+
+		const result = 85 ^ 170;
+		console.log("XOR test: " + result);
+
+	}
 
 	function concatBuffer(buffer1, buffer2) {
 	  var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
