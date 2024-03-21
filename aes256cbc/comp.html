@@ -123,43 +123,67 @@ input[type='text'][disabled] {
 		const countstring_binary = new TextEncoder().encode(countstring);
 		console.log("countstring in binary array: " + countstring_binary);
 
-		const all_1s = new Uint8Array(10);
-		for (let index = 0; index < all_1s.length; index++) {
-			all_1s[index] = 255;
-		}
-		console.log("test value all 1's in binary array: " + all_1s);
-
-		let xor_result = new Uint8Array(10);
-		for (let i = 0; i < all_1s.length; i++) {
-			xor_result[i] = all_1s[i] ^ countstring_binary[i];
-		}
-		console.log("XOR test result binary array: " + xor_result);
-		for (let i = 0; i < all_1s.length; i++) {
-			xor_result[i] = xor_result[i] ^ all_1s[i];
-		}
-		console.log("XOR test INVERSE result binary array: " + xor_result);
-
-
+		return countstring_binary;
 	}
 
-	function getHash2k(pass) {
-		// Convert to binary.
+	async function getHash2k(pass) {
+		console.log("entered password: " + pass);
+		// Convert to binary (Uint8Array).
+		const password_binary = new TextEncoder().encode(pass);
+		console.log("password binary array: " + password_binary);
 
-		// Take SHA256.
+		// Create array to hold result
+
+		// Take initial SHA256.
+		let	sha_result = await crypto.subtle.digest('SHA-256', password_binary);
+		let sha_cumulative = new Uint8Array();
+
+		do{
+			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
+			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
+			sha_cumulative = new Uint8Array(sha_cumulative);
+			//console.log("sha_cumulative: " + sha_cumulative);
+		} while( sha_cumulative.length < 2000 );
+
+		
+		//console.log("sha_cumulative: " + sha_cumulative);
 
 		// Append SHA256 of Hash(n-1)
 
-
+		return sha_cumulative;
 	}
 
-	function compartmentalize() {
+	async function compartmentalize() {
 		const plaintext = document.getElementById("enter_plaintext").value;
 		const password = document.getElementById("enter_password").value;
 
-		prepPtext(plaintext);
+		// Prepare plaintext side for XOR.
+		const plaintext_binary = prepPtext(plaintext);
+		console.log("plaintext input binary array: " + plaintext_binary);
 
-		const result = 85 ^ 170;
-		console.log("XOR test: " + result);
+		// Prepare password side for XOR.
+		const pass_binary = await getHash2k(password);
+		//console.log("password input binary array: " + pass_binary);
+
+		// Choose loop index length as the length of the shorter array.
+		let index_length;
+		if( pass_binary.length > plaintext_binary.length ){
+			index_length= plaintext_binary.length;
+		}else{
+			index_length = pass_binary.length;
+		}
+
+		// Perform the bitwise XOR sequentially.
+		let xor_result = new Uint8Array(index_length);
+		for (let i = 0; i < index_length; i++) {
+			xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
+		}
+		console.log("XOR result binary array: " + xor_result);
+
+		for (let i = 0; i < index_length; i++) {
+			xor_result[i] = xor_result[i] ^ pass_binary[i];
+		}
+		console.log("XOR INVERSE result binary array: " + xor_result);
 
 	}
 
