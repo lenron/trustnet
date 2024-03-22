@@ -123,7 +123,11 @@ input[type='text'][disabled] {
 		const countstring_binary = new TextEncoder().encode(countstring);
 		console.log("countstring in binary array: " + countstring_binary);
 
-		return countstring_binary;
+		// Copy to size 2000 array for XOR.
+		let big_arr = new Uint8Array(2000);
+		big_arr.set(countstring_binary);
+
+		return big_arr;
 	}
 
 	async function getHash2k(pass) {
@@ -165,22 +169,17 @@ input[type='text'][disabled] {
 		const pass_binary = await getHash2k(password);
 		//console.log("password input binary array: " + pass_binary);
 
-		// Choose loop index length as the length of the shorter array.
-		let index_length;
-		if( pass_binary.length > plaintext_binary.length ){
-			index_length= plaintext_binary.length;
-		}else{
-			index_length = pass_binary.length;
-		}
+		// Each array should already be of length 2000.
+		const array_length = 2000;
 
 		// Perform the bitwise XOR sequentially.
-		let xor_result = new Uint8Array(index_length);
-		for (let i = 0; i < index_length; i++) {
+		let xor_result = new Uint8Array(array_length);
+		for (let i = 0; i < array_length; i++) {
 			xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
 		}
 		console.log("XOR result binary array: " + xor_result);
 
-		for (let i = 0; i < index_length; i++) {
+		for (let i = 0; i < array_length; i++) {
 			xor_result[i] = xor_result[i] ^ pass_binary[i];
 		}
 		console.log("XOR INVERSE result binary array: " + xor_result);
