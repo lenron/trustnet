@@ -62,7 +62,7 @@ input[type='text'][disabled] {
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Output:</label>
-			<textarea id="encrypt_output" style="width: 1000px; height: 350px;"></textarea>
+			<textarea id="encrypt_output" style="width: 1000px; height: 365px;"></textarea>
 		</div>
 	</div>
 
@@ -75,7 +75,7 @@ input[type='text'][disabled] {
 				<div style="display: flex; flex-direction: column;">
 					<div style="margin: 1px; display: flex; flex-direction: column;">
 						<label>CSS Encrypted input:</label>
-						<textarea id="enter_encrypted" style="width: 1000px; height: 350px;"></textarea>
+						<textarea id="enter_encrypted" style="width: 1000px; height: 365px;"></textarea>
 					</div>
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
 						<div style="margin-right: 5px; display: flex; flex-direction: column;">
@@ -190,14 +190,6 @@ input[type='text'][disabled] {
 		const password = document.getElementById("decrypt_password").value;
 		const compd_val = document.getElementById("enter_encrypted").value; //compartmentalized value
 
-/*
-		const result_hexstring = buf2hex(xor_result);
-		console.log("XOR result hex string: " + result_hexstring);
-		const result_b58 = encode_b58(result_hexstring);
-		console.log("XOR result base 58 encoded: " + result_b58);
-		const decoded_b58_arr = from_b58(result_b58);
-		console.log("decoded result: " + decoded_b58_arr);
-*/
 		// Convert from base 58.
 		const decoded_b58_arr = from_b58(compd_val);
 		console.log("decoded result: " + decoded_b58_arr);
