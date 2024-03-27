@@ -107,6 +107,7 @@ input[type='text'][disabled] {
 
 </body>
 </html>
+<script src="annotated.js"></script>
 <script>
 
 	function prepPtext(plaintext) {
@@ -180,7 +181,8 @@ input[type='text'][disabled] {
 		console.log("XOR result hex string: " + result_hexstring);
 		const result_b58 = encode_b58(result_hexstring);
 		console.log("XOR result base 58 encoded: " + result_b58);
-		
+		const decoded_b58_arr = from_b58(result_b58);
+		console.log("decoded result: " + decoded_b58_arr);
 
 /*
 		for (let i = 0; i < array_length; i++) {
