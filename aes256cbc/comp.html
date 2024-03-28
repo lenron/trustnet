@@ -67,6 +67,28 @@ input[type='text'][disabled] {
 	</div>
 
 	<div>
+	   <h3>Final Step</h3>
+	</div>
+	<div id='final_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Input:</label>
+			<textarea id="final_input" oninput="check_input()" style="width: 1000px; height: 365px;"></textarea>
+		</div>
+		<div style="margin: 5px; display: flex; flex-direction: column;">
+			<label>Password:</label>
+			<input id="final_password" style="width: 400px;"></input>
+		</div>
+		<div>
+			<button id='final_button' onclick="final_step()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Step</button>
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<b>Final Output:</b>
+			<input id='final_output' style="width: 600px;">
+		</div>
+	</div>
+
+
+	<div>
 	   <h3>Decryption</h3>
 	</div>
 	<div id='decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
@@ -140,6 +162,22 @@ input[type='text'][disabled] {
 </html>
 <script src="annotated.js"></script>
 <script>
+
+	function check_input(){
+		let input = document.getElementById("final_input").value;
+		// Disable Final Step button if any non-base58 characters are entered.
+		const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
+		if( regex.test(input) ){
+			console.log("enable");
+			//enable button
+			document.getElementById("final_button").disabled = false;
+		}else{
+			console.log("disable");
+			//disable button
+			document.getElementById("final_button").disabled = true;
+		}
+
+	}
 
 	function prepPtext(plaintext) {
 		console.log("plaintext input: " + plaintext);
@@ -250,6 +288,7 @@ input[type='text'][disabled] {
 
 		document.getElementById("decrypt_password").value = password;
 		document.getElementById("enter_encrypted").value = result_b58;
+		document.getElementById("final_input").value = result_b58;
 		document.getElementById("encrypt_output").value = result_b58;
 	}
 
