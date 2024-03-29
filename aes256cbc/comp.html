@@ -49,7 +49,7 @@ input[type='text'][disabled] {
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
 						<div style="margin-right: 5px; display: flex; flex-direction: column;">
 							<div style="margin: 1px; display: flex; flex-direction: column;">
-								<label>Password:</label>
+								<label>Encode Password:</label>
 								<input id="encrypt_password" style="width: 400px;"></input>
 							</div>
 						</div>
@@ -72,10 +72,10 @@ input[type='text'][disabled] {
 	<div id='final_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Input:</label>
-			<textarea id="final_input" oninput="check_input()" style="width: 1000px; height: 365px;"></textarea>
+			<textarea id="final_input" oninput="check_b58chars()" style="width: 1000px; height: 365px;"></textarea>
 		</div>
 		<div style="margin: 5px; display: flex; flex-direction: column;">
-			<label>Password:</label>
+			<label>Final Password:</label>
 			<input id="final_password" style="width: 400px;"></input>
 		</div>
 		<div>
@@ -102,7 +102,7 @@ input[type='text'][disabled] {
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
 						<div style="margin-right: 5px; display: flex; flex-direction: column;">
 							<div style="margin: 1px; display: flex; flex-direction: column;">
-								<label>Password:</label>
+								<label>Encode Password:</label>
 								<input id="decrypt_password" style="width: 400px;"></input>
 							</div>
 						</div>
@@ -163,7 +163,29 @@ input[type='text'][disabled] {
 <script src="annotated.js"></script>
 <script>
 
-	function check_input(){
+	function final_step(){
+		// Copy input data and password.
+
+		// Check input data for non-b58 chars
+
+		// Get size of input data
+
+		// Get hash of password, twice as long as input
+
+		// Convert password hash to base58
+
+		// Make sure arrays are of equal size
+
+		// Convert both arrays to b58 numerical equivalent.
+
+		// Add the arrays piecewise, modulo 57, then store to new array.
+
+		// Convert numerical values to b58 chars.
+
+
+	}
+
+	function check_b58chars(){
 		let input = document.getElementById("final_input").value;
 		// Disable Final Step button if any non-base58 characters are entered.
 		const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
@@ -200,7 +222,7 @@ input[type='text'][disabled] {
 		return big_arr;
 	}
 
-	async function getHash2k(pass) {
+	async function getHash2k(pass, length) {
 		console.log("entered password: " + pass);
 		// Convert to binary (Uint8Array).
 		const password_binary = new TextEncoder().encode(pass);
@@ -217,7 +239,7 @@ input[type='text'][disabled] {
 			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
 			sha_cumulative = new Uint8Array(sha_cumulative);
 			//console.log("sha_cumulative: " + sha_cumulative);
-		} while( sha_cumulative.length < 2000 );
+		} while( sha_cumulative.length < length);
 		//console.log("sha_cumulative: " + sha_cumulative);
 
 		return sha_cumulative;
@@ -232,11 +254,11 @@ input[type='text'][disabled] {
 		const decoded_b58_arr = from_b58(compd_val);
 		console.log("decoded result: " + decoded_b58_arr);
 
-		// Compute password for XOR.
-		const pass_binary = await getHash2k(password);
-
 		// Each array should already be of length 2000.
 		const array_length = 2000;
+
+		// Compute password for XOR.
+		const pass_binary = await getHash2k(password, array_length);
 
 		// Perform the bitwise XOR sequentially.
 		// Inverse of XOR is XOR and is communicative.
@@ -266,12 +288,12 @@ input[type='text'][disabled] {
 		const plaintext_binary = prepPtext(plaintext);
 		console.log("plaintext input binary array: " + plaintext_binary);
 
-		// Prepare password side for XOR.
-		const pass_binary = await getHash2k(password);
-		//console.log("password input binary array: " + pass_binary);
-
 		// Each array should already be of length 2000.
 		const array_length = 2000;
+
+		// Prepare password side for XOR.
+		const pass_binary = await getHash2k(password, array_length);
+		//console.log("password input binary array: " + pass_binary);
 
 		// Perform the bitwise XOR sequentially.
 		let xor_result = new Uint8Array(array_length);
