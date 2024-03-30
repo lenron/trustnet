@@ -72,7 +72,7 @@ input[type='text'][disabled] {
 	<div id='final_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Input:</label>
-			<textarea id="final_input" oninput="check_b58chars()" style="width: 1000px; height: 365px;"></textarea>
+			<textarea id="final_input" oninput="check_input_nonb58()" style="width: 1000px; height: 365px;"></textarea>
 		</div>
 		<div style="margin: 5px; display: flex; flex-direction: column;">
 			<label>Final Password:</label>
@@ -83,7 +83,7 @@ input[type='text'][disabled] {
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<b>Final Output:</b>
-			<input id='final_output' style="width: 600px;">
+			<textarea id='final_output' style="width: 1000px; height: 400px;"></textarea>
 		</div>
 	</div>
 
@@ -163,42 +163,99 @@ input[type='text'][disabled] {
 <script src="annotated.js"></script>
 <script>
 
-	function final_step(){
+// Base 58 character map.
+const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+	async function final_step(){
 		// Copy input data and password.
+		const input_data = document.getElementById("final_input").value;
+		const password = document.getElementById("final_password").value;
 
 		// Check input data for non-b58 chars
-
-		// Get size of input data
-
-		// Get hash of password, twice as long as input
-
-		// Convert password hash to base58
-
-		// Make sure arrays are of equal size
-
-		// Convert both arrays to b58 numerical equivalent.
-
-		// Add the arrays piecewise, modulo 57, then store to new array.
-
-		// Convert numerical values to b58 chars.
-
-
-	}
-
-	function check_b58chars(){
-		let input = document.getElementById("final_input").value;
-		// Disable Final Step button if any non-base58 characters are entered.
-		const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
-		if( regex.test(input) ){
-			console.log("enable");
-			//enable button
-			document.getElementById("final_button").disabled = false;
-		}else{
-			console.log("disable");
-			//disable button
-			document.getElementById("final_button").disabled = true;
+		if( !check_b58chars(input_data) ){
+			console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
+			// Abort final step encode.
+			document.getElementById("final_output").value = "Non-base 58 chars found in the Final Step input!";
+			return;
 		}
 
+		// Get size of input data
+		const input_length = input_data.length;
+		console.log("final input string length: " + input_length);
+
+		// Get hash+append of password, to length of input for now. 
+		const pass_hash = await getHash2k(password, input_length);
+		console.log("password hash result: " + pass_hash);
+		console.log(pass_hash);
+
+		// Convert password hash to base58
+		const pass_b58 = to_b58(pass_hash);
+		console.log("password hash b58: " + pass_b58);
+		console.log("password hash b58 length: " + pass_b58.length);
+
+		// Convert input to b58 numerical equivalent and get size.
+		let input_b58_num_arr = new Array(input_length);
+		let pass_b58_num_arr = new Array(input_length);
+		for (let i = 0; i < input_length; i++) {
+			input_b58_num_arr[i] = base58map.indexOf(input_data.charAt(i));
+			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
+		}
+		console.log("input base58 numerical array: " + input_b58_num_arr);
+		console.log("password base58 numerical array: " + pass_b58_num_arr);
+
+		// Add the arrays piecewise, 
+		let sum_b58_num_arr = new Array(input_length);
+		for (let i = 0; i < input_length; i++) {
+			sum_b58_num_arr[i] = input_b58_num_arr[i] + pass_b58_num_arr[i];
+		}
+		console.log("sum base58 numerical array: " + sum_b58_num_arr);
+		// modulo 57, then store to new array.
+		for (let i = 0; i < input_length; i++) {
+			sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
+		}
+		console.log("modulo base58 numerical array: " + sum_b58_num_arr);
+
+		// Convert numerical values to b58 chars.
+		const long_way = to_b58(sum_b58_num_arr);
+		console.log("Final Result (long way): " + long_way);
+
+		let short_arr = new Array(input_length);
+		for (let i = 0; i < input_length; i++) {
+			short_arr[i] = (base58map.indexOf(input_data.charAt(i)) + base58map.indexOf(pass_b58.charAt(i))) % 58;
+		}
+		console.log("Final Result (short way) Array: " + short_arr);
+		const short_way = to_b58(short_arr);
+		console.log("Final Result (short way): " + short_way);
+		document.getElementById("final_output").value = short_way;
+	}
+
+	function check_b58chars(input){
+		// From the first char(^) to the last($), match zero or more(*) of 
+		// 1-9A-HJ-NP-Za-km-z (false if any non-b58 chars).
+		const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
+		if( regex.test(input) ){
+			// Return true/valid: non-b58 chars were NOT found.
+			return 1;
+		}else{
+			// Return false/invalid: non-b58 chars were found.
+			return 0;
+		}
+	}
+
+	function check_input_nonb58(){
+		let input = document.getElementById("final_input").value;
+		// Disable Final Step button if any non-base58 characters are entered.
+		if( check_b58chars(input) ){
+			//console.log("enable");
+			//enable button
+			document.getElementById("final_button").disabled = false;
+			document.getElementById("final_output").value = "";
+		}else{
+			console.log("Non-base 58 chars found in the Final Step input!");
+			//disable button
+			document.getElementById("final_button").disabled = true;
+			document.getElementById("final_output").value = "Non-base 58 chars found in the Final Step input!";
+		}
 	}
 
 	function prepPtext(plaintext) {
@@ -303,15 +360,14 @@ input[type='text'][disabled] {
 		console.log("XOR result binary array: " + xor_result);
 
 		// Convert to base58
-		const result_hexstring = buf2hex(xor_result);
-		console.log("XOR result hex string: " + result_hexstring);
-		const result_b58 = encode_b58(result_hexstring);
+		const result_b58 = to_b58(xor_result);
 		console.log("XOR result base 58 encoded: " + result_b58);
 
 		document.getElementById("decrypt_password").value = password;
 		document.getElementById("enter_encrypted").value = result_b58;
 		document.getElementById("final_input").value = result_b58;
 		document.getElementById("encrypt_output").value = result_b58;
+		console.log("result length (num chars): " + result_b58.length);
 	}
 
 	function concatBuffer(buffer1, buffer2) {
