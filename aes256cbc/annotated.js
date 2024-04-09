@@ -1,7 +1,7 @@
 var to_b58 = function(
     B,            //Uint8Array raw byte input
-    A             //Base58 characters (i.e. "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 ) {
+    var A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
     var d = [],   //the array for storing the stream of base58 digits
         s = "",   //the result string variable that will be returned
         i,        //the iterator variable for the byte input
