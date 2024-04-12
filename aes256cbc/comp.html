@@ -79,11 +79,18 @@ input[type='text'][disabled] {
 			<input id="final_password" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='final_button' onclick="final_step()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Step</button>
+			<button id='final_button' onclick="final_step_encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Encrypt</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<b>Final Output:</b>
 			<textarea id='final_output' style="width: 1000px; height: 400px;"></textarea>
+		</div>
+		<div>
+			<button id='final_decrypt_button' onclick="final_step_decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Decrypt</button>
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<b>Final Decrypt:</b>
+			<textarea id='final_decrypt' style="width: 1000px; height: 400px;"></textarea>
 		</div>
 	</div>
 
@@ -175,7 +182,8 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		console.log("plaintext input binary array: " + plaintext_binary);
 
 		// Each array should already be of length 2000.
-		const array_length = 2000;
+		//const array_length = 2000;
+		const array_length = 20;
 
 		// Prepare password side for XOR.
 		const pass_binary = await getHash2k(password, array_length);
@@ -208,7 +216,8 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		console.log("decoded result: " + decoded_b58_arr);
 
 		// Each array should already be of length 2000.
-		const array_length = 2000;
+		//const array_length = 2000;
+		const array_length = 20;
 
 		// Compute password for XOR.
 		const pass_binary = await getHash2k(password, array_length);
@@ -233,7 +242,84 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		document.getElementById("decrypt_output").value = decrypted_string;
 	}
 
-	async function final_step(){
+	// Given password and stored input, decrypt final step.
+	async function final_step_decrypt(){
+		// Get inputs.
+		const final_encrypted = document.getElementById("final_output").value;
+		const password = document.getElementById("final_password").value;
+
+		// Get size of input data
+		//const final_encrypted_length = final_encrypted.length / 2;
+		const final_encrypted_length = final_encrypted.length;
+		console.log("DECRYPT: final final_encrypted string length: " + final_encrypted_length);
+
+		// Get hash+append of password, to length of final_encrypted for now. 
+		const pass_hash = await getHash2k(password, final_encrypted_length);
+		console.log("DECRYPT: password hash result: " + pass_hash);
+		console.log(pass_hash);
+
+		// Convert password hash to base58
+		const pass_b58 = to_b58(pass_hash);
+		console.log("DECRYPT: password hash b58: " + pass_b58);
+		console.log("DECRYPT: password hash b58 length: " + pass_b58.length);
+
+		// Convert final_encrypted to b58 numerical equivalent and get size.
+		let final_encrypted_b58_num_arr = new Array(final_encrypted_length);
+		let pass_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			final_encrypted_b58_num_arr[i] = base58map.indexOf(final_encrypted.charAt(i));
+			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
+		}
+		console.log("DECRYPT: final_encrypted base58 numerical array: " + final_encrypted_b58_num_arr);
+		console.log("DECRYPT: password base58 numerical array: " + pass_b58_num_arr);
+
+		// Add the arrays piecewise, 
+		let in_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
+				final_encrypted_b58_num_arr[i] += 58;
+			}
+			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
+		}
+		console.log("DECRYPT: computed input base58 numerical array: " + in_b58_num_arr);
+		const comp_input_b58 = to_b58(in_b58_num_arr);
+		console.log("DECRYPT: Final Result " + comp_input_b58);
+		document.getElementById("final_decrypt").value = comp_input_b58;
+		//document.getElementById("final_decrypt").value = comp_input_b58;
+
+		// for each
+			// if difference negative add 58
+			// I = F - P
+/*
+		// Add the arrays piecewise, 
+		let sum_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			sum_b58_num_arr[i] = final_encrypted_b58_num_arr[i] + pass_b58_num_arr[i];
+		}
+		console.log("DECRYPT: sum base58 numerical array: " + sum_b58_num_arr);
+		// modulo 57, then store to new array.
+		for (let i = 0; i < final_encrypted_length; i++) {
+			sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
+		}
+		console.log("DECRYPT: modulo base58 numerical array: " + sum_b58_num_arr);
+
+		// Convert numerical values to b58 chars.
+		const long_way = to_b58(sum_b58_num_arr);
+		console.log("DECRYPT: Final Result (long way): " + long_way);
+/*
+		let short_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			short_arr[i] = (base58map.indexOf(final_encrypted_data.charAt(i)) + base58map.indexOf(pass_b58.charAt(i))) % 58;
+		}
+		console.log("DECRYPT: Final Result (short way) Array: " + short_arr);
+		const short_way = to_b58(short_arr);
+		console.log("DECRYPT: Final Result (short way): " + short_way);
+		document.getElementById("final_output").value = short_way;
+	}
+*/
+	}
+
+	async function final_step_encrypt(){
 		// Copy input data and password.
 		const input_data = document.getElementById("final_input").value;
 		const password = document.getElementById("final_password").value;
@@ -283,9 +369,15 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		console.log("modulo base58 numerical array: " + sum_b58_num_arr);
 
 		// Convert numerical values to b58 chars.
-		const long_way = to_b58(sum_b58_num_arr);
-		console.log("Final Result (long way): " + long_way);
+		//const long_way = to_b58(sum_b58_num_arr);
+		let final_encrypted_string = '';
+		for (let i = 0; i < input_length; i++) {
+			final_encrypted_string += base58map.charAt(sum_b58_num_arr[i]);
+		}
 
+		console.log("Final Result (long way): " + final_encrypted_string);
+		document.getElementById("final_output").value = final_encrypted_string;
+/*
 		let short_arr = new Array(input_length);
 		for (let i = 0; i < input_length; i++) {
 			short_arr[i] = (base58map.indexOf(input_data.charAt(i)) + base58map.indexOf(pass_b58.charAt(i))) % 58;
@@ -293,7 +385,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		console.log("Final Result (short way) Array: " + short_arr);
 		const short_way = to_b58(short_arr);
 		console.log("Final Result (short way): " + short_way);
-		document.getElementById("final_output").value = short_way;
+*/
 	}
 
 	function check_b58chars(input){
@@ -365,6 +457,9 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			//console.log("sha_cumulative: " + sha_cumulative);
 		} while( sha_cumulative.length < length);
 		//console.log("sha_cumulative: " + sha_cumulative);
+
+		// Truncate array to size <length>
+		sha_cumulative = sha_cumulative.slice(0, length);
 
 		return sha_cumulative;
 	}
