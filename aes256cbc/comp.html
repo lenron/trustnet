@@ -85,13 +85,6 @@ input[type='text'][disabled] {
 			<b>Final Output:</b>
 			<textarea id='final_output' style="width: 1000px; height: 400px;"></textarea>
 		</div>
-		<div>
-			<button id='final_decrypt_button' onclick="final_step_decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Decrypt</button>
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<b>Final Decrypt:</b>
-			<textarea id='final_decrypt' style="width: 1000px; height: 400px;"></textarea>
-		</div>
 	</div>
 
 
@@ -99,13 +92,20 @@ input[type='text'][disabled] {
 	   <h3>Decryption</h3>
 	</div>
 	<div id='decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+		<div style="margin: 5px; display: flex; flex-direction: column;">
+			<label>Final Password:</label>
+			<input id="final_password_decrypt" style="width: 400px;"></input>
+		</div>
+		<div>
+			<button id='final_decrypt_button' onclick="final_step_decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Decrypt</button>
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<b>Final Decrypt:</b>
+			<textarea id='final_decrypt' style="width: 1000px; height: 400px;"></textarea>
+		</div>
 		<div style="display: flex; flex-direction: row;">
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
-					<div style="margin: 1px; display: flex; flex-direction: column;">
-						<label>CSS Encrypted input:</label>
-						<textarea id="enter_encrypted" style="width: 1000px; height: 365px;"></textarea>
-					</div>
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
 						<div style="margin-right: 5px; display: flex; flex-direction: column;">
 							<div style="margin: 1px; display: flex; flex-direction: column;">
@@ -118,7 +118,7 @@ input[type='text'][disabled] {
 			</div> 
 		</div>
 		<div>
-			<button id='comp_decode' onclick="comp_decode()" style="background-color: lightgreen; width: 200px; margin: 5px;">comp_decode</button>
+			<button id='comp_decode' onclick="comp_decode()" style="background-color: lightgreen; width: 200px; margin: 5px;">First Step Decode</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Output (plaintext):</label>
@@ -182,8 +182,8 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		console.log("plaintext input binary array: " + plaintext_binary);
 
 		// Each array should already be of length 2000.
-		//const array_length = 2000;
-		const array_length = 20;
+		const array_length = 2000;
+		//const array_length = 20;
 
 		// Prepare password side for XOR.
 		const pass_binary = await getHash2k(password, array_length);
@@ -201,7 +201,6 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		console.log("XOR result base 58 encoded: " + result_b58);
 
 		document.getElementById("decrypt_password").value = password;
-		document.getElementById("enter_encrypted").value = result_b58;
 		document.getElementById("final_input").value = result_b58;
 		document.getElementById("encrypt_output").value = result_b58;
 		console.log("result length (num chars): " + result_b58.length);
@@ -209,15 +208,15 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 	async function comp_decode() {
 		const password = document.getElementById("decrypt_password").value;
-		const compd_val = document.getElementById("enter_encrypted").value; //compartmentalized value
+		const compd_val = document.getElementById("final_decrypt").value; //compartmentalized value
 
 		// Convert from base 58.
 		const decoded_b58_arr = from_b58(compd_val);
 		console.log("decoded result: " + decoded_b58_arr);
 
 		// Each array should already be of length 2000.
-		//const array_length = 2000;
-		const array_length = 20;
+		const array_length = 2000;
+		//const array_length = 20;
 
 		// Compute password for XOR.
 		const pass_binary = await getHash2k(password, array_length);
@@ -282,9 +281,14 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
 		}
 		console.log("DECRYPT: computed input base58 numerical array: " + in_b58_num_arr);
-		const comp_input_b58 = to_b58(in_b58_num_arr);
-		console.log("DECRYPT: Final Result " + comp_input_b58);
-		document.getElementById("final_decrypt").value = comp_input_b58;
+		// Convert numerical values to b58 chars.
+		let final_decrypted_string = '';
+		for (let i = 0; i < final_encrypted_length; i++) {
+			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
+		}
+		console.log("DECRYPT: Final Result " + final_decrypted_string);
+		document.getElementById("final_decrypt").value = final_decrypted_string;
+		//document.getElementById("enter_encrypted").value = final_decrypted_string;
 		//document.getElementById("final_decrypt").value = comp_input_b58;
 
 		// for each
@@ -323,6 +327,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		// Copy input data and password.
 		const input_data = document.getElementById("final_input").value;
 		const password = document.getElementById("final_password").value;
+		document.getElementById("final_password_decrypt").value = document.getElementById("final_password").value;
 
 		// Check input data for non-b58 chars
 		if( !check_b58chars(input_data) ){
