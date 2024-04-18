@@ -113,6 +113,97 @@ input[type='text'][disabled] {
 
 
 	<div>
+	   <h3>Encryption</h3>
+	</div>
+	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+		<div style="display: flex; flex-direction: row;">
+			<div style="margin: 5px;"> 
+				<div style="display: flex; flex-direction: column;">
+					<div style="margin: 1px; display: flex; flex-direction: column;">
+						<label>Plaintext:</label>
+						<input id="enter_plaintext_obs" style="width: 600px;"></input>
+					</div>
+					<div style="margin: 0px; display: flex; flex-direction: row;"> 
+						<div style="margin-right: 5px; display: flex; flex-direction: column;">
+							<div style="margin: 1px; display: flex; flex-direction: column;">
+								<label>Encode Password:</label>
+								<input id="encrypt_password" style="width: 400px;"></input>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> 
+		</div>
+		<div>
+			<button id='comp_encode' onclick="comp_encode()" style="background-color: lightgreen; width: 200px; margin: 5px;">comp_encode</button>
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Output:</label>
+			<textarea id="encrypt_output" style="width: 1000px; height: 365px;"></textarea>
+		</div>
+	</div>
+
+	<div>
+	   <h3>Final Step</h3>
+	</div>
+	<div id='final_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Input:</label>
+			<textarea id="final_input" oninput="check_input_nonb58()" style="width: 1000px; height: 365px;"></textarea>
+		</div>
+		<div style="margin: 5px; display: flex; flex-direction: column;">
+			<label>Final Password:</label>
+			<input id="final_password" style="width: 400px;"></input>
+		</div>
+		<div>
+			<button id='final_button' onclick="final_step_encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Encrypt</button>
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<b>Final Output:</b>
+			<textarea id='final_output' style="width: 1000px; height: 400px;"></textarea>
+		</div>
+	</div>
+
+
+	<div>
+	   <h3>Decryption</h3>
+	</div>
+	<div id='decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+		<div style="margin: 5px; display: flex; flex-direction: column;">
+			<label>Final Password:</label>
+			<input id="final_password_decrypt" style="width: 400px;"></input>
+		</div>
+		<div>
+			<button id='final_decrypt_button' onclick="final_step_decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Decrypt</button>
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<b>Final Decrypt:</b>
+			<textarea id='final_decrypt' style="width: 1000px; height: 400px;"></textarea>
+		</div>
+		<div style="display: flex; flex-direction: row;">
+			<div style="margin: 5px;"> 
+				<div style="display: flex; flex-direction: column;">
+					<div style="margin: 0px; display: flex; flex-direction: row;"> 
+						<div style="margin-right: 5px; display: flex; flex-direction: column;">
+							<div style="margin: 1px; display: flex; flex-direction: column;">
+								<label>Encode Password:</label>
+								<input id="decrypt_password_obs" style="width: 400px;"></input>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> 
+		</div>
+		<div>
+			<button id='comp_decode' onclick="comp_decode()" style="background-color: lightgreen; width: 200px; margin: 5px;">First Step Decode</button>
+		</div>
+		<div style="display: flex; flex-direction: column; margin: 5px;">
+			<label>Output (plaintext):</label>
+			<input id='final_decrypt_output' style="width: 600px;">
+		</div>
+	</div>
+
+	<div>
 	   <h3>AES-256-CBC Decryption</h3>
 	</div>
 	<div id='decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
@@ -221,7 +312,11 @@ input[type='text'][disabled] {
 
 </body>
 </html>
+<script src="annotated.js"></script>
 <script>
+
+// Base 58 character map.
+const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 	function getKeyMaterial(password) {
 		const enc = new TextEncoder();
@@ -380,9 +475,10 @@ input[type='text'][disabled] {
 			['encrypt']
 		);
 
-		// The 'make it go' main digest call.
+		// The 'make it go' main digest call. Returns an array buffer.
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
+		// Copy the output array buffer into a new typed array.
 		cipherbytes = new Uint8Array(encrypted_result);
 		const result = _arrayBufferToBase64(encrypted_result); 
 		const encrypted_string64 = _arrayBufferToBase64(cipherbytes);
@@ -394,6 +490,8 @@ input[type='text'][disabled] {
 		const const_salt = "Salted__";
 		const salt64 = new TextEncoder().encode(const_salt);
 		const two_salts = concatBuffer(salt64, salt);
+		// Buffers and typed arrays are similar and can mostly be used interchangably.
+		// This is actually a utin8array.
 		const encrypted_output_buf = concatBuffer(two_salts, cipherbytes);
 
 		const out64 = _arrayBufferToBase64(encrypted_output_buf);
@@ -403,6 +501,302 @@ input[type='text'][disabled] {
 		document.getElementById("decrypt_input").value = out;
 	}
 
+	async function comp_encode() {
+		const plaintext = document.getElementById("enter_plaintext_obs").value;
+		const password = document.getElementById("encrypt_password").value;
+
+		// Prepare plaintext side for XOR.
+		const plaintext_binary = prepPtext(plaintext);
+		console.log("plaintext input binary array: " + plaintext_binary);
+
+		// Each array should already be of length 2000.
+		const array_length = 2000;
+		//const array_length = 20;
+
+		// Prepare password side for XOR.
+		const pass_binary = await getHash2k(password, array_length);
+		//console.log("password input binary array: " + pass_binary);
+
+		// Perform the bitwise XOR sequentially.
+		let xor_result = new Uint8Array(array_length);
+		for (let i = 0; i < array_length; i++) {
+			xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
+		}
+		console.log("XOR result binary array: " + xor_result);
+
+		// Convert to base58
+		const result_b58 = to_b58(xor_result);
+		console.log("XOR result base 58 encoded: " + result_b58);
+
+		document.getElementById("decrypt_password_obs").value = password;
+		document.getElementById("final_input").value = result_b58;
+		document.getElementById("encrypt_output").value = result_b58;
+		console.log("result length (num chars): " + result_b58.length);
+	}
+
+	async function comp_decode() {
+		const password = document.getElementById("decrypt_password_obs").value;
+		const compd_val = document.getElementById("final_decrypt").value; //compartmentalized value
+
+		// Convert from base 58.
+		const decoded_b58_arr = from_b58(compd_val);
+		console.log("decoded result: " + decoded_b58_arr);
+
+		// Each array should already be of length 2000.
+		const array_length = 2000;
+		//const array_length = 20;
+
+		// Compute password for XOR.
+		const pass_binary = await getHash2k(password, array_length);
+
+		// Perform the bitwise XOR sequentially.
+		// Inverse of XOR is XOR and is communicative.
+		// XOR password and output to get input.
+		let xor_result = new Uint8Array(array_length);
+		for (let i = 0; i < array_length; i++) {
+			xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
+		}
+		console.log("XOR result (decoded) binary array: " + xor_result);
+		let plaintextbytes = Array.from(xor_result);
+		// Strip off tailing zeros.
+		while(plaintextbytes[plaintextbytes.length - 1] == 0){
+			plaintextbytes.pop();
+		}
+		console.log("Stripped binary array: " + plaintextbytes);
+		plaintextbytes = Uint8Array.from(plaintextbytes);
+		const decrypted_string = new TextDecoder().decode(plaintextbytes);
+		console.log("decrypted_string: " + decrypted_string);
+		document.getElementById("final_decrypt_output").value = decrypted_string;
+	}
+
+	// Given password and stored input, decrypt final step.
+	async function final_step_decrypt(){
+		// Get inputs.
+		const final_encrypted = document.getElementById("final_output").value;
+		const password = document.getElementById("final_password").value;
+
+		// Get size of input data
+		//const final_encrypted_length = final_encrypted.length / 2;
+		const final_encrypted_length = final_encrypted.length;
+		console.log("DECRYPT: final final_encrypted string length: " + final_encrypted_length);
+
+		// Get hash+append of password, to length of final_encrypted for now. 
+		const pass_hash = await getHash2k(password, final_encrypted_length);
+		console.log("DECRYPT: password hash result: " + pass_hash);
+		console.log(pass_hash);
+
+		// Convert password hash to base58
+		const pass_b58 = to_b58(pass_hash);
+		console.log("DECRYPT: password hash b58: " + pass_b58);
+		console.log("DECRYPT: password hash b58 length: " + pass_b58.length);
+
+		// Convert final_encrypted to b58 numerical equivalent and get size.
+		let final_encrypted_b58_num_arr = new Array(final_encrypted_length);
+		let pass_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			final_encrypted_b58_num_arr[i] = base58map.indexOf(final_encrypted.charAt(i));
+			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
+		}
+		console.log("DECRYPT: final_encrypted base58 numerical array: " + final_encrypted_b58_num_arr);
+		console.log("DECRYPT: password base58 numerical array: " + pass_b58_num_arr);
+
+		// Add the arrays piecewise, 
+		let in_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
+				final_encrypted_b58_num_arr[i] += 58;
+			}
+			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
+		}
+		console.log("DECRYPT: computed input base58 numerical array: " + in_b58_num_arr);
+		// Convert numerical values to b58 chars.
+		let final_decrypted_string = '';
+		for (let i = 0; i < final_encrypted_length; i++) {
+			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
+		}
+		console.log("DECRYPT: Final Result " + final_decrypted_string);
+		document.getElementById("final_decrypt").value = final_decrypted_string;
+		//document.getElementById("enter_encrypted").value = final_decrypted_string;
+		//document.getElementById("final_decrypt").value = comp_input_b58;
+
+		// for each
+			// if difference negative add 58
+			// I = F - P
+/*
+		// Add the arrays piecewise, 
+		let sum_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			sum_b58_num_arr[i] = final_encrypted_b58_num_arr[i] + pass_b58_num_arr[i];
+		}
+		console.log("DECRYPT: sum base58 numerical array: " + sum_b58_num_arr);
+		// modulo 57, then store to new array.
+		for (let i = 0; i < final_encrypted_length; i++) {
+			sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
+		}
+		console.log("DECRYPT: modulo base58 numerical array: " + sum_b58_num_arr);
+
+		// Convert numerical values to b58 chars.
+		const long_way = to_b58(sum_b58_num_arr);
+		console.log("DECRYPT: Final Result (long way): " + long_way);
+/*
+		let short_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			short_arr[i] = (base58map.indexOf(final_encrypted_data.charAt(i)) + base58map.indexOf(pass_b58.charAt(i))) % 58;
+		}
+		console.log("DECRYPT: Final Result (short way) Array: " + short_arr);
+		const short_way = to_b58(short_arr);
+		console.log("DECRYPT: Final Result (short way): " + short_way);
+		document.getElementById("final_output").value = short_way;
+	}
+*/
+	}
+
+	async function final_step_encrypt(){
+		// Copy input data and password.
+		const input_data = document.getElementById("final_input").value;
+		const password = document.getElementById("final_password").value;
+		document.getElementById("final_password_decrypt").value = document.getElementById("final_password").value;
+
+		// Check input data for non-b58 chars
+		if( !check_b58chars(input_data) ){
+			console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
+			// Abort final step encode.
+			document.getElementById("final_output").value = "Non-base 58 chars found in the Final Step input!";
+			return;
+		}
+
+		// Get size of input data
+		const input_length = input_data.length;
+		console.log("final input string length: " + input_length);
+
+		// Get hash+append of password, to length of input for now. 
+		const pass_hash = await getHash2k(password, input_length);
+		console.log("password hash result: " + pass_hash);
+		console.log(pass_hash);
+
+		// Convert password hash to base58
+		const pass_b58 = to_b58(pass_hash);
+		console.log("password hash b58: " + pass_b58);
+		console.log("password hash b58 length: " + pass_b58.length);
+
+		// Convert input to b58 numerical equivalent and get size.
+		let input_b58_num_arr = new Array(input_length);
+		let pass_b58_num_arr = new Array(input_length);
+		for (let i = 0; i < input_length; i++) {
+			input_b58_num_arr[i] = base58map.indexOf(input_data.charAt(i));
+			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
+		}
+		console.log("input base58 numerical array: " + input_b58_num_arr);
+		console.log("password base58 numerical array: " + pass_b58_num_arr);
+
+		// Add the arrays piecewise, 
+		let sum_b58_num_arr = new Array(input_length);
+		for (let i = 0; i < input_length; i++) {
+			sum_b58_num_arr[i] = input_b58_num_arr[i] + pass_b58_num_arr[i];
+		}
+		console.log("sum base58 numerical array: " + sum_b58_num_arr);
+		// modulo 57, then store to new array.
+		for (let i = 0; i < input_length; i++) {
+			sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
+		}
+		console.log("modulo base58 numerical array: " + sum_b58_num_arr);
+
+		// Convert numerical values to b58 chars.
+		//const long_way = to_b58(sum_b58_num_arr);
+		let final_encrypted_string = '';
+		for (let i = 0; i < input_length; i++) {
+			final_encrypted_string += base58map.charAt(sum_b58_num_arr[i]);
+		}
+
+		console.log("Final Result (long way): " + final_encrypted_string);
+		document.getElementById("final_output").value = final_encrypted_string;
+/*
+		let short_arr = new Array(input_length);
+		for (let i = 0; i < input_length; i++) {
+			short_arr[i] = (base58map.indexOf(input_data.charAt(i)) + base58map.indexOf(pass_b58.charAt(i))) % 58;
+		}
+		console.log("Final Result (short way) Array: " + short_arr);
+		const short_way = to_b58(short_arr);
+		console.log("Final Result (short way): " + short_way);
+*/
+	}
+
+	function check_b58chars(input){
+		// From the first char(^) to the last($), match zero or more(*) of 
+		// 1-9A-HJ-NP-Za-km-z (false if any non-b58 chars).
+		const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
+		if( regex.test(input) ){
+			// Return true/valid: non-b58 chars were NOT found.
+			return 1;
+		}else{
+			// Return false/invalid: non-b58 chars were found.
+			return 0;
+		}
+	}
+
+	function check_input_nonb58(){
+		let input = document.getElementById("final_input").value;
+		// Disable Final Step button if any non-base58 characters are entered.
+		if( check_b58chars(input) ){
+			//console.log("enable");
+			//enable button
+			document.getElementById("final_button").disabled = false;
+			document.getElementById("final_output").value = "";
+		}else{
+			console.log("Non-base 58 chars found in the Final Step input!");
+			//disable button
+			document.getElementById("final_button").disabled = true;
+			document.getElementById("final_output").value = "Non-base 58 chars found in the Final Step input!";
+		}
+	}
+
+	function prepPtext(plaintext) {
+		console.log("plaintext input: " + plaintext);
+		// Count chars.
+		const num_chars = plaintext.length;
+		console.log("number chars: " + num_chars);
+
+		// Form 'countstring'.
+		const countstring = num_chars + ':' + plaintext;
+		console.log("assembled countstring: " + countstring);
+
+		// Convert to binary (Uint8Array).
+		const countstring_binary = new TextEncoder().encode(countstring);
+		console.log("countstring in binary array: " + countstring_binary);
+
+		// Copy to size 2000 array for XOR.
+		let big_arr = new Uint8Array(2000);
+		big_arr.set(countstring_binary);
+
+		return big_arr;
+	}
+
+	async function getHash2k(pass, length) {
+		console.log("entered password: " + pass);
+		// Convert to binary (Uint8Array).
+		const password_binary = new TextEncoder().encode(pass);
+		console.log("password binary array: " + password_binary);
+
+		// Take initial SHA256.
+		let	sha_result = await crypto.subtle.digest('SHA-256', password_binary);
+		let sha_cumulative = new Uint8Array();
+
+		// Loop until we have 2000 bytes of data.
+		do{
+			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
+			// Append SHA256 of Hash(n-1)
+			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
+			sha_cumulative = new Uint8Array(sha_cumulative);
+			//console.log("sha_cumulative: " + sha_cumulative);
+		} while( sha_cumulative.length < length);
+		//console.log("sha_cumulative: " + sha_cumulative);
+
+		// Truncate array to size <length>
+		sha_cumulative = sha_cumulative.slice(0, length);
+
+		return sha_cumulative;
+	}
+	// Outputs data in a typed array.
 	function concatBuffer(buffer1, buffer2) {
 	  var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
 	  tmp.set(new Uint8Array(buffer1), 0);
