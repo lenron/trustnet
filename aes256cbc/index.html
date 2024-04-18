@@ -120,7 +120,7 @@ input[type='text'][disabled] {
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
 					<div style="margin: 1px; display: flex; flex-direction: column;">
-						<label>OpenSSL Input:</label>
+						<label>OpenSSL Input (base 64):</label>
 						<input id="openssl_input_obs" style="width: 600px;"></input>
 					</div>
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
@@ -315,6 +315,11 @@ input[type='text'][disabled] {
 <script src="annotated.js"></script>
 <script>
 
+// Global buffer variables to hold binary data instead of pushing it through
+// several string/b64 to buffer conversions.
+let ssl_enc_out;
+let obs1_dec_out;
+
 // Base 58 character map.
 const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
@@ -331,15 +336,21 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 	async function decryptCbc() {
 		// Get input.
-		const ciphertext = document.getElementById("decrypt_input").value;
+		const ciphertext64 = document.getElementById("decrypt_input").value;
 		// Convert string to Uint8Array.
 		//const inputbytes = new TextEncoder().encode(ciphertext);
-		const ciphertext64 = btoa(ciphertext);
+
+		//const ciphertext64 = btoa(ciphertext);
 		const inputbytes = base64ToArrayBuffer(ciphertext64);
 
 
 		// ciphertext is now in a form that is ready to give to the encryption function.
-		const ciphertextbytes = new Uint8Array(inputbytes);
+		let ciphertextbytes = new Uint8Array(inputbytes);
+		//if((ciphertextbytes.length/2)!==
+		console.log("openssl dec input STRING: " + ciphertextbytes);
+		// Copy from global variable instead.
+		//ciphertextbytes = obs1_dec_out;
+		//console.log("openssl dec input BUFFER: " + ciphertextbytes);
 		const dec = new TextDecoder();
 		const input_string = dec.decode(ciphertextbytes);
 		console.log("ciphertext: " + input_string);
@@ -392,6 +403,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			['decrypt']
 		);
 
+console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		// The 'make it go' main digest call.
 		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
@@ -474,7 +486,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			false, 
 			['encrypt']
 		);
-
+console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		// The 'make it go' main digest call. Returns an array buffer.
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
@@ -493,12 +505,15 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		// Buffers and typed arrays are similar and can mostly be used interchangably.
 		// This is actually a utin8array.
 		const encrypted_output_buf = concatBuffer(two_salts, cipherbytes);
+		ssl_enc_out = encrypted_output_buf;
+		//console.log("TESTOUT:");
+		//console.log(encrypted_output_buf);
 
 		const out64 = _arrayBufferToBase64(encrypted_output_buf);
 		document.getElementById("openssl_output64").value = out64;
 		const out = atob(out64);
 		document.getElementById("openssl_output").value = out;
-		document.getElementById("openssl_input_obs").value = out;
+		document.getElementById("openssl_input_obs").value = out64;
 	}
 
 	async function comp_encode() {
@@ -506,8 +521,12 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const password = document.getElementById("encrypt_password").value;
 
 		// Prepare plaintext side for XOR.
-		const plaintext_binary = prepPtext(plaintext);
-		console.log("plaintext input binary array: " + plaintext_binary);
+		let plaintext_binary = prepPtext(plaintext);
+		console.log("TESTOUT: plaintext input binary array: " + plaintext_binary);
+
+		// Use saved binary array from openssl instead.
+		//plaintext_binary = ssl_enc_out;
+		//console.log("TESTOUT: copied binary array" + plaintext_binary);
 
 		// Each array should already be of length 2000.
 		const array_length = 2000;
@@ -522,11 +541,11 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		for (let i = 0; i < array_length; i++) {
 			xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
 		}
-		console.log("XOR result binary array: " + xor_result);
+//		console.log("XOR result binary array: " + xor_result);
 
 		// Convert to base58
 		const result_b58 = to_b58(xor_result);
-		console.log("XOR result base 58 encoded: " + result_b58);
+//		console.log("XOR result base 58 encoded: " + result_b58);
 
 		document.getElementById("decrypt_password_obs").value = password;
 		document.getElementById("final_input").value = result_b58;
@@ -548,6 +567,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		// Compute password for XOR.
 		const pass_binary = await getHash2k(password, array_length);
+		console.log("pass_binary: " + pass_binary);
 
 		// Perform the bitwise XOR sequentially.
 		// Inverse of XOR is XOR and is communicative.
@@ -562,9 +582,10 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		while(plaintextbytes[plaintextbytes.length - 1] == 0){
 			plaintextbytes.pop();
 		}
-		console.log("Stripped binary array: " + plaintextbytes);
+		//console.log("Stripped binary array: " + plaintextbytes);
 		plaintextbytes = Uint8Array.from(plaintextbytes);
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
+		console.log("decrypted_string pre strip: " + decrypted_string);
 		decrypted_string = decrypted_string.split(":").pop();
 		console.log("decrypted_string: " + decrypted_string);
 		document.getElementById("final_decrypt_output").value = decrypted_string;
@@ -584,12 +605,11 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		// Get hash+append of password, to length of final_encrypted for now. 
 		const pass_hash = await getHash2k(password, final_encrypted_length);
-		console.log("DECRYPT: password hash result: " + pass_hash);
-		console.log(pass_hash);
+		//console.log("DECRYPT: password hash result: " + pass_hash);
 
 		// Convert password hash to base58
 		const pass_b58 = to_b58(pass_hash);
-		console.log("DECRYPT: password hash b58: " + pass_b58);
+		//console.log("DECRYPT: password hash b58: " + pass_b58);
 		console.log("DECRYPT: password hash b58 length: " + pass_b58.length);
 
 		// Convert final_encrypted to b58 numerical equivalent and get size.
@@ -599,8 +619,8 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			final_encrypted_b58_num_arr[i] = base58map.indexOf(final_encrypted.charAt(i));
 			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
 		}
-		console.log("DECRYPT: final_encrypted base58 numerical array: " + final_encrypted_b58_num_arr);
-		console.log("DECRYPT: password base58 numerical array: " + pass_b58_num_arr);
+		//console.log("DECRYPT: final_encrypted base58 numerical array: " + final_encrypted_b58_num_arr);
+		//console.log("DECRYPT: password base58 numerical array: " + pass_b58_num_arr);
 
 		// Add the arrays piecewise, 
 		let in_b58_num_arr = new Array(final_encrypted_length);
@@ -610,7 +630,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			}
 			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
 		}
-		console.log("DECRYPT: computed input base58 numerical array: " + in_b58_num_arr);
+		//console.log("DECRYPT: computed input base58 numerical array: " + in_b58_num_arr);
 		// Convert numerical values to b58 chars.
 		let final_decrypted_string = '';
 		for (let i = 0; i < final_encrypted_length; i++) {
@@ -673,12 +693,11 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		// Get hash+append of password, to length of input for now. 
 		const pass_hash = await getHash2k(password, input_length);
-		console.log("password hash result: " + pass_hash);
-		console.log(pass_hash);
+		//console.log("password hash result: " + pass_hash);
 
 		// Convert password hash to base58
 		const pass_b58 = to_b58(pass_hash);
-		console.log("password hash b58: " + pass_b58);
+		//console.log("password hash b58: " + pass_b58);
 		console.log("password hash b58 length: " + pass_b58.length);
 
 		// Convert input to b58 numerical equivalent and get size.
@@ -688,20 +707,20 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			input_b58_num_arr[i] = base58map.indexOf(input_data.charAt(i));
 			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
 		}
-		console.log("input base58 numerical array: " + input_b58_num_arr);
-		console.log("password base58 numerical array: " + pass_b58_num_arr);
+		//console.log("input base58 numerical array: " + input_b58_num_arr);
+		//console.log("password base58 numerical array: " + pass_b58_num_arr);
 
 		// Add the arrays piecewise, 
 		let sum_b58_num_arr = new Array(input_length);
 		for (let i = 0; i < input_length; i++) {
 			sum_b58_num_arr[i] = input_b58_num_arr[i] + pass_b58_num_arr[i];
 		}
-		console.log("sum base58 numerical array: " + sum_b58_num_arr);
+		//console.log("sum base58 numerical array: " + sum_b58_num_arr);
 		// modulo 57, then store to new array.
 		for (let i = 0; i < input_length; i++) {
 			sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
 		}
-		console.log("modulo base58 numerical array: " + sum_b58_num_arr);
+		//console.log("modulo base58 numerical array: " + sum_b58_num_arr);
 
 		// Convert numerical values to b58 chars.
 		//const long_way = to_b58(sum_b58_num_arr);
@@ -710,7 +729,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			final_encrypted_string += base58map.charAt(sum_b58_num_arr[i]);
 		}
 
-		console.log("Final Result (long way): " + final_encrypted_string);
+		//console.log("Final Result (long way): " + final_encrypted_string);
 		document.getElementById("final_output").value = final_encrypted_string;
 /*
 		let short_arr = new Array(input_length);
