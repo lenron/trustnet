@@ -33,38 +33,38 @@ input[type='text'][disabled] {
 </style>
 
 <body>
-	   <h1>OpenSSL Equivalent AES-256-CBC Encryption/Decryption using PBKDF2</h1>
+	   <h1>Lenron Custom Data Encryption/Obsfucation</h1>
 
 	<div>
-	   <h3>AES-256-CBC Encryption</h3>
+	   <h3>OpenSSL AES-256-CBC Encryption (PBKDF2)</h3>
 	</div>
-	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='openssl_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: row;">
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
 					<div style="margin: 1px; display: flex; flex-direction: column;">
 						<label>Plaintext:</label>
-						<input id="enter_plaintext" style="width: 600px;"></input>
+						<input id="enter_openssl_plaintext" style="width: 600px;"></input>
 					</div>
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
 							<div style="margin-right: 5px; display: flex; flex-direction: column;">
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Password:</label>
-									<input id="enter_password" style="width: 400px;"></input>
+									<input id="enter_openssl_password" style="width: 400px;"></input>
 								</div>
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Salt (hex):</label>
-									<input id="enter_salt" style="width: 400px;"></input>
+									<input id="enter_openssl_salt" style="width: 400px;"></input>
 								</div>
 							</div>
 							<div style="display: flex; flex-direction: column;">
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Iterations:</label>
-									<input id="enter_iterations" style="width: 186px;" value="10000"></input>
+									<input id="enter_openssl_iterations" style="width: 186px;" value="10000"></input>
 								</div>
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Hash:</label>
-									<input id="enter_hash" style="width: 186px;" value="SHA-256"></input>
+									<input id="enter_openssl_hash" style="width: 186px;" value="SHA-256"></input>
 								</div>
 							</div>
 					</div>
@@ -72,7 +72,7 @@ input[type='text'][disabled] {
 			</div> 
 		</div>
 		<div>
-			<button id='encrypt_cbc' onclick="encryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
+			<button id='encrypt_openssl_button' onclick="encryptOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Key Data (hex) - Key + IV:</label>
@@ -95,39 +95,38 @@ input[type='text'][disabled] {
 <br>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Encrypted Output:</label>
-			<input id='encrypted_output' style="width: 600px;">
+			<input id='openssl_encrypted_output' style="width: 600px;">
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Encrypted Output (base 64):</label>
-			<input id='encrypted_output64' style="width: 600px;">
+			<input id='openssl_encrypted_output64' style="width: 600px;">
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>OpenSSL Output:</label>
-			<input id='openssl_output' style="width: 600px;">
+			<input id='openssl_salted_output' style="width: 600px;">
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>OpenSSL Output (base 64):</label>
-			<input id='openssl_output64' style="width: 600px;">
+			<input id='openssl_salted_output64' style="width: 600px;">
 		</div>
 	</div>
 
-
 	<div>
-	   <h3>Custom Obsfuction Encryption</h3>
+	   <h3>Obsfuction Step 1 Encryption</h3>
 	</div>
-	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='obs1_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: row;">
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
 					<div style="margin: 1px; display: flex; flex-direction: column;">
 						<label>OpenSSL Input (base 64):</label>
-						<input id="openssl_input_obs" style="width: 600px;"></input>
+						<input id="obs1_input" style="width: 600px;"></input>
 					</div>
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
 						<div style="margin-right: 5px; display: flex; flex-direction: column;">
 							<div style="margin: 1px; display: flex; flex-direction: column;">
-								<label>Encode Password:</label>
-								<input id="encrypt_password" style="width: 400px;"></input>
+								<label>Obs Step 1 Password:</label>
+								<input id="obs1_password_encrypt" style="width: 400px;"></input>
 							</div>
 						</div>
 					</div>
@@ -135,126 +134,116 @@ input[type='text'][disabled] {
 			</div> 
 		</div>
 		<div>
-			<button id='comp_encode' onclick="comp_encode()" style="background-color: lightgreen; width: 200px; margin: 5px;">comp_encode</button>
+			<button id='obs1Encrypt_button' onclick="obs1Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obsfucate Step 1</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Output:</label>
-			<textarea id="encrypt_output" style="width: 1000px; height: 365px;"></textarea>
+			<label>Obs Step 1 Output:</label>
+			<textarea id="obs1_encrypt_output" style="width: 1000px; height: 365px;"></textarea>
 		</div>
 	</div>
 
 	<div>
-	   <h3>Final Step</h3>
+	   <h3>Obsfucate Step 2 Encryption</h3>
 	</div>
-	<div id='final_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='obs2_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Input (checks b58 chars):</label>
-			<textarea id="final_input" oninput="check_input_nonb58()" style="width: 1000px; height: 365px;"></textarea>
+			<label>Obs Step 2 Input (checks b58 chars):</label>
+			<textarea id="obs2_input" oninput="check_input_nonb58()" style="width: 1000px; height: 365px;"></textarea>
 		</div>
 		<div style="margin: 5px; display: flex; flex-direction: column;">
-			<label>Final Password:</label>
-			<input id="final_password" style="width: 400px;"></input>
+			<label>Obs Step 2 Password:</label>
+			<input id="obs2_password_encrypt" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='final_button' onclick="final_step_encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Encrypt</button>
+			<button id='obs2Encrypt_button' onclick="obs2Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obsfucate Step 2</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<b>Final Output:</b>
-			<textarea id='final_output' style="width: 1000px; height: 400px;"></textarea>
+			<b>Obs Step 2 Output:</b>
+			<textarea id='obs2_encrypt_output' style="width: 1000px; height: 400px;"></textarea>
 		</div>
 	</div>
 
 
 	<div>
-	   <h3>Decryption</h3>
+	   <h3>Obsfucate Step 2 Decryption</h3>
 	</div>
-	<div id='decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='obs2_decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="margin: 5px; display: flex; flex-direction: column;">
-			<label>Final Password:</label>
-			<input id="final_password_decrypt" style="width: 400px;"></input>
+			<label>Obs Step 2 Password:</label>
+			<input id="obs2_password_decrypt" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='final_decrypt_button' onclick="final_step_decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Final Decrypt</button>
+			<button id='obs2_decrypt_button' onclick="obs2Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obs Step 2 Decrypt</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<b>Final Decrypt:</b>
-			<textarea id='final_decrypt' style="width: 1000px; height: 400px;"></textarea>
+			<b>Obs Step 2 Decrypt:</b>
+			<textarea id='obs2_decrypt_input' style="width: 1000px; height: 400px;"></textarea>
 		</div>
-		<div style="display: flex; flex-direction: row;">
-			<div style="margin: 5px;"> 
-				<div style="display: flex; flex-direction: column;">
-					<div style="margin: 0px; display: flex; flex-direction: row;"> 
-						<div style="margin-right: 5px; display: flex; flex-direction: column;">
-							<div style="margin: 1px; display: flex; flex-direction: column;">
-								<label>Encode Password:</label>
-								<input id="decrypt_password_obs" style="width: 400px;"></input>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div> 
+		<div style="margin: 5px; display: flex; flex-direction: column;">
+			<label>Obs Step 1 Password:</label>
+			<input id="obs1_password_decrypt" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='comp_decode' onclick="comp_decode()" style="background-color: lightgreen; width: 200px; margin: 5px;">First Step Decode</button>
+			<button id='obs_1_decrypt_button' onclick="obs1Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obsfucate Step 1 Decrypt</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Output (plaintext):</label>
-			<input id='final_decrypt_output' style="width: 600px;">
+			<label>Output (OpenSSL base64):</label>
+			<input id='obs2_decrypt_output' style="width: 600px;">
 		</div>
 	</div>
 
 	<div>
-	   <h3>AES-256-CBC Decryption</h3>
+	   <h3>OpenSSL AES-256-CBC Decryption (PBKDF2)</h3>
 	</div>
-	<div id='decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='openssl_decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: row;">
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
 					<div style="margin: 1px; display: flex; flex-direction: column;">
 						<label>OpenSSL Encrypted String-- Ready for Decrypt:</label>
-						<input id="decrypt_input" style="width: 600px;"></input>
+						<input id="openssl_decrypt_input" style="width: 600px;"></input>
 					</div>
 					<div style="margin: 0px; display: flex; flex-direction: column;"> 
 							<div style="margin-right: 5px; display: flex; flex-direction: column;">
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Password:</label>
-									<input id="decrypt_password" style="width: 410px;"></input>
+									<input id="openssl_decrypt_password" style="width: 410px;"></input>
 								</div>
 							</div>
 							<div style="display: flex; flex-direction: row;">
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Iterations:</label>
-									<input id="decrypt_iterations" style="width: 200px;" value="10000"></input>
+									<input id="openssl_decrypt_iterations" style="width: 200px;" value="10000"></input>
 								</div>
 								<div style="margin: 1px; display: flex; flex-direction: column;">
 									<label>Hash:</label>
-									<input id="decrypt_hash" style="width: 200px;" value="SHA-256"></input>
+									<input id="openssl_decrypt_hash" style="width: 200px;" value="SHA-256"></input>
 								</div>
 							</div>
 					</div>
 				</div>
 				<div>
-					<button id='decrypt_cbc' onclick="decryptCbc()" style="background-color: lightgreen; width: 200px; margin: 5px;">Decrypt AES-256-CBC</button>
+					<button id='' onclick="decryptOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Decrypt AES-256-CBC</button>
 				</div>
 				<div style="margin: 5px; display: flex; flex-direction: column;">
 					<label>Extracted Salt (hex):</label>
-					<input id="decrypt_salt" style="width: 400px;"></input>
+					<input id="openssl_decrypt_salt" style="width: 400px;"></input>
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>Extracted Key Data (hex) - Key + IV:</label>
-					<input id='decrypt_fullkey' style="width: 800px;">
+					<input id='openssl_decrypt_fullkey' style="width: 800px;">
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>Extracted Key Data (hex) - Key:</label>
-					<input id='decrypt_key' style="width: 600px;">
+					<input id='openssl_decrypt_key' style="width: 600px;">
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>Extracted Key Data (hex) - IV:</label>
-					<input id='decrypt_iv' style="width: 600px;">
+					<input id='openssl_decrypt_iv' style="width: 600px;">
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<label>OpenSSL Decrypted Output (plaintext):</label>
-					<input id='decrypt_output' style="width: 600px;">
+					<input id='openssl_decrypt_output' style="width: 600px;">
 				</div>
 			</div> 
 		</div>
@@ -334,9 +323,9 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		);
 	}
 
-	async function decryptCbc() {
+	async function decryptOpenSSL() {
 		// Get input.
-		const ciphertext64 = document.getElementById("decrypt_input").value;
+		const ciphertext64 = document.getElementById("openssl_decrypt_input").value;
 		// Convert string to Uint8Array.
 		//const inputbytes = new TextEncoder().encode(ciphertext);
 
@@ -355,13 +344,13 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const input_string = dec.decode(ciphertextbytes);
 		console.log("ciphertext: " + input_string);
 		console.log(ciphertextbytes);
-		const iter = Number(document.getElementById("decrypt_iterations").value);
-		const digest_hash = document.getElementById("decrypt_hash").value;
+		const iter = Number(document.getElementById("openssl_decrypt_iterations").value);
+		const digest_hash = document.getElementById("openssl_decrypt_hash").value;
 		const salt = ciphertextbytes.slice(8,16);
-		document.getElementById("decrypt_salt").value = buf2hex(salt).toUpperCase();
+		document.getElementById("openssl_decrypt_salt").value = buf2hex(salt).toUpperCase();
 
 		// Prepare inputs for digest.
-		const pass = document.getElementById("decrypt_password").value;
+		const pass = document.getElementById("openssl_decrypt_password").value;
 		const keyMaterial = await getKeyMaterial(pass);
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
@@ -378,7 +367,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
 		const full_key = buf2hex(derivedKeyBuffer);
-		document.getElementById("decrypt_fullkey").value = full_key.toUpperCase();
+		document.getElementById("openssl_decrypt_fullkey").value = full_key.toUpperCase();
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
@@ -386,8 +375,8 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const ivbytes = derivedKeyBuffer.slice(32);
 		const key_key = buf2hex(keybytes);
 		const key_iv = buf2hex(ivbytes);
-		document.getElementById("decrypt_key").value = key_key.toUpperCase();
-		document.getElementById("decrypt_iv").value = key_iv.toUpperCase();
+		document.getElementById("openssl_decrypt_key").value = key_key.toUpperCase();
+		document.getElementById("openssl_decrypt_iv").value = key_iv.toUpperCase();
 
 		// Extract the encrypted phrase from OpenSSL input
 		const cipherbytesphrase = ciphertextbytes.slice(16);
@@ -409,13 +398,13 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
 		plaintextbytes = new Uint8Array(decrypted_result);
 		const decrypted_string = new TextDecoder().decode( plaintextbytes );
-		document.getElementById("decrypt_output").value = decrypted_string;
+		document.getElementById("openssl_decrypt_output").value = decrypted_string;
 		console.log("Decrypted output: " + decrypted_string);
-	}
+	}//decryptOpenSSL
 
-	async function encryptCbc() {
+	async function encryptOpenSSL() {
 		// Get input from user.
-		const plaintext = document.getElementById("enter_plaintext").value;
+		const plaintext = document.getElementById("enter_openssl_plaintext").value;
 		// Convert string to Uint8Array.
 		const inputbytes = new TextEncoder().encode( plaintext );
 		// Make the plaintext look like a file by adding a single newline
@@ -431,25 +420,25 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		const plaintext64 = _arrayBufferToBase64(plaintextbytes);
 		console.log("plaintext 64: " + plaintext64);
 		console.log(plaintextbytes);
-		const iter = Number(document.getElementById("enter_iterations").value);
-		const digest_hash = document.getElementById("enter_hash").value;
+		const iter = Number(document.getElementById("enter_openssl_iterations").value);
+		const digest_hash = document.getElementById("enter_openssl_hash").value;
 
 		// Check if we need to generate a salt.
-		let salt_input = document.getElementById("enter_salt").value;
+		let salt_input = document.getElementById("enter_openssl_salt").value;
 		let salt;
 		if( salt_input ){
 			salt = hex2buf(salt_input);
 		}else{
 			salt = window.crypto.getRandomValues(new Uint8Array(8));
-			document.getElementById("enter_salt").value = buf2hex(salt).toUpperCase();
+			document.getElementById("enter_openssl_salt").value = buf2hex(salt).toUpperCase();
 		}
 
 		// Prepare inputs for digest.
-		const pass = document.getElementById("enter_password").value;
+		const pass = document.getElementById("enter_openssl_password").value;
 		const keyMaterial = await getKeyMaterial(pass);
 
 		// Propagate password to decrypt for ease of use.
-		document.getElementById("decrypt_password").value = pass;
+		document.getElementById("openssl_decrypt_password").value = pass;
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
 		// be used to create the cryptoKey object needed for the main digest.
@@ -494,9 +483,9 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		cipherbytes = new Uint8Array(encrypted_result);
 		const result = _arrayBufferToBase64(encrypted_result); 
 		const encrypted_string64 = _arrayBufferToBase64(cipherbytes);
-		document.getElementById("encrypted_output64").value = encrypted_string64;
+		document.getElementById("openssl_encrypted_output64").value = encrypted_string64;
 		const encrypted_string = btoa(encrypted_string64);
-		document.getElementById("encrypted_output").value = encrypted_string;
+		document.getElementById("openssl_encrypted_output").value = encrypted_string;
 
 		// Combine constant salt, random salt, and encrypted result as array buffers, then convert to base64.
 		const const_salt = "Salted__";
@@ -510,15 +499,15 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		//console.log(encrypted_output_buf);
 
 		const out64 = _arrayBufferToBase64(encrypted_output_buf);
-		document.getElementById("openssl_output64").value = out64;
+		document.getElementById("openssl_salted_output64").value = out64;
 		const out = atob(out64);
-		document.getElementById("openssl_output").value = out;
-		document.getElementById("openssl_input_obs").value = out64;
-	}
+		document.getElementById("openssl_salted_output").value = out;
+		document.getElementById("obs1_input").value = out64;
+	}//encryptOpenSSL
 
-	async function comp_encode() {
-		const plaintext = document.getElementById("openssl_input_obs").value;
-		const password = document.getElementById("encrypt_password").value;
+	async function obs1Encrypt() {
+		const plaintext = document.getElementById("obs1_input").value;
+		const password = document.getElementById("obs1_password_encrypt").value;
 
 		// Prepare plaintext side for XOR.
 		let plaintext_binary = prepPtext(plaintext);
@@ -534,28 +523,28 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 
 		// Prepare password side for XOR.
 		const pass_binary = await getHash2k(password, array_length);
-		//console.log("password input binary array: " + pass_binary);
+		console.log("password input binary array: " + pass_binary);
 
 		// Perform the bitwise XOR sequentially.
 		let xor_result = new Uint8Array(array_length);
 		for (let i = 0; i < array_length; i++) {
 			xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
 		}
-//		console.log("XOR result binary array: " + xor_result);
+		console.log("XOR result binary array: " + xor_result);
 
 		// Convert to base58
 		const result_b58 = to_b58(xor_result);
 //		console.log("XOR result base 58 encoded: " + result_b58);
 
-		document.getElementById("decrypt_password_obs").value = password;
-		document.getElementById("final_input").value = result_b58;
-		document.getElementById("encrypt_output").value = result_b58;
+		document.getElementById("obs1_password_decrypt").value = password;
+		document.getElementById("obs2_input").value = result_b58;
+		document.getElementById("obs1_encrypt_output").value = result_b58;
 		console.log("result length (num chars): " + result_b58.length);
-	}
+	}//obs1Encrypt
 
-	async function comp_decode() {
-		const password = document.getElementById("decrypt_password_obs").value;
-		const compd_val = document.getElementById("final_decrypt").value; //compartmentalized value
+	async function obs1Decrypt() {
+		const compd_val = document.getElementById("obs2_decrypt_input").value; //compartmentalized value
+		const password = document.getElementById("obs1_password_decrypt").value;
 
 		// Convert from base 58.
 		const decoded_b58_arr = from_b58(compd_val);
@@ -588,15 +577,15 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		console.log("decrypted_string pre strip: " + decrypted_string);
 		decrypted_string = decrypted_string.split(":").pop();
 		console.log("decrypted_string: " + decrypted_string);
-		document.getElementById("final_decrypt_output").value = decrypted_string;
-		document.getElementById("decrypt_input").value = decrypted_string;
-	}
+		document.getElementById("obs2_decrypt_output").value = decrypted_string;
+		document.getElementById("openssl_decrypt_input").value = decrypted_string;
+	}//obs1Decrypt
 
 	// Given password and stored input, decrypt final step.
-	async function final_step_decrypt(){
+	async function obs2Decrypt(){
 		// Get inputs.
-		const final_encrypted = document.getElementById("final_output").value;
-		const password = document.getElementById("final_password").value;
+		const final_encrypted = document.getElementById("obs2_encrypt_output").value;
+		const password = document.getElementById("obs2_password_decrypt").value;
 
 		// Get size of input data
 		//const final_encrypted_length = final_encrypted.length / 2;
@@ -637,53 +626,23 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
 		}
 		console.log("DECRYPT: Final Result " + final_decrypted_string);
-		document.getElementById("final_decrypt").value = final_decrypted_string;
-		//document.getElementById("enter_encrypted").value = final_decrypted_string;
+		document.getElementById("obs2_decrypt_input").value = final_decrypted_string;
+		//document.getElementById("enter_openssl_encrypted").value = final_decrypted_string;
 		//document.getElementById("final_decrypt").value = comp_input_b58;
 
-		// for each
-			// if difference negative add 58
-			// I = F - P
-/*
-		// Add the arrays piecewise, 
-		let sum_b58_num_arr = new Array(final_encrypted_length);
-		for (let i = 0; i < final_encrypted_length; i++) {
-			sum_b58_num_arr[i] = final_encrypted_b58_num_arr[i] + pass_b58_num_arr[i];
-		}
-		console.log("DECRYPT: sum base58 numerical array: " + sum_b58_num_arr);
-		// modulo 57, then store to new array.
-		for (let i = 0; i < final_encrypted_length; i++) {
-			sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
-		}
-		console.log("DECRYPT: modulo base58 numerical array: " + sum_b58_num_arr);
+	}//obs2Decrypt
 
-		// Convert numerical values to b58 chars.
-		const long_way = to_b58(sum_b58_num_arr);
-		console.log("DECRYPT: Final Result (long way): " + long_way);
-/*
-		let short_arr = new Array(final_encrypted_length);
-		for (let i = 0; i < final_encrypted_length; i++) {
-			short_arr[i] = (base58map.indexOf(final_encrypted_data.charAt(i)) + base58map.indexOf(pass_b58.charAt(i))) % 58;
-		}
-		console.log("DECRYPT: Final Result (short way) Array: " + short_arr);
-		const short_way = to_b58(short_arr);
-		console.log("DECRYPT: Final Result (short way): " + short_way);
-		document.getElementById("final_output").value = short_way;
-	}
-*/
-	}
-
-	async function final_step_encrypt(){
+	async function obs2Encrypt(){
 		// Copy input data and password.
-		const input_data = document.getElementById("final_input").value;
-		const password = document.getElementById("final_password").value;
-		document.getElementById("final_password_decrypt").value = document.getElementById("final_password").value;
+		const input_data = document.getElementById("obs2_input").value;
+		const password = document.getElementById("obs2_password_encrypt").value;
+		document.getElementById("obs2_password_decrypt").value = document.getElementById("obs2_password_encrypt").value;
 
 		// Check input data for non-b58 chars
 		if( !check_b58chars(input_data) ){
 			console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
 			// Abort final step encode.
-			document.getElementById("final_output").value = "Non-base 58 chars found in the Final Step input!";
+			document.getElementById("obs2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
 			return;
 		}
 
@@ -730,17 +689,8 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		}
 
 		//console.log("Final Result (long way): " + final_encrypted_string);
-		document.getElementById("final_output").value = final_encrypted_string;
-/*
-		let short_arr = new Array(input_length);
-		for (let i = 0; i < input_length; i++) {
-			short_arr[i] = (base58map.indexOf(input_data.charAt(i)) + base58map.indexOf(pass_b58.charAt(i))) % 58;
-		}
-		console.log("Final Result (short way) Array: " + short_arr);
-		const short_way = to_b58(short_arr);
-		console.log("Final Result (short way): " + short_way);
-*/
-	}
+		document.getElementById("obs2_encrypt_output").value = final_encrypted_string;
+	}//obs2Encrypt
 
 	function check_b58chars(input){
 		// From the first char(^) to the last($), match zero or more(*) of 
@@ -756,18 +706,18 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 	}
 
 	function check_input_nonb58(){
-		let input = document.getElementById("final_input").value;
+		let input = document.getElementById("obs2_input").value;
 		// Disable Final Step button if any non-base58 characters are entered.
 		if( check_b58chars(input) ){
 			//console.log("enable");
 			//enable button
-			document.getElementById("final_button").disabled = false;
-			document.getElementById("final_output").value = "";
+			document.getElementById("obs2Encrypt_button").disabled = false;
+			document.getElementById("obs2_encrypt_output").value = "";
 		}else{
 			console.log("Non-base 58 chars found in the Final Step input!");
 			//disable button
-			document.getElementById("final_button").disabled = true;
-			document.getElementById("final_output").value = "Non-base 58 chars found in the Final Step input!";
+			document.getElementById("obs2Encrypt_button").disabled = true;
+			document.getElementById("obs2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
 		}
 	}
 
@@ -799,8 +749,9 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		console.log("password binary array: " + password_binary);
 
 		// Take initial SHA256.
-		let	sha_result = await crypto.subtle.digest('SHA-256', password_binary);
-		let sha_cumulative = new Uint8Array();
+		let initial_sha = await crypto.subtle.digest('SHA-256', password_binary);
+		let sha_cumulative = initial_sha;
+		let	sha_result;
 
 		// Loop until we have 2000 bytes of data.
 		do{
@@ -817,6 +768,7 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 
 		return sha_cumulative;
 	}
+
 	// Outputs data in a typed array.
 	function concatBuffer(buffer1, buffer2) {
 	  var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
