@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>OpenSSL Enc/Dec</title>
+    <title>Lenron Custom Data Encryption/Obfuscation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -33,7 +33,7 @@ input[type='text'][disabled] {
 </style>
 
 <body>
-	   <h1>Lenron Custom Data Encryption/Obsfucation</h1>
+	   <h1>Lenron Custom Data Encryption/Obfuscation</h1>
 
 	<div>
 	   <h3>OpenSSL AES-256-CBC Encryption (PBKDF2)</h3>
@@ -112,21 +112,21 @@ input[type='text'][disabled] {
 	</div>
 
 	<div>
-	   <h3>Obsfuction Step 1 Encryption</h3>
+	   <h3>Obfuscation Step 1 Encryption</h3>
 	</div>
-	<div id='obs1_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='obf1_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: row;">
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
 					<div style="margin: 1px; display: flex; flex-direction: column;">
 						<label>OpenSSL Input (base 64):</label>
-						<input id="obs1_input" style="width: 600px;"></input>
+						<input id="obf1_input" style="width: 600px;"></input>
 					</div>
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
 						<div style="margin-right: 5px; display: flex; flex-direction: column;">
 							<div style="margin: 1px; display: flex; flex-direction: column;">
-								<label>Obs Step 1 Password:</label>
-								<input id="obs1_password_encrypt" style="width: 400px;"></input>
+								<label>Obf Step 1 Password:</label>
+								<input id="obf1_password_encrypt" style="width: 400px;"></input>
 							</div>
 						</div>
 					</div>
@@ -134,61 +134,61 @@ input[type='text'][disabled] {
 			</div> 
 		</div>
 		<div>
-			<button id='obs1Encrypt_button' onclick="obs1Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obsfucate Step 1</button>
+			<button id='obf1Encrypt_button' onclick="obf1Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 1</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Obs Step 1 Output:</label>
-			<textarea id="obs1_encrypt_output" style="width: 1000px; height: 365px;"></textarea>
+			<label>Obf Step 1 Output:</label>
+			<textarea id="obf1_encrypt_output" style="width: 1000px; height: 365px;"></textarea>
 		</div>
 	</div>
 
 	<div>
-	   <h3>Obsfucate Step 2 Encryption</h3>
+	   <h3>Obfuscate Step 2 Encryption</h3>
 	</div>
-	<div id='obs2_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='obf2_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Obs Step 2 Input (checks b58 chars):</label>
-			<textarea id="obs2_input" oninput="check_input_nonb58()" style="width: 1000px; height: 365px;"></textarea>
+			<label>Obf Step 2 Input (checks b58 chars):</label>
+			<textarea id="obf2_input" oninput="check_input_nonb58()" style="width: 1000px; height: 365px;"></textarea>
 		</div>
 		<div style="margin: 5px; display: flex; flex-direction: column;">
-			<label>Obs Step 2 Password:</label>
-			<input id="obs2_password_encrypt" style="width: 400px;"></input>
+			<label>Obf Step 2 Password:</label>
+			<input id="obf2_password_encrypt" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='obs2Encrypt_button' onclick="obs2Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obsfucate Step 2</button>
+			<button id='obf2Encrypt_button' onclick="obf2Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 2</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<b>Obs Step 2 Output:</b>
-			<textarea id='obs2_encrypt_output' style="width: 1000px; height: 400px;"></textarea>
+			<b>Obf Step 2 Output:</b>
+			<textarea id='obf2_encrypt_output' style="width: 1000px; height: 400px;"></textarea>
 		</div>
 	</div>
 
 
 	<div>
-	   <h3>Obsfucate Step 2 Decryption</h3>
+	   <h3>Obfuscate Step 2 Decryption</h3>
 	</div>
-	<div id='obs2_decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='obf2_decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="margin: 5px; display: flex; flex-direction: column;">
-			<label>Obs Step 2 Password:</label>
-			<input id="obs2_password_decrypt" style="width: 400px;"></input>
+			<label>Obf Step 2 Password:</label>
+			<input id="obf2_password_decrypt" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='obs2_decrypt_button' onclick="obs2Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obs Step 2 Decrypt</button>
+			<button id='obf2_decrypt_button' onclick="obf2Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obf Step 2 Decrypt</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<b>Obs Step 2 Decrypt:</b>
-			<textarea id='obs2_decrypt_input' style="width: 1000px; height: 400px;"></textarea>
+			<b>Obf Step 2 Decrypt:</b>
+			<textarea id='obf2_decrypt_input' style="width: 1000px; height: 400px;"></textarea>
 		</div>
 		<div style="margin: 5px; display: flex; flex-direction: column;">
-			<label>Obs Step 1 Password:</label>
-			<input id="obs1_password_decrypt" style="width: 400px;"></input>
+			<label>Obf Step 1 Password:</label>
+			<input id="obf1_password_decrypt" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='obs_1_decrypt_button' onclick="obs1Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obsfucate Step 1 Decrypt</button>
+			<button id='obf1Decrypt_button' onclick="obf1Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 1 Decrypt</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Output (OpenSSL base64):</label>
-			<input id='obs2_decrypt_output' style="width: 600px;">
+			<input id='obf2_decrypt_output' style="width: 600px;">
 		</div>
 	</div>
 
@@ -307,7 +307,7 @@ input[type='text'][disabled] {
 // Global buffer variables to hold binary data instead of pushing it through
 // several string/b64 to buffer conversions.
 let ssl_enc_out;
-let obs1_dec_out;
+let obf1_dec_out;
 
 // Base 58 character map.
 const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -338,7 +338,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//if((ciphertextbytes.length/2)!==
 		console.log("openssl dec input STRING: " + ciphertextbytes);
 		// Copy from global variable instead.
-		//ciphertextbytes = obs1_dec_out;
+		//ciphertextbytes = obf1_dec_out;
 		//console.log("openssl dec input BUFFER: " + ciphertextbytes);
 		const dec = new TextDecoder();
 		const input_string = dec.decode(ciphertextbytes);
@@ -502,12 +502,12 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		document.getElementById("openssl_salted_output64").value = out64;
 		const out = atob(out64);
 		document.getElementById("openssl_salted_output").value = out;
-		document.getElementById("obs1_input").value = out64;
+		document.getElementById("obf1_input").value = out64;
 	}//encryptOpenSSL
 
-	async function obs1Encrypt() {
-		const plaintext = document.getElementById("obs1_input").value;
-		const password = document.getElementById("obs1_password_encrypt").value;
+	async function obf1Encrypt() {
+		const plaintext = document.getElementById("obf1_input").value;
+		const password = document.getElementById("obf1_password_encrypt").value;
 
 		// Prepare plaintext side for XOR.
 		let plaintext_binary = prepPtext(plaintext);
@@ -536,15 +536,15 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		const result_b58 = to_b58(xor_result);
 //		console.log("XOR result base 58 encoded: " + result_b58);
 
-		document.getElementById("obs1_password_decrypt").value = password;
-		document.getElementById("obs2_input").value = result_b58;
-		document.getElementById("obs1_encrypt_output").value = result_b58;
+		document.getElementById("obf1_password_decrypt").value = password;
+		document.getElementById("obf2_input").value = result_b58;
+		document.getElementById("obf1_encrypt_output").value = result_b58;
 		console.log("result length (num chars): " + result_b58.length);
-	}//obs1Encrypt
+	}//obf1Encrypt
 
-	async function obs1Decrypt() {
-		const compd_val = document.getElementById("obs2_decrypt_input").value; //compartmentalized value
-		const password = document.getElementById("obs1_password_decrypt").value;
+	async function obf1Decrypt() {
+		const compd_val = document.getElementById("obf2_decrypt_input").value; //compartmentalized value
+		const password = document.getElementById("obf1_password_decrypt").value;
 
 		// Convert from base 58.
 		const decoded_b58_arr = from_b58(compd_val);
@@ -577,15 +577,15 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		console.log("decrypted_string pre strip: " + decrypted_string);
 		decrypted_string = decrypted_string.split(":").pop();
 		console.log("decrypted_string: " + decrypted_string);
-		document.getElementById("obs2_decrypt_output").value = decrypted_string;
+		document.getElementById("obf2_decrypt_output").value = decrypted_string;
 		document.getElementById("openssl_decrypt_input").value = decrypted_string;
-	}//obs1Decrypt
+	}//obf1Decrypt
 
 	// Given password and stored input, decrypt final step.
-	async function obs2Decrypt(){
+	async function obf2Decrypt(){
 		// Get inputs.
-		const final_encrypted = document.getElementById("obs2_encrypt_output").value;
-		const password = document.getElementById("obs2_password_decrypt").value;
+		const final_encrypted = document.getElementById("obf2_encrypt_output").value;
+		const password = document.getElementById("obf2_password_decrypt").value;
 
 		// Get size of input data
 		//const final_encrypted_length = final_encrypted.length / 2;
@@ -626,23 +626,23 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
 		}
 		console.log("DECRYPT: Final Result " + final_decrypted_string);
-		document.getElementById("obs2_decrypt_input").value = final_decrypted_string;
+		document.getElementById("obf2_decrypt_input").value = final_decrypted_string;
 		//document.getElementById("enter_openssl_encrypted").value = final_decrypted_string;
 		//document.getElementById("final_decrypt").value = comp_input_b58;
 
-	}//obs2Decrypt
+	}//obf2Decrypt
 
-	async function obs2Encrypt(){
+	async function obf2Encrypt(){
 		// Copy input data and password.
-		const input_data = document.getElementById("obs2_input").value;
-		const password = document.getElementById("obs2_password_encrypt").value;
-		document.getElementById("obs2_password_decrypt").value = document.getElementById("obs2_password_encrypt").value;
+		const input_data = document.getElementById("obf2_input").value;
+		const password = document.getElementById("obf2_password_encrypt").value;
+		document.getElementById("obf2_password_decrypt").value = document.getElementById("obf2_password_encrypt").value;
 
 		// Check input data for non-b58 chars
 		if( !check_b58chars(input_data) ){
 			console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
 			// Abort final step encode.
-			document.getElementById("obs2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
+			document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
 			return;
 		}
 
@@ -689,8 +689,8 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		}
 
 		//console.log("Final Result (long way): " + final_encrypted_string);
-		document.getElementById("obs2_encrypt_output").value = final_encrypted_string;
-	}//obs2Encrypt
+		document.getElementById("obf2_encrypt_output").value = final_encrypted_string;
+	}//obf2Encrypt
 
 	function check_b58chars(input){
 		// From the first char(^) to the last($), match zero or more(*) of 
@@ -706,18 +706,18 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 	}
 
 	function check_input_nonb58(){
-		let input = document.getElementById("obs2_input").value;
+		let input = document.getElementById("obf2_input").value;
 		// Disable Final Step button if any non-base58 characters are entered.
 		if( check_b58chars(input) ){
 			//console.log("enable");
 			//enable button
-			document.getElementById("obs2Encrypt_button").disabled = false;
-			document.getElementById("obs2_encrypt_output").value = "";
+			document.getElementById("obf2Encrypt_button").disabled = false;
+			document.getElementById("obf2_encrypt_output").value = "";
 		}else{
 			console.log("Non-base 58 chars found in the Final Step input!");
 			//disable button
-			document.getElementById("obs2Encrypt_button").disabled = true;
-			document.getElementById("obs2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
+			document.getElementById("obf2Encrypt_button").disabled = true;
+			document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
 		}
 	}
 
