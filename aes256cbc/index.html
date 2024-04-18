@@ -113,15 +113,15 @@ input[type='text'][disabled] {
 
 
 	<div>
-	   <h3>Encryption</h3>
+	   <h3>Custom Obsfuction Encryption</h3>
 	</div>
 	<div id='encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: row;">
 			<div style="margin: 5px;"> 
 				<div style="display: flex; flex-direction: column;">
 					<div style="margin: 1px; display: flex; flex-direction: column;">
-						<label>Plaintext:</label>
-						<input id="enter_plaintext_obs" style="width: 600px;"></input>
+						<label>OpenSSL Input:</label>
+						<input id="openssl_input_obs" style="width: 600px;"></input>
 					</div>
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
 						<div style="margin-right: 5px; display: flex; flex-direction: column;">
@@ -148,7 +148,7 @@ input[type='text'][disabled] {
 	</div>
 	<div id='final_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Input:</label>
+			<label>Input (checks b58 chars):</label>
 			<textarea id="final_input" oninput="check_input_nonb58()" style="width: 1000px; height: 365px;"></textarea>
 		</div>
 		<div style="margin: 5px; display: flex; flex-direction: column;">
@@ -498,11 +498,11 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		document.getElementById("openssl_output64").value = out64;
 		const out = atob(out64);
 		document.getElementById("openssl_output").value = out;
-		document.getElementById("decrypt_input").value = out;
+		document.getElementById("openssl_input_obs").value = out;
 	}
 
 	async function comp_encode() {
-		const plaintext = document.getElementById("enter_plaintext_obs").value;
+		const plaintext = document.getElementById("openssl_input_obs").value;
 		const password = document.getElementById("encrypt_password").value;
 
 		// Prepare plaintext side for XOR.
@@ -564,9 +564,11 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		}
 		console.log("Stripped binary array: " + plaintextbytes);
 		plaintextbytes = Uint8Array.from(plaintextbytes);
-		const decrypted_string = new TextDecoder().decode(plaintextbytes);
+		let decrypted_string = new TextDecoder().decode(plaintextbytes);
+		decrypted_string = decrypted_string.split(":").pop();
 		console.log("decrypted_string: " + decrypted_string);
 		document.getElementById("final_decrypt_output").value = decrypted_string;
+		document.getElementById("decrypt_input").value = decrypted_string;
 	}
 
 	// Given password and stored input, decrypt final step.
