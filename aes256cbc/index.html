@@ -44,7 +44,10 @@ input[type='text'][disabled] {
 				<div style="display: flex; flex-direction: column;">
 					<div style="margin: 1px; display: flex; flex-direction: column;">
 						<label>Plaintext:</label>
-						<input id="enter_openssl_plaintext" style="width: 600px;"></input>
+						<div>
+							<input id="enter_openssl_plaintext" oninput="check_init_input()" style="width: 600px;"></input>
+							<label style="display: none; color: red; font-weight: bold;" id="input_warning">INPUT LENGTH TOO LONG</label>
+						</div>
 					</div>
 					<div style="margin: 0px; display: flex; flex-direction: row;"> 
 							<div style="margin-right: 5px; display: flex; flex-direction: column;">
@@ -110,6 +113,9 @@ input[type='text'][disabled] {
 			<input id='openssl_salted_output64' style="width: 600px;">
 		</div>
 	</div>
+
+
+		<h3 id="openssl_output_warning" style="color: red; display:none;">OpenSSL output length greater than 732!</h3>
 
 	<div>
 	   <h3>Obfuscation Step 1 Encryption</h3>
@@ -462,6 +468,12 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		//console.log(encrypted_output_buf);
 
 		const out64 = _arrayBufferToBase64(encrypted_output_buf);
+		//Check length < 732
+		if( out64.length > 732 ){
+			document.getElementById("openssl_output_warning").style.display = 'inline';
+		}else{
+			document.getElementById("openssl_output_warning").style.display = 'none';
+		}
 		document.getElementById("openssl_salted_output64").value = out64;
 		const out = atob(out64);
 		document.getElementById("openssl_salted_output").value = out;
@@ -472,6 +484,14 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		const plaintext = document.getElementById("obf1_input").value;
 		const password = document.getElementById("obf1_password_encrypt").value;
 
+/*
+		//Check length < 732
+		if( plaintext.length > 732 || password.length > 732){
+			document.getElementById("openssl_output_warning").style.display = 'inline';
+		}else{
+			document.getElementById("openssl_output_warning").style.display = 'none';
+		}
+*/
 		// Prepare plaintext side for XOR.
 		let plaintext_binary = prepPtext(plaintext);
 		console.log("TESTOUT: plaintext input binary array: " + plaintext_binary);
@@ -481,7 +501,7 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		//console.log("TESTOUT: copied binary array" + plaintext_binary);
 
 		// Each array should already be of length 2000.
-		const array_length = 2000;
+		const array_length = 732;
 		//const array_length = 20;
 
 		// Prepare password side for XOR.
@@ -496,8 +516,10 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		console.log("XOR result binary array: " + xor_result);
 
 		// Convert to base58
-		const result_b58 = to_b58(xor_result);
+		let result_b58 = to_b58(xor_result);
+		console.log("Base58 Data length (from 732 length array):" + result_b58.length);
 //		console.log("XOR result base 58 encoded: " + result_b58);
+		//result_b58 = result_b58.substring(0, Math.min(result_b58.length, 1000));
 
 		document.getElementById("obf1_password_decrypt").value = password;
 		document.getElementById("obf2_input").value = result_b58;
@@ -511,10 +533,11 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 
 		// Convert from base 58.
 		const decoded_b58_arr = from_b58(compd_val);
-		console.log("decoded result: " + decoded_b58_arr);
+		console.log("~~OMG~~ decoded result: " + decoded_b58_arr);
+		console.log("~~OMG~~ LENGTH: " + decoded_b58_arr.length);
 
 		// Each array should already be of length 2000.
-		const array_length = 2000;
+		const array_length = 732;
 		//const array_length = 20;
 
 		// Compute password for XOR.
@@ -537,6 +560,7 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		//console.log("Stripped binary array: " + plaintextbytes);
 		plaintextbytes = Uint8Array.from(plaintextbytes);
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
+		//let decrypted_string = _arrayBufferToBase64(plaintextbytes);
 		console.log("decrypted_string pre strip: " + decrypted_string);
 		decrypted_string = decrypted_string.split(":").pop();
 		console.log("decrypted_string: " + decrypted_string);
@@ -561,7 +585,7 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 
 		// Convert password hash to base58
 		const pass_b58 = to_b58(pass_hash);
-		//console.log("DECRYPT: password hash b58: " + pass_b58);
+		console.log("DECRYPT: password hash b58: " + pass_b58);
 		console.log("DECRYPT: password hash b58 length: " + pass_b58.length);
 
 		// Convert final_encrypted to b58 numerical equivalent and get size.
@@ -668,6 +692,17 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		}
 	}
 
+	function check_init_input(){
+		let input = document.getElementById("enter_openssl_plaintext").value;
+		if( input.length > 731 ){
+			document.getElementById("input_warning").style.display = 'inline';
+			document.getElementById("encrypt_openssl_button").disabled = true;
+		}else{
+			document.getElementById("input_warning").style.display = 'none';
+			document.getElementById("encrypt_openssl_button").disabled = false;
+		}
+	}
+
 	function check_input_nonb58(){
 		let input = document.getElementById("obf2_input").value;
 		// Disable Final Step button if any non-base58 characters are entered.
@@ -675,12 +710,12 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 			//console.log("enable");
 			//enable button
 			document.getElementById("obf2Encrypt_button").disabled = false;
-			document.getElementById("obf2_encrypt_output").value = "";
+			//document.getElementById("obf2_encrypt_output").value = "";
 		}else{
 			console.log("Non-base 58 chars found in the Final Step input!");
 			//disable button
 			document.getElementById("obf2Encrypt_button").disabled = true;
-			document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
+			//document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
 		}
 	}
 
@@ -691,15 +726,18 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		console.log("number chars: " + num_chars);
 
 		// Form 'countstring'.
-		const countstring = num_chars + ':' + plaintext;
+		let countstring = num_chars + ':' + plaintext;
 		console.log("assembled countstring: " + countstring);
+		// Trim string to usable size.
+		//countstring = countstring.substring(0, Math.min(countstring.length, 732));
 
 		// Convert to binary (Uint8Array).
 		const countstring_binary = new TextEncoder().encode(countstring);
 		console.log("countstring in binary array: " + countstring_binary);
 
+
 		// Copy to size 2000 array for XOR.
-		let big_arr = new Uint8Array(2000);
+		let big_arr = new Uint8Array(732);
 		big_arr.set(countstring_binary);
 
 		return big_arr;
