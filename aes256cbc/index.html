@@ -292,85 +292,6 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		);
 	}
 
-	async function decryptOpenSSL() {
-		// Get input.
-		const ciphertext64 = document.getElementById("openssl_decrypt_input").value;
-		// Convert string to Uint8Array.
-		//const inputbytes = new TextEncoder().encode(ciphertext);
-
-		//const ciphertext64 = btoa(ciphertext);
-		const inputbytes = base64ToArrayBuffer(ciphertext64);
-
-
-		// ciphertext is now in a form that is ready to give to the encryption function.
-		let ciphertextbytes = new Uint8Array(inputbytes);
-		//if((ciphertextbytes.length/2)!==
-		console.log("openssl dec input STRING: " + ciphertextbytes);
-		// Copy from global variable instead.
-		//ciphertextbytes = obf1_dec_out;
-		//console.log("openssl dec input BUFFER: " + ciphertextbytes);
-		const dec = new TextDecoder();
-		const input_string = dec.decode(ciphertextbytes);
-		console.log("ciphertext: " + input_string);
-		console.log(ciphertextbytes);
-		const iter = Number(document.getElementById("openssl_decrypt_iterations").value);
-		const digest_hash = document.getElementById("openssl_decrypt_hash").value;
-		const salt = ciphertextbytes.slice(8,16);
-		document.getElementById("openssl_decrypt_salt").value = buf2hex(salt).toUpperCase();
-
-		// Prepare inputs for digest.
-		const pass = document.getElementById("openssl_decrypt_password").value;
-		const keyMaterial = await getKeyMaterial(pass);
-
-		// Use the key derivation function PBKDF2 to derive bits that will 
-		// be used to create the cryptoKey object needed for the main digest.
-		const derived_bits = await window.crypto.subtle.deriveBits(
-			{
-				name: "PBKDF2",
-				salt,
-				iterations: iter,
-				hash: digest_hash,
-			},
-			keyMaterial,
-			384,
-		);
-		const derivedKeyBuffer = new Uint8Array(derived_bits);
-		const full_key = buf2hex(derivedKeyBuffer);
-		document.getElementById("openssl_decrypt_fullkey").value = full_key.toUpperCase();
-
-		// OpenSSL derives the key and IV using the same PBKDF2 digest.
-		// The first 256 bits are used as key, the last 128 are used for IV.
-		const keybytes = derivedKeyBuffer.slice(0, 32);
-		const ivbytes = derivedKeyBuffer.slice(32);
-		const key_key = buf2hex(keybytes);
-		const key_iv = buf2hex(ivbytes);
-		document.getElementById("openssl_decrypt_key").value = key_key.toUpperCase();
-		document.getElementById("openssl_decrypt_iv").value = key_iv.toUpperCase();
-
-		// Extract the encrypted phrase from OpenSSL input
-		const cipherbytesphrase = ciphertextbytes.slice(16);
-
-		let key = await window.crypto.subtle.importKey(
-			'raw', 
-			keybytes, 
-			{
-				name: 'AES-CBC', 
-				length: 256
-			}, 
-			false, 
-			['decrypt']
-		);
-
-console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
-		// The 'make it go' main digest call.
-		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
-		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
-		plaintextbytes = new Uint8Array(decrypted_result);
-		const decrypted_string = new TextDecoder().decode( plaintextbytes );
-		document.getElementById("openssl_decrypt_output").value = decrypted_string;
-		console.log("Decrypted output: " + decrypted_string);
-	}//decryptOpenSSL
-
 	async function encryptOpenSSL() {
 		// Get input from user.
 		const plaintext = document.getElementById("enter_openssl_plaintext").value;
@@ -480,6 +401,85 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		document.getElementById("obf1_input").value = out64;
 	}//encryptOpenSSL
 
+	async function decryptOpenSSL() {
+		// Get input.
+		const ciphertext64 = document.getElementById("openssl_decrypt_input").value;
+		// Convert string to Uint8Array.
+		//const inputbytes = new TextEncoder().encode(ciphertext);
+
+		//const ciphertext64 = btoa(ciphertext);
+		const inputbytes = base64ToArrayBuffer(ciphertext64);
+
+
+		// ciphertext is now in a form that is ready to give to the encryption function.
+		let ciphertextbytes = new Uint8Array(inputbytes);
+		//if((ciphertextbytes.length/2)!==
+		console.log("openssl dec input STRING: " + ciphertextbytes);
+		// Copy from global variable instead.
+		//ciphertextbytes = obf1_dec_out;
+		//console.log("openssl dec input BUFFER: " + ciphertextbytes);
+		const dec = new TextDecoder();
+		const input_string = dec.decode(ciphertextbytes);
+		console.log("ciphertext: " + input_string);
+		console.log(ciphertextbytes);
+		const iter = Number(document.getElementById("openssl_decrypt_iterations").value);
+		const digest_hash = document.getElementById("openssl_decrypt_hash").value;
+		const salt = ciphertextbytes.slice(8,16);
+		document.getElementById("openssl_decrypt_salt").value = buf2hex(salt).toUpperCase();
+
+		// Prepare inputs for digest.
+		const pass = document.getElementById("openssl_decrypt_password").value;
+		const keyMaterial = await getKeyMaterial(pass);
+
+		// Use the key derivation function PBKDF2 to derive bits that will 
+		// be used to create the cryptoKey object needed for the main digest.
+		const derived_bits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				salt,
+				iterations: iter,
+				hash: digest_hash,
+			},
+			keyMaterial,
+			384,
+		);
+		const derivedKeyBuffer = new Uint8Array(derived_bits);
+		const full_key = buf2hex(derivedKeyBuffer);
+		document.getElementById("openssl_decrypt_fullkey").value = full_key.toUpperCase();
+
+		// OpenSSL derives the key and IV using the same PBKDF2 digest.
+		// The first 256 bits are used as key, the last 128 are used for IV.
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+		const key_key = buf2hex(keybytes);
+		const key_iv = buf2hex(ivbytes);
+		document.getElementById("openssl_decrypt_key").value = key_key.toUpperCase();
+		document.getElementById("openssl_decrypt_iv").value = key_iv.toUpperCase();
+
+		// Extract the encrypted phrase from OpenSSL input
+		const cipherbytesphrase = ciphertextbytes.slice(16);
+
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				name: 'AES-CBC', 
+				length: 256
+			}, 
+			false, 
+			['decrypt']
+		);
+
+console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
+		// The 'make it go' main digest call.
+		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
+		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
+		plaintextbytes = new Uint8Array(decrypted_result);
+		const decrypted_string = new TextDecoder().decode( plaintextbytes );
+		document.getElementById("openssl_decrypt_output").value = decrypted_string;
+		console.log("Decrypted output: " + decrypted_string);
+	}//decryptOpenSSL
+
 	async function obf1Encrypt() {
 		const plaintext = document.getElementById("obf1_input").value;
 		const password = document.getElementById("obf1_password_encrypt").value;
@@ -568,57 +568,6 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		document.getElementById("openssl_decrypt_input").value = decrypted_string;
 	}//obf1Decrypt
 
-	// Given password and stored input, decrypt final step.
-	async function obf2Decrypt(){
-		// Get inputs.
-		const final_encrypted = document.getElementById("obf2_encrypt_output").value;
-		const password = document.getElementById("obf2_password_decrypt").value;
-
-		// Get size of input data
-		//const final_encrypted_length = final_encrypted.length / 2;
-		const final_encrypted_length = final_encrypted.length;
-		console.log("DECRYPT: final final_encrypted string length: " + final_encrypted_length);
-
-		// Get hash+append of password, to length of final_encrypted for now. 
-		const pass_hash = await getHash2k(password, final_encrypted_length);
-		//console.log("DECRYPT: password hash result: " + pass_hash);
-
-		// Convert password hash to base58
-		const pass_b58 = to_b58(pass_hash);
-		console.log("DECRYPT: password hash b58: " + pass_b58);
-		console.log("DECRYPT: password hash b58 length: " + pass_b58.length);
-
-		// Convert final_encrypted to b58 numerical equivalent and get size.
-		let final_encrypted_b58_num_arr = new Array(final_encrypted_length);
-		let pass_b58_num_arr = new Array(final_encrypted_length);
-		for (let i = 0; i < final_encrypted_length; i++) {
-			final_encrypted_b58_num_arr[i] = base58map.indexOf(final_encrypted.charAt(i));
-			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
-		}
-		//console.log("DECRYPT: final_encrypted base58 numerical array: " + final_encrypted_b58_num_arr);
-		//console.log("DECRYPT: password base58 numerical array: " + pass_b58_num_arr);
-
-		// Add the arrays piecewise, 
-		let in_b58_num_arr = new Array(final_encrypted_length);
-		for (let i = 0; i < final_encrypted_length; i++) {
-			if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
-				final_encrypted_b58_num_arr[i] += 58;
-			}
-			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
-		}
-		//console.log("DECRYPT: computed input base58 numerical array: " + in_b58_num_arr);
-		// Convert numerical values to b58 chars.
-		let final_decrypted_string = '';
-		for (let i = 0; i < final_encrypted_length; i++) {
-			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
-		}
-		console.log("DECRYPT: Final Result " + final_decrypted_string);
-		document.getElementById("obf2_decrypt_input").value = final_decrypted_string;
-		//document.getElementById("enter_openssl_encrypted").value = final_decrypted_string;
-		//document.getElementById("final_decrypt").value = comp_input_b58;
-
-	}//obf2Decrypt
-
 	async function obf2Encrypt(){
 		// Copy input data and password.
 		const input_data = document.getElementById("obf2_input").value;
@@ -678,6 +627,56 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		//console.log("Final Result (long way): " + final_encrypted_string);
 		document.getElementById("obf2_encrypt_output").value = final_encrypted_string;
 	}//obf2Encrypt
+
+	async function obf2Decrypt(){
+		// Get inputs.
+		const final_encrypted = document.getElementById("obf2_encrypt_output").value;
+		const password = document.getElementById("obf2_password_decrypt").value;
+
+		// Get size of input data
+		//const final_encrypted_length = final_encrypted.length / 2;
+		const final_encrypted_length = final_encrypted.length;
+		console.log("DECRYPT: final final_encrypted string length: " + final_encrypted_length);
+
+		// Get hash+append of password, to length of final_encrypted for now. 
+		const pass_hash = await getHash2k(password, final_encrypted_length);
+		//console.log("DECRYPT: password hash result: " + pass_hash);
+
+		// Convert password hash to base58
+		const pass_b58 = to_b58(pass_hash);
+		console.log("DECRYPT: password hash b58: " + pass_b58);
+		console.log("DECRYPT: password hash b58 length: " + pass_b58.length);
+
+		// Convert final_encrypted to b58 numerical equivalent and get size.
+		let final_encrypted_b58_num_arr = new Array(final_encrypted_length);
+		let pass_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			final_encrypted_b58_num_arr[i] = base58map.indexOf(final_encrypted.charAt(i));
+			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
+		}
+		//console.log("DECRYPT: final_encrypted base58 numerical array: " + final_encrypted_b58_num_arr);
+		//console.log("DECRYPT: password base58 numerical array: " + pass_b58_num_arr);
+
+		// Add the arrays piecewise, 
+		let in_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
+				final_encrypted_b58_num_arr[i] += 58;
+			}
+			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
+		}
+		//console.log("DECRYPT: computed input base58 numerical array: " + in_b58_num_arr);
+		// Convert numerical values to b58 chars.
+		let final_decrypted_string = '';
+		for (let i = 0; i < final_encrypted_length; i++) {
+			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
+		}
+		console.log("DECRYPT: Final Result " + final_decrypted_string);
+		document.getElementById("obf2_decrypt_input").value = final_decrypted_string;
+		//document.getElementById("enter_openssl_encrypted").value = final_decrypted_string;
+		//document.getElementById("final_decrypt").value = comp_input_b58;
+
+	}//obf2Decrypt
 
 	function check_b58chars(input){
 		// From the first char(^) to the last($), match zero or more(*) of 
