@@ -154,7 +154,7 @@ input[type='text'][disabled] {
 	<div id='obf2_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Obf Step 2 Input (checks b58 chars):</label>
-			<textarea id="obf2_input" oninput="check_input_nonb58()" style="width: 1000px; height: 365px;"></textarea>
+			<textarea id="obf2_input" oninput="check_input_obf2()" style="width: 1000px; height: 365px;"></textarea>
 		</div>
 		<div style="margin: 5px; display: flex; flex-direction: column;">
 			<label>Obf Step 2 Password:</label>
@@ -306,10 +306,10 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const plaintextbytes = new Uint8Array(plaintextbytes_buf);
 		const dec = new TextDecoder();
 		const input_string = dec.decode(plaintextbytes);
-		console.log("plaintext: " + input_string);
+		//console.log("plaintext: " + input_string);
 		const plaintext64 = _arrayBufferToBase64(plaintextbytes);
-		console.log("plaintext 64: " + plaintext64);
-		console.log(plaintextbytes);
+		//console.log("plaintext 64: " + plaintext64);
+		//console.log(plaintextbytes);
 		const iter = Number(document.getElementById("enter_openssl_iterations").value);
 		const digest_hash = document.getElementById("enter_openssl_hash").value;
 
@@ -365,7 +365,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			false, 
 			['encrypt']
 		);
-console.log("PLAINTEXTBYTES: " + plaintextbytes);
+//console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		// The 'make it go' main digest call. Returns an array buffer.
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
@@ -389,6 +389,7 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		//console.log(encrypted_output_buf);
 
 		const out64 = _arrayBufferToBase64(encrypted_output_buf);
+			console.log("openssl output length: " + out64.length);
 		//Check length < 732
 		if( out64.length > 732 ){
 			document.getElementById("openssl_output_warning").style.display = 'inline';
@@ -414,14 +415,14 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		// ciphertext is now in a form that is ready to give to the encryption function.
 		let ciphertextbytes = new Uint8Array(inputbytes);
 		//if((ciphertextbytes.length/2)!==
-		console.log("openssl dec input STRING: " + ciphertextbytes);
+		//console.log("openssl dec input STRING: " + ciphertextbytes);
 		// Copy from global variable instead.
 		//ciphertextbytes = obf1_dec_out;
 		//console.log("openssl dec input BUFFER: " + ciphertextbytes);
 		const dec = new TextDecoder();
 		const input_string = dec.decode(ciphertextbytes);
-		console.log("ciphertext: " + input_string);
-		console.log(ciphertextbytes);
+		//console.log("ciphertext: " + input_string);
+		//console.log(ciphertextbytes);
 		const iter = Number(document.getElementById("openssl_decrypt_iterations").value);
 		const digest_hash = document.getElementById("openssl_decrypt_hash").value;
 		const salt = ciphertextbytes.slice(8,16);
@@ -470,20 +471,22 @@ console.log("PLAINTEXTBYTES: " + plaintextbytes);
 			['decrypt']
 		);
 
-console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
+//console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		// The 'make it go' main digest call.
 		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
 		plaintextbytes = new Uint8Array(decrypted_result);
 		const decrypted_string = new TextDecoder().decode( plaintextbytes );
 		document.getElementById("openssl_decrypt_output").value = decrypted_string;
-		console.log("Decrypted output: " + decrypted_string);
+		//console.log("Decrypted output: " + decrypted_string);
 	}//decryptOpenSSL
 
 	async function obf1Encrypt() {
 		const plaintext = document.getElementById("obf1_input").value;
 		const password = document.getElementById("obf1_password_encrypt").value;
 
+		console.log("Obfuscation Step 1 Encrypt input: " + plaintext);
+		console.log("Obf Step 1 Length: " + plaintext.length);
 /*
 		//Check length < 732
 		if( plaintext.length > 732 || password.length > 732){
@@ -494,7 +497,7 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 */
 		// Prepare plaintext side for XOR.
 		let plaintext_binary = prepPtext(plaintext);
-		console.log("TESTOUT: plaintext input binary array: " + plaintext_binary);
+		//console.log("TESTOUT: plaintext input binary array: " + plaintext_binary);
 
 		// Use saved binary array from openssl instead.
 		//plaintext_binary = ssl_enc_out;
@@ -506,25 +509,25 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 
 		// Prepare password side for XOR.
 		const pass_binary = await getHash2k(password, array_length);
-		console.log("password input binary array: " + pass_binary);
+		//console.log("password input binary array: " + pass_binary);
 
 		// Perform the bitwise XOR sequentially.
 		let xor_result = new Uint8Array(array_length);
 		for (let i = 0; i < array_length; i++) {
 			xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
 		}
-		console.log("XOR result binary array: " + xor_result);
+		//console.log("XOR result binary array: " + xor_result);
 
 		// Convert to base58
 		let result_b58 = to_b58(xor_result);
-		console.log("Base58 Data length (from 732 length array):" + result_b58.length);
+		//console.log("Base58 Data length (from 732 length array):" + result_b58.length);
 //		console.log("XOR result base 58 encoded: " + result_b58);
 		//result_b58 = result_b58.substring(0, Math.min(result_b58.length, 1000));
 
 		document.getElementById("obf1_password_decrypt").value = password;
 		document.getElementById("obf2_input").value = result_b58;
 		document.getElementById("obf1_encrypt_output").value = result_b58;
-		console.log("result length (num chars): " + result_b58.length);
+		//console.log("result length (num chars): " + result_b58.length);
 	}//obf1Encrypt
 
 	async function obf1Decrypt() {
@@ -533,8 +536,8 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 
 		// Convert from base 58.
 		const decoded_b58_arr = from_b58(compd_val);
-		console.log("~~OMG~~ decoded result: " + decoded_b58_arr);
-		console.log("~~OMG~~ LENGTH: " + decoded_b58_arr.length);
+		//console.log("~~OMG~~ decoded result: " + decoded_b58_arr);
+		//console.log("~~OMG~~ LENGTH: " + decoded_b58_arr.length);
 
 		// Each array should already be of length 2000.
 		const array_length = 732;
@@ -542,7 +545,7 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 
 		// Compute password for XOR.
 		const pass_binary = await getHash2k(password, array_length);
-		console.log("pass_binary: " + pass_binary);
+		//console.log("pass_binary: " + pass_binary);
 
 		// Perform the bitwise XOR sequentially.
 		// Inverse of XOR is XOR and is communicative.
@@ -551,7 +554,7 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		for (let i = 0; i < array_length; i++) {
 			xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
 		}
-		console.log("XOR result (decoded) binary array: " + xor_result);
+		//console.log("XOR result (decoded) binary array: " + xor_result);
 		let plaintextbytes = Array.from(xor_result);
 		// Strip off tailing zeros.
 		while(plaintextbytes[plaintextbytes.length - 1] == 0){
@@ -561,9 +564,9 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		plaintextbytes = Uint8Array.from(plaintextbytes);
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
 		//let decrypted_string = _arrayBufferToBase64(plaintextbytes);
-		console.log("decrypted_string pre strip: " + decrypted_string);
+		//console.log("decrypted_string pre strip: " + decrypted_string);
 		decrypted_string = decrypted_string.split(":").pop();
-		console.log("decrypted_string: " + decrypted_string);
+		//console.log("decrypted_string: " + decrypted_string);
 		document.getElementById("obf2_decrypt_output").value = decrypted_string;
 		document.getElementById("openssl_decrypt_input").value = decrypted_string;
 	}//obf1Decrypt
@@ -574,9 +577,12 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		const password = document.getElementById("obf2_password_encrypt").value;
 		document.getElementById("obf2_password_decrypt").value = document.getElementById("obf2_password_encrypt").value;
 
+		console.log("Obfuscation Step 2 Encrypt input: " + input_data);
+		console.log("Obf Step 2 Length: " + input_data.length);
+
 		// Check input data for non-b58 chars
 		if( !check_b58chars(input_data) ){
-			console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
+			//console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
 			// Abort final step encode.
 			document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
 			return;
@@ -584,7 +590,7 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 
 		// Get size of input data
 		const input_length = input_data.length;
-		console.log("final input string length: " + input_length);
+		//console.log("final input string length: " + input_length);
 
 		// Get hash+append of password, to length of input for now. 
 		const pass_hash = await getHash2k(password, input_length);
@@ -593,7 +599,7 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		// Convert password hash to base58
 		const pass_b58 = to_b58(pass_hash);
 		//console.log("password hash b58: " + pass_b58);
-		console.log("password hash b58 length: " + pass_b58.length);
+		//console.log("password hash b58 length: " + pass_b58.length);
 
 		// Convert input to b58 numerical equivalent and get size.
 		let input_b58_num_arr = new Array(input_length);
@@ -624,6 +630,8 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 			final_encrypted_string += base58map.charAt(sum_b58_num_arr[i]);
 		}
 
+		console.log("Obfuscation Step 2 Encrypt output: " + final_encrypted_string);
+		console.log("Obf Step 2 output Length: " + final_encrypted_string.length);
 		//console.log("Final Result (long way): " + final_encrypted_string);
 		document.getElementById("obf2_encrypt_output").value = final_encrypted_string;
 	}//obf2Encrypt
@@ -636,7 +644,7 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		// Get size of input data
 		//const final_encrypted_length = final_encrypted.length / 2;
 		const final_encrypted_length = final_encrypted.length;
-		console.log("DECRYPT: final final_encrypted string length: " + final_encrypted_length);
+		//console.log("DECRYPT: final final_encrypted string length: " + final_encrypted_length);
 
 		// Get hash+append of password, to length of final_encrypted for now. 
 		const pass_hash = await getHash2k(password, final_encrypted_length);
@@ -644,8 +652,8 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 
 		// Convert password hash to base58
 		const pass_b58 = to_b58(pass_hash);
-		console.log("DECRYPT: password hash b58: " + pass_b58);
-		console.log("DECRYPT: password hash b58 length: " + pass_b58.length);
+		//console.log("DECRYPT: password hash b58: " + pass_b58);
+		//console.log("DECRYPT: password hash b58 length: " + pass_b58.length);
 
 		// Convert final_encrypted to b58 numerical equivalent and get size.
 		let final_encrypted_b58_num_arr = new Array(final_encrypted_length);
@@ -671,7 +679,7 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		for (let i = 0; i < final_encrypted_length; i++) {
 			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
 		}
-		console.log("DECRYPT: Final Result " + final_decrypted_string);
+		//console.log("DECRYPT: Final Result " + final_decrypted_string);
 		document.getElementById("obf2_decrypt_input").value = final_decrypted_string;
 		//document.getElementById("enter_openssl_encrypted").value = final_decrypted_string;
 		//document.getElementById("final_decrypt").value = comp_input_b58;
@@ -693,7 +701,12 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 
 	function check_init_input(){
 		let input = document.getElementById("enter_openssl_plaintext").value;
-		if( input.length > 731 ){
+
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		//console.log("byte size: " + size);
+		//if( input.length > 500 ){
+		if( size > 500 ){
 			document.getElementById("input_warning").style.display = 'inline';
 			document.getElementById("encrypt_openssl_button").disabled = true;
 		}else{
@@ -702,7 +715,7 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		}
 	}
 
-	function check_input_nonb58(){
+	function check_input_obf2(){
 		let input = document.getElementById("obf2_input").value;
 		// Disable Final Step button if any non-base58 characters are entered.
 		if( check_b58chars(input) ){
@@ -711,28 +724,36 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 			document.getElementById("obf2Encrypt_button").disabled = false;
 			//document.getElementById("obf2_encrypt_output").value = "";
 		}else{
-			console.log("Non-base 58 chars found in the Final Step input!");
+			//console.log("Non-base 58 chars found in the Final Step input!");
 			//disable button
 			document.getElementById("obf2Encrypt_button").disabled = true;
 			//document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
 		}
+
+		if( input.length == 1000 ){
+			//document.getElementById("obf2Encrypt_button").disabled = false;
+			console.log("Obf2 input size verified as valid (exactly 1000 chars)");
+		}else{
+			//document.getElementById("obf2Encrypt_button").disabled = true;
+			console.log("Obf2 input size INVALID!");
+		}
 	}
 
 	function prepPtext(plaintext) {
-		console.log("plaintext input: " + plaintext);
+		//console.log("plaintext input: " + plaintext);
 		// Count chars.
 		const num_chars = plaintext.length;
-		console.log("number chars: " + num_chars);
+		//console.log("number chars: " + num_chars);
 
 		// Form 'countstring'.
 		let countstring = num_chars + ':' + plaintext;
-		console.log("assembled countstring: " + countstring);
+		//console.log("assembled countstring: " + countstring);
 		// Trim string to usable size.
 		//countstring = countstring.substring(0, Math.min(countstring.length, 732));
 
 		// Convert to binary (Uint8Array).
 		const countstring_binary = new TextEncoder().encode(countstring);
-		console.log("countstring in binary array: " + countstring_binary);
+		//console.log("countstring in binary array: " + countstring_binary);
 
 
 		// Copy to size 2000 array for XOR.
@@ -743,10 +764,10 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 	}
 
 	async function getHash2k(pass, length) {
-		console.log("entered password: " + pass);
+		//console.log("entered password: " + pass);
 		// Convert to binary (Uint8Array).
 		const password_binary = new TextEncoder().encode(pass);
-		console.log("password binary array: " + password_binary);
+		//console.log("password binary array: " + password_binary);
 
 		// Take initial SHA256.
 		let initial_sha = await crypto.subtle.digest('SHA-256', password_binary);
@@ -814,18 +835,18 @@ console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 
 	function encode64(){
 		let raw_text = document.getElementById("raw_64encode_text").value;
-		console.log("Encoding the string: '" + raw_text + "'");
+		//console.log("Encoding the string: '" + raw_text + "'");
 		const encoded64 = btoa(raw_text);
-		console.log("Encoded string: '" + encoded64 + "'");
+		//console.log("Encoded string: '" + encoded64 + "'");
 		document.getElementById("encoded64_text").value = encoded64;
 		document.getElementById("raw_64encoded_text").value = encoded64;
 	}
 
 	function decode64(){
 		let decoded_text = document.getElementById("raw_64encoded_text").value;
-		console.log("Decoding the string: '" + decoded_text + "'");
+		//console.log("Decoding the string: '" + decoded_text + "'");
 		const decoded64 = atob(decoded_text);
-		console.log("Decoded string: '" + decoded64 + "'");
+		//console.log("Decoded string: '" + decoded64 + "'");
 		document.getElementById("decoded64_text").value = decoded64;
 	}
 
