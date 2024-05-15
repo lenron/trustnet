@@ -52,7 +52,8 @@ input[type='text'][disabled] {
 
 /* Change background color of buttons on hover */
 .tab button:hover {
-  background-color: #ddd;
+	text-decoration: underline;
+	background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), lightgrey;
 }
 
 /* Create an active/current tablink class */
@@ -77,10 +78,10 @@ input[type='text'][disabled] {
 	   <h3>Production Prototype</h3>
 	</div>
 	<div class='tab'>
-		<button class="tablinks" onclick="setTab(event, 'store')">Store</button>
-		<button class="tablinks" onclick="setTab(event, 'load')">Load</button>
+		<button class="tablinks" style="background-color:plum;" onclick="setTab(event, 'store')">Store</button>
+		<button class="tablinks" style="background-color:lightblue;" onclick="setTab(event, 'load')">Load</button>
 	</div>
-	<div id='store' class="tabcontent" style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='store' class="tabcontent" style="display: flex; flex-direction: column; border-style: inset; width: fit-content; background-color: plum;">
 		<div style="display: flex;">
 			<div id='enter_div' style="display: flex; flex-direction: column; margin: 5px;">
 				<div style="display: flex; flex-direction: column; margin: 5px;">
@@ -117,7 +118,7 @@ input[type='text'][disabled] {
 			<button id='store_button' onclick="deepStore()" style="background-color: lightgreen; width: 200px; margin: 5px;">Deep Store</button>
 		</div>
 	</div>
-	<div id='load' class="tabcontent" style="display: none; flex-direction: column; border-style: inset; width: fit-content;">
+	<div id='load' class="tabcontent" style="display: none; flex-direction: column; border-style: inset; width: fit-content; background-color: lightblue;">
 		<div style="display: flex;">
 			<div id='enter_div' style="display: flex; flex-direction: column; margin: 5px;">
 				<div id='codeword_div' style="display: flex; flex-direction: column;">
