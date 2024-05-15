@@ -389,6 +389,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log(encrypted_output_buf);
 
 		const out64 = _arrayBufferToBase64(encrypted_output_buf);
+			console.log("openssl output length: " + out64.length);
 		//Check length < 732
 		if( out64.length > 732 ){
 			document.getElementById("openssl_output_warning").style.display = 'inline';
@@ -700,7 +701,12 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 	function check_init_input(){
 		let input = document.getElementById("enter_openssl_plaintext").value;
-		if( input.length > 500 ){
+
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		//console.log("byte size: " + size);
+		//if( input.length > 500 ){
+		if( size > 500 ){
 			document.getElementById("input_warning").style.display = 'inline';
 			document.getElementById("encrypt_openssl_button").disabled = true;
 		}else{
