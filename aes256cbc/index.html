@@ -33,32 +33,33 @@ input[type='text'][disabled] {
 
 /* Style the tab */
 .tab {
-  overflow: hidden;
+	display: flex;
   border: 1px solid #ccc;
   background-color: #f1f1f1;
 }
 
 /* Style the buttons inside the tab */
 .tab button {
+	width: 50%;
   background-color: inherit;
-  float: left;
   border: none;
   outline: none;
-  cursor: pointer;
   padding: 14px 16px;
   transition: 0.3s;
   font-size: 17px;
+	background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), lightgrey;
 }
 
 /* Change background color of buttons on hover */
 .tab button:hover {
 	text-decoration: underline;
-	background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), lightgrey;
+	background-image: none; /* remove shadow (linear-gradient) */
 }
 
 /* Create an active/current tablink class */
 .tab button.active {
   background-color: #ccc;
+	background-image: none; /* remove shadow (linear-gradient) */
 }
 
 /* Style the tab content */
@@ -69,6 +70,18 @@ input[type='text'][disabled] {
   border-top: none;
 }
 
+.doit_button {
+	background-color: lightgreen;
+	width: 100%;
+	height: 40px;
+	margin: 5px;
+}
+
+.doit_button:hover {
+	text-decoration: underline;
+	border: 5px solid red;
+}
+
 </style>
 
 <body>
@@ -77,82 +90,85 @@ input[type='text'][disabled] {
 	<div>
 	   <h3>Production Prototype</h3>
 	</div>
-	<div class='tab'>
-		<button class="tablinks" style="background-color:plum;" onclick="setTab(event, 'store')">Store</button>
-		<button class="tablinks" style="background-color:lightblue;" onclick="setTab(event, 'load')">Load</button>
-	</div>
-	<div id='store' class="tabcontent" style="display: flex; flex-direction: column; border-style: inset; width: fit-content; background-color: plum;">
-		<div style="display: flex;">
-			<div id='enter_div' style="display: flex; flex-direction: column; margin: 5px;">
-				<div style="display: flex; flex-direction: column; margin: 5px;">
-					<label>Enter Data:</label>
-					<textarea id="plaintext_input" oninput="check_init_input()" style="width: 600px; height: 200px;"></textarea>
-				</div>
-				<div id='codeword_div' style="display: flex; flex-direction: column;">
-					<div style="margin: 5px; display: flex; flex-direction: column;">
-						<label>Codeword:</label>
-						<input id="codeword" style="width: 400px;"></input>
-					</div>
-					<div id='password_div' style="display: flex; flex-direction: column;">
-						<div style="margin: 5px; display: flex; flex-direction: column;">
-							<label>Password 1:</label>
-							<input id="pass_1" style="width: 400px;"></input>
-						</div>
-						<div style="margin: 5px; display: flex; flex-direction: column;">
-							<label>Password 2:</label>
-							<input id="pass_2" style="width: 400px;"></input>
-						</div>
-						<div style="margin: 5px; display: flex; flex-direction: column;">
-							<label>Password 3:</label>
-							<input id="pass_3" style="width: 400px;"></input>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div style="display: flex; flex-direction: column; margin: 5px;">
-				<b>Status:</b>
-				<textarea id='status_display' style="width: 400px; height: 400px;"></textarea>
-			</div>
+
+	<div id='prod_div' class="" style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
+		<div class='tab'>
+			<button class="tablinks active" style="background-color:plum;" onclick="setTab(event, 'store')">Store</button>
+			<button class="tablinks" style="background-color:lightblue;" onclick="setTab(event, 'load')">Load</button>
 		</div>
-		<div>
-			<button id='store_button' onclick="deepStore()" style="background-color: lightgreen; width: 200px; margin: 5px;">Deep Store</button>
-		</div>
-	</div>
-	<div id='load' class="tabcontent" style="display: none; flex-direction: column; border-style: inset; width: fit-content; background-color: lightblue;">
-		<div style="display: flex;">
-			<div id='enter_div' style="display: flex; flex-direction: column; margin: 5px;">
-				<div id='codeword_div' style="display: flex; flex-direction: column;">
-					<div style="margin: 5px; display: flex; flex-direction: column;">
-						<label>Codeword:</label>
-						<input id="codeword" style="width: 400px;"></input>
+		<div id='store' class="tabcontent " style="display: flex; flex-direction: column; width: fit-content; background-color: plum;">
+			<div style="display: flex;">
+				<div id='store_enter_div' style="display: flex; flex-direction: column; margin: 5px;">
+					<div style="display: flex; flex-direction: column; margin: 5px;">
+						<label>Enter Data:</label>
+						<textarea id="plaintext_input" oninput="check_init_input()" style="width: 600px; height: 200px;"></textarea>
 					</div>
-					<div id='password_div' style="display: flex; flex-direction: column;">
+					<div id='store_codeword_div' style="display: flex; flex-direction: column;">
 						<div style="margin: 5px; display: flex; flex-direction: column;">
-							<label>Password 1:</label>
-							<input id="pass_1" style="width: 400px;"></input>
+							<label>Codeword:</label>
+							<input id="store_codeword" style="width: 400px;"></input>
 						</div>
-						<div style="margin: 5px; display: flex; flex-direction: column;">
-							<label>Password 2:</label>
-							<input id="pass_2" style="width: 400px;"></input>
-						</div>
-						<div style="margin: 5px; display: flex; flex-direction: column;">
-							<label>Password 3:</label>
-							<input id="pass_3" style="width: 400px;"></input>
+						<div id='store_password_div' style="display: flex; flex-direction: column;">
+							<div style="margin: 5px; display: flex; flex-direction: column;">
+								<label>Password 1:</label>
+								<input id="store_pass_1" style="width: 400px;"></input>
+							</div>
+							<div style="margin: 5px; display: flex; flex-direction: column;">
+								<label>Password 2:</label>
+								<input id="store_pass_2" style="width: 400px;"></input>
+							</div>
+							<div style="margin: 5px; display: flex; flex-direction: column;">
+								<label>Password 3:</label>
+								<input id="store_pass_3" style="width: 400px;"></input>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
-					<label>Enter Data:</label>
-					<textarea id="plaintext_input" oninput="check_init_input()" style="width: 600px; height: 200px;"></textarea>
+					<b>Status:</b>
+					<textarea id='status_display' style="width: 400px; height: 400px;"></textarea>
 				</div>
 			</div>
-			<div style="display: flex; flex-direction: column; margin: 5px;">
-				<b>Status:</b>
-				<textarea id='status_display' style="width: 400px; height: 400px;"></textarea>
+			<div style="margin: 5px;">
+				<button class="doit_button" id='store_button' onclick="deepStore()">Deep Store</button>
 			</div>
 		</div>
-		<div>
-			<button id='store_button' onclick="deepStore()" style="background-color: lightgreen; width: 200px; margin: 5px;">Deep Store</button>
+		<div id='load' class="tabcontent" style="display: none; flex-direction: column; width: fit-content; background-color: lightblue;">
+			<div style="display: flex;">
+				<div id='load_enter_div' style="display: flex; flex-direction: column; margin: 5px;">
+					<div id='load_codeword_div' style="display: flex; flex-direction: column;">
+						<div style="margin: 5px; display: flex; flex-direction: column;">
+							<label>Codeword:</label>
+							<input id="load_codeword" style="width: 400px;"></input>
+						</div>
+						<div id='load_password_div' style="display: flex; flex-direction: column;">
+							<div style="margin: 5px; display: flex; flex-direction: column;">
+								<label>Password 1:</label>
+								<input id="load_pass_1" style="width: 400px;"></input>
+							</div>
+							<div style="margin: 5px; display: flex; flex-direction: column;">
+								<label>Password 2:</label>
+								<input id="load_pass_2" style="width: 400px;"></input>
+							</div>
+							<div style="margin: 5px; display: flex; flex-direction: column;">
+								<label>Password 3:</label>
+								<input id="load_pass_3" style="width: 400px;"></input>
+							</div>
+						</div>
+					</div>
+					<div style="display: flex; flex-direction: column; margin: 5px;">
+						<label>Retrieved Data:</label>
+						<textarea id="output_display" disabled style="width: 600px; height: 200px;"></textarea>
+					</div>
+				</div>
+				<div style="display: flex; flex-direction: column; margin: 5px;">
+					<b>Status:</b>
+					<textarea id='status_display' style="width: 400px; height: 400px;"></textarea>
+				</div>
+			</div>
+			<div style="margin: 5px;">
+				<button class="doit_button" id='load_button' onclick="deepLoad()" >Load Data</button>
+			</div>
 		</div>
 	</div>
 
