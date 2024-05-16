@@ -98,7 +98,7 @@ input[type='text'][disabled] {
 		</div>
 		<div id='store' class="tabcontent " style="display: flex; flex-direction: column; width: fit-content; background-color: plum;">
 			<div style="display: flex;">
-				<div id='store_enter_div' style="display: flex; flex-direction: column; margin: 5px;">
+				<div id='store_enter_div' style="display: flex; flex-direction: column;">
 					<div style="display: flex; flex-direction: column; margin: 5px;">
 						<label>Enter Data:</label>
 						<textarea id="plaintext_input" oninput="check_init_input()" style="width: 600px; height: 200px;"></textarea>
@@ -437,17 +437,45 @@ function setTab(evt, cityName) {
 
 	async function deepStore(){
 
-		// Get input data from user.
+		// Get save data from user.
 		const plaintext = document.getElementById("plaintext_input").value;
 
-		// OpenSSL Encrypt
-		const openssl_encrypted = encryptOpenSSL(plaintext);
+		// Get code/passwords from user.
+		const codeword = document.getElementById("store_codeword").value;
+		const store_pass_1 = document.getElementById("store_pass_1").value;
+		const store_pass_2 = document.getElementById("store_pass_2").value;
+		const store_pass_3 = document.getElementById("store_pass_3").value;
+
+		// OpenSSL Encrypt (base 64 encoded)
+		const openssl_encrypted = await encryptOpenSSL(plaintext, store_pass_1);
 
 		// Obfuscation Step 1 Encrypt
+		const obf_s1_encrypted = await obf1Encrypt(openssl_encrypted, store_pass_2);
 
 		// Check data length and type (check 2: 1000 char length, base 58).
+		document.getElementById("status_display").value += 'Running Check 2...';
+		// If all b58 chars...
+		if( check_b58chars(obf_s1_encrypted) ){
+			document.getElementById("status_display").value += "Data type verified.\n";
+		}else{
+			document.getElementById("status_display").value += "Data type INVALID.\n";
+			document.getElementById("status_display").value += "Critical Failure! End.\n"
+			return;
+		}
+
+		if( obf_s1_encrypted.length == 1000 ){ 
+			document.getElementById("status_display").value += "Data length verified.\n";
+		}else{
+			document.getElementById("status_display").value += "Data length INVALID. Length: " + obf_s1_encrypted.length + "\n";
+			document.getElementById("status_display").value += "Critical Failure! End.\n"
+			return;
+		}
 
 		// Obfuscation Step 2 Encrypt
+		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, store_pass_3);
+		document.getElementById("status_display").value += "Encrypt Completed Successfully.\n"
+		document.getElementById("status_display").value += "Encrypted data:\n" + obf_s2_encrypted; 
+
 
 		// Compute Fingerprint
 
@@ -494,7 +522,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		);
 	}
 
-	async function encryptOpenSSL(plaintext) {
+	async function encryptOpenSSL(plaintext, pass) {
 		// Get input from user.
 		//const plaintext = document.getElementById("enter_openssl_plaintext").value;
 
@@ -527,7 +555,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		}
 
 		// Prepare inputs for digest.
-		const pass = document.getElementById("enter_openssl_password").value;
+		//const pass = document.getElementById("enter_openssl_password").value;
 		const keyMaterial = await getKeyMaterial(pass);
 
 		// Propagate password to decrypt for ease of use.
@@ -603,6 +631,8 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const out = atob(out64);
 		document.getElementById("openssl_salted_output").value = out;
 		document.getElementById("obf1_input").value = out64;
+
+		return out64;
 	}//encryptOpenSSL
 
 	async function decryptOpenSSL() {
@@ -684,9 +714,9 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log("Decrypted output: " + decrypted_string);
 	}//decryptOpenSSL
 
-	async function obf1Encrypt() {
-		const plaintext = document.getElementById("obf1_input").value;
-		const password = document.getElementById("obf1_password_encrypt").value;
+	async function obf1Encrypt(plaintext, password) {
+		//const plaintext = document.getElementById("obf1_input").value;
+		//const password = document.getElementById("obf1_password_encrypt").value;
 
 		console.log("Obfuscation Step 1 Encrypt input: " + plaintext);
 		console.log("Obf Step 1 Length: " + plaintext.length);
@@ -730,6 +760,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		document.getElementById("obf1_password_decrypt").value = password;
 		document.getElementById("obf2_input").value = result_b58;
 		document.getElementById("obf1_encrypt_output").value = result_b58;
+		return result_b58;
 		//console.log("result length (num chars): " + result_b58.length);
 	}//obf1Encrypt
 
@@ -774,10 +805,10 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		document.getElementById("openssl_decrypt_input").value = decrypted_string;
 	}//obf1Decrypt
 
-	async function obf2Encrypt(){
+	async function obf2Encrypt(input_data, password){
 		// Copy input data and password.
-		const input_data = document.getElementById("obf2_input").value;
-		const password = document.getElementById("obf2_password_encrypt").value;
+		//const input_data = document.getElementById("obf2_input").value;
+		//const password = document.getElementById("obf2_password_encrypt").value;
 		document.getElementById("obf2_password_decrypt").value = document.getElementById("obf2_password_encrypt").value;
 
 		console.log("Obfuscation Step 2 Encrypt input: " + input_data);
@@ -837,6 +868,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		console.log("Obf Step 2 output Length: " + final_encrypted_string.length);
 		//console.log("Final Result (long way): " + final_encrypted_string);
 		document.getElementById("obf2_encrypt_output").value = final_encrypted_string;
+		return final_encrypted_string;
 	}//obf2Encrypt
 
 	async function obf2Decrypt(){
@@ -920,6 +952,17 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			document.getElementById("store_button").disabled = false;
 		}
 	}
+/*
+	function check_2(input){
+		//let input = document.getElementById("obf2_input").value;
+
+		// Return fail if the length isn't 1000 and chars aren't base 58.
+			return 1;
+		}else{
+			return 0;
+		}
+	}
+*/
 
 	function check_input_obf2(){
 		let input = document.getElementById("obf2_input").value;
