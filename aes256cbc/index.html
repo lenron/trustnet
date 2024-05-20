@@ -452,29 +452,10 @@ function setTab(evt, cityName) {
 		// Obfuscation Step 1 Encrypt
 		const obf_s1_encrypted = await obf1Encrypt(openssl_encrypted, store_pass_2);
 
-		// Check data length and type (check 2: 1000 char length, base 58).
-		document.getElementById("status_display").value += 'Running Check 2...';
-		// If all b58 chars...
-		if( check_b58chars(obf_s1_encrypted) ){
-			document.getElementById("status_display").value += "Data type verified.\n";
-		}else{
-			document.getElementById("status_display").value += "Data type INVALID.\n";
-			document.getElementById("status_display").value += "Critical Failure! End.\n"
-			return;
-		}
-
-		if( obf_s1_encrypted.length == 1000 ){ 
-			document.getElementById("status_display").value += "Data length verified.\n";
-		}else{
-			document.getElementById("status_display").value += "Data length INVALID. Length: " + obf_s1_encrypted.length + "\n";
-			document.getElementById("status_display").value += "Critical Failure! End.\n"
-			return;
-		}
-
 		// Obfuscation Step 2 Encrypt
 		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, store_pass_3);
 		document.getElementById("status_display").value += "Encrypt Completed Successfully.\n"
-		document.getElementById("status_display").value += "Encrypted data:\n" + obf_s2_encrypted; 
+		//document.getElementById("status_display").value += "Encrypted data:\n" + obf_s2_encrypted; 
 
 
 		// Compute Fingerprint
@@ -714,48 +695,76 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log("Decrypted output: " + decrypted_string);
 	}//decryptOpenSSL
 
+	async function getXOR(plaintext_binary, password){
+		// 732 usually produces our target 1000 chars of output.
+		const array_length = 1000;
+		//const array_length = 20;
+
+		// Prepare password side for XOR.
+		const pass_binary = await getPassHash(password, array_length);
+		//console.log("password input binary array: " + pass_binary);
+
+		let xor_result = new Array();
+
+		// Start 1 under 732
+		let try_length = 731;
+		let result_b58 = '';
+
+		while(result_b58.length < 1000){
+			// Reset the array.
+			xor_result = new Array();
+
+			console.log("TRY Length: " + try_length);
+			//let xor_result = new Uint8Array(array_length);
+			for (let i = 0; i < try_length; i++) {
+				//xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
+				xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
+			}
+			//console.log("XOR: " + xor_result);
+			// Convert to base58
+			result_b58 = to_b58(xor_result);
+			console.log("RESULT: " + result_b58);
+			console.log("Data LENGTH: " + result_b58.length);
+
+			try_length++;
+		}
+		return result_b58;
+	}
+
+
 	async function obf1Encrypt(plaintext, password) {
 		//const plaintext = document.getElementById("obf1_input").value;
 		//const password = document.getElementById("obf1_password_encrypt").value;
 
 		console.log("Obfuscation Step 1 Encrypt input: " + plaintext);
 		console.log("Obf Step 1 Length: " + plaintext.length);
-/*
-		//Check length < 732
-		if( plaintext.length > 732 || password.length > 732){
-			document.getElementById("openssl_output_warning").style.display = 'inline';
-		}else{
-			document.getElementById("openssl_output_warning").style.display = 'none';
-		}
-*/
+
 		// Prepare plaintext side for XOR.
 		let plaintext_binary = prepPtext(plaintext);
-		//console.log("TESTOUT: plaintext input binary array: " + plaintext_binary);
 
-		// Use saved binary array from openssl instead.
-		//plaintext_binary = ssl_enc_out;
-		//console.log("TESTOUT: copied binary array" + plaintext_binary);
+		// Run the XOR and return exactly 1000 base 58 chars.
+		const result_b58 = await getXOR(plaintext_binary, password);
 
-		// Each array should already be of length 2000.
-		const array_length = 732;
-		//const array_length = 20;
-
-		// Prepare password side for XOR.
-		const pass_binary = await getHash2k(password, array_length);
-		//console.log("password input binary array: " + pass_binary);
-
-		// Perform the bitwise XOR sequentially.
-		let xor_result = new Uint8Array(array_length);
-		for (let i = 0; i < array_length; i++) {
-			xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
+		// Check data length and type (check 2: 1000 char length, base 58).
+		document.getElementById("status_display").value += 'Running Check 2...';
+		// If all b58 chars...
+		if( check_b58chars(result_b58) ){
+			document.getElementById("status_display").value += "Data type verified.\n";
+		}else{
+			document.getElementById("status_display").value += "Data type INVALID.\n";
+			document.getElementById("status_display").value += "Critical Failure! End.\n"
+			throw new Error('Obfuscation step 1 INVALID characters found!');
+			//return;
 		}
-		//console.log("XOR result binary array: " + xor_result);
 
-		// Convert to base58
-		let result_b58 = to_b58(xor_result);
-		//console.log("Base58 Data length (from 732 length array):" + result_b58.length);
-//		console.log("XOR result base 58 encoded: " + result_b58);
-		//result_b58 = result_b58.substring(0, Math.min(result_b58.length, 1000));
+		if( result_b58.length == 1000 ){ 
+			document.getElementById("status_display").value += "Data length verified.\n";
+		}else{
+			document.getElementById("status_display").value += "Data length INVALID. Length: " + result_b58.length + "\n";
+			document.getElementById("status_display").value += "Critical Failure! End.\n"
+			throw new Error('Obfuscation step 1 output length INVALID!');
+			//return;
+		}
 
 		document.getElementById("obf1_password_decrypt").value = password;
 		document.getElementById("obf2_input").value = result_b58;
@@ -770,16 +779,12 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		// Convert from base 58.
 		const decoded_b58_arr = from_b58(compd_val);
-		//console.log("~~OMG~~ decoded result: " + decoded_b58_arr);
-		//console.log("~~OMG~~ LENGTH: " + decoded_b58_arr.length);
 
-		// Each array should already be of length 2000.
-		const array_length = 732;
-		//const array_length = 20;
+		//const array_length = 732;
+		const array_length = decoded_b58_arr.length;
 
 		// Compute password for XOR.
-		const pass_binary = await getHash2k(password, array_length);
-		//console.log("pass_binary: " + pass_binary);
+		const pass_binary = await getPassHash(password, array_length);
 
 		// Perform the bitwise XOR sequentially.
 		// Inverse of XOR is XOR and is communicative.
@@ -788,7 +793,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		for (let i = 0; i < array_length; i++) {
 			xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
 		}
-		//console.log("XOR result (decoded) binary array: " + xor_result);
+
 		let plaintextbytes = Array.from(xor_result);
 		// Strip off tailing zeros.
 		while(plaintextbytes[plaintextbytes.length - 1] == 0){
@@ -797,8 +802,8 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log("Stripped binary array: " + plaintextbytes);
 		plaintextbytes = Uint8Array.from(plaintextbytes);
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
-		//let decrypted_string = _arrayBufferToBase64(plaintextbytes);
-		//console.log("decrypted_string pre strip: " + decrypted_string);
+
+		// Decode countstring
 		decrypted_string = decrypted_string.split(":").pop();
 		//console.log("decrypted_string: " + decrypted_string);
 		document.getElementById("obf2_decrypt_output").value = decrypted_string;
@@ -827,7 +832,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log("final input string length: " + input_length);
 
 		// Get hash+append of password, to length of input for now. 
-		const pass_hash = await getHash2k(password, input_length);
+		const pass_hash = await getPassHash(password, input_length);
 		//console.log("password hash result: " + pass_hash);
 
 		// Convert password hash to base58
@@ -882,7 +887,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log("DECRYPT: final final_encrypted string length: " + final_encrypted_length);
 
 		// Get hash+append of password, to length of final_encrypted for now. 
-		const pass_hash = await getHash2k(password, final_encrypted_length);
+		const pass_hash = await getPassHash(password, final_encrypted_length);
 		//console.log("DECRYPT: password hash result: " + pass_hash);
 
 		// Convert password hash to base58
@@ -1006,13 +1011,13 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 
 		// Copy to size 2000 array for XOR.
-		let big_arr = new Uint8Array(732);
+		let big_arr = new Uint8Array(1000);
 		big_arr.set(countstring_binary);
 
 		return big_arr;
 	}
 
-	async function getHash2k(pass, length) {
+	async function getPassHash(pass, length) {
 		//console.log("entered password: " + pass);
 		// Convert to binary (Uint8Array).
 		const password_binary = new TextEncoder().encode(pass);
