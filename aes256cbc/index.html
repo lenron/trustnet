@@ -222,7 +222,7 @@ input[type='text'][disabled] {
 			</div> 
 		</div>
 		<div>
-			<button id='encrypt_openssl_button' onclick="encryptOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
+			<button id='encrypt_openssl_button' onclick="encOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Key Data (hex) - Key + IV:</label>
@@ -376,7 +376,7 @@ input[type='text'][disabled] {
 					</div>
 				</div>
 				<div>
-					<button id='' onclick="decryptOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Decrypt AES-256-CBC</button>
+					<button id='' onclick="decOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Decrypt AES-256-CBC</button>
 				</div>
 				<div style="margin: 5px; display: flex; flex-direction: column;">
 					<label>Extracted Salt (hex):</label>
@@ -435,6 +435,23 @@ function setTab(evt, cityName) {
   evt.currentTarget.className += " active";
 }
 
+	async function encryptStack(plaintext, pass1, pass2, pass3){
+		// OpenSSL Encrypt (base 64 encoded)
+		const openssl_encrypted = await encOpenSSL(plaintext, pass1);
+		// Obfuscation Step 1 Encrypt
+		const obf_s1_encrypted = await obf1Encrypt(openssl_encrypted, pass2);
+		// Obfuscation Step 2 Encrypt
+		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, pass3);
+		return obf_s2_encrypted;
+	}
+
+	async function decryptStack(encrypted, pass1, pass2, pass3){
+		const obf2_decrypted = await obf2Decrypt(encrypted, pass3);
+		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass2);
+		const plaintext = await decOpenSSL(obf1_decrypted, pass1);
+		return plaintext;
+	}
+
 	async function deepStore(){
 
 		// Get save data from user.
@@ -442,21 +459,23 @@ function setTab(evt, cityName) {
 
 		// Get code/passwords from user.
 		const codeword = document.getElementById("store_codeword").value;
-		const store_pass_1 = document.getElementById("store_pass_1").value;
-		const store_pass_2 = document.getElementById("store_pass_2").value;
-		const store_pass_3 = document.getElementById("store_pass_3").value;
+		const pass_1 = document.getElementById("store_pass_1").value;
+		const pass_2 = document.getElementById("store_pass_2").value;
+		const pass_3 = document.getElementById("store_pass_3").value;
 
-		// OpenSSL Encrypt (base 64 encoded)
-		const openssl_encrypted = await encryptOpenSSL(plaintext, store_pass_1);
-
-		// Obfuscation Step 1 Encrypt
-		const obf_s1_encrypted = await obf1Encrypt(openssl_encrypted, store_pass_2);
-
-		// Obfuscation Step 2 Encrypt
-		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, store_pass_3);
+		// Triple Encrypt
+		const encrypted = await encryptStack(plaintext, pass_1, pass_2, pass_3);
 		document.getElementById("status_display").value += "Encrypt Completed Successfully.\n"
-		//document.getElementById("status_display").value += "Encrypted data:\n" + obf_s2_encrypted; 
 
+		// Check Decrypt
+		const check_decrypt = await decryptStack(encrypted, pass_1, pass_2, pass_3);
+		if( plaintext == check_decrypt ){
+			document.getElementById("status_display").value += "Encrypted data integrity verified.\n"
+		}else{
+console.log("plaintext: ~" + plaintext + "~");
+console.log("decrypted: ~" + check_decrypt + "~");
+			document.getElementById("status_display").value += "Unable to properly extract input data from encrypted! FAIL.\n"
+		} 
 
 		// Compute Fingerprint
 
@@ -503,7 +522,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		);
 	}
 
-	async function encryptOpenSSL(plaintext, pass) {
+	async function encOpenSSL(plaintext, pass) {
 		// Get input from user.
 		//const plaintext = document.getElementById("enter_openssl_plaintext").value;
 
@@ -614,13 +633,11 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		document.getElementById("obf1_input").value = out64;
 
 		return out64;
-	}//encryptOpenSSL
+	}//encOpenSSL
 
-	async function decryptOpenSSL() {
+	async function decOpenSSL(ciphertext64) {
 		// Get input.
-		const ciphertext64 = document.getElementById("openssl_decrypt_input").value;
-		// Convert string to Uint8Array.
-		//const inputbytes = new TextEncoder().encode(ciphertext);
+		//const ciphertext64 = document.getElementById("openssl_decrypt_input").value;
 
 		//const ciphertext64 = btoa(ciphertext);
 		const inputbytes = base64ToArrayBuffer(ciphertext64);
@@ -628,15 +645,10 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		// ciphertext is now in a form that is ready to give to the encryption function.
 		let ciphertextbytes = new Uint8Array(inputbytes);
-		//if((ciphertextbytes.length/2)!==
-		//console.log("openssl dec input STRING: " + ciphertextbytes);
-		// Copy from global variable instead.
-		//ciphertextbytes = obf1_dec_out;
-		//console.log("openssl dec input BUFFER: " + ciphertextbytes);
+
 		const dec = new TextDecoder();
 		const input_string = dec.decode(ciphertextbytes);
-		//console.log("ciphertext: " + input_string);
-		//console.log(ciphertextbytes);
+
 		const iter = Number(document.getElementById("openssl_decrypt_iterations").value);
 		const digest_hash = document.getElementById("openssl_decrypt_hash").value;
 		const salt = ciphertextbytes.slice(8,16);
@@ -690,10 +702,13 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
 		plaintextbytes = new Uint8Array(decrypted_result);
-		const decrypted_string = new TextDecoder().decode( plaintextbytes );
+		let decrypted_string = new TextDecoder().decode( plaintextbytes );
+		// Pop single newline added in enc in order to output the same encrypted data as openssl command line.
+		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
 		document.getElementById("openssl_decrypt_output").value = decrypted_string;
+		return decrypted_string;
 		//console.log("Decrypted output: " + decrypted_string);
-	}//decryptOpenSSL
+	}//decOpenSSL
 
 	async function getXOR(plaintext_binary, password){
 		// 732 usually produces our target 1000 chars of output.
@@ -773,9 +788,9 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log("result length (num chars): " + result_b58.length);
 	}//obf1Encrypt
 
-	async function obf1Decrypt() {
-		const compd_val = document.getElementById("obf2_decrypt_input").value; //compartmentalized value
-		const password = document.getElementById("obf1_password_decrypt").value;
+	async function obf1Decrypt(compd_val, password) {
+		//const compd_val = document.getElementById("obf2_decrypt_input").value; //compartmentalized value
+		//const password = document.getElementById("obf1_password_decrypt").value;
 
 		// Convert from base 58.
 		const decoded_b58_arr = from_b58(compd_val);
@@ -808,6 +823,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log("decrypted_string: " + decrypted_string);
 		document.getElementById("obf2_decrypt_output").value = decrypted_string;
 		document.getElementById("openssl_decrypt_input").value = decrypted_string;
+		return decrypted_string;
 	}//obf1Decrypt
 
 	async function obf2Encrypt(input_data, password){
@@ -876,10 +892,10 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		return final_encrypted_string;
 	}//obf2Encrypt
 
-	async function obf2Decrypt(){
+	async function obf2Decrypt(final_encrypted, password){
 		// Get inputs.
-		const final_encrypted = document.getElementById("obf2_encrypt_output").value;
-		const password = document.getElementById("obf2_password_decrypt").value;
+		//const final_encrypted = document.getElementById("obf2_encrypt_output").value;
+		//const password = document.getElementById("obf2_password_decrypt").value;
 
 		// Get size of input data
 		//const final_encrypted_length = final_encrypted.length / 2;
@@ -923,7 +939,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		document.getElementById("obf2_decrypt_input").value = final_decrypted_string;
 		//document.getElementById("enter_openssl_encrypted").value = final_decrypted_string;
 		//document.getElementById("final_decrypt").value = comp_input_b58;
-
+		return final_decrypted_string;
 	}//obf2Decrypt
 
 	function check_b58chars(input){
