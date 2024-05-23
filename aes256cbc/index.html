@@ -456,12 +456,17 @@ function setTab(evt, cityName) {
 
 		// Get save data from user.
 		const plaintext = document.getElementById("plaintext_input").value;
-
 		// Get code/passwords from user.
 		const codeword = document.getElementById("store_codeword").value;
 		const pass_1 = document.getElementById("store_pass_1").value;
 		const pass_2 = document.getElementById("store_pass_2").value;
 		const pass_3 = document.getElementById("store_pass_3").value;
+
+		// Make sure data isn't blank, and mandate that all 3 pw's are used in addition to the cw.
+		if( plaintext === '' || codeword === '' || pass_1 === '' || pass_2 === '' || pass_3 === '' ){
+			document.getElementById("status_display").value += "To proceed, please make sure no fields are blank.\n"
+			throw new Error('Empty fields found! Ending.');
+		}
 
 		// Triple Encrypt
 		const encrypted = await encryptStack(plaintext, pass_1, pass_2, pass_3);
