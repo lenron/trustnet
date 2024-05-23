@@ -472,16 +472,39 @@ function setTab(evt, cityName) {
 		if( plaintext == check_decrypt ){
 			document.getElementById("status_display").value += "Encrypted data integrity verified.\n"
 		}else{
-console.log("plaintext: ~" + plaintext + "~");
-console.log("decrypted: ~" + check_decrypt + "~");
+			console.log("plaintext: ~" + plaintext + "~");
+			console.log("decrypted: ~" + check_decrypt + "~");
 			document.getElementById("status_display").value += "Unable to properly extract input data from encrypted! FAIL.\n"
 		} 
 
 		// Compute Fingerprint
+		// sub all lowercase
+		const cw_caps = codeword.toLowerCase();
+		// take sha256 hash of codeword, pass 2, pass 3
+		const enc = new TextEncoder();
+		const cw_buf = enc.encode(cw_caps);
+		const p2_buf = enc.encode(pass_2);
+		const p3_buf = enc.encode(pass_3);
+		const cw_hash = await crypto.subtle.digest('SHA-256', cw_buf);
+		const p2_hash = await crypto.subtle.digest('SHA-256', p2_buf);
+		const p3_hash = await crypto.subtle.digest('SHA-256', p3_buf);
+		// concatenate: fingerprint = cw_hash + p2_hash + p3_hash;
+		const cw_and_p2_hash = concatBuffer(cw_hash, p2_hash)
+		const concatenated_hashes = concatBuffer(cw_and_p2_hash, p3_hash)
+		print_buf = new Uint8Array(concatenated_hashes);
+		console.log("concat hash: " + print_buf);
+
+		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
+		const fingerprint = new Uint8Array(fp_hash);
+		console.log("fingerprint: " + fingerprint);
+		const fp_hex = buf2hex(fingerprint);
+		console.log("fingerprint hex: " + fp_hex);
+		console.log("fingerprint length: " + fp_hex.length);
 
 		// Store to SQL
-
-		// Check Load
+			// loop for a while until load returns stored value properly
+			// Check Load
+			// 
 
 		// Report Results
 
