@@ -525,8 +525,8 @@ function setTab(evt, cityName) {
 		//const fingerprint = "";
 		//const data = "";
 		//const SERVER_URL = '/cgi-bin/send-notification.pl';
-		//const SERVER_URL = '/cgi-bin/store.pl';
-		const SERVER_URL = 'https://chat.dance/crypto/obfuscate/cgi-bin/store.pl';
+		const SERVER_URL = '/crypto/obfuscate/cgi-bin/store.pl';
+		//const SERVER_URL = 'https://chat.dance/crypto/obfuscate/cgi-bin/store.pl';
 		
 		console.log("Attempting Server Store.\nFingerprint:" + fingerprint + "\nData:" + data + "\n");
 		const response = await fetch(SERVER_URL, {

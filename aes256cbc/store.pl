@@ -43,7 +43,7 @@ if ($q->param){
 
 	# Notify of success or failure
 	print $q->header();
-	print '{"response":"1"}';;
+	print '{"response":"3"}';;
 }
 
 
