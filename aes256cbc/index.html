@@ -469,11 +469,11 @@ function setTab(evt, cityName) {
 		}
 
 		// Triple Encrypt
-		const encrypted = await encryptStack(plaintext, pass_1, pass_2, pass_3);
+		const encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
 		document.getElementById("status_display").value += "Encrypt Completed Successfully.\n"
 
 		// Check Decrypt
-		const check_decrypt = await decryptStack(encrypted, pass_1, pass_2, pass_3);
+		const check_decrypt = await decryptStack(encrypted_data, pass_1, pass_2, pass_3);
 		if( plaintext == check_decrypt ){
 			document.getElementById("status_display").value += "Encrypted data integrity verified.\n"
 		}else{
@@ -496,24 +496,52 @@ function setTab(evt, cityName) {
 		// concatenate: fingerprint = cw_hash + p2_hash + p3_hash;
 		const cw_and_p2_hash = concatBuffer(cw_hash, p2_hash)
 		const concatenated_hashes = concatBuffer(cw_and_p2_hash, p3_hash)
-		print_buf = new Uint8Array(concatenated_hashes);
-		console.log("concat hash: " + print_buf);
-
 		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
 		const fingerprint = new Uint8Array(fp_hash);
-		console.log("fingerprint: " + fingerprint);
+		//console.log("fingerprint: " + fingerprint);
 		const fp_hex = buf2hex(fingerprint);
 		console.log("fingerprint hex: " + fp_hex);
 		console.log("fingerprint length: " + fp_hex.length);
+		// fingerprint length check
+		if( fp_hex.length != 64 ){
+			document.getElementById("status_display").value += "Fingerprint length problem! Ending.\n"
+			throw new Error('Fingerprint length INVALID!');
+		}
 
 		// Store to SQL
 			// loop for a while until load returns stored value properly
 			// Check Load
 			// 
+		// Use fetch() for server communication
+		const server_response = serverStore(fp_hex, encrypted_data);
+		console.log("Server Response from store: ");
+		console.log(server_response);
 
 		// Report Results
 
 	}
+
+	async function serverStore(fingerprint, data){
+		//const fingerprint = "";
+		//const data = "";
+		//const SERVER_URL = '/cgi-bin/send-notification.pl';
+		//const SERVER_URL = '/cgi-bin/store.pl';
+		const SERVER_URL = 'https://chat.dance/crypto/obfuscate/cgi-bin/store.pl';
+		
+		console.log("Attempting Server Store.\nFingerprint:" + fingerprint + "\nData:" + data + "\n");
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/html',
+			},
+			body: JSON.stringify({
+				fingerprint: fingerprint,
+				data: data,
+			}),
+		})
+		return response.json()
+	}
+
 
 	async function deepLoad(){
 
