@@ -18,9 +18,6 @@ my $db_username = 'chatriwe_admin';
 my $db_pw = 'Vuu_fQY1#qH,';
 my $db_name = 'chatriwe_obf';
 
-my $test_fingerprint = '942b3dfb68d049de55a45d7b10ed0c62abb0799e38e4463aa8c504d625a841c6'; 
-my $test_data = 'Db7Rdw29i19Y57nEnZtFLtkd8G9GDG8zWtkPVtwRA517bnB8D7vgN1RiZ7neF1q8cfT6YGk8e4NLjvwC8DhrcgYN5PL1RXiwjcydzstMZBtn5sqs6D4FgF15cogWS1LARGmFfvmuN4hUaMzHAxe6A5VkLBwXc9rNcC4iHiSZz6acYASKrJ319bCt6wGqx1m3zcJWCqac6SrSKbQCagsuQSQJUSYVMqt8M4QtXZ8HdBock1WUdHR2vdDcvDjRMaRxW1ZhZBJ5eqwQdXsLrRX9514b5CS6Y9muKBJQqXUb1p8fdwYm2BjLmJQjNXoxozLtJ5Q4kMEvYPWxFKcY8hjiLrk2BEF1ivG3bPFs6zwawS2QvryEZWdt52BttGU4qaAxoMFRnSAWqgyJaPt35MGNeFw13BjcKpgUVJpfjYiJ7VoHh1kUcUVN9pty8jYyZ4hBqn5c256v3QBnqpNiMnzmtoiHei3881aBbCk5V61dTxTKs31daxF3gyKP1enKPc5yZfpPadyUTJZUaRNLJKoxT9yb8JraG7t6nCPe63Qkg9KnN8MYHbJmx5QeBFiPy1qJPqzEevsSyaQRNupp6vpUCgPzuLoCigkrLkdiDnmYxS5dB5S2HwAzCR8wQhyY3AMs5g6ZLwK7q5F75Ldxw4cGTYLg81uJzQUB5WYJvztkFx5rhCPUbjXb99JtLMbQUAWanCU26LVTM5mssRm7Sf1uCdcWXqe7JfpiWP8Bv8LQC7F2KAMeURwQafUS6KSof47haPN9S4s8JZc3JYsTxzBaT2uGB89XexCvKnqrYQbucFpnJzMVgoQ7KcFYvwkJ937kfxUD2LQ64GdQtkMtZLiCs79zMidKN9zkhauxrjpz65ckfYmqfu11KLAjZXd4AmoB3zQV4CLZMTYrToJ33FhcqAKtv3AfQ1fJriUaCsUmZaTM8wUHJe6FpTmboiGaH2bA1ziTEVrnuBzbnME9D98GHQgavkKxFxmhY3MoZzdz';
-
 if ($q->param){
 
 	# Decode to hash ref to extract fingerprint and data
@@ -31,12 +28,18 @@ if ($q->param){
 	# check for only hex and b58 chars
 	# check that SQL returned a response of success
 
+	# First try to create new record. If that fails, modify the existing one.
 	my $dbh = DBI->connect("dbi:mysql:$db_name", $db_username, $db_pw);
-	$dbh->do("INSERT INTO $db_table (fingerprint, data) VALUES (?, ?)", undef, $fingerprint, $data);
+	my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data) VALUES (?, ?)", undef, $fingerprint, $data);
+	# undef return indicates we need to modify the record instead.
+	if(not defined $response){
+		$dbh->do("UPDATE $db_table SET data=? WHERE fingerprint='$fingerprint'", undef, $data) or die $dbh->errstr;
+	}
 	$dbh->disconnect();
 
-	# If log exists, we know q->param caught data
+	# If log exists, we know q->param caught data.
 	my $filename = './log.txt';
+	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename) or die;
 	print $fh "fingerprint: $fingerprint\n";
 	print $fh "data: $data\n";

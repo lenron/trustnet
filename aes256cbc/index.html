@@ -513,22 +513,38 @@ function setTab(evt, cityName) {
 			// Check Load
 			// 
 		// Use fetch() for server communication
-		const server_response = serverStore(fp_hex, encrypted_data);
+		const server_response = await serverStore(fp_hex, encrypted_data);
 		console.log("Server Response from store: ");
 		console.log(server_response);
 
 		// Report Results
 
-	}
+	}// deepStore()
 
+/*
+	async function serverLoad(fingerprint){
+		//const fingerprint = "";
+		const SERVER_URL = '/crypto/obfuscate/cgi-bin/load.pl';
+		
+		console.log("Attempting Server Load with\nFingerprint: " + fingerprint); 
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/html',
+			},
+			body: JSON.stringify({
+				fingerprint: fingerprint,
+			}),
+		})
+		return response.json()
+	}
+*/
 	async function serverStore(fingerprint, data){
 		//const fingerprint = "";
 		//const data = "";
-		//const SERVER_URL = '/cgi-bin/send-notification.pl';
 		const SERVER_URL = '/crypto/obfuscate/cgi-bin/store.pl';
-		//const SERVER_URL = 'https://chat.dance/crypto/obfuscate/cgi-bin/store.pl';
 		
-		console.log("Attempting Server Store.\nFingerprint:" + fingerprint + "\nData:" + data + "\n");
+		console.log("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
