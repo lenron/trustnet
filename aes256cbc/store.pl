@@ -33,12 +33,13 @@ if ($q->param){
 	my $filename = './log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename) or die;
-	print $fh "time: $time\n";
+	print $fh "STORE\n";
+	print $fh "$time\n";
 	print $fh "fingerprint: $fingerprint\n";
 	print $fh "data: $data\n\n";
 
 	# Return fail if data isn't in the proper form.
-	# Match exactly 64 hex chars, ignoring case.      Match exactly 1000 base58 chars.
+	# Match exactly 64 hex chars, (i)gnoring case.      Match exactly 1000 base58 chars.
 	if( !($fingerprint =~ /^[0-9a-f]{64}$/i) || !($data =~ /^[1-9A-HJ-NP-Za-km-z]{1000}$/) ){
 		print $q->header();
 		# qq{} is a standin for double quotes, used here so we can pass the dub quote char to print.
