@@ -483,23 +483,7 @@ function setTab(evt, cityName) {
 		} 
 
 		// Compute Fingerprint
-		// sub all lowercase
-		const cw_caps = codeword.toLowerCase();
-		// take sha256 hash of codeword, pass 2, pass 3
-		const enc = new TextEncoder();
-		const cw_buf = enc.encode(cw_caps);
-		const p2_buf = enc.encode(pass_2);
-		const p3_buf = enc.encode(pass_3);
-		const cw_hash = await crypto.subtle.digest('SHA-256', cw_buf);
-		const p2_hash = await crypto.subtle.digest('SHA-256', p2_buf);
-		const p3_hash = await crypto.subtle.digest('SHA-256', p3_buf);
-		// concatenate: fingerprint = cw_hash + p2_hash + p3_hash;
-		const cw_and_p2_hash = concatBuffer(cw_hash, p2_hash)
-		const concatenated_hashes = concatBuffer(cw_and_p2_hash, p3_hash)
-		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
-		const fingerprint = new Uint8Array(fp_hash);
-		//console.log("fingerprint: " + fingerprint);
-		const fp_hex = buf2hex(fingerprint);
+		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
 		console.log("fingerprint hex: " + fp_hex);
 		console.log("fingerprint length: " + fp_hex.length);
 		// fingerprint length check
@@ -508,14 +492,12 @@ function setTab(evt, cityName) {
 			throw new Error('Fingerprint length INVALID!');
 		}
 
-		// Store to SQL
-			// loop for a while until load returns stored value properly
-			// Check Load
-			// 
 		// Use fetch() for server communication
 		const server_response = await serverStore(fp_hex, encrypted_data);
-		console.log("Server Response from store: ");
+		console.log("Server Response from store: " + server_response.response);
 		console.log(server_response);
+
+		// Check Load
 
 		// Report Results
 
@@ -539,6 +521,27 @@ function setTab(evt, cityName) {
 		return response.json()
 	}
 */
+	async function computeFingerprint(codeword, pass_2, pass_3){
+		// sub all lowercase
+		const cw_lower = codeword.toLowerCase();
+		// take sha256 hash of codeword, pass 2, pass 3
+		const enc = new TextEncoder();
+		const cw_buf = enc.encode(cw_lower);
+		const p2_buf = enc.encode(pass_2);
+		const p3_buf = enc.encode(pass_3);
+		const cw_hash = await crypto.subtle.digest('SHA-256', cw_buf);
+		const p2_hash = await crypto.subtle.digest('SHA-256', p2_buf);
+		const p3_hash = await crypto.subtle.digest('SHA-256', p3_buf);
+		// concatenate: fingerprint = cw_hash + p2_hash + p3_hash;
+		const cw_and_p2_hash = concatBuffer(cw_hash, p2_hash)
+		const concatenated_hashes = concatBuffer(cw_and_p2_hash, p3_hash)
+		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
+		const fingerprint = new Uint8Array(fp_hash);
+		//console.log("fingerprint: " + fingerprint);
+		const fp_hex = buf2hex(fingerprint);
+		return fp_hex;
+	}
+
 	async function serverStore(fingerprint, data){
 		//const fingerprint = "";
 		//const data = "";

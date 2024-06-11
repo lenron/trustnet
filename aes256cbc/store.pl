@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use cPanelUserConfig;
 
+use Time::Piece;
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
@@ -25,33 +26,55 @@ if ($q->param){
 	my $fingerprint = $hash_ref->{fingerprint};
 	my $data = $hash_ref->{data};
 
-	# check for only hex and b58 chars
-	# check that SQL returned a response of success
+	# Get current time for log.
+	my $t = localtime;
+	my $time = $t->strftime();
+	# If log exists, we know q->param caught data.
+	my $filename = './log.txt';
+	# Append to existing file if it exists, create new otherwise.
+	open(my $fh, '>>', $filename) or die;
+	print $fh "time: $time\n";
+	print $fh "fingerprint: $fingerprint\n";
+	print $fh "data: $data\n\n";
+
+	# Return fail if data isn't in the proper form.
+	# Match exactly 64 hex chars, ignoring case.      Match exactly 1000 base58 chars.
+	if( !($fingerprint =~ /^[0-9a-f]{64}$/i) || !($data =~ /^[1-9A-HJ-NP-Za-km-z]{1000}$/) ){
+		print $q->header();
+		# qq{} is a standin for double quotes, used here so we can pass the dub quote char to print.
+		print qq{{"response":"0"}};
+		exit 0;
+	}
 
 	# First try to create new record. If that fails, modify the existing one.
 	my $dbh = DBI->connect("dbi:mysql:$db_name", $db_username, $db_pw);
 	my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data) VALUES (?, ?)", undef, $fingerprint, $data);
 	# undef return indicates we need to modify the record instead.
 	if(not defined $response){
-		$dbh->do("UPDATE $db_table SET data=? WHERE fingerprint='$fingerprint'", undef, $data) or die $dbh->errstr;
+		$response = $dbh->do("UPDATE $db_table SET data=? WHERE fingerprint='$fingerprint'", undef, $data) or die $dbh->errstr;
 	}
 	$dbh->disconnect();
 
-	# If log exists, we know q->param caught data.
-	my $filename = './log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $fh, '>>', $filename) or die;
-	print $fh "fingerprint: $fingerprint\n";
-	print $fh "data: $data\n";
-
 	# Notify of success or failure
 	print $q->header();
-	print '{"response":"3"}';;
+	print qq{{"response":"$response"}};
 }
 
 
 
 =pod
+	if($test_fingerprint =~ /^[0-9a-f]{64}$/i){
+		print "fingerprint matched\n";
+	}else{
+		print "fingerprint not matched\n";
+	}
+
+	if($test_data =~ /^[1-9A-HJ-NP-Za-km-z]{1000}$/){
+		print "data matched\n";
+	}else{
+		print "data not matched\n";
+	}
+
 # testing - print fingerprints
 	# ASC for ascending, DESC for descending
 	my $dbh = DBI->connect("dbi:mysql:$db_name", $db_username, $db_pw);
