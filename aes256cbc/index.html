@@ -464,22 +464,22 @@ function setTab(evt, cityName) {
 
 		// Make sure data isn't blank, and mandate that all 3 pw's are used in addition to the cw.
 		if( plaintext === '' || codeword === '' || pass_1 === '' || pass_2 === '' || pass_3 === '' ){
-			document.getElementById("status_display").value += "To proceed, please make sure no fields are blank.\n"
+			addStatus("To proceed, please make sure no fields are blank.\n");
 			throw new Error('Empty fields found! Ending.');
 		}
 
 		// Triple Encrypt
 		const encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
-		document.getElementById("status_display").value += "Encrypt Completed Successfully.\n"
+		addStatus("Encrypt Completed Successfully.\n");
 
 		// Check Decrypt
 		const check_decrypt = await decryptStack(encrypted_data, pass_1, pass_2, pass_3);
 		if( plaintext == check_decrypt ){
-			document.getElementById("status_display").value += "Encrypted data integrity verified.\n"
+			addStatus("Encrypted data integrity verified.\n");
 		}else{
 			console.log("plaintext: ~" + plaintext + "~");
 			console.log("decrypted: ~" + check_decrypt + "~");
-			document.getElementById("status_display").value += "Unable to properly extract input data from encrypted! FAIL.\n"
+			addStatus("Unable to properly extract input data from encrypted! FAIL.\n");
 		} 
 
 		// Compute Fingerprint
@@ -488,14 +488,20 @@ function setTab(evt, cityName) {
 		console.log("fingerprint length: " + fp_hex.length);
 		// fingerprint length check
 		if( fp_hex.length != 64 ){
-			document.getElementById("status_display").value += "Fingerprint length problem! Ending.\n"
+			addStatus("Fingerprint length problem! Ending.\n");
 			throw new Error('Fingerprint length INVALID!');
 		}
 
 		// Use fetch() for server communication
 		const server_response = await serverStore(fp_hex, encrypted_data);
-		console.log("Server Response from STORE: " + "~" + server_response.response + "~");
+		sr_store_result = server_response.response;
+		console.log("Server Response from STORE: " + "~" + sr_store_result + "~");
 		console.log(server_response);
+		// Store returned 0 (fail).
+		if( Number(sr_store_result)  != 1){
+			addStatus("There was a problem storing the data! End.\n\n");
+			throw new Error('STORE ERROR!');
+		}
 
 		// Check Load
 		// return of 0 means fingerprint form check fails
@@ -506,16 +512,15 @@ function setTab(evt, cityName) {
 
 		// Report Results
 		if( encrypted_data  == sr_load.response ){
-			addStatus("Data successfully saved to server.");
+			addStatus("Data successfully saved to server.\n\n");
 		}else{
-			addStatus("Data failed to save to server!");
+			addStatus("Data failed to save to server!\n\n");
 		}
 
 	}// deepStore()
 
 	function addStatus( msg ){
 			document.getElementById("status_display").value += msg;
-			document.getElementById("status_display").value += "\n";
 	}//addStatus()
 
 	async function serverLoad(fingerprint){
@@ -850,22 +855,22 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const result_b58 = await getXOR(plaintext_binary, password);
 
 		// Check data length and type (check 2: 1000 char length, base 58).
-		document.getElementById("status_display").value += 'Running Check 2...';
+		addStatus('Running Check 2...\n');
 		// If all b58 chars...
 		if( check_b58chars(result_b58) ){
-			document.getElementById("status_display").value += "Data type verified.\n";
+			addStatus("Data type verified.\n");
 		}else{
-			document.getElementById("status_display").value += "Data type INVALID.\n";
-			document.getElementById("status_display").value += "Critical Failure! End.\n"
+			addStatus("Data type INVALID.\n");
+			addStatus("Critical Failure! End.\n");
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 			//return;
 		}
 
 		if( result_b58.length == 1000 ){ 
-			document.getElementById("status_display").value += "Data length verified.\n";
+			addStatus("Data length verified.\n");
 		}else{
-			document.getElementById("status_display").value += "Data length INVALID. Length: " + result_b58.length + "\n";
-			document.getElementById("status_display").value += "Critical Failure! End.\n"
+			addStatus("Data length INVALID. Length: " + result_b58.length + "\n");
+			addStatus("Critical Failure! End.\n");
 			throw new Error('Obfuscation step 1 output length INVALID!');
 			//return;
 		}
