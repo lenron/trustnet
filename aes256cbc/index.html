@@ -136,7 +136,7 @@ input[type='text'][disabled] {
 		</div>
 		<div id='load' class="tabcontent" style="display: none; flex-direction: column; width: fit-content; background-color: lightblue;">
 			<div style="display: flex;">
-				<div id='load_enter_div' style="display: flex; flex-direction: column; margin: 5px;">
+				<div id='load_enter_div' style="display: flex; flex-direction: column;">
 					<div id='load_codeword_div' style="display: flex; flex-direction: column;">
 						<div style="margin: 5px; display: flex; flex-direction: column;">
 							<label>Codeword:</label>
@@ -433,7 +433,7 @@ function setTab(evt, cityName) {
   }
   document.getElementById(cityName).style.display = "flex";
   evt.currentTarget.className += " active";
-}
+}//setTab()
 
 	async function encryptStack(plaintext, pass1, pass2, pass3){
 		// OpenSSL Encrypt (base 64 encoded)
@@ -443,14 +443,14 @@ function setTab(evt, cityName) {
 		// Obfuscation Step 2 Encrypt
 		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, pass3);
 		return obf_s2_encrypted;
-	}
+	}//encryptStack()
 
 	async function decryptStack(encrypted, pass1, pass2, pass3){
 		const obf2_decrypted = await obf2Decrypt(encrypted, pass3);
 		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass2);
 		const plaintext = await decOpenSSL(obf1_decrypted, pass1);
 		return plaintext;
-	}
+	}//decryptStack()
 
 	async function deepStore(){
 
@@ -517,7 +517,50 @@ function setTab(evt, cityName) {
 			addStatus("Data failed to save to server!\n\n");
 		}
 
-	}// deepStore()
+	}//deepStore()
+
+
+	async function deepLoad(){
+
+		// Get code/passwords from user.
+		const codeword = document.getElementById("load_codeword").value;
+		const pass_1 = document.getElementById("load_pass_1").value;
+		const pass_2 = document.getElementById("load_pass_2").value;
+		const pass_3 = document.getElementById("load_pass_3").value;
+console.log("code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
+
+		// Compute Fingerprint
+		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
+		console.log("fingerprint hex: " + fp_hex);
+		console.log("fingerprint length: " + fp_hex.length);
+		// fingerprint length check
+		if( fp_hex.length != 64 ){
+			addStatus("Fingerprint length problem! Ending.\n");
+			throw new Error('Fingerprint length INVALID!');
+		}
+
+		// Load from SQL
+		const sr_load = await serverLoad(fp_hex);
+		console.log("Server Response from LOAD: " + "~" + sr_load.response + "~");
+		console.log(sr_load);
+	//	const server_data = sr_load.response;
+
+		// Triple Decrypt
+/*
+		const obf2_decrypted = await obf2Decrypt(sr_load.response, pass_3);
+console.log("obf2dec: " + obf2_decrypted);
+		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass_2);
+console.log("obf1dec: " + obf1_decrypted);
+		const plaintext = await decOpenSSL(obf1_decrypted, pass_1);
+*/
+		const decrypted = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
+console.log("decrypted: " + decrypted);
+		// Report Results 
+		//document.getElementById("output_display").value = decrypted;
+		document.getElementById("output_display").value = decrypted;
+
+	}//deepLoad()
+
 
 	function addStatus( msg ){
 			document.getElementById("status_display").value += msg;
@@ -538,7 +581,7 @@ function setTab(evt, cityName) {
 			}),
 		})
 		return response.json()
-	}
+	}//serverLoad()
 
 	async function serverStore(fingerprint, data){
 		//const fingerprint = "";
@@ -557,7 +600,7 @@ function setTab(evt, cityName) {
 			}),
 		})
 		return response.json()
-	}
+	}//serverStore()
 
 	async function computeFingerprint(codeword, pass_2, pass_3){
 		// sub all lowercase
@@ -578,24 +621,8 @@ function setTab(evt, cityName) {
 		//console.log("fingerprint: " + fingerprint);
 		const fp_hex = buf2hex(fingerprint);
 		return fp_hex;
-	}
+	}//computeFingerprint
 
-
-	async function deepLoad(){
-
-		// Compute Fingerprint
-
-		// Load from SQL
-
-		// Obfuscation Step 2 Decrypt
-
-		// Obfuscation Step 1 Decrypt
-
-		// OpenSSL Decrypt
-
-		// Report Results 
-
-	}
 
 // Global buffer variables to hold binary data instead of pushing it through
 // several string/b64 to buffer conversions.
@@ -614,7 +641,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			false,
 			["deriveBits", "deriveKey"],
 		);
-	}
+	}//getKeyMaterial()
 
 	async function encOpenSSL(plaintext, pass) {
 		// Get input from user.
@@ -727,7 +754,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		document.getElementById("obf1_input").value = out64;
 
 		return out64;
-	}//encOpenSSL
+	}//encOpenSSL()
 
 	async function decOpenSSL(ciphertext64) {
 		// Get input.
@@ -802,7 +829,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		document.getElementById("openssl_decrypt_output").value = decrypted_string;
 		return decrypted_string;
 		//console.log("Decrypted output: " + decrypted_string);
-	}//decOpenSSL
+	}//decOpenSSL()
 
 	async function getXOR(plaintext_binary, password){
 		// 732 usually produces our target 1000 chars of output.
@@ -838,7 +865,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			try_length++;
 		}
 		return result_b58;
-	}
+	}//getXOR()
 
 
 	async function obf1Encrypt(plaintext, password) {
@@ -880,7 +907,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		document.getElementById("obf1_encrypt_output").value = result_b58;
 		return result_b58;
 		//console.log("result length (num chars): " + result_b58.length);
-	}//obf1Encrypt
+	}//obf1Encrypt()
 
 	async function obf1Decrypt(compd_val, password) {
 		//const compd_val = document.getElementById("obf2_decrypt_input").value; //compartmentalized value
@@ -984,7 +1011,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log("Final Result (long way): " + final_encrypted_string);
 		document.getElementById("obf2_encrypt_output").value = final_encrypted_string;
 		return final_encrypted_string;
-	}//obf2Encrypt
+	}//obf2Encrypt()
 
 	async function obf2Decrypt(final_encrypted, password){
 		// Get inputs.
@@ -1034,7 +1061,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//document.getElementById("enter_openssl_encrypted").value = final_decrypted_string;
 		//document.getElementById("final_decrypt").value = comp_input_b58;
 		return final_decrypted_string;
-	}//obf2Decrypt
+	}//obf2Decrypt()
 
 	function check_b58chars(input){
 		// From the first char(^) to the last($), match zero or more(*) of 
@@ -1047,7 +1074,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			// Return false/invalid: non-b58 chars were found.
 			return 0;
 		}
-	}
+	}//check_b58chars()
 
 	function check_init_input(){
 		let input = document.getElementById("plaintext_input").value;
@@ -1066,18 +1093,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			//document.getElementById("encrypt_openssl_button").disabled = false;
 			document.getElementById("store_button").disabled = false;
 		}
-	}
-/*
-	function check_2(input){
-		//let input = document.getElementById("obf2_input").value;
-
-		// Return fail if the length isn't 1000 and chars aren't base 58.
-			return 1;
-		}else{
-			return 0;
-		}
-	}
-*/
+	}//check_init_input()
 
 	function check_input_obf2(){
 		let input = document.getElementById("obf2_input").value;
@@ -1101,7 +1117,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			//document.getElementById("obf2Encrypt_button").disabled = true;
 			console.log("Obf2 input size INVALID!");
 		}
-	}
+	}//check_input_obf2()
 
 	function prepPtext(plaintext) {
 		//console.log("plaintext input: " + plaintext);
@@ -1125,7 +1141,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		big_arr.set(countstring_binary);
 
 		return big_arr;
-	}
+	}//prepPtext()
 
 	async function getPassHash(pass, length) {
 		//console.log("entered password: " + pass);
@@ -1152,7 +1168,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		sha_cumulative = sha_cumulative.slice(0, length);
 
 		return sha_cumulative;
-	}
+	}//getPassHash()
 
 	// Outputs data in a typed array.
 	function concatBuffer(buffer1, buffer2) {
@@ -1160,7 +1176,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 	  tmp.set(new Uint8Array(buffer1), 0);
 	  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
 	  return tmp.buffer;
-	};
+	}//concatBuffer()
 
 	function _arrayBufferToBase64( buffer ) {
 		var binary = '';
@@ -1170,13 +1186,13 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			binary += String.fromCharCode( bytes[ i ] );
 		}
 		return window.btoa( binary );
-	}
+	}//_arrayBufferToBase64()
 
 	function buf2hex(buffer) { // buffer is an ArrayBuffer
 		return [...new Uint8Array(buffer)]
 			.map(x => x.toString(16).padStart(2, '0'))
 			.join('');
-	}
+	}//buf2hex()
 	 // This function converts a hex string into an ArrayBuffer for hash processing.
 	function hex2buf(hexString){
 		// convert to a number array representing the hex bytes.
@@ -1186,7 +1202,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		}
 		const hexArrayBuffer = new Uint8Array(hexBytesArray);
 		return hexArrayBuffer;
-	}
+	}//hex2buf()
 
 	function base64ToArrayBuffer(base64) {
 		var binaryString = atob(base64);
@@ -1195,7 +1211,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			bytes[i] = binaryString.charCodeAt(i);
 		}
 		return bytes.buffer;
-	}
+	}//base64ToArrayBuffer()
 
 	function encode64(){
 		let raw_text = document.getElementById("raw_64encode_text").value;
@@ -1204,7 +1220,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//console.log("Encoded string: '" + encoded64 + "'");
 		document.getElementById("encoded64_text").value = encoded64;
 		document.getElementById("raw_64encoded_text").value = encoded64;
-	}
+	}//encode64()
 
 	function decode64(){
 		let decoded_text = document.getElementById("raw_64encoded_text").value;
@@ -1212,7 +1228,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const decoded64 = atob(decoded_text);
 		//console.log("Decoded string: '" + decoded64 + "'");
 		document.getElementById("decoded64_text").value = decoded64;
-	}
+	}//decode64()
 
 </script>
 
