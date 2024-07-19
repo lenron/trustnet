@@ -127,7 +127,7 @@ input[type='text'][disabled] {
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<b>Status:</b>
-					<textarea id='status_display' style="width: 400px; height: 400px;"></textarea>
+					<textarea id='status_display_store' style="width: 400px; height: 400px;"></textarea>
 				</div>
 			</div>
 			<div style="margin: 5px;">
@@ -164,7 +164,7 @@ input[type='text'][disabled] {
 				</div>
 				<div style="display: flex; flex-direction: column; margin: 5px;">
 					<b>Status:</b>
-					<textarea id='status_display' style="width: 400px; height: 400px;"></textarea>
+					<textarea id='status_display_load' style="width: 400px; height: 400px;"></textarea>
 				</div>
 			</div>
 			<div style="margin: 5px;">
@@ -546,25 +546,32 @@ console.log("code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
 	//	const server_data = sr_load.response;
 
 		// Triple Decrypt
-/*
 		const obf2_decrypted = await obf2Decrypt(sr_load.response, pass_3);
 console.log("obf2dec: " + obf2_decrypted);
 		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass_2);
 console.log("obf1dec: " + obf1_decrypted);
 		const plaintext = await decOpenSSL(obf1_decrypted, pass_1);
-*/
-		const decrypted = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
-console.log("decrypted: " + decrypted);
+		//const decrypted = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
+//console.log("decrypted: " + decrypted);
 		// Report Results 
 		//document.getElementById("output_display").value = decrypted;
-		document.getElementById("output_display").value = decrypted;
+		document.getElementById("output_display").value = plaintext;
+		if( decrypted ){
+			addLoadStatus("Completed Successfully.\n");
+		}else{
+			addLoadStatus("Failed.\n");
+		}
 
 	}//deepLoad()
 
 
 	function addStatus( msg ){
-			document.getElementById("status_display").value += msg;
+			document.getElementById("status_display_store").value += msg;
 	}//addStatus()
+
+	function addLoadStatus( msg ){
+			document.getElementById("status_display_load").value += msg;
+	}//addLoadStatus()
 
 	async function serverLoad(fingerprint){
 		//const fingerprint = "";
@@ -876,7 +883,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		console.log("Obf Step 1 Length: " + plaintext.length);
 
 		// Prepare plaintext side for XOR.
-		let plaintext_binary = prepPtext(plaintext);
+		let plaintext_binary = prepData(plaintext);
 
 		// Run the XOR and return exactly 1000 base 58 chars.
 		const result_b58 = await getXOR(plaintext_binary, password);
@@ -1119,14 +1126,14 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		}
 	}//check_input_obf2()
 
-	function prepPtext(plaintext) {
-		//console.log("plaintext input: " + plaintext);
+	function prepData(data) {
+		//console.log("data input: " + data);
 		// Count chars.
-		const num_chars = plaintext.length;
+		const num_chars = data.length;
 		//console.log("number chars: " + num_chars);
 
 		// Form 'countstring'.
-		let countstring = num_chars + ':' + plaintext;
+		let countstring = num_chars + ':' + data;
 		//console.log("assembled countstring: " + countstring);
 		// Trim string to usable size.
 		//countstring = countstring.substring(0, Math.min(countstring.length, 732));
@@ -1135,13 +1142,12 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const countstring_binary = new TextEncoder().encode(countstring);
 		//console.log("countstring in binary array: " + countstring_binary);
 
-
-		// Copy to size 2000 array for XOR.
+		// Copy to size 1000 array for XOR.
 		let big_arr = new Uint8Array(1000);
 		big_arr.set(countstring_binary);
 
 		return big_arr;
-	}//prepPtext()
+	}//prepData()
 
 	async function getPassHash(pass, length) {
 		//console.log("entered password: " + pass);
