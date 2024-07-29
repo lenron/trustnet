@@ -847,7 +847,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		const pass_binary = await getPassHash(password, array_length);
 		//console.log("password input binary array: " + pass_binary);
 
-		let xor_result = new Array();
+		//let xor_result = new Array();
 
 		// Start 1 under 732
 		let try_length = 731;
@@ -871,6 +871,42 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 			try_length++;
 		}
+
+		// Prepend b58 0 char (1) to fix length problem.
+		if( result_b58.length == 1001){
+			addStatus("Edgecase Detected!");
+			try_length = try_length - 2;
+			xor_result = new Array();
+			for (let i = 0; i < try_length; i++) {
+				//xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
+				xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
+			}
+			let edgecase_result_before = to_b58(xor_result);
+			console.log("b58 BEFORE append 1: " + edgecase_result_before);
+			let from_before = from_b58(edgecase_result_before);
+			console.log("conversion BEFORE append 1: " + from_before);
+
+			let edgecase_result_after = '1' + edgecase_result_before;
+			console.log("test AFTER append 1: " + edgecase_result_after);
+			let from_after = from_b58(edgecase_result_before);
+			console.log("conversion AFTER append 1: " + from_after);
+			//if( from_before == from_after){
+			//if( from_before.equals(from_after) === true ){
+			if( JSON.stringify(from_before) === JSON.stringify(from_after) ){
+				console.log("SUCCESSFUL FIX??!?!?!?");
+				addStatus("Edgecase Handled!");
+				// Implement fix!
+console.log(edgecase_result_after);
+console.log("length: " + edgecase_result_after.length);
+				result_b58 = edgecase_result_after;
+console.log(result_b58);
+console.log("length: " + result_b58.length);
+			}else{
+				console.log("FAILURE...");
+				addStatus("Failed to handle Edgecase...");
+			}
+		}
+
 		return result_b58;
 	}//getXOR()
 
