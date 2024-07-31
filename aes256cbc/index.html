@@ -839,16 +839,64 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 	}//decOpenSSL()
 
 	async function getXOR(plaintext_binary, password){
-		// 732 usually produces our target 1000 chars of output.
-		const array_length = 1000;
-		//const array_length = 20;
+		// Spec says compute to 2000 bytes of length.
+		const array_length = 2000;
 
 		// Prepare password side for XOR.
 		const pass_binary = await getPassHash(password, array_length);
 		//console.log("password input binary array: " + pass_binary);
 
-		//let xor_result = new Array();
+		let xor_result = new Array();
 
+			for (let i = 0; i < array_length; i++) {
+				xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
+			}
+			//console.log("XOR initial result: " + xor_result);
+
+			// now should have byte array of 2000 bytes
+			// cut off bytes till 1000 or less b58 chars produced (maybe start at 1000)
+			let array_slice = xor_result.slice(0, 780);
+			let last_byte_popped;
+			let result_b58 = to_b58(array_slice);
+			while( result_b58.length > 1000 ){
+				last_byte_popped = array_slice.pop();
+				result_b58 = to_b58(array_slice);
+			}
+
+
+			// I believe the bottom two options are equivalent mathematically.
+
+				//if not exactly 1000, reinstate last byte, remove single bits.
+					// bitshift most sig byte 
+					// try conversion again.
+
+				// Could we convert to hex first before sending to base 58 converter?
+				// Would that not be the same as zeroing most sig digits?
+					// Convert to hex
+					// Strip 1 digit
+					// convert back to binary
+					// try conversion again.
+
+
+
+
+			// Convert to base58
+			//result_b58 = to_b58(xor_result);
+			console.log("RESULT: " + result_b58);
+			console.log("Data LENGTH: " + result_b58.length);
+
+
+
+
+
+
+		return result_b58;
+	}//getXOR()
+
+
+
+
+/*
 		// Start 1 under 732
 		let try_length = 731;
 		let result_b58 = '';
@@ -875,7 +923,11 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		// Prepend b58 0 char (1) to fix length problem.
 		if( result_b58.length == 1001){
 			addStatus("Edgecase Detected!");
-			try_length = try_length - 2;
+		}
+*/
+
+
+/*			try_length = try_length - 2;
 			xor_result = new Array();
 			for (let i = 0; i < try_length; i++) {
 				//xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
@@ -906,10 +958,9 @@ console.log("length: " + result_b58.length);
 				addStatus("Failed to handle Edgecase...");
 			}
 		}
-
 		return result_b58;
 	}//getXOR()
-
+*/
 
 	async function obf1Encrypt(plaintext, password) {
 		//const plaintext = document.getElementById("obf1_input").value;
