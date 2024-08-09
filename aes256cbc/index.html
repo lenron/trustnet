@@ -844,7 +844,8 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		// Prepare password side for XOR.
 		const pass_binary = await getPassHash(password, array_length);
-		//console.log("password input binary array: " + pass_binary);
+		console.log("plaintext binary array: " + plaintext_binary);
+		console.log("password input binary array: " + pass_binary);
 
 		let xor_result = new Array();
 
@@ -856,13 +857,64 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			// now should have byte array of 2000 bytes
 			// cut off bytes till 1000 or less b58 chars produced (maybe start at 1000)
 			let array_slice = xor_result.slice(0, 780);
+			// need this for when we find the correct spot and need to back fill data.
 			let last_byte_popped;
+			let array_slice_hex;
 			let result_b58 = to_b58(array_slice);
 			while( result_b58.length > 1000 ){
 				last_byte_popped = array_slice.pop();
 				result_b58 = to_b58(array_slice);
+				console.log("array_slice: " + array_slice);
+				console.log("b58 length: " + result_b58.length);
+				console.log("result_b58: " + result_b58);
 			}
+			// check if we need to add more precision in order to correct obfuscated data length
+			if( result_b58.length != 1000 ){
+				console.log("1000 char output missed. ADD MORE PRECISION!");
+				console.log("result_b58: " + result_b58);
 
+				// try adding hex zeros
+				// convert to hex
+				array_slice_hex = buf2hex(array_slice);
+				// add hex zero
+				console.log("array slice hex before pad: " + array_slice_hex);
+				array_slice_hex = array_slice_hex + '0';
+				console.log("array slice hex after pad: " + array_slice_hex);
+				array_slice_buffer = hex2buf(array_slice_hex);
+				result_b58 = to_b58(array_slice_buffer);
+				console.log("b58 length: " + result_b58.length);
+				console.log("result_b58: " + result_b58);
+
+
+				// try adding byte back and then stripping hex digits
+				// first replace byte data 
+				console.log("array_slice: " + array_slice);
+				array_slice.push(last_byte_popped);
+				console.log("array_slice after push: " + array_slice);
+				result_b58 = to_b58(array_slice);
+				array_slice_buffer = new Uint8Array(array_slice);
+				let count = 0;
+				while( result_b58.length > 1000 && count < 4){
+					// convert to hex
+					array_slice_hex = buf2hex(array_slice_buffer);
+					// strip lead hex char which should be the most sig digit
+					console.log("array slice hex before strip: " + array_slice_hex);
+					array_slice_hex = array_slice_hex.substring(0, array_slice_hex.length - 1);
+					console.log("array slice hex after strip: " + array_slice_hex);
+					// convert back
+					array_slice_buffer = hex2buf(array_slice_hex);
+					//check length
+					//array_slice = new Array(array_slice_buffer);
+				console.log("array_slice after reinstation: " + array_slice_buffer);
+					console.log("array slice length: " + array_slice_buffer.length);
+					// convert to b58 and check
+					//array_slice_buffer = new Uint8Array(array_slice);
+					result_b58 = to_b58(array_slice_buffer);
+				console.log("result_b58: " + result_b58);
+					console.log("result b58 length: " + result_b58.length);
+					count++;
+				}
+			}
 
 			// I believe the bottom two options are equivalent mathematically.
 
@@ -877,18 +929,10 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 					// convert back to binary
 					// try conversion again.
 
-
-
-
 			// Convert to base58
 			//result_b58 = to_b58(xor_result);
 			console.log("RESULT: " + result_b58);
 			console.log("Data LENGTH: " + result_b58.length);
-
-
-
-
-
 
 		return result_b58;
 	}//getXOR()
