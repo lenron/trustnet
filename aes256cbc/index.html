@@ -101,26 +101,26 @@ input[type='text'][disabled] {
 				<div id='store_enter_div' style="display: flex; flex-direction: column;">
 					<div style="display: flex; flex-direction: column; margin: 5px;">
 						<label>Enter Data:</label>
-						<textarea id="plaintext_input" oninput="check_init_input()" style="width: 600px; height: 200px;"></textarea>
+						<textarea id="plaintext_input" oninput="check_init_input()" style="width: 600px; height: 200px;">teafdeafa</textarea>
 						<label style="margin-top: 2px; display: none; color: red; font-weight: bold;" id="input_warning">INPUT BYTE LENGTH TOO LONG</label>
 					</div>
 					<div id='store_codeword_div' style="display: flex; flex-direction: column;">
 						<div style="margin: 5px; display: flex; flex-direction: column;">
 							<label>Codeword:</label>
-							<input id="store_codeword" style="width: 400px;"></input>
+							<input value="fea" id="store_codeword" style="width: 400px;"></input>
 						</div>
 						<div id='store_password_div' style="display: flex; flex-direction: column;">
 							<div style="margin: 5px; display: flex; flex-direction: column;">
 								<label>Password 1:</label>
-								<input id="store_pass_1" style="width: 400px;"></input>
+								<input value="fead" id="store_pass_1" style="width: 400px;"></input>
 							</div>
 							<div style="margin: 5px; display: flex; flex-direction: column;">
 								<label>Password 2:</label>
-								<input id="store_pass_2" style="width: 400px;"></input>
+								<input value="hfdasgfda" id="store_pass_2" style="width: 400px;"></input>
 							</div>
 							<div style="margin: 5px; display: flex; flex-direction: column;">
 								<label>Password 3:</label>
-								<input id="store_pass_3" style="width: 400px;"></input>
+								<input value="fdafdaf" id="store_pass_3" style="width: 400px;"></input>
 							</div>
 						</div>
 					</div>
@@ -222,7 +222,7 @@ input[type='text'][disabled] {
 			</div> 
 		</div>
 		<div>
-			<button id='encrypt_openssl_button' onclick="encOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt AES-256-CBC</button>
+			<button id='encrypt_openssl_button' onclick="debug_encOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt OpenSSL</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Key Data (hex) - Key + IV:</label>
@@ -287,7 +287,7 @@ input[type='text'][disabled] {
 			</div> 
 		</div>
 		<div>
-			<button id='obf1Encrypt_button' onclick="obf1Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 1</button>
+			<button id='obf1Encrypt_button' onclick="debug_obf1Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 1</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Obf Step 1 Output:</label>
@@ -308,7 +308,7 @@ input[type='text'][disabled] {
 			<input id="obf2_password_encrypt" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='obf2Encrypt_button' onclick="obf2Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 2</button>
+			<button id='obf2Encrypt_button' onclick="debug_obf2Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 2</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<b>Obf Step 2 Output:</b>
@@ -326,7 +326,7 @@ input[type='text'][disabled] {
 			<input id="obf2_password_decrypt" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='obf2_decrypt_button' onclick="obf2Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obf Step 2 Decrypt</button>
+			<button id='obf2_decrypt_button' onclick="debug_obf2Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obf Step 2 Decrypt</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<b>Obf Step 2 Decrypt:</b>
@@ -337,7 +337,7 @@ input[type='text'][disabled] {
 			<input id="obf1_password_decrypt" style="width: 400px;"></input>
 		</div>
 		<div>
-			<button id='obf1Decrypt_button' onclick="obf1Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 1 Decrypt</button>
+			<button id='obf1Decrypt_button' onclick="debug_obf1Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 1 Decrypt</button>
 		</div>
 		<div style="display: flex; flex-direction: column; margin: 5px;">
 			<label>Output (OpenSSL base64):</label>
@@ -650,6 +650,14 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		);
 	}//getKeyMaterial()
 
+	async function debug_encOpenSSL(){
+		// get input
+		const data = document.getElementById("enter_openssl_plaintext").value;
+		const password = document.getElementById("enter_openssl_password").value;
+		// set output
+		encOpenSSL(data, password);
+	}
+
 	async function encOpenSSL(plaintext, pass) {
 		// Get input from user.
 		//const plaintext = document.getElementById("enter_openssl_plaintext").value;
@@ -871,10 +879,29 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			// check if we need to add more precision in order to correct obfuscated data length
 			if( result_b58.length != 1000 ){
 				console.log("1000 char output missed. ADD MORE PRECISION!");
-				console.log("result_b58: " + result_b58);
+				array_slice.push(last_byte_popped);
+				word_array = byteToWord( array_slice );
+				while( result_b58.length != 1000){
+					console.log("word_array: " + word_array);
+					last_word_popped = word_array.pop();
+					result_b58 = to_b58_words(word_array);
+					console.log("b58 length: " + result_b58.length);
+					console.log("result_b58: " + result_b58);
+					i++;
+				}
+				console.log("MOONSHOT");
+			}	
 
+/*
+				array_slice.unshift(0);
+				array_slice = new Uint8Array(array_slice);
+				result_b58 = to_b58(array_slice);
+				console.log("BIG TRY: " + array_slice);
+				console.log("TRY length: " + result_b58.length);
+				console.log("TRY result b58: " + result_b58);
 				// try adding hex zeros
 				// convert to hex
+/*
 				array_slice_hex = buf2hex(array_slice);
 				// add hex zero
 				console.log("array slice hex before pad: " + array_slice_hex);
@@ -884,8 +911,18 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 				result_b58 = to_b58(array_slice_buffer);
 				console.log("b58 length: " + result_b58.length);
 				console.log("result_b58: " + result_b58);
+				array_slice_buffer = new Array(array_slice_buffer);
+				array_slice_buffer.unshift(0, 0);
+				//test_buffer.unshift(0);
+				console.log("TEST   TEST    test_buffer: " + array_slice_buffer);
+				let test_b58 = to_b58(array_slice_buffer);
+				console.log("TEST   TEST    test_b58: " + test_b58);
+				const a = [ 0 , 0 , 43 , 1 , 0 ];
+				test_b58 = to_b58(a);
+				console.log("TEST   TEST    a: " + test_b58);
 
 
+return;
 				// try adding byte back and then stripping hex digits
 				// first replace byte data 
 				console.log("array_slice: " + array_slice);
@@ -929,6 +966,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 					// convert back to binary
 					// try conversion again.
 
+*/
 			// Convert to base58
 			//result_b58 = to_b58(xor_result);
 			console.log("RESULT: " + result_b58);
@@ -1005,6 +1043,13 @@ console.log("length: " + result_b58.length);
 		return result_b58;
 	}//getXOR()
 */
+	async function debug_obf1Encrypt(){
+		// get input
+		const data = document.getElementById("obf1_input").value;
+		const password = document.getElementById("obf1_password_encrypt").value;
+		// set output
+		obf1Encrypt(data, password);
+	}
 
 	async function obf1Encrypt(plaintext, password) {
 		//const plaintext = document.getElementById("obf1_input").value;
@@ -1047,6 +1092,13 @@ console.log("length: " + result_b58.length);
 		//console.log("result length (num chars): " + result_b58.length);
 	}//obf1Encrypt()
 
+	async function debug_obf1Decrypt(){
+		// get input
+		const data = document.getElementById("obf2_decrypt_input").value;
+		const password = document.getElementById("obf1_password_decrypt").value;
+		// set output
+		obf1Decrypt(data, password);
+	}
 	async function obf1Decrypt(compd_val, password) {
 		//const compd_val = document.getElementById("obf2_decrypt_input").value; //compartmentalized value
 		//const password = document.getElementById("obf1_password_decrypt").value;
@@ -1085,6 +1137,13 @@ console.log("length: " + result_b58.length);
 		return decrypted_string;
 	}//obf1Decrypt
 
+	async function debug_obf2Encrypt(){
+		// get input
+		const data = document.getElementById("obf2_input").value;
+		const password = document.getElementById("obf2_password_encrypt").value;
+		// set output
+		obf2Encrypt(data, password);
+	}
 	async function obf2Encrypt(input_data, password){
 		// Copy input data and password.
 		//const input_data = document.getElementById("obf2_input").value;
@@ -1151,6 +1210,13 @@ console.log("length: " + result_b58.length);
 		return final_encrypted_string;
 	}//obf2Encrypt()
 
+	async function debug_obf2Decrypt(){
+		// get input
+		const data = document.getElementById("obf2_encrypt_output").value;
+		const password = document.getElementById("obf2_password_decrypt").value;
+		// set output
+		obf2Decrypt(data, password);
+	}
 	async function obf2Decrypt(final_encrypted, password){
 		// Get inputs.
 		//const final_encrypted = document.getElementById("obf2_encrypt_output").value;
