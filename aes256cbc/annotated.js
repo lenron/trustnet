@@ -113,3 +113,67 @@ var from_b58_words = function(
     //return new Uint8Array(b) //return the final byte array in Uint8Array format
     return new Array(b) //return the final byte array in Uint8Array format
 }
+
+function wordToByte( words ){
+	bytes = new Array();
+	let bite;
+	let upper;
+	for(let i = 1; i < words.length; i+=2){
+		// add lower bite.
+		bite = words[i];
+		// add upper 
+		upper = words[i-1];
+		if( upper >> 3 ){
+			upper = upper - 8;
+			bite = bite + 128;
+		}
+		if( upper >> 2 ){
+			upper = upper - 4;
+			bite = bite + 64;
+		}
+		if( upper >> 1 ){
+			upper = upper - 2;
+			bite = bite + 32;
+		}
+		if( upper ){
+			bite = bite + 16;
+		}
+		bytes.push( bite );
+	}
+	return bytes;
+}
+
+
+function byteToWord( bytes ){
+	words = new Array();
+	let upper;
+	let lower;
+	let bite;
+
+	for(i in bytes) {
+		bite = bytes[i];
+		upper = 0;
+		lower = 0;
+		if( bite >> 7 ){ 
+			upper += 8;
+			bite = bite - 128;
+		}
+		if( bite >> 6 ){ 
+			upper += 4;
+			bite = bite - 64;
+		}
+		if( bite >> 5 ){ 
+			upper += 2;
+			bite = bite - 32;
+		}
+		if( bite >> 4 ){ 
+			upper += 1;
+			bite = bite - 16;
+		}
+		words.push(upper);
+		words.push(bite);
+	}
+	return words;
+}
+
+
