@@ -782,7 +782,6 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		//const ciphertext64 = btoa(ciphertext);
 		const inputbytes = base64ToArrayBuffer(ciphertext64);
 
-
 		// ciphertext is now in a form that is ready to give to the encryption function.
 		let ciphertextbytes = new Uint8Array(inputbytes);
 
@@ -958,16 +957,16 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 	async function obf1Decrypt(compd_val, password) {
 		//const compd_val = document.getElementById("obf2_decrypt_input").value; //compartmentalized value
 		//const password = document.getElementById("obf1_password_decrypt").value;
+		const regex = /^\d+:/;
 
-		//compd_val = compd_val.substr(1);
 		// Convert from base 58.
-		const decoded_b58_arr = from_b58(compd_val);
+		let decoded_b58_arr = from_b58(compd_val);
 
 		//const array_length = 732;
-		const array_length = decoded_b58_arr.length;
+		let array_length = decoded_b58_arr.length;
 
 		// Compute password for XOR.
-		const pass_binary = await getPassHash(password, array_length);
+		let pass_binary = await getPassHash(password, array_length);
 
 		// Perform the bitwise XOR sequentially.
 		// Inverse of XOR is XOR and is communicative.
@@ -986,6 +985,30 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		plaintextbytes = Uint8Array.from(plaintextbytes);
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
 
+		// use regex to test that decrypted_string is in the correct form. remove prepend 0 if not.
+		if( !regex.test(decrypted_string) ){
+			console.log("NO MATCH: try stripping zero");
+			try_stripped = compd_val.substr(1);
+			// Convert from base 58.
+			decoded_b58_arr = from_b58(try_stripped);
+			array_length = decoded_b58_arr.length;
+			// Compute password for XOR.
+			pass_binary = await getPassHash(password, array_length);
+			xor_result = new Uint8Array(array_length);
+			for (let i = 0; i < array_length; i++) {
+				xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
+			}
+
+			plaintextbytes = Array.from(xor_result);
+			// Strip off tailing zeros.
+			while(plaintextbytes[plaintextbytes.length - 1] == 0){
+				plaintextbytes.pop();
+			}
+			//console.log("Stripped binary array: " + plaintextbytes);
+			plaintextbytes = Uint8Array.from(plaintextbytes);
+			decrypted_string = new TextDecoder().decode(plaintextbytes);
+		}
+
 console.log("decrypted string: " + decrypted_string);
 		// Decode countstring
 		decrypted_string = decrypted_string.split(":").pop();
@@ -996,6 +1019,10 @@ console.log("decrypted string: " + decrypted_string);
 		document.getElementById("openssl_decrypt_input").value = decrypted_string;
 		return decrypted_string;
 	}//obf1Decrypt
+
+
+
+
 
 	async function debug_obf2Encrypt(){
 		// get input
