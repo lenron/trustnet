@@ -114,7 +114,7 @@ var from_b58_words = function(
     return new Array(b) //return the final byte array in Uint8Array format
 }
 
-function wordToByte( words ){
+function wordsToBytes( words ){
 	bytes = new Array();
 	let bite;
 	let upper;
@@ -144,7 +144,7 @@ function wordToByte( words ){
 }
 
 
-function byteToWord( bytes ){
+function bytesToWords( bytes ){
 	words = new Array();
 	let upper;
 	let lower;

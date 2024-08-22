@@ -539,29 +539,33 @@ console.log("code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
 			throw new Error('Fingerprint length INVALID!');
 		}
 
-		// Load from SQL
+		// Load from server
 		const sr_load = await serverLoad(fp_hex);
 		console.log("Server Response from LOAD: " + "~" + sr_load.response + "~");
 		console.log(sr_load);
-	//	const server_data = sr_load.response;
+		if( sr_load.response == '' ){
+			addLoadStatus("Nothing Found.");
+			return;
+		}
 
 		// Triple Decrypt
 		const obf2_decrypted = await obf2Decrypt(sr_load.response, pass_3);
-console.log("obf2dec: " + obf2_decrypted);
+		console.log("obf2dec: " + obf2_decrypted);
 		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass_2);
-console.log("obf1dec: " + obf1_decrypted);
+		console.log("obf1dec: " + obf1_decrypted);
 		const plaintext = await decOpenSSL(obf1_decrypted, pass_1);
 		//const decrypted = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
-//console.log("decrypted: " + decrypted);
+		//console.log("decrypted: " + decrypted);
 		// Report Results 
 		//document.getElementById("output_display").value = decrypted;
 		document.getElementById("output_display").value = plaintext;
+/*
 		if( decrypted ){
 			addLoadStatus("Completed Successfully.\n");
 		}else{
 			addLoadStatus("Failed.\n");
 		}
-
+*/
 	}//deepLoad()
 
 
@@ -857,192 +861,43 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		let xor_result = new Array();
 
-			for (let i = 0; i < array_length; i++) {
-				xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
-			}
-			//console.log("XOR initial result: " + xor_result);
-
-			// now should have byte array of 2000 bytes
-			// cut off bytes till 1000 or less b58 chars produced (maybe start at 1000)
-			let array_slice = xor_result.slice(0, 780);
-			// need this for when we find the correct spot and need to back fill data.
-			let last_byte_popped;
-			let array_slice_hex;
-			let result_b58 = to_b58(array_slice);
-			while( result_b58.length > 1000 ){
-				last_byte_popped = array_slice.pop();
-				result_b58 = to_b58(array_slice);
-				console.log("array_slice: " + array_slice);
+		for (let i = 0; i < array_length; i++) {
+			xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
+		}
+		// now should have byte array of 2000 bytes
+		// cut off bytes till 1000 or less b58 chars produced (maybe start at 1000)
+		let array_slice = xor_result.slice(0, 780);
+		// need this for when we find the correct spot and need to back fill data.
+		let last_byte_popped;
+		let array_slice_hex;
+		let result_b58 = to_b58(array_slice);
+		while( result_b58.length > 1000 ){
+			last_byte_popped = array_slice.pop();
+			result_b58 = to_b58(array_slice);
+			//console.log("array_slice: " + array_slice);
+			//console.log("b58 length: " + result_b58.length);
+			//console.log("result_b58: " + result_b58);
+		}
+		// check if we need to add more precision in order to correct obfuscated data length
+		if( result_b58.length != 1000 ){
+			console.log("1000 char output missed. ADD MORE PRECISION!");
+			array_slice.push(last_byte_popped);
+			word_array = bytesToWords( array_slice );
+			while( result_b58.length != 1000){
+				console.log("word_array: " + word_array);
+				last_word_popped = word_array.pop();
+				result_b58 = to_b58_words(word_array);
 				console.log("b58 length: " + result_b58.length);
 				console.log("result_b58: " + result_b58);
+				i++;
 			}
-			// check if we need to add more precision in order to correct obfuscated data length
-			if( result_b58.length != 1000 ){
-				console.log("1000 char output missed. ADD MORE PRECISION!");
-				array_slice.push(last_byte_popped);
-				word_array = byteToWord( array_slice );
-				while( result_b58.length != 1000){
-					console.log("word_array: " + word_array);
-					last_word_popped = word_array.pop();
-					result_b58 = to_b58_words(word_array);
-					console.log("b58 length: " + result_b58.length);
-					console.log("result_b58: " + result_b58);
-					i++;
-				}
-				console.log("MOONSHOT");
-			}	
+		}	
 
-/*
-				array_slice.unshift(0);
-				array_slice = new Uint8Array(array_slice);
-				result_b58 = to_b58(array_slice);
-				console.log("BIG TRY: " + array_slice);
-				console.log("TRY length: " + result_b58.length);
-				console.log("TRY result b58: " + result_b58);
-				// try adding hex zeros
-				// convert to hex
-/*
-				array_slice_hex = buf2hex(array_slice);
-				// add hex zero
-				console.log("array slice hex before pad: " + array_slice_hex);
-				array_slice_hex = array_slice_hex + '0';
-				console.log("array slice hex after pad: " + array_slice_hex);
-				array_slice_buffer = hex2buf(array_slice_hex);
-				result_b58 = to_b58(array_slice_buffer);
-				console.log("b58 length: " + result_b58.length);
-				console.log("result_b58: " + result_b58);
-				array_slice_buffer = new Array(array_slice_buffer);
-				array_slice_buffer.unshift(0, 0);
-				//test_buffer.unshift(0);
-				console.log("TEST   TEST    test_buffer: " + array_slice_buffer);
-				let test_b58 = to_b58(array_slice_buffer);
-				console.log("TEST   TEST    test_b58: " + test_b58);
-				const a = [ 0 , 0 , 43 , 1 , 0 ];
-				test_b58 = to_b58(a);
-				console.log("TEST   TEST    a: " + test_b58);
-
-
-return;
-				// try adding byte back and then stripping hex digits
-				// first replace byte data 
-				console.log("array_slice: " + array_slice);
-				array_slice.push(last_byte_popped);
-				console.log("array_slice after push: " + array_slice);
-				result_b58 = to_b58(array_slice);
-				array_slice_buffer = new Uint8Array(array_slice);
-				let count = 0;
-				while( result_b58.length > 1000 && count < 4){
-					// convert to hex
-					array_slice_hex = buf2hex(array_slice_buffer);
-					// strip lead hex char which should be the most sig digit
-					console.log("array slice hex before strip: " + array_slice_hex);
-					array_slice_hex = array_slice_hex.substring(0, array_slice_hex.length - 1);
-					console.log("array slice hex after strip: " + array_slice_hex);
-					// convert back
-					array_slice_buffer = hex2buf(array_slice_hex);
-					//check length
-					//array_slice = new Array(array_slice_buffer);
-				console.log("array_slice after reinstation: " + array_slice_buffer);
-					console.log("array slice length: " + array_slice_buffer.length);
-					// convert to b58 and check
-					//array_slice_buffer = new Uint8Array(array_slice);
-					result_b58 = to_b58(array_slice_buffer);
-				console.log("result_b58: " + result_b58);
-					console.log("result b58 length: " + result_b58.length);
-					count++;
-				}
-			}
-
-			// I believe the bottom two options are equivalent mathematically.
-
-				//if not exactly 1000, reinstate last byte, remove single bits.
-					// bitshift most sig byte 
-					// try conversion again.
-
-				// Could we convert to hex first before sending to base 58 converter?
-				// Would that not be the same as zeroing most sig digits?
-					// Convert to hex
-					// Strip 1 digit
-					// convert back to binary
-					// try conversion again.
-
-*/
-			// Convert to base58
-			//result_b58 = to_b58(xor_result);
-			console.log("RESULT: " + result_b58);
-			console.log("Data LENGTH: " + result_b58.length);
-
+		console.log("RESULT: " + result_b58);
+		console.log("Data LENGTH: " + result_b58.length);
 		return result_b58;
 	}//getXOR()
 
-
-
-
-/*
-		// Start 1 under 732
-		let try_length = 731;
-		let result_b58 = '';
-
-		while(result_b58.length < 1000){
-			// Reset the array.
-			xor_result = new Array();
-
-			console.log("TRY Length: " + try_length);
-			//let xor_result = new Uint8Array(array_length);
-			for (let i = 0; i < try_length; i++) {
-				//xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
-				xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
-			}
-			//console.log("XOR: " + xor_result);
-			// Convert to base58
-			result_b58 = to_b58(xor_result);
-			console.log("RESULT: " + result_b58);
-			console.log("Data LENGTH: " + result_b58.length);
-
-			try_length++;
-		}
-
-		// Prepend b58 0 char (1) to fix length problem.
-		if( result_b58.length == 1001){
-			addStatus("Edgecase Detected!");
-		}
-*/
-
-
-/*			try_length = try_length - 2;
-			xor_result = new Array();
-			for (let i = 0; i < try_length; i++) {
-				//xor_result[i] = pass_binary[i] ^ plaintext_binary[i];
-				xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
-			}
-			let edgecase_result_before = to_b58(xor_result);
-			console.log("b58 BEFORE append 1: " + edgecase_result_before);
-			let from_before = from_b58(edgecase_result_before);
-			console.log("conversion BEFORE append 1: " + from_before);
-
-			let edgecase_result_after = '1' + edgecase_result_before;
-			console.log("test AFTER append 1: " + edgecase_result_after);
-			let from_after = from_b58(edgecase_result_before);
-			console.log("conversion AFTER append 1: " + from_after);
-			//if( from_before == from_after){
-			//if( from_before.equals(from_after) === true ){
-			if( JSON.stringify(from_before) === JSON.stringify(from_after) ){
-				console.log("SUCCESSFUL FIX??!?!?!?");
-				addStatus("Edgecase Handled!");
-				// Implement fix!
-console.log(edgecase_result_after);
-console.log("length: " + edgecase_result_after.length);
-				result_b58 = edgecase_result_after;
-console.log(result_b58);
-console.log("length: " + result_b58.length);
-			}else{
-				console.log("FAILURE...");
-				addStatus("Failed to handle Edgecase...");
-			}
-		}
-		return result_b58;
-	}//getXOR()
-*/
 	async function debug_obf1Encrypt(){
 		// get input
 		const data = document.getElementById("obf1_input").value;
@@ -1099,10 +954,12 @@ console.log("length: " + result_b58.length);
 		// set output
 		obf1Decrypt(data, password);
 	}
+
 	async function obf1Decrypt(compd_val, password) {
 		//const compd_val = document.getElementById("obf2_decrypt_input").value; //compartmentalized value
 		//const password = document.getElementById("obf1_password_decrypt").value;
 
+		//compd_val = compd_val.substr(1);
 		// Convert from base 58.
 		const decoded_b58_arr = from_b58(compd_val);
 
@@ -1129,8 +986,11 @@ console.log("length: " + result_b58.length);
 		plaintextbytes = Uint8Array.from(plaintextbytes);
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
 
+console.log("decrypted string: " + decrypted_string);
 		// Decode countstring
 		decrypted_string = decrypted_string.split(":").pop();
+
+console.log("decrypted string: " + decrypted_string);
 		//console.log("decrypted_string: " + decrypted_string);
 		document.getElementById("obf2_decrypt_output").value = decrypted_string;
 		document.getElementById("openssl_decrypt_input").value = decrypted_string;
