@@ -527,7 +527,7 @@ function setTab(evt, cityName) {
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
-console.log("code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
+		console.log("code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
 
 		// Compute Fingerprint
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
@@ -836,7 +836,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			['decrypt']
 		);
 
-//console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
+		//console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
 		// The 'make it go' main digest call.
 		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
@@ -957,7 +957,6 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 	async function obf1Decrypt(compd_val, password) {
 		//const compd_val = document.getElementById("obf2_decrypt_input").value; //compartmentalized value
 		//const password = document.getElementById("obf1_password_decrypt").value;
-		const regex = /^\d+:/;
 
 		// Convert from base 58.
 		let decoded_b58_arr = from_b58(compd_val);
@@ -986,6 +985,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
 
 		// use regex to test that decrypted_string is in the correct form. remove prepend 0 if not.
+		const regex = /^\d+:/;
 		if( !regex.test(decrypted_string) ){
 			console.log("NO MATCH: try stripping zero");
 			try_stripped = compd_val.substr(1);
@@ -1007,21 +1007,24 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			//console.log("Stripped binary array: " + plaintextbytes);
 			plaintextbytes = Uint8Array.from(plaintextbytes);
 			decrypted_string = new TextDecoder().decode(plaintextbytes);
+			
+			// Make sure this fixed it.
+			if( !regex.test(decrypted_string) ){
+				addStatus("DECRYPT RETRY FAILED!\n");
+				throw new Error('DECRYPT RETRY FAILED!');
+			}
 		}
 
-console.log("decrypted string: " + decrypted_string);
+		console.log("obf1 decrypted num string: " + decrypted_string);
 		// Decode countstring
 		decrypted_string = decrypted_string.split(":").pop();
 
-console.log("decrypted string: " + decrypted_string);
+		console.log("obf1 decrypted string: " + decrypted_string);
 		//console.log("decrypted_string: " + decrypted_string);
 		document.getElementById("obf2_decrypt_output").value = decrypted_string;
 		document.getElementById("openssl_decrypt_input").value = decrypted_string;
 		return decrypted_string;
 	}//obf1Decrypt
-
-
-
 
 
 	async function debug_obf2Encrypt(){
