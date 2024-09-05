@@ -420,6 +420,9 @@ input[type='text'][disabled] {
 <script src="annotated.js"></script>
 <script>
 
+// Base 58 character map.
+const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
 // w3 tab function
 function setTab(evt, cityName) {
   var i, tabcontent, tablinks;
@@ -633,15 +636,6 @@ function setTab(evt, cityName) {
 		const fp_hex = buf2hex(fingerprint);
 		return fp_hex;
 	}//computeFingerprint
-
-
-// Global buffer variables to hold binary data instead of pushing it through
-// several string/b64 to buffer conversions.
-let ssl_enc_out;
-let obf1_dec_out;
-
-// Base 58 character map.
-const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 	function getKeyMaterial(password) {
 		const enc = new TextEncoder();
@@ -1011,6 +1005,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			// Make sure this fixed it.
 			if( !regex.test(decrypted_string) ){
 				addStatus("DECRYPT RETRY FAILED!\n");
+				addLoadStatus("DECRYPT RETRY FAILED!\n");
 				throw new Error('DECRYPT RETRY FAILED!');
 			}
 		}
