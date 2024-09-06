@@ -514,7 +514,7 @@ function setTab(evt, cityName) {
 		console.log(sr_load);
 
 		// Report Results
-		if( encrypted_data  == sr_load.response ){
+		if( encrypted_data  === sr_load.response ){
 			addStatus("Data successfully saved to server.\n\n");
 		}else{
 			addStatus("Data failed to save to server!\n\n");
@@ -551,12 +551,16 @@ function setTab(evt, cityName) {
 			return;
 		}
 
+		const enc_data = String(sr_load.response);
+
+		//const plaintext = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
+		//console.log("plaintext: " + plaintext);
 		// Triple Decrypt
-		const obf2_decrypted = await obf2Decrypt(sr_load.response, pass_3);
+		const obf2_decrypted = await obf2Decrypt(enc_data, pass_3);
 		console.log("obf2dec: " + obf2_decrypted);
 		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass_2);
 		console.log("obf1dec: " + obf1_decrypted);
-		const plaintext = await decOpenSSL(obf1_decrypted, pass_1);
+		plaintext = await decOpenSSL(obf1_decrypted, pass_1);
 		//const decrypted = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
 		//console.log("decrypted: " + decrypted);
 		// Report Results 
@@ -672,7 +676,7 @@ function setTab(evt, cityName) {
 		const dec = new TextDecoder();
 		const input_string = dec.decode(plaintextbytes);
 		//console.log("plaintext: " + input_string);
-		const plaintext64 = _arrayBufferToBase64(plaintextbytes);
+		//const plaintext64 = _arrayBufferToBase64(plaintextbytes);
 		//console.log("plaintext 64: " + plaintext64);
 		//console.log(plaintextbytes);
 		const iter = Number(document.getElementById("enter_openssl_iterations").value);
@@ -736,8 +740,13 @@ function setTab(evt, cityName) {
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
 		// Copy the output array buffer into a new typed array.
 		cipherbytes = new Uint8Array(encrypted_result);
-		const result = _arrayBufferToBase64(encrypted_result); 
-		const encrypted_string64 = _arrayBufferToBase64(cipherbytes);
+//		const result = _arrayBufferToBase64(encrypted_result); 
+		const result = bytesToBase64(new TextEncoder().encode(encrypted_result));
+
+//		const encrypted_string64 = _arrayBufferToBase64(cipherbytes);
+		const encrypted_string64 = bytesToBase64(new TextEncoder().encode(cipherbytes));
+
+
 		document.getElementById("openssl_encrypted_output64").value = encrypted_string64;
 		const encrypted_string = btoa(encrypted_string64);
 		document.getElementById("openssl_encrypted_output").value = encrypted_string;
@@ -753,7 +762,10 @@ function setTab(evt, cityName) {
 		//console.log("TESTOUT:");
 		//console.log(encrypted_output_buf);
 
-		const out64 = _arrayBufferToBase64(encrypted_output_buf);
+//		const out64 = _arrayBufferToBase64(encrypted_output_buf);
+		const out64 = bytesToBase64(new TextEncoder().encode(encrypted_output_buf));
+
+
 			console.log("openssl output length: " + out64.length);
 		//Check length < 732
 		if( out64.length > 732 ){
@@ -772,12 +784,11 @@ function setTab(evt, cityName) {
 	async function decOpenSSL(ciphertext64) {
 		// Get input.
 		//const ciphertext64 = document.getElementById("openssl_decrypt_input").value;
-
 		//const ciphertext64 = btoa(ciphertext);
-		const inputbytes = base64ToArrayBuffer(ciphertext64);
 
 		// ciphertext is now in a form that is ready to give to the encryption function.
-		let ciphertextbytes = new Uint8Array(inputbytes);
+		let ciphertextby = new TextDecoder().decode(base64ToBytes(ciphertext64));
+		const ciphertextbytes = new Uint8Array(ciphertextby);
 
 		const dec = new TextDecoder();
 		const input_string = dec.decode(ciphertextbytes);
@@ -829,10 +840,20 @@ function setTab(evt, cityName) {
 			false, 
 			['decrypt']
 		);
+/*
+		try{
+			// The 'make it go' main digest call.
+			const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
+		}catch(error){
+			console.log("Error!");
+			console.log(error);
+			console.log("message: " + error.message);
+		}
+*/
+			const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
 
-		//console.log("CIPHERBYTESPHRASE: " + cipherbytesphrase);
-		// The 'make it go' main digest call.
-		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
+
+
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
 		plaintextbytes = new Uint8Array(decrypted_result);
 		let decrypted_string = new TextDecoder().decode( plaintextbytes );
@@ -840,7 +861,6 @@ function setTab(evt, cityName) {
 		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
 		document.getElementById("openssl_decrypt_output").value = decrypted_string;
 		return decrypted_string;
-		//console.log("Decrypted output: " + decrypted_string);
 	}//decOpenSSL()
 
 	async function getXOR(plaintext_binary, password){
@@ -1265,6 +1285,25 @@ function setTab(evt, cityName) {
 	  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
 	  return tmp.buffer;
 	}//concatBuffer()
+
+
+	// MDN funcction Usage:
+	// bytesToBase64(new TextEncoder().encode("a Ā 𐀀 文 🦄")); // "YSDEgCDwkICAIOaWhyDwn6aE"
+	// new TextDecoder().decode(base64ToBytes("YSDEgCDwkICAIOaWhyDwn6aE")); // "a Ā 𐀀 文 🦄"
+
+	// MDN function
+	function base64ToBytes(base64) {
+		const binString = atob(base64);
+		return Uint8Array.from(binString, (m) => m.codePointAt(0));
+	}
+
+	// MDN function
+	function bytesToBase64(bytes) {
+		const binString = Array.from(bytes, (byte) =>
+			String.fromCodePoint(byte),
+		).join("");
+		return btoa(binString);
+	}
 
 	function _arrayBufferToBase64( buffer ) {
 		var binary = '';
