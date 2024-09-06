@@ -739,12 +739,17 @@ function setTab(evt, cityName) {
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
 		//var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
 		// Copy the output array buffer into a new typed array.
-		cipherbytes = new Uint8Array(encrypted_result);
-//		const result = _arrayBufferToBase64(encrypted_result); 
-		const result = bytesToBase64(new TextEncoder().encode(encrypted_result));
+		const cipherbytes = new Uint8Array(encrypted_result);
 
-//		const encrypted_string64 = _arrayBufferToBase64(cipherbytes);
-		const encrypted_string64 = bytesToBase64(new TextEncoder().encode(cipherbytes));
+//		const result = _arrayBufferToBase64(encrypted_result); 
+		//const result = bytesToBase64(new TextEncoder().encode(encrypted_result));
+		const result = bytesToBase64(encrypted_result);
+
+		console.log("cipherbytes: " + cipherbytes);
+		const encrypted_string64_old = _arrayBufferToBase64(cipherbytes);
+		console.log("OLD openssl_encrypted_output64: " + encrypted_string64_old);
+		const encrypted_string64 = bytesToBase64(cipherbytes);
+		console.log("NEW openssl_encrypted_output64: " + encrypted_string64);
 
 
 		document.getElementById("openssl_encrypted_output64").value = encrypted_string64;
@@ -757,13 +762,18 @@ function setTab(evt, cityName) {
 		const two_salts = concatBuffer(salt64, salt);
 		// Buffers and typed arrays are similar and can mostly be used interchangably.
 		// This is actually a utin8array.
-		const encrypted_output_buf = concatBuffer(two_salts, cipherbytes);
+		let encrypted_output_buf = concatBuffer(two_salts, cipherbytes);
+		encrypted_output_buf = new Uint8Array(encrypted_output_buf);
 		ssl_enc_out = encrypted_output_buf;
-		//console.log("TESTOUT:");
-		//console.log(encrypted_output_buf);
+		console.log("TESTOUT:");
+		console.log(encrypted_output_buf);
 
-//		const out64 = _arrayBufferToBase64(encrypted_output_buf);
-		const out64 = bytesToBase64(new TextEncoder().encode(encrypted_output_buf));
+		let out64 = _arrayBufferToBase64(encrypted_output_buf);
+		console.log("out64: " + out64);
+		//const out64 = bytesToBase64(new TextEncoder().encode(encrypted_output_buf));
+		out64 = bytesToBase64(encrypted_output_buf);
+		out64 = new Array(out64);
+		console.log("out64 again: " + out64);
 
 
 			console.log("openssl output length: " + out64.length);
@@ -787,7 +797,8 @@ function setTab(evt, cityName) {
 		//const ciphertext64 = btoa(ciphertext);
 
 		// ciphertext is now in a form that is ready to give to the encryption function.
-		let ciphertextby = new TextDecoder().decode(base64ToBytes(ciphertext64));
+		//let ciphertextby = new TextDecoder().decode(base64ToBytes(ciphertext64));
+		let ciphertextby = base64ToBytes(ciphertext64);
 		const ciphertextbytes = new Uint8Array(ciphertextby);
 
 		const dec = new TextDecoder();
