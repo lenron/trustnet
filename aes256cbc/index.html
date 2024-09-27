@@ -376,7 +376,7 @@ input[type='text'][disabled] {
 					</div>
 				</div>
 				<div>
-					<button id='' onclick="decOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Decrypt AES-256-CBC</button>
+					<button disabled id='' onclick="decOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Decrypt AES-256-CBC</button>
 				</div>
 				<div style="margin: 5px; display: flex; flex-direction: column;">
 					<label>Extracted Salt (hex):</label>
@@ -674,7 +674,7 @@ function setTab(evt, cityName) {
 		// plaintext is now in a form that is ready to give to the encryption function.
 		const plaintextbytes = new Uint8Array(plaintextbytes_buf);
 		const dec = new TextDecoder();
-		const input_string = dec.decode(plaintextbytes);
+		//const input_string = dec.decode(plaintextbytes);
 		//console.log("plaintext: " + input_string);
 		//const plaintext64 = _arrayBufferToBase64(plaintextbytes);
 		//console.log("plaintext 64: " + plaintext64);
@@ -734,6 +734,7 @@ function setTab(evt, cityName) {
 			false, 
 			['encrypt']
 		);
+
 //console.log("PLAINTEXTBYTES: " + plaintextbytes);
 		// The 'make it go' main digest call. Returns an array buffer.
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
@@ -791,7 +792,7 @@ function setTab(evt, cityName) {
 		return out64;
 	}//encOpenSSL()
 
-	async function decOpenSSL(ciphertext64) {
+	async function decOpenSSL(ciphertext64, pass) {
 		// Get input.
 		//const ciphertext64 = document.getElementById("openssl_decrypt_input").value;
 		//const ciphertext64 = btoa(ciphertext);
@@ -804,13 +805,16 @@ function setTab(evt, cityName) {
 		const dec = new TextDecoder();
 		const input_string = dec.decode(ciphertextbytes);
 
-		const iter = Number(document.getElementById("openssl_decrypt_iterations").value);
-		const digest_hash = document.getElementById("openssl_decrypt_hash").value;
-		const salt = ciphertextbytes.slice(8,16);
+		//const iter = Number(document.getElementById("openssl_decrypt_iterations").value);
+		//const digest_hash = document.getElementById("openssl_decrypt_hash").value;
+		const digest_hash = 'SHA-256';
+		const iter = 10000;
+		const salta = ciphertextbytes.slice(8,16);
+		const salt = new Uint8Array(salta);
 		document.getElementById("openssl_decrypt_salt").value = buf2hex(salt).toUpperCase();
 
 		// Prepare inputs for digest.
-		const pass = document.getElementById("openssl_decrypt_password").value;
+		//const pass = document.getElementById("openssl_decrypt_password").value;
 		const keyMaterial = await getKeyMaterial(pass);
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
@@ -851,6 +855,8 @@ function setTab(evt, cityName) {
 			false, 
 			['decrypt']
 		);
+
+		console.log("decO main call with salt:" + salt + "  iter:" + iter + "  hash:" + digest_hash);
 /*
 		try{
 			// The 'make it go' main digest call.
