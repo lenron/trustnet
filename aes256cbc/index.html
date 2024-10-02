@@ -173,7 +173,7 @@ input[type='text'][disabled] {
 		</div>
 	</div>
 
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br>
 
 	<div>
 		<h3>OpenSSL Equivalent Commands</h3>
@@ -292,6 +292,10 @@ function setTab(evt, cityName) {
 			addStatus("Data failed to save to server!\n\n");
 		}
 
+		/////////////////////////////
+		// Maybe delete the record (once I write that sub) if it fails to load correctly?????
+		////////////////////////
+
 	}//deepStore()
 
 
@@ -355,6 +359,8 @@ function setTab(evt, cityName) {
 			document.getElementById("status_display_load").value += msg;
 	}//addLoadStatus()
 
+	// Server communication function. Endpoint load.pl will attempt to load
+	// encrypted data corresponding to the input fingerprint.
 	async function serverLoad(fingerprint){
 		const SERVER_URL = '/crypto/obfuscate/cgi-bin/load.pl';
 		
@@ -371,6 +377,8 @@ function setTab(evt, cityName) {
 		return response.json()
 	}//serverLoad()
 
+	// Server communication function. Endpoint store.pl will attempt to store 
+	// input encrypted data at the input fingerprint location.
 	async function serverStore(fingerprint, data){
 		const SERVER_URL = '/crypto/obfuscate/cgi-bin/store.pl';
 		
