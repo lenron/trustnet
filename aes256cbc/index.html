@@ -173,234 +173,7 @@ input[type='text'][disabled] {
 		</div>
 	</div>
 
-
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-	<div>
-	   <h3>OpenSSL AES-256-CBC Encryption (PBKDF2)</h3>
-	</div>
-	<div id='openssl_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
-		<div style="display: flex; flex-direction: row;">
-			<div style="margin: 5px;"> 
-				<div style="display: flex; flex-direction: column;">
-					<div style="margin: 1px; display: flex; flex-direction: column;">
-						<label>Plaintext:</label>
-						<div>
-							<input id="enter_openssl_plaintext" oninput="check_init_input()" style="width: 600px;"></input>
-							<label style="display: none; color: red; font-weight: bold;" id="input_warning">INPUT LENGTH TOO LONG</label>
-						</div>
-					</div>
-					<div style="margin: 0px; display: flex; flex-direction: row;"> 
-							<div style="margin-right: 5px; display: flex; flex-direction: column;">
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Password:</label>
-									<input id="enter_openssl_password" style="width: 400px;"></input>
-								</div>
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Salt (hex):</label>
-									<input id="enter_openssl_salt" style="width: 400px;"></input>
-								</div>
-							</div>
-							<div style="display: flex; flex-direction: column;">
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Iterations:</label>
-									<input id="enter_openssl_iterations" style="width: 186px;" value="10000"></input>
-								</div>
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Hash:</label>
-									<input id="enter_openssl_hash" style="width: 186px;" value="SHA-256"></input>
-								</div>
-							</div>
-					</div>
-				</div>
-			</div> 
-		</div>
-		<div>
-			<button id='encrypt_openssl_button' onclick="debug_encOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Encrypt OpenSSL</button>
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Key Data (hex) - Key + IV:</label>
-			<input id='key_output_full' style="width: 800px;">
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Key Data (hex) - Key:</label>
-			<input id='key_output_key' style="width: 600px;">
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Key Data (hex) - IV:</label>
-			<input id='key_output_iv' style="width: 600px;">
-		</div>
-		<div style="margin: 1px;">
-			<b>OpenSSL derives the key and IV using the same PBKDF2 digest.</b>
-		</div>
-		<div style="margin: 1px;">
-			<b>The first 256 bits are used as key, the last 128 are used for IV.</b>
-		</div>
-<br>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Encrypted Output:</label>
-			<input id='openssl_encrypted_output' style="width: 600px;">
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Encrypted Output (base 64):</label>
-			<input id='openssl_encrypted_output64' style="width: 600px;">
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>OpenSSL Output:</label>
-			<input id='openssl_salted_output' style="width: 600px;">
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>OpenSSL Output (base 64):</label>
-			<input id='openssl_salted_output64' style="width: 600px;">
-		</div>
-	</div>
-
-
-		<h3 id="openssl_output_warning" style="color: red; display:none;">OpenSSL output length greater than 732!</h3>
-
-	<div>
-	   <h3>Obfuscation Step 1 Encryption</h3>
-	</div>
-	<div id='obf1_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
-		<div style="display: flex; flex-direction: row;">
-			<div style="margin: 5px;"> 
-				<div style="display: flex; flex-direction: column;">
-					<div style="margin: 1px; display: flex; flex-direction: column;">
-						<label>OpenSSL Input (base 64):</label>
-						<input id="obf1_input" style="width: 600px;"></input>
-					</div>
-					<div style="margin: 0px; display: flex; flex-direction: row;"> 
-						<div style="margin-right: 5px; display: flex; flex-direction: column;">
-							<div style="margin: 1px; display: flex; flex-direction: column;">
-								<label>Obf Step 1 Password:</label>
-								<input id="obf1_password_encrypt" style="width: 400px;"></input>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div> 
-		</div>
-		<div>
-			<button id='obf1Encrypt_button' onclick="debug_obf1Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 1</button>
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Obf Step 1 Output:</label>
-			<textarea id="obf1_encrypt_output" style="width: 1000px; height: 365px;"></textarea>
-		</div>
-	</div>
-
-	<div>
-	   <h3>Obfuscate Step 2 Encryption</h3>
-	</div>
-	<div id='obf2_encrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Obf Step 2 Input (checks b58 chars):</label>
-			<textarea id="obf2_input" oninput="check_input_obf2()" style="width: 1000px; height: 365px;"></textarea>
-		</div>
-		<div style="margin: 5px; display: flex; flex-direction: column;">
-			<label>Obf Step 2 Password:</label>
-			<input id="obf2_password_encrypt" style="width: 400px;"></input>
-		</div>
-		<div>
-			<button id='obf2Encrypt_button' onclick="debug_obf2Encrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 2</button>
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<b>Obf Step 2 Output:</b>
-			<textarea id='obf2_encrypt_output' style="width: 1000px; height: 400px;"></textarea>
-		</div>
-	</div>
-
-
-	<div>
-	   <h3>Obfuscate Step 2 Decryption</h3>
-	</div>
-	<div id='obf2_decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
-		<div style="margin: 5px; display: flex; flex-direction: column;">
-			<label>Obf Step 2 Password:</label>
-			<input id="obf2_password_decrypt" style="width: 400px;"></input>
-		</div>
-		<div>
-			<button id='obf2_decrypt_button' onclick="debug_obf2Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obf Step 2 Decrypt</button>
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<b>Obf Step 2 Decrypt:</b>
-			<textarea id='obf2_decrypt_input' style="width: 1000px; height: 400px;"></textarea>
-		</div>
-		<div style="margin: 5px; display: flex; flex-direction: column;">
-			<label>Obf Step 1 Password:</label>
-			<input id="obf1_password_decrypt" style="width: 400px;"></input>
-		</div>
-		<div>
-			<button id='obf1Decrypt_button' onclick="debug_obf1Decrypt()" style="background-color: lightgreen; width: 200px; margin: 5px;">Obfuscate Step 1 Decrypt</button>
-		</div>
-		<div style="display: flex; flex-direction: column; margin: 5px;">
-			<label>Output (OpenSSL base64):</label>
-			<input id='obf2_decrypt_output' style="width: 600px;">
-		</div>
-	</div>
-
-	<div>
-	   <h3>OpenSSL AES-256-CBC Decryption (PBKDF2)</h3>
-	</div>
-	<div id='openssl_decrypt_pane' style="display: flex; flex-direction: column; border-style: inset; width: fit-content;">
-		<div style="display: flex; flex-direction: row;">
-			<div style="margin: 5px;"> 
-				<div style="display: flex; flex-direction: column;">
-					<div style="margin: 1px; display: flex; flex-direction: column;">
-						<label>OpenSSL Encrypted String-- Ready for Decrypt:</label>
-						<input id="openssl_decrypt_input" style="width: 600px;"></input>
-					</div>
-					<div style="margin: 0px; display: flex; flex-direction: column;"> 
-							<div style="margin-right: 5px; display: flex; flex-direction: column;">
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Password:</label>
-									<input id="openssl_decrypt_password" style="width: 410px;"></input>
-								</div>
-							</div>
-							<div style="display: flex; flex-direction: row;">
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Iterations:</label>
-									<input id="openssl_decrypt_iterations" style="width: 200px;" value="10000"></input>
-								</div>
-								<div style="margin: 1px; display: flex; flex-direction: column;">
-									<label>Hash:</label>
-									<input id="openssl_decrypt_hash" style="width: 200px;" value="SHA-256"></input>
-								</div>
-							</div>
-					</div>
-				</div>
-				<div>
-					<button disabled id='' onclick="decOpenSSL()" style="background-color: lightgreen; width: 200px; margin: 5px;">Decrypt AES-256-CBC</button>
-				</div>
-				<div style="margin: 5px; display: flex; flex-direction: column;">
-					<label>Extracted Salt (hex):</label>
-					<input id="openssl_decrypt_salt" style="width: 400px;"></input>
-				</div>
-				<div style="display: flex; flex-direction: column; margin: 5px;">
-					<label>Extracted Key Data (hex) - Key + IV:</label>
-					<input id='openssl_decrypt_fullkey' style="width: 800px;">
-				</div>
-				<div style="display: flex; flex-direction: column; margin: 5px;">
-					<label>Extracted Key Data (hex) - Key:</label>
-					<input id='openssl_decrypt_key' style="width: 600px;">
-				</div>
-				<div style="display: flex; flex-direction: column; margin: 5px;">
-					<label>Extracted Key Data (hex) - IV:</label>
-					<input id='openssl_decrypt_iv' style="width: 600px;">
-				</div>
-				<div style="display: flex; flex-direction: column; margin: 5px;">
-					<label>OpenSSL Decrypted Output (plaintext):</label>
-					<input id='openssl_decrypt_output' style="width: 600px;">
-				</div>
-			</div> 
-		</div>
-	</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 	<div>
 		<h3>OpenSSL Equivalent Commands</h3>
@@ -413,7 +186,6 @@ input[type='text'][disabled] {
 		<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
 	</div>
 
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 </body>
 </html>
@@ -575,7 +347,6 @@ function setTab(evt, cityName) {
 */
 	}//deepLoad()
 
-
 	function addStatus( msg ){
 			document.getElementById("status_display_store").value += msg;
 	}//addStatus()
@@ -651,7 +422,7 @@ function setTab(evt, cityName) {
 			["deriveBits", "deriveKey"],
 		);
 	}//getKeyMaterial()
-
+/*
 	async function debug_encOpenSSL(){
 		// get input
 		const data = document.getElementById("enter_openssl_plaintext").value;
@@ -659,7 +430,7 @@ function setTab(evt, cityName) {
 		// set output
 		encOpenSSL(data, password);
 	}
-
+*/
 	async function encOpenSSL(plaintext, pass) {
 		// Get input from user.
 		//const plaintext = document.getElementById("enter_openssl_plaintext").value;
@@ -679,25 +450,19 @@ function setTab(evt, cityName) {
 		//const plaintext64 = _arrayBufferToBase64(plaintextbytes);
 		//console.log("plaintext 64: " + plaintext64);
 		//console.log(plaintextbytes);
-		const iter = Number(document.getElementById("enter_openssl_iterations").value);
-		const digest_hash = document.getElementById("enter_openssl_hash").value;
 
-		// Check if we need to generate a salt.
-		let salt_input = document.getElementById("enter_openssl_salt").value;
-		let salt;
-		if( salt_input ){
-			salt = hex2buf(salt_input);
-		}else{
-			salt = window.crypto.getRandomValues(new Uint8Array(8));
-			document.getElementById("enter_openssl_salt").value = buf2hex(salt).toUpperCase();
-		}
+		const iter = 10000;
+		const digest_hash = 'SHA-256';
+
+		// Generate random salt.
+		const salt = window.crypto.getRandomValues(new Uint8Array(8));
 
 		// Prepare inputs for digest.
 		//const pass = document.getElementById("enter_openssl_password").value;
 		const keyMaterial = await getKeyMaterial(pass);
 
 		// Propagate password to decrypt for ease of use.
-		document.getElementById("openssl_decrypt_password").value = pass;
+		//document.getElementById("openssl_decrypt_password").value = pass;
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
 		// be used to create the cryptoKey object needed for the main digest.
@@ -713,7 +478,7 @@ function setTab(evt, cityName) {
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
 		const full_key = buf2hex(derivedKeyBuffer);
-		document.getElementById("key_output_full").value = full_key.toUpperCase();
+		//document.getElementById("key_output_full").value = full_key.toUpperCase();
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
@@ -721,8 +486,8 @@ function setTab(evt, cityName) {
 		const ivbytes = derivedKeyBuffer.slice(32);
 		const key_key = buf2hex(keybytes);
 		const key_iv = buf2hex(ivbytes);
-		document.getElementById("key_output_key").value = key_key.toUpperCase();
-		document.getElementById("key_output_iv").value = key_iv.toUpperCase();
+		//document.getElementById("key_output_key").value = key_key.toUpperCase();
+		//document.getElementById("key_output_iv").value = key_iv.toUpperCase();
 
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
@@ -753,9 +518,9 @@ function setTab(evt, cityName) {
 		console.log("NEW openssl_encrypted_output64: " + encrypted_string64);
 
 
-		document.getElementById("openssl_encrypted_output64").value = encrypted_string64;
+		//document.getElementById("openssl_encrypted_output64").value = encrypted_string64;
 		const encrypted_string = btoa(encrypted_string64);
-		document.getElementById("openssl_encrypted_output").value = encrypted_string;
+		//document.getElementById("openssl_encrypted_output").value = encrypted_string;
 
 		// Combine constant salt, random salt, and encrypted result as array buffers, then convert to base64.
 		const const_salt = "Salted__";
@@ -775,9 +540,8 @@ function setTab(evt, cityName) {
 		out64 = bytesToBase64(encrypted_output_buf);
 		out64 = new Array(out64);
 		console.log("out64 again: " + out64);
-
-
-			console.log("openssl output length: " + out64.length);
+		console.log("openssl output length: " + out64.length);
+/*
 		//Check length < 732
 		if( out64.length > 732 ){
 			document.getElementById("openssl_output_warning").style.display = 'inline';
@@ -788,7 +552,7 @@ function setTab(evt, cityName) {
 		const out = atob(out64);
 		document.getElementById("openssl_salted_output").value = out;
 		document.getElementById("obf1_input").value = out64;
-
+*/
 		return out64;
 	}//encOpenSSL()
 
@@ -811,7 +575,7 @@ function setTab(evt, cityName) {
 		const iter = 10000;
 		const salta = ciphertextbytes.slice(8,16);
 		const salt = new Uint8Array(salta);
-		document.getElementById("openssl_decrypt_salt").value = buf2hex(salt).toUpperCase();
+		//document.getElementById("openssl_decrypt_salt").value = buf2hex(salt).toUpperCase();
 
 		// Prepare inputs for digest.
 		//const pass = document.getElementById("openssl_decrypt_password").value;
@@ -831,7 +595,7 @@ function setTab(evt, cityName) {
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
 		const full_key = buf2hex(derivedKeyBuffer);
-		document.getElementById("openssl_decrypt_fullkey").value = full_key.toUpperCase();
+		//document.getElementById("openssl_decrypt_fullkey").value = full_key.toUpperCase();
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
@@ -839,8 +603,8 @@ function setTab(evt, cityName) {
 		const ivbytes = derivedKeyBuffer.slice(32);
 		const key_key = buf2hex(keybytes);
 		const key_iv = buf2hex(ivbytes);
-		document.getElementById("openssl_decrypt_key").value = key_key.toUpperCase();
-		document.getElementById("openssl_decrypt_iv").value = key_iv.toUpperCase();
+		//document.getElementById("openssl_decrypt_key").value = key_key.toUpperCase();
+		//document.getElementById("openssl_decrypt_iv").value = key_iv.toUpperCase();
 
 		// Extract the encrypted phrase from OpenSSL input
 		const cipherbytesphrase = ciphertextbytes.slice(16);
@@ -876,7 +640,6 @@ function setTab(evt, cityName) {
 		let decrypted_string = new TextDecoder().decode( plaintextbytes );
 		// Pop single newline added in enc in order to output the same encrypted data as openssl command line.
 		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
-		document.getElementById("openssl_decrypt_output").value = decrypted_string;
 		return decrypted_string;
 	}//decOpenSSL()
 
@@ -927,7 +690,7 @@ function setTab(evt, cityName) {
 		console.log("Data LENGTH: " + result_b58.length);
 		return result_b58;
 	}//getXOR()
-
+/*
 	async function debug_obf1Encrypt(){
 		// get input
 		const data = document.getElementById("obf1_input").value;
@@ -935,6 +698,7 @@ function setTab(evt, cityName) {
 		// set output
 		obf1Encrypt(data, password);
 	}
+*/
 
 	async function obf1Encrypt(plaintext, password) {
 		//const plaintext = document.getElementById("obf1_input").value;
@@ -970,13 +734,13 @@ function setTab(evt, cityName) {
 			//return;
 		}
 
-		document.getElementById("obf1_password_decrypt").value = password;
-		document.getElementById("obf2_input").value = result_b58;
-		document.getElementById("obf1_encrypt_output").value = result_b58;
+		//document.getElementById("obf1_password_decrypt").value = password;
+		//document.getElementById("obf2_input").value = result_b58;
+		//document.getElementById("obf1_encrypt_output").value = result_b58;
 		return result_b58;
 		//console.log("result length (num chars): " + result_b58.length);
 	}//obf1Encrypt()
-
+/*
 	async function debug_obf1Decrypt(){
 		// get input
 		const data = document.getElementById("obf2_decrypt_input").value;
@@ -984,6 +748,7 @@ function setTab(evt, cityName) {
 		// set output
 		obf1Decrypt(data, password);
 	}
+*/
 
 	async function obf1Decrypt(compd_val, password) {
 		//const compd_val = document.getElementById("obf2_decrypt_input").value; //compartmentalized value
@@ -1053,12 +818,12 @@ function setTab(evt, cityName) {
 
 		console.log("obf1 decrypted string: " + decrypted_string);
 		//console.log("decrypted_string: " + decrypted_string);
-		document.getElementById("obf2_decrypt_output").value = decrypted_string;
-		document.getElementById("openssl_decrypt_input").value = decrypted_string;
+		//document.getElementById("obf2_decrypt_output").value = decrypted_string;
+		//document.getElementById("openssl_decrypt_input").value = decrypted_string;
 		return decrypted_string;
 	}//obf1Decrypt
 
-
+/*
 	async function debug_obf2Encrypt(){
 		// get input
 		const data = document.getElementById("obf2_input").value;
@@ -1066,20 +831,23 @@ function setTab(evt, cityName) {
 		// set output
 		obf2Encrypt(data, password);
 	}
+*/
+
+
 	async function obf2Encrypt(input_data, password){
 		// Copy input data and password.
 		//const input_data = document.getElementById("obf2_input").value;
 		//const password = document.getElementById("obf2_password_encrypt").value;
-		document.getElementById("obf2_password_decrypt").value = document.getElementById("obf2_password_encrypt").value;
+		//document.getElementById("obf2_password_decrypt").value = document.getElementById("obf2_password_encrypt").value;
 
 		console.log("Obfuscation Step 2 Encrypt input: " + input_data);
 		console.log("Obf Step 2 Length: " + input_data.length);
 
 		// Check input data for non-b58 chars
 		if( !check_b58chars(input_data) ){
-			//console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
+			console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
 			// Abort final step encode.
-			document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
+			//document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
 			return;
 		}
 
@@ -1128,10 +896,10 @@ function setTab(evt, cityName) {
 		console.log("Obfuscation Step 2 Encrypt output: " + final_encrypted_string);
 		console.log("Obf Step 2 output Length: " + final_encrypted_string.length);
 		//console.log("Final Result (long way): " + final_encrypted_string);
-		document.getElementById("obf2_encrypt_output").value = final_encrypted_string;
+		//document.getElementById("obf2_encrypt_output").value = final_encrypted_string;
 		return final_encrypted_string;
 	}//obf2Encrypt()
-
+/*
 	async function debug_obf2Decrypt(){
 		// get input
 		const data = document.getElementById("obf2_encrypt_output").value;
@@ -1139,6 +907,7 @@ function setTab(evt, cityName) {
 		// set output
 		obf2Decrypt(data, password);
 	}
+*/
 	async function obf2Decrypt(final_encrypted, password){
 		// Get inputs.
 		//const final_encrypted = document.getElementById("obf2_encrypt_output").value;
@@ -1183,7 +952,7 @@ function setTab(evt, cityName) {
 			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
 		}
 		//console.log("DECRYPT: Final Result " + final_decrypted_string);
-		document.getElementById("obf2_decrypt_input").value = final_decrypted_string;
+		//document.getElementById("obf2_decrypt_input").value = final_decrypted_string;
 		//document.getElementById("enter_openssl_encrypted").value = final_decrypted_string;
 		//document.getElementById("final_decrypt").value = comp_input_b58;
 		return final_decrypted_string;
@@ -1356,7 +1125,7 @@ function setTab(evt, cityName) {
 		}
 		return bytes.buffer;
 	}//base64ToArrayBuffer()
-
+/*
 	function encode64(){
 		let raw_text = document.getElementById("raw_64encode_text").value;
 		//console.log("Encoding the string: '" + raw_text + "'");
@@ -1373,7 +1142,7 @@ function setTab(evt, cityName) {
 		//console.log("Decoded string: '" + decoded64 + "'");
 		document.getElementById("decoded64_text").value = decoded64;
 	}//decode64()
-
+*/
 </script>
 
 
