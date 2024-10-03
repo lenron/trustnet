@@ -431,7 +431,7 @@ function setTab(evt, cityName) {
 
 	async function encOpenSSL(plaintext, pass) {
 
-		// Convert string to Uint8Array.
+		// Encode plaintext in utf8 and store in Uint8Array inputbytes.
 		const inputbytes = new TextEncoder().encode( plaintext );
 		// Make the plaintext look like a file by adding a single newline
 		// char to the end of the string.
@@ -440,16 +440,14 @@ function setTab(evt, cityName) {
 		const plaintextbytes_buf = concatBuffer(inputbytes, single_newline);
 		// plaintext is now in a form that is ready to give to the encryption function.
 		const plaintextbytes = new Uint8Array(plaintextbytes_buf);
-		const dec = new TextDecoder();
-
-		const iter = 10000;
-		const digest_hash = 'SHA-256';
 
 		// Generate random salt.
 		const salt = window.crypto.getRandomValues(new Uint8Array(8));
 
 		// Prepare inputs for digest.
 		const keyMaterial = await getKeyMaterial(pass);
+		const iter = 10000;
+		const digest_hash = 'SHA-256';
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
 		// be used to create the cryptoKey object needed for the main digest.
@@ -464,15 +462,13 @@ function setTab(evt, cityName) {
 			384,
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
-		const full_key = buf2hex(derivedKeyBuffer);
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
 		const keybytes = derivedKeyBuffer.slice(0, 32);
 		const ivbytes = derivedKeyBuffer.slice(32);
-		const key_key = buf2hex(keybytes);
-		const key_iv = buf2hex(ivbytes);
 
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
 			keybytes, 
@@ -486,38 +482,22 @@ function setTab(evt, cityName) {
 
 		// Main Function Call
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
+
 		// Copy the output array buffer into a new typed array.
 		const cipherbytes = new Uint8Array(encrypted_result);
-
+		// Convert to base64 for the next encryption step.
 		const result = bytesToBase64(encrypted_result);
 
-		console.log("cipherbytes: " + cipherbytes);
-		const encrypted_string64_old = _arrayBufferToBase64(cipherbytes);
-		console.log("OLD openssl_encrypted_output64: " + encrypted_string64_old);
-		const encrypted_string64 = bytesToBase64(cipherbytes);
-		console.log("NEW openssl_encrypted_output64: " + encrypted_string64);
-
-		const encrypted_string = btoa(encrypted_string64);
-
 		// Combine constant salt, random salt, and encrypted result as array buffers, then convert to base64.
+		// out = Salted__ + <random salt> + <utf8 encoded ciphertext>
 		const const_salt = "Salted__";
 		const salt64 = new TextEncoder().encode(const_salt);
 		const two_salts = concatBuffer(salt64, salt);
-		// Buffers and typed arrays are similar and can mostly be used interchangably.
-		// This is actually a utin8array.
+		// Merge salts with encoded ciphertext.
 		let encrypted_output_buf = concatBuffer(two_salts, cipherbytes);
 		encrypted_output_buf = new Uint8Array(encrypted_output_buf);
-		ssl_enc_out = encrypted_output_buf;
-		console.log("TESTOUT:");
-		console.log(encrypted_output_buf);
-
-		let out64 = _arrayBufferToBase64(encrypted_output_buf);
-		console.log("out64: " + out64);
-		//const out64 = bytesToBase64(new TextEncoder().encode(encrypted_output_buf));
-		out64 = bytesToBase64(encrypted_output_buf);
+		let out64 = bytesToBase64(encrypted_output_buf);
 		out64 = new Array(out64);
-		console.log("out64 again: " + out64);
-		console.log("openssl output length: " + out64.length);
 
 		return out64;
 	}//encOpenSSL()
@@ -552,18 +532,16 @@ function setTab(evt, cityName) {
 			384,
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
-		const full_key = buf2hex(derivedKeyBuffer);
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
 		const keybytes = derivedKeyBuffer.slice(0, 32);
 		const ivbytes = derivedKeyBuffer.slice(32);
-		const key_key = buf2hex(keybytes);
-		const key_iv = buf2hex(ivbytes);
 
 		// Extract the encrypted phrase from OpenSSL input
 		const cipherbytesphrase = ciphertextbytes.slice(16);
 
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
 			keybytes, 
