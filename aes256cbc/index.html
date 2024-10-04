@@ -672,12 +672,17 @@ function setTab(evt, cityName) {
 			plaintextbytes.pop();
 		}
 		plaintextbytes = Uint8Array.from(plaintextbytes);
+		// utf8 to text
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
 
-		// use regex to test that decrypted_string is in the correct form. remove lead 0 if not.
+		// data should now be in countstring form.
+
+		// use regex to see if decrypted_string looks like the countstring. 
+		// remove lead char (hopefully a 0) if not.
 		const regex = /^\d+:/;
 		if( !regex.test(decrypted_string) ){
 			console.log("NO MATCH: try stripping zero");
+			// Try stripping zero from function input and running the obf1 decrypt again.
 			try_stripped = compd_val.substr(1);
 			// Convert from base 58.
 			decoded_b58_arr = from_b58(try_stripped);
@@ -705,10 +710,8 @@ function setTab(evt, cityName) {
 			}
 		}
 
-		console.log("obf1 decrypted num string: " + decrypted_string);
 		// Decode countstring
 		decrypted_string = decrypted_string.split(":").pop();
-		console.log("obf1 decrypted string: " + decrypted_string);
 
 		return decrypted_string;
 	}//obf1Decrypt
