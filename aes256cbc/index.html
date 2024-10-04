@@ -290,11 +290,11 @@ function setTab(evt, cityName) {
 			addStatus("Data successfully saved to server.\n\n");
 		}else{
 			addStatus("Data failed to save to server!\n\n");
-		}
 
-		/////////////////////////////
-		// Maybe delete the record (once I write that sub) if it fails to load correctly?????
-		////////////////////////
+			/////////////////////////////
+			// Maybe delete the record (once I write that sub) if it fails to load correctly?????
+			////////////////////////
+		}
 
 	}//deepStore()
 
@@ -674,7 +674,7 @@ function setTab(evt, cityName) {
 		plaintextbytes = Uint8Array.from(plaintextbytes);
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
 
-		// use regex to test that decrypted_string is in the correct form. remove prepend 0 if not.
+		// use regex to test that decrypted_string is in the correct form. remove lead 0 if not.
 		const regex = /^\d+:/;
 		if( !regex.test(decrypted_string) ){
 			console.log("NO MATCH: try stripping zero");
@@ -771,7 +771,7 @@ function setTab(evt, cityName) {
 		// Convert password hash to base58
 		const pass_b58 = to_b58(pass_hash);
 
-		// Convert final_encrypted to b58 numerical equivalent and get size.
+		// Convert to b58 numerical equivalent 
 		let final_encrypted_b58_num_arr = new Array(final_encrypted_length);
 		let pass_b58_num_arr = new Array(final_encrypted_length);
 		for (let i = 0; i < final_encrypted_length; i++) {
@@ -779,7 +779,7 @@ function setTab(evt, cityName) {
 			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
 		}
 
-		// Add the arrays piecewise, 
+		// Run the sum-and-58-modulo inverse function
 		let in_b58_num_arr = new Array(final_encrypted_length);
 		for (let i = 0; i < final_encrypted_length; i++) {
 			if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
