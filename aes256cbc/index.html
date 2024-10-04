@@ -590,14 +590,23 @@ function setTab(evt, cityName) {
 		// If we don't encode to 1000 popping 8-bit bytes, try popping 4-bit words!
 		if( result_b58.length != 1000 ){
 			console.log("1000 char output missed. ADD MORE PRECISION!");
+			// Start by pushing back on the last popped byte.
 			array_slice.push(last_byte_popped);
+			// Convert to word array.
 			word_array = bytesToWords( array_slice );
+			// We have 4 words that are poppable.
+			let tries = 0;
 			while( result_b58.length != 1000){
 				console.log("word_array: " + word_array);
 				last_word_popped = word_array.pop();
 				result_b58 = to_b58_words(word_array);
 				console.log("b58 length: " + result_b58.length);
 				console.log("result_b58: " + result_b58);
+				tries++;
+				// Not sure how to test this as it may never trigger.
+				if( tries > 4 ){
+					throw new Error('MAJOR ERROR: additional precision not sufficient to reach 1000 characters of length. Ending.');
+				}
 			}
 		}	
 
@@ -706,8 +715,6 @@ function setTab(evt, cityName) {
 
 
 	async function obf2Encrypt(input_data, password){
-		console.log("Obfuscation Step 2 Encrypt input: " + input_data);
-		console.log("Obf Step 2 Length: " + input_data.length);
 
 		// Check input data for non-b58 chars
 		if( !check_b58chars(input_data) ){
@@ -716,16 +723,16 @@ function setTab(evt, cityName) {
 			return;
 		}
 
-		// Get size of input data
+		// Get size of input data (should be 1000)
 		const input_length = input_data.length;
 
-		// Get hash+append of password, to length of input for now. 
+		// Get hash+append of password, to length of input.
 		const pass_hash = await getPassHash(password, input_length);
 
 		// Convert password hash to base58
 		const pass_b58 = to_b58(pass_hash);
 
-		// Convert input to b58 numerical equivalent and get size.
+		// Convert to b58 numerical equivalent 
 		let input_b58_num_arr = new Array(input_length);
 		let pass_b58_num_arr = new Array(input_length);
 		for (let i = 0; i < input_length; i++) {
@@ -749,9 +756,6 @@ function setTab(evt, cityName) {
 		for (let i = 0; i < input_length; i++) {
 			final_encrypted_string += base58map.charAt(sum_b58_num_arr[i]);
 		}
-
-		console.log("Obfuscation Step 2 Encrypt output: " + final_encrypted_string);
-		console.log("Obf Step 2 output Length: " + final_encrypted_string.length);
 
 		return final_encrypted_string;
 	}//obf2Encrypt()
