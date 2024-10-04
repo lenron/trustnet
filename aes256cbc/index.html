@@ -505,7 +505,7 @@ function setTab(evt, cityName) {
 	async function decOpenSSL(ciphertext64, pass) {
 
 		// ciphertext is now in a form that is ready to give to the encryption function.
-		let ciphertextby = base64ToBytes(ciphertext64);
+		const ciphertextby = base64ToBytes(ciphertext64);
 		const ciphertextbytes = new Uint8Array(ciphertextby);
 
 		const dec = new TextDecoder();
@@ -564,31 +564,30 @@ function setTab(evt, cityName) {
 	}//decOpenSSL()
 
 	async function getXOR(plaintext_binary, password){
-		// Spec says compute to 2000 bytes of length.
-		const array_length = 2000;
-
+		// 1000 seems more reasonable if we're immediately going to chop it to 780.
+		const array_length = 1000;
 		// Prepare password side for XOR.
 		const pass_binary = await getPassHash(password, array_length);
-		console.log("plaintext binary array: " + plaintext_binary);
-		console.log("password input binary array: " + pass_binary);
 
+		// Perform the XOR bytewise in a loop.
 		let xor_result = new Array();
-
+		// XOR is a ^ in javascript
 		for (let i = 0; i < array_length; i++) {
 			xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
 		}
-		// now should have byte array of 2000 bytes
-		// cut off bytes till 1000 or less b58 chars produced (maybe start at 1000)
+
+		// Now that we have plenty of XOR'd binary data,
+		// we need to pop the number of bytes that will encode to exactly 1000 chars of base58 data.
 		let array_slice = xor_result.slice(0, 780);
-		// need this for when we find the correct spot and need to back fill data.
 		let last_byte_popped;
 		let array_slice_hex;
 		let result_b58 = to_b58(array_slice);
+		// Start by popping whole bytes, then check if we encoded to 1000 exactly.
 		while( result_b58.length > 1000 ){
 			last_byte_popped = array_slice.pop();
 			result_b58 = to_b58(array_slice);
 		}
-		// check if we need to add more precision in order to correct obfuscated data length
+		// If we don't encode to 1000 popping 8-bit bytes, try popping 4-bit words!
 		if( result_b58.length != 1000 ){
 			console.log("1000 char output missed. ADD MORE PRECISION!");
 			array_slice.push(last_byte_popped);
@@ -599,7 +598,6 @@ function setTab(evt, cityName) {
 				result_b58 = to_b58_words(word_array);
 				console.log("b58 length: " + result_b58.length);
 				console.log("result_b58: " + result_b58);
-				i++;
 			}
 		}	
 
@@ -610,13 +608,10 @@ function setTab(evt, cityName) {
 
 	async function obf1Encrypt(plaintext, password) {
 
-		console.log("Obfuscation Step 1 Encrypt input: " + plaintext);
-		console.log("Obf Step 1 Length: " + plaintext.length);
-
 		// Prepare plaintext side for XOR.
-		let plaintext_binary = prepData(plaintext);
+		let plaintext_binary = addCountstring(plaintext);
 
-		// Run the XOR and return exactly 1000 base 58 chars.
+		// XOR plaintext with password and return exactly 1000 base 58 chars.
 		const result_b58 = await getXOR(plaintext_binary, password);
 
 		// Check data length and type (check 2: 1000 char length, base 58).
@@ -858,28 +853,18 @@ function setTab(evt, cityName) {
 */
 
 
-	function prepData(data) {
-		//console.log("data input: " + data);
+	function addCountstring(data) {
 		// Count chars.
 		const num_chars = data.length;
-		//console.log("number chars: " + num_chars);
-
 		// Form 'countstring'.
 		let countstring = num_chars + ':' + data;
-		//console.log("assembled countstring: " + countstring);
-		// Trim string to usable size.
-		//countstring = countstring.substring(0, Math.min(countstring.length, 732));
-
 		// Convert to binary (Uint8Array).
 		const countstring_binary = new TextEncoder().encode(countstring);
-		//console.log("countstring in binary array: " + countstring_binary);
-
 		// Copy to size 1000 array for XOR.
 		let big_arr = new Uint8Array(1000);
 		big_arr.set(countstring_binary);
-
 		return big_arr;
-	}//prepData()
+	}//addCountstring()
 
 	async function getPassHash(pass, length) {
 		//console.log("entered password: " + pass);
