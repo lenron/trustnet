@@ -1,0 +1,139 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<body>
+
+	<div>
+		<h3>Harnessing back button behavior including mouse-back, click of button, etc.</h3>
+	</div>
+	<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
+		<div id='0' style="display:flex;">
+			<label>Zero<label>
+			<input value="0" id="0" style="width: 400px;"></input>
+		</div>
+	</div>
+
+<br><br>
+
+	<div>
+		<h3>HTML Block</h3>
+	</div>
+<br>
+
+	<TMPL_VAR NAME=htmlblock>
+	
+
+
+
+</body>
+<script>
+
+	// for template variable setup, just use 1 that holds every html block?
+	//
+	// Not sure if we're gonna need a loop:
+	/*
+		<TMPL_LOOP NAME=hidden_inputs>
+			<input type="hidden" value="<TMPL_VAR NAME=value>" id="<TMPL_VAR NAME=name>" name="<TMPL_VAR NAME=name>"></TMPL_LOOP>
+			<input type="hidden" value="<TMPL_VAR NAME=screenname>" id="screenname" name="screenname">
+	*/
+	//
+	//
+
+
+
+console.log();
+
+
+	// Add listener with useCapture=true
+	// remove listener when triggered, targeting by using same passed parameters
+
+
+	//window.addEventListener('onbeforeunload', handleBack, true);
+	window.addEventListener('pagehide', handleBack, true);
+
+	function handleBackHard(event){
+		console.log("onbeforeunload");
+		console.log(event);
+		alert("onbeforeunload");
+
+		// unload events will block bfcache functionality
+		//window.removeEventListener('onbeforeunload', handleBackHard, true);
+	//	history.pushState("", document.title, window.location.pathname);
+	//	location.reload();
+	}
+
+	function handleBack(event){
+		console.log("PAGEHIDE");
+
+		// 
+		history.pushState("", document.title, window.location.pathname);
+		location.reload();
+	}
+
+/*
+
+// Global variable  
+let set_location = 0;
+
+	// Test if popstate will catch everything. Operating as if it does for now.
+	window.addEventListener('popstate', function (event) {
+		console.log("popstate!");
+		alert("popstate!");
+
+		if( set_location === 0 ){
+			console.log("popstate! On Root Set!");
+			// Do default back behavior
+		}else{
+			console.log("popstate! On Set Location #" + set_location);
+			// Go to previous Set
+
+		}
+	});
+*/
+	// Catch Enter key press with this in the HTML Object:
+	// onkeypress="return window.parent.searchKeyPress(event);"
+	function searchKeyPress(e){
+		console.log("keyCode: " + e.keyCode);
+		// look for window.event in case event isn't passed in
+		e = e || window.event;
+		if (e.keyCode == 13){
+		console.log("keyCode is 13!!! ~" + e.keyCode + "~");
+			// Run the function directly instead of using a .click of the button,
+			// which seemed to cause issues.
+			check_captcha();
+			return false;
+		}
+		return true;
+	}
+
+
+/*
+window.onhashchange = function() {
+    if (window.innerDocClick) {
+        //Your own in-page mechanism triggered the hash change
+    } else {
+        //Browser back button was clicked
+    }
+}
+
+function goBack() {
+    window.location.hash = window.location.lasthash[window.location.lasthash.length-1];
+    window.location.lasthash.pop();
+}
+
+document.onmouseover = function() {
+    //User's mouse is inside the page.
+    window.innerDocClick = true;
+}
+
+document.onmouseleave = function() {
+    //User's mouse has left the page.
+    window.innerDocClick = false;
+}
+*/
+</script>
+
+</body>
+
+</html>

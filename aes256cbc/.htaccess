@@ -1,0 +1,35 @@
+DirectoryIndex obf.pl
+
+
+#RewriteEngine On
+##Not sure what this do
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#Try global re-route
+#RewriteRule ^.*$ /cgi-bin/obf.pl [NC,L,QSA]
+
+
+#RewriteRule ^(.*)$ /cgi-bin/rewrite.pl [L,QSA]
+#RewriteRule ^(\w+)-(\w+)$ /cgi-bin/rewrite.pl?word1=$1&word2=$2 [QSA,L]
+#RewriteRule ^(\w+)-(\w+)$ /cgi-bin/receive_message.pl?word1=$1&word2=$2 [QSA,L]
+
+# Set up redirect for receiver side direct chat link
+#RewriteRule ^(\w+)-(\w+)$ /cgi-bin/chat.pl?word1=$1&word2=$2 [QSA,L]
+# Set up redirect for 9-card/link chat links room
+#RewriteRule ^chats/(\w+-\w+)$ /cgi-bin/chat.pl?keypair=$1 [QSA,L]
+
+# Service Workers shouldn't be cached for very long
+<FilesMatch "serviceworker.js">
+  ExpiresDefault "now"
+</FilesMatch>
+
+#RewriteRule ^/testing/save-subscription$ /testing/save-subscription.pl [L,R]
+
+#Redirect 301 /testing/save-subscription /testing/save-subscription.pl
+#Redirect /testing/save-subscription /testing/save-subscription.pl [QSA,L,R=308]
+#Redirect /testing/save-subscription /testing/save-subscription.pl [L,R=201]
+#Redirect 301 /fetch /fetch
+#Redirect 301 /fetch/fetch /fetch/fetch.pl
+
+
+
