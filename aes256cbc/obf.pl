@@ -1,24 +1,23 @@
-#!/usr/bin/perl
+#!/home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin/perl5.10.1
 use strict;
 use warnings;
-use cPanelUserConfig;
+# Not needed when under perlbrew switch I guess?
+#use cPanelUserConfig;
+#!/usr/bin/perl
 
-# Shebang line needs changed on server I guess.
 
 use HTML::Template;
-#use CGI qw(:standard escapeHTML);
-#use URI::Escape;
+use CGI qw(:standard escapeHTML);
+use URI::Escape;
 
-#my $q = CGI->new;
+my $q = CGI->new;
 # Passed in from .htaccess
-#my $word1 = CGI::escapeHTML(param('word1'));
-#my $word2 = CGI::escapeHTML(param('word2'));
+my $test = CGI::escapeHTML(param('test'));
 
 # open the html template
 my $template = HTML::Template->new(filename => 'fsobf.tmpl');
 
-my $htmlblock = qq{
-
+my $test1 = qq{
 	<div>
 		<h3>This is from the perl htmlblock variable.</h3>
 	</div>
@@ -26,14 +25,22 @@ my $htmlblock = qq{
 		<div id='1' style="display:flex;">
 			<label>First<label>
 			<input value="1" id="1" style="width: 400px;"></input>
+			<button type="button" id="home_button" class="home_button" onclick="location.href='https://chat.dance/obf/obf.pl?test=1a';">Home</button>
 		</div>
 	</div>
-
-
 };
 
-# always let either the chat or button rooms know who their button room is
-$template->param(htmlblock => $htmlblock);
+my $test2 = qq{
+	<div>
+		<h3>Made It</h3>
+	</div>
+};
+
+if( $test eq '1a' ){
+	$template->param(htmlblock => $test2);
+}else{
+	$template->param(htmlblock => $test1);
+}
 
 # send the obligatory Content-Type and print the template output
 print "Content-Type: text/html\n\n", $template->output;
