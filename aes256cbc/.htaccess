@@ -1,12 +1,12 @@
 DirectoryIndex obf.pl
 
-
-#RewriteEngine On
+RewriteEngine On
 ##Not sure what this do
-#RewriteCond %{REQUEST_FILENAME} !-f
-#RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 #Try global re-route
-#RewriteRule ^.*$ /cgi-bin/obf.pl [NC,L,QSA]
+#RewriteRule ^(.*)$ /cgi-bin/obf.pl?test=$1 [NC,L,QSA]
+
 
 
 #RewriteRule ^(.*)$ /cgi-bin/rewrite.pl [L,QSA]
