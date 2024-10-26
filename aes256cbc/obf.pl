@@ -2,8 +2,6 @@
 use strict;
 use warnings;
 # Not needed when under perlbrew switch I guess?
-#use cPanelUserConfig;
-#!/usr/bin/perl
 
 
 use HTML::Template;
