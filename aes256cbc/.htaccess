@@ -1,4 +1,4 @@
-DirectoryIndex obf.pl
+DirectoryIndex obfuscate.pl
 
 RewriteEngine On
 ##Not sure what this do

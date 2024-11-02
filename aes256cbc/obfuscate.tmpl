@@ -2,32 +2,124 @@
 <html>
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <meta content="utf-8" http-equiv="encoding">
+<style>
+
+	html {
+		background-color: #272727;
+/*		position: fixed;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		width: 100%;
+*/
+	}
+
+	body {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		margin: 0;
+		padding: 0;
+		/*justify-content: center;
+		align-items: center;
+		position: relative;*/
+	}
+
+	.header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		color: #54c597;
+		padding: 4px;
+		padding-right: 10px;
+		padding-left: 10px;
+	}
+
+	.header_content {
+		display: flex;
+	}
+
+	.header_title {
+
+	}
+
+	.header_label {
+		padding: 8px;
+	}
+
+	.center_html {
+		width: 100%;
+		background-color: #272727;
+		flex: 1 auto;
+		display: flex;
+		/*align-self: center;*/
+	}
+
+	.content_html {
+		width: 100%;
+		display: flex;
+		/*align-items: baseline;*/
+		justify-content: center;
+	}
+
+	.obf_button {
+		/*width: 400px;*/
+		height: 50px;
+		background-color: #434343;
+		border: 2px solid;
+		padding: 8px;
+		margin: 2px;
+		padding-right: 10px;
+		padding-left: 10px;
+		color: #54c597;
+		border-color: #54c597;
+		font-size: 17px;
+		border-radius: 10px;
+	}
+	
+</style>
 <body>
 
+	<div class="header" id="header">
+		<div class="header_content" id="header_left">
+			<div class="header_title">
+				<h1>SECRETWORD</h1>
+			</div>
+		</div>
+		<div class="header_content" id="header_right">
+			<div class="header_label" style="">
+				<label>HOW IT WORKS</label>
+			</div>
+			<div class="header_label" style="">
+				<label>FAQ</label>
+			</div>
+		</div>
+	</div>
+	<div class="center_html" id="center_html">
+		<div class="content_html" id="content_html">
 
-	<TMPL_VAR NAME=htmlblock>
-	
+			<TMPL_VAR NAME=htmlblock>
+<!--
+			<div id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
+				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
+				<div id="button_div" style="display:flex; justify-content: center">
+					<button class="obf_button" id='go_store_thread' onclick="location.href='https://chat.dance/obfuscate.pl?id=store';">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_load_thread' onclick="location.href='https://chat.dance/obfuscate.pl?id=load';">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_import_thread' onclick="location.href='https://chat.dance/obfuscate.pl?id=delete';">IMPORT SECRET DATA</button>
+				</div>
+			</div>
+--!>
+		</div>
+	</div>
 
-
+	<input value="fea" id="store_codeword" style="display:none; width: 400px;"></input>
+	<input value="fead" id="store_pass_1" style="display:none; width: 400px;"></input>
+	<input value="hfdasgfda" id="store_pass_2" style="display:none; width: 400px;"></input>
+	<input value="fdafdaf" id="store_pass_3" style="display:none; width: 400px;">
 
 </body>
 <script>
-
-	// for template variable setup, just use 1 that holds every html block?
-	//
-	// Not sure if we're gonna need a loop:
-	/*
-		<TMPL_LOOP NAME=hidden_inputs>
-			<input type="hidden" value="<TMPL_VAR NAME=value>" id="<TMPL_VAR NAME=name>" name="<TMPL_VAR NAME=name>"></TMPL_LOOP>
-			<input type="hidden" value="<TMPL_VAR NAME=screenname>" id="screenname" name="screenname">
-	*/
-	//
-	//
-
-
-
-console.log();
-
 
 	// Catch Enter key press with this in the HTML Object:
 	// onkeypress="return window.parent.searchKeyPress(event);"
@@ -44,7 +136,6 @@ console.log();
 		}
 		return true;
 	}
-
 
 </script>
 

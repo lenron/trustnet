@@ -9,29 +9,55 @@ use URI::Escape;
 
 my $q = CGI->new;
 # Passed in from .htaccess
-my $test = CGI::escapeHTML(param('test'));
+my $id = 'main';
+$id = CGI::escapeHTML(param('id'));
 
 # open the html template
-my $template = HTML::Template->new(filename => 'fsobf.tmpl');
+my $template = HTML::Template->new(filename => 'obfuscate.tmpl');
 
-my $test1 = qq{
+my $main = qq{
+
+			<div id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
+				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
+				<div id="button_div" style="display:flex; justify-content: center">
+					<button class="obf_button" id='go_store_thread' onclick="location.href='https://chat.dance/obfuscate.pl?id=store';">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_load_thread' onclick="location.href='https://chat.dance/obfuscate.pl?id=load';">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_import_thread' onclick="location.href='https://chat.dance/obfuscate.pl?id=delete';">IMPORT SECRET DATA</button>
+				</div>
+			</div>
+
+};
+
+my $store = qq{
+
+};
+my $load = qq{
+
+};
+my $delete = qq{
+
+};
+my $error = qq{
 	<div>
-		<h3>This is from the perl htmlblock variable.</h3>
-	</div>
-	<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
-		<div id='1' style="display:flex;">
-			<label>First<label>
-			<input value="1" id="1" style="width: 400px;"></input>
-			<button type="button" id="home_button" class="home_button" onclick="location.href='https://chat.dance/obf/obf.pl?test=1a';">Home</button>
-		</div>
+		<h3>Invalid id.</h3>
 	</div>
 };
 
-my $test2 = qq{
-	<div>
-		<h3>Made It</h3>
-	</div>
-};
+
+if( $id eq 'main' ){
+	$template->param(htmlblock => $main);
+}elsif( $id eq 'store' {
+	$template->param(htmlblock => $store);
+}elsif( $id eq 'load' {
+	$template->param(htmlblock => $load);
+}elsif( $id eq 'delete' {
+	$template->param(htmlblock => $delete);
+}else{
+	$template->param(htmlblock => $error);
+
+}
+
+
 
 if( $test eq '1a' ){
 	$template->param(htmlblock => $test2);
@@ -44,14 +70,6 @@ print "Content-Type: text/html\n\n", $template->output;
 
 
 exit 0;
-	# Add data in a loop
-	#$template->param(
-		#element_ids => [
-			#{ id => 'word1' },
-			##{ id => 'word2' },
-		#]
-	#);
-#
 
 
 
