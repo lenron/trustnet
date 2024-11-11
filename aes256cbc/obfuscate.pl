@@ -28,21 +28,134 @@ my $main = qq{
 };
 
 my $store = qq{
+<!--   store  --!>
+			<div class="gen store one" id="generated_html" style="">
+				<label>STORE DATA</label>
+				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
+				<input value="" id="store_codeword" style="">
+				<button class="" id='sf1' style="width: 250px;" onclick="storeFromOne()">NEXT</button>
+			</div>
 
+			<div class="gen store two" id="generated_html" style="display:none">
+				<label>STORE DATA</label>
+				<textarea value="" id="store_data" rows="8" cols="50">ENTER YOUR SECRET DATA</textarea>
+				<button class="" id='sf2' style="width: 250px; align-self:center;" onclick="storeFromTwo()">ENCRYPT DATA</button>
+			</div>
+
+			<div class="gen store three" id="generated_html" style="display:none">
+				<label>&#10004; SECRET DATA SAVED</label>
+				<h2>ENTER SECRET WORD 1</h2>
+				<input value="" id="store_p1" style="">
+				<div class="button_pair" id="button_pair" style="display:flex;">
+					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>
+					<button class="" id='sf3' style="flex-grow:1;" onclick="storeFromThree()">ENHANCE SECURITY</button>
+				</div>
+			</div>
+
+			<div class="gen store four" id="generated_html" style="display:none">
+				<label>&#10004; SECRET DATA SAVED</label>
+				<label>&#10004; SECRET WORD 1 SAVED</label>
+				<h2>ENTER SECRET WORD 2</h2>
+				<input value="" id="store_p2" style="">
+				<div class="button_pair" id="button_pair" style="display:flex;">
+					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>
+					<button class="" id='sf4' style="flex-grow:1;" onclick="storeFromFour()">ENHANCE SECURITY</button>
+				</div>
+			</div>
+
+			<div class="gen store five" id="generated_html" style="display:none">
+				<label>&#10004; SECRET DATA SAVED</label>
+				<label>&#10004; SECRET WORD 1 SAVED</label>
+				<label>&#10004; SECRET WORD 2 SAVED</label>
+				<h2>ENTER SECRET WORD 3</h2>
+				<input value="" id="store_p3" style="">
+				<button class="" id='deepstorebutton' style="width:50%;align-self:center;" onclick="storeFromFive()">DEEP STORE DATA</button>
+			</div>
+
+			<div class="gen store six" id="generated_html" style="display:none">
+				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
+				<div class="button_pair" id="button_pair" style="display:flex;">
+					<button class="" id='accessdata' style="width:400px;" onclick="loadFromOne()">ACCESS DATA</button>
+					<button class="" id='learnmore' style="width:400px;" onclick="faq()">LEARN MORE</button>
+				</div>
+			</div>
+	<input id="store_codeword_ph" style="display:none;">
+	<input id="store_data_ph" style="display:none;">
+	<input id="store_p1_ph" style="display:none;">
+	<input id="store_p2_ph" style="display:none;">
+	<input id="store_p3_ph" style="display:none;">
+<!--  store  --!>
 };
+
 my $load = qq{
+<!--   load  --!>
+			<div class="gen load one" id="generated_html" style="">
+				<label>ACCESS DATA</label>
+				<h2>ENTER CODE WORD</h2>
+				<input value="" id="load_codeword" style="">
+				<button class="" id='lf1' style="width: 250px;" onclick="loadFromOne()">NEXT</button>
+			</div>
+
+			<div class="gen load two" id="generated_html" style="display:none">
+				<label>&#10004; CODE WORD ENTERED</label> 
+				<h2>ENTER SECRET WORD 1</h2>
+				<input value="" id="load_p1" style="">
+				<div class="button_pair" id="button_pair" style="display:flex;">
+					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>
+					<button class="" id='lf2' style="flex-grow:1;" onclick="loadFromTwo()">NEXT</button>
+				</div>
+			</div>
+
+			<div class="gen load three" id="generated_html" style="display:none">
+				<label>&#10004; CODE WORD ENTERED</label> 
+				<label>&#10004; SECRET WORD 1 ENTERED</label> 
+				<h2>ENTER SECRET WORD 2</h2>
+				<input value="" id="load_p2" style="">
+				<div class="button_pair" id="button_pair" style="display:flex;">
+					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>
+					<button class="" id='lf3' style="flex-grow:1;" onclick="loadFromThree()">NEXT</button>
+				</div>
+			</div>
+
+			<div class="gen load four" id="generated_html" style="display:none">
+				<label>&#10004; CODE WORD ENTERED</label> 
+				<label>&#10004; SECRET WORD 1 ENTERED</label> 
+				<label>&#10004; SECRET WORD 2 ENTERED</label> 
+				<h2>ENTER SECRET WORD 3</h2>
+				<input value="" id="load_p3" style="">
+				<div class="button_pair" id="button_pair" style="display:flex;">
+					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>
+					<button class="" id='lf4' style="flex-grow:1;" onclick="loadFromFour()">ACCESS DATA</button>
+				</div>
+			</div>
+
+			<div class="gen load five" id="generated_html" style="display:none">
+				<label>&#10004; SUCCESS</label>
+				<textarea value="" id="load_data" rows="8" cols="50">i luv lamp ;-)</textarea>
+				<div class="button_pair" id="button_pair" style="display:flex;">
+					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">ACCESS MORE DATA</button>
+					<button class="" id='' style="flex-grow:1;" onclick="">STORE MORE DATA</button>
+				</div>
+			</div>
+
+	<input id="load_codeword_ph" style="display:none;">
+	<input id="load_p1_ph" style="display:none;">
+	<input id="load_p2_ph" style="display:none;">
+	<input id="load_p3_ph" style="display:none;">
+<!--   load  --!>
+};
+
+my $import = qq{
 
 };
-my $delete = qq{
 
-};
 
 if( $id eq 'store'){
 	$template->param(htmlblock => $store);
 }elsif( $id eq 'load'){
 	$template->param(htmlblock => $load);
-}elsif( $id eq 'delete'){
-	$template->param(htmlblock => $delete);
+}elsif( $id eq 'import'){
+	$template->param(htmlblock => $import);
 }else{
 	$template->param(htmlblock => $main);
 }
