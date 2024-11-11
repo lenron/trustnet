@@ -63,19 +63,43 @@
 		justify-content: center;
 	}
 
-	.obf_button {
+	/* obf button */
+	button {
 		/*width: 400px;*/
-		height: 50px;
+		height: 65px;
 		background-color: #434343;
 		border: 2px solid;
-		padding: 8px;
-		margin: 2px;
+		padding: 2px;
+		margin: 8px;
 		padding-right: 10px;
 		padding-left: 10px;
 		color: #54c597;
 		border-color: #54c597;
 		font-size: 17px;
-		border-radius: 10px;
+		border-radius: 15px;
+	}
+
+	input {
+		height: 80px;
+		background-color: #272727;
+		border: 2px solid;
+		padding: 8px;
+		margin: 8px;
+		border-color: #54c597;
+		color: #54c597;
+		font-size: 25px;
+		border-radius: 20px;
+	}
+
+	textarea {
+		background-color: #272727;
+		border: 2px solid;
+		padding: 8px;
+		margin: 8px;
+		border-color: #54c597;
+		color: #54c597;
+		font-size: 25px;
+		border-radius: 30px;
 	}
 	
 </style>
@@ -99,12 +123,27 @@
 	<div class="center_html" id="center_html">
 		<div class="content_html" id="content_html">
 
-			<div id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
-				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
+
+			<div class="store one" id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
+				<label>STORE DATA</label>
+				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
+				<input value="" id="store_codeword" style="">
+				<button class="" id='go_store_thread' style="width: 250px;" onclick="stepFromOne()">NEXT</button>
+			</div>
+
+			<div class="store two" id="generated_html" style="align-self: center; display: none; flex-direction: column; justify-content: center; color: #54c597">
+				<label>STORE DATA</label>
+				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
 				<div id="button_div" style="display:flex; justify-content: center">
-					<button class="obf_button" id='go_store_thread' onclick="location.href='https://chat.dance/obfuscate.pl?id=store0';">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_thread' onclick="location.href='https://chat.dance/obfuscate.pl?id=load0';">ACCESS SECRET DATA</button>
-					<button class="obf_button" id='go_import_thread' onclick="location.href='https://chat.dance/obfuscate.pl?id=delete0';">IMPORT SECRET DATA</button>
+					<textarea value="" id="store_codeword" rows="8" cols="100"></textarea>
+				</div>
+			</div>
+
+			<div class="store" id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
+				<label>STORE DATA</label>
+				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
+				<div id="button_div" style="display:flex; justify-content: center">
+					<textarea value="" id="store_codeword" rows="8" cols="50"></textarea>
 				</div>
 			</div>
 
@@ -113,6 +152,14 @@
 
 </body>
 <script>
+
+	function stepFromOne(){
+		console.log("hit stepFromOne()");
+		// Show Class 2
+		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "flex");
+		// Hide Class 1
+		document.querySelectorAll(".store.one").forEach(a=>a.style.display = "none");
+	}
 
 	// Catch Enter key press with this in the HTML Object:
 	// onkeypress="return window.parent.searchKeyPress(event);"
