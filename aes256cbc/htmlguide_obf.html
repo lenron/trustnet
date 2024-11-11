@@ -63,6 +63,15 @@
 		justify-content: center;
 	}
 
+	/* generated conetent */
+	.gen {
+		align-self: center;
+		display: flex;
+		flex-direction: column;
+		justify-content: center; 
+		color: #54c597;
+	}
+
 	/* obf button */
 	button {
 		/*width: 400px;*/
@@ -124,26 +133,26 @@
 		<div class="content_html" id="content_html">
 
 
-			<div class="store one" id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
+			<div class="gen store one" id="generated_html" style="">
 				<label>STORE DATA</label>
 				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
 				<input value="" id="store_codeword" style="">
-				<button class="" id='go_store_thread' style="width: 250px;" onclick="stepFromOne()">NEXT</button>
+				<button class="" id='sf1' style="width: 250px;" onclick="stepFromOne()">NEXT</button>
 			</div>
 
-			<div class="store two" id="generated_html" style="align-self: center; display: none; flex-direction: column; justify-content: center; color: #54c597">
+			<div class="gen store two" id="generated_html" style="display:none">
 				<label>STORE DATA</label>
-				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
-				<div id="button_div" style="display:flex; justify-content: center">
-					<textarea value="" id="store_codeword" rows="8" cols="100"></textarea>
-				</div>
+				<textarea value="" id="store_data" rows="8" cols="50">ENTER YOUR SECRET DATA</textarea>
+				<button class="" id='sf2' style="width: 250px; align-self:center;" onclick="stepFromTwo()">ENCRYPT DATA</button>
 			</div>
 
-			<div class="store" id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
-				<label>STORE DATA</label>
-				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
-				<div id="button_div" style="display:flex; justify-content: center">
-					<textarea value="" id="store_codeword" rows="8" cols="50"></textarea>
+			<div class="gen store three" id="generated_html" style="display:none">
+				<label>&#9744;STORE DATA SAVED</label>
+				<h2>ENTER SECRET WORD 1</h2>
+				<input value="" id="store_p1" style="">
+				<div class="button_pair" id="button_pair">
+					<button class="" id='sf1' style="width: 250px;" onclick="deepStore()">NEXT</button>
+					<button class="" id='sf1' style="width: 250px;" onclick="stepFromThree()">NEXT</button>
 				</div>
 			</div>
 
@@ -155,11 +164,22 @@
 
 	function stepFromOne(){
 		console.log("hit stepFromOne()");
-		// Show Class 2
+		// Show elements with classes store AND two
 		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "flex");
-		// Hide Class 1
+		// Hide elements with classes store AND one 
 		document.querySelectorAll(".store.one").forEach(a=>a.style.display = "none");
 	}
+
+	function stepFromTwo(){
+		console.log("hit stepFromTwo()");
+		// Show 
+		document.querySelectorAll(".store.three").forEach(a=>a.style.display = "flex");
+		// Hide 
+		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "none");
+	}
+
+
+
 
 	// Catch Enter key press with this in the HTML Object:
 	// onkeypress="return window.parent.searchKeyPress(event);"
