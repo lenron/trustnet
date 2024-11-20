@@ -146,124 +146,12 @@
 		<div class="content_html" id="content_html">
 
 			<TMPL_VAR NAME=htmlblock>
-<!--   store  
-			<div class="gen store one" id="generated_html" style="">
-				<label>STORE DATA</label>
-				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
-				<input value="" id="store_codeword" style="">
-				<button class="" id='sf1' style="width: 250px;" onclick="storeFromOne()">NEXT</button>
-			</div>
 
-			<div class="gen store two" id="generated_html" style="display:none">
-				<label>STORE DATA</label>
-				<textarea value="" id="store_data" rows="8" cols="50">ENTER YOUR SECRET DATA</textarea>
-				<button class="" id='sf2' style="width: 250px; align-self:center;" onclick="storeFromTwo()">ENCRYPT DATA</button>
-			</div>
-
-			<div class="gen store three" id="generated_html" style="display:none">
-				<label>&#10004; SECRET DATA SAVED</label>
-				<h2>ENTER SECRET WORD 1</h2>
-				<input value="" id="store_p1" style="">
-				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>
-					<button class="" id='sf3' style="flex-grow:1;" onclick="storeFromThree()">ENHANCE SECURITY</button>
-				</div>
-			</div>
-
-			<div class="gen store four" id="generated_html" style="display:none">
-				<label>&#10004; SECRET DATA SAVED</label>
-				<label>&#10004; SECRET WORD 1 SAVED</label>
-				<h2>ENTER SECRET WORD 2</h2>
-				<input value="" id="store_p2" style="">
-				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>
-					<button class="" id='sf4' style="flex-grow:1;" onclick="storeFromFour()">ENHANCE SECURITY</button>
-				</div>
-			</div>
-
-			<div class="gen store five" id="generated_html" style="display:none">
-				<label>&#10004; SECRET DATA SAVED</label>
-				<label>&#10004; SECRET WORD 1 SAVED</label>
-				<label>&#10004; SECRET WORD 2 SAVED</label>
-				<h2>ENTER SECRET WORD 3</h2>
-				<input value="" id="store_p3" style="">
-				<button class="" id='deepstorebutton' style="width:50%;align-self:center;" onclick="storeFromFive()">DEEP STORE DATA</button>
-			</div>
-
-			<div class="gen store six" id="generated_html" style="display:none">
-				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
-				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='accessdata' style="width:400px;" onclick="loadFromOne()">ACCESS DATA</button>
-					<button class="" id='learnmore' style="width:400px;" onclick="faq()">LEARN MORE</button>
-				</div>
-			</div>
-	<input id="store_codeword_ph" style="display:none;">
-	<input id="store_data_ph" style="display:none;">
-	<input id="store_p1_ph" style="display:none;">
-	<input id="store_p2_ph" style="display:none;">
-	<input id="store_p3_ph" style="display:none;">
-   store  
-
-
-   load  
-			<div class="gen load one" id="generated_html" style="">
-				<label>ACCESS DATA</label>
-				<h2>ENTER CODE WORD</h2>
-				<input value="" id="load_codeword" style="">
-				<button class="" id='lf1' style="width: 250px;" onclick="loadFromOne()">NEXT</button>
-			</div>
-
-			<div class="gen load two" id="generated_html" style="display:none">
-				<label>&#10004; CODE WORD ENTERED</label> 
-				<h2>ENTER SECRET WORD 1</h2>
-				<input value="" id="load_p1" style="">
-				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>
-					<button class="" id='lf2' style="flex-grow:1;" onclick="loadFromTwo()">NEXT</button>
-				</div>
-			</div>
-
-			<div class="gen load three" id="generated_html" style="display:none">
-				<label>&#10004; CODE WORD ENTERED</label> 
-				<label>&#10004; SECRET WORD 1 ENTERED</label> 
-				<h2>ENTER SECRET WORD 2</h2>
-				<input value="" id="load_p2" style="">
-				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>
-					<button class="" id='lf3' style="flex-grow:1;" onclick="loadFromThree()">NEXT</button>
-				</div>
-			</div>
-
-			<div class="gen load four" id="generated_html" style="display:none">
-				<label>&#10004; CODE WORD ENTERED</label> 
-				<label>&#10004; SECRET WORD 1 ENTERED</label> 
-				<label>&#10004; SECRET WORD 2 ENTERED</label> 
-				<h2>ENTER SECRET WORD 3</h2>
-				<input value="" id="load_p3" style="">
-				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>
-					<button class="" id='lf4' style="flex-grow:1;" onclick="loadFromFour()">ACCESS DATA</button>
-				</div>
-			</div>
-
-			<div class="gen load five" id="generated_html" style="display:none">
-				<label>&#10004; SUCCESS</label>
-				<textarea value="" id="load_data" rows="8" cols="50">i luv lamp ;-)</textarea>
-				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">ACCESS MORE DATA</button>
-					<button class="" id='' style="flex-grow:1;" onclick="">STORE MORE DATA</button>
-				</div>
-			</div>
-
-	<input id="load_codeword_ph" style="display:none;">
-	<input id="load_p1_ph" style="display:none;">
-	<input id="load_p2_ph" style="display:none;">
-	<input id="load_p3_ph" style="display:none;">
-   load  --!>
 		</div>
 	</div>
 
 </body>
+<script src="base58.js"></script>
 <script>
 
 	// Set Title to link to Home.
@@ -287,8 +175,8 @@
 	// delete data
 
 
-	function storeFromOne(){
-		console.log("hit storeFromOne()");
+	function storeOne(){
+		console.log("hit storeOne()");
 		// Show elements with classes store AND two
 		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "flex");
 		// Hide elements with classes store AND one 
@@ -297,8 +185,8 @@
 		// hold code word
 	}
 
-	function storeFromTwo(){
-		console.log("hit storeFromTwo()");
+	function storeTwo(){
+		console.log("hit storeTwo()");
 		// Show 
 		document.querySelectorAll(".store.three").forEach(a=>a.style.display = "flex");
 		// Hide 
@@ -307,7 +195,7 @@
 		// hold data
 	}
 
-	function storeFromThree(){
+	function storeThree(){
 		console.log("store from three");
 		// Show 
 		document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
@@ -317,7 +205,7 @@
 		// hold p1
 	}
 
-	function storeFromFour(){
+	function storeFour(){
 		console.log("store from four");
 		// Show 
 		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "flex");
@@ -327,15 +215,18 @@
 		// hold p2
 	}
 
-	function storeFromFive(){
+	function storeFive(){
 		console.log("store from five");
 		// Show 
 		document.querySelectorAll(".store.six").forEach(a=>a.style.display = "flex");
 		// Hide 
 		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "none");
 
+		deepStore();
+
 		// hold p3
 		// deep store
+		// clear sensitive data / reload page
 
 		// last buttons go to:
 		// Load
@@ -344,7 +235,7 @@
 
 
 //////////////load
-	function loadFromOne(){
+	function loadOne(){
 		console.log("");
 		// Show elements with classes load AND two
 		document.querySelectorAll(".load.two").forEach(a=>a.style.display = "flex");
@@ -354,7 +245,7 @@
 		// hold code word
 	}
 
-	function loadFromTwo(){
+	function loadTwo(){
 		console.log("");
 		// Show 
 		document.querySelectorAll(".load.three").forEach(a=>a.style.display = "flex");
@@ -364,7 +255,7 @@
 		// hold p1
 	}
 
-	function loadFromThree(){
+	function loadThree(){
 		console.log("");
 		// Show 
 		document.querySelectorAll(".load.four").forEach(a=>a.style.display = "flex");
@@ -374,18 +265,18 @@
 		// hold p2
 	}
 
-	function loadFromFour(){
+	function loadFour(){
 		console.log("");
 		// Show 
 		document.querySelectorAll(".load.five").forEach(a=>a.style.display = "flex");
 		// Hide 
 		document.querySelectorAll(".load.four").forEach(a=>a.style.display = "none");
 
+		deepLoad();
+
 		// hold p3
 		// deep load
 	}
-
-
 
 	// Catch Enter key press with this in the HTML Object:
 	// onkeypress="return window.parent.searchKeyPress(event);"
@@ -402,6 +293,790 @@
 		}
 		return true;
 	}
+
+////////////////////////////////////////////
+//////		Begin Merge 	////////////////
+////////////////////////////////////////////
+
+
+// Base 58 character map.
+const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+
+	async function encryptStack(plaintext, pass1, pass2, pass3){
+		// OpenSSL Encrypt (base 64 encoded)
+		const openssl_encrypted = await encOpenSSL(plaintext, pass1);
+		// Obfuscation Step 1 Encrypt
+		const obf_s1_encrypted = await obf1Encrypt(openssl_encrypted, pass2);
+		// Obfuscation Step 2 Encrypt
+		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, pass3);
+		return obf_s2_encrypted;
+	}//encryptStack()
+
+	async function decryptStack(encrypted, pass1, pass2, pass3){
+		const obf2_decrypted = await obf2Decrypt(encrypted, pass3);
+		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass2);
+		const plaintext = await decOpenSSL(obf1_decrypted, pass1);
+		return plaintext;
+	}//decryptStack()
+
+	async function deepStore(){
+
+		// Get save data from user.
+		const plaintext = document.getElementById("store_data").value;
+		// Get code/passwords from user.
+		const codeword = document.getElementById("store_codeword").value;
+		const pass_1 = document.getElementById("store_pass_1").value;
+		const pass_2 = document.getElementById("store_pass_2").value;
+		const pass_3 = document.getElementById("store_pass_3").value;
+
+		// Make sure data isn't blank, and mandate that all 3 pw's are used in addition to the cw.
+		if( plaintext === '' || codeword === '' || pass_1 === '' || pass_2 === '' || pass_3 === '' ){
+			//addStatus("To proceed, please make sure no fields are blank.\n");
+			throw new Error('Empty fields found! Ending.');
+		}
+
+		// Triple Encrypt
+		const encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
+		//addStatus("Encrypt Completed Successfully.\n");
+
+		// Check Decrypt
+		const check_decrypt = await decryptStack(encrypted_data, pass_1, pass_2, pass_3);
+		if( plaintext == check_decrypt ){
+			//addStatus("Encrypted data integrity verified.\n");
+		}else{
+			console.log("plaintext: ~" + plaintext + "~");
+			console.log("decrypted: ~" + check_decrypt + "~");
+			//addStatus("Unable to properly extract input data from encrypted! FAIL.\n");
+		} 
+
+		// Compute Fingerprint
+		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
+		console.log("fingerprint hex: " + fp_hex);
+		console.log("fingerprint length: " + fp_hex.length);
+		// fingerprint length check
+		if( fp_hex.length != 64 ){
+			//addStatus("Fingerprint length problem! Ending.\n");
+			throw new Error('Fingerprint length INVALID!');
+		}
+
+		// Use fetch() for server communication
+		const server_response = await serverStore(fp_hex, encrypted_data);
+		sr_store_result = server_response.response;
+		console.log("Server Response from STORE: " + "~" + sr_store_result + "~");
+		console.log(server_response);
+		// Store returned 0 (fail).
+		if( Number(sr_store_result)  != 1){
+			//addStatus("There was a problem storing the data! End.\n\n");
+			throw new Error('STORE ERROR!');
+		}
+
+		// Check Load
+		// return of 0 means fingerprint form check fails
+		// return of empty means fingerprint returned nothing
+		const sr_load = await serverLoad(fp_hex);
+		console.log("Server Response from LOAD: " + "~" + sr_load.response + "~");
+		console.log(sr_load);
+
+		// Report Results
+		if( encrypted_data  === sr_load.response ){
+			//addStatus("Data successfully saved to server.\n\n");
+		}else{
+			//addStatus("Data failed to save to server!\n\n");
+
+			/////////////////////////////
+			// Maybe delete the record (once I write that sub) if it fails to load correctly?????
+			////////////////////////
+		}
+
+	}//deepStore()
+
+
+	async function deepLoad(){
+
+		// Get code/passwords from user.
+		const codeword = document.getElementById("load_codeword").value;
+		const pass_1 = document.getElementById("load_pass_1").value;
+		const pass_2 = document.getElementById("load_pass_2").value;
+		const pass_3 = document.getElementById("load_pass_3").value;
+		console.log("code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
+
+		// Compute Fingerprint
+		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
+		console.log("fingerprint hex: " + fp_hex);
+		console.log("fingerprint length: " + fp_hex.length);
+		// fingerprint length check
+		if( fp_hex.length != 64 ){
+			//addStatus("Fingerprint length problem! Ending.\n");
+			throw new Error('Fingerprint length INVALID!');
+		}
+
+		// Load from server
+		const sr_load = await serverLoad(fp_hex);
+		console.log("Server Response from LOAD: " + "~" + sr_load.response + "~");
+		console.log(sr_load);
+		if( sr_load.response == '' ){
+			//addLoadStatus("Nothing Found.");
+			return;
+		}
+
+		const enc_data = String(sr_load.response);
+
+		//const plaintext = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
+		//console.log("plaintext: " + plaintext);
+		// Triple Decrypt
+		const obf2_decrypted = await obf2Decrypt(enc_data, pass_3);
+		console.log("obf2dec: " + obf2_decrypted);
+		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass_2);
+		console.log("obf1dec: " + obf1_decrypted);
+		plaintext = await decOpenSSL(obf1_decrypted, pass_1);
+		//const decrypted = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
+		//console.log("decrypted: " + decrypted);
+		// Report Results 
+		//document.getElementById("output_display").value = decrypted;
+		document.getElementById("output_display").value = plaintext;
+/*
+		if( decrypted ){
+			//addLoadStatus("Completed Successfully.\n");
+		}else{
+			//addLoadStatus("Failed.\n");
+		}
+*/
+	}//deepLoad()
+
+/*
+	function addStatus( msg ){
+			document.getElementById("status_display_store").value += msg;
+	}//addStatus()
+
+	function addLoadStatus( msg ){
+			document.getElementById("status_display_load").value += msg;
+	}//addLoadStatus()
+*/
+	// Server communication function. Endpoint load.pl will attempt to load
+	// encrypted data corresponding to the input fingerprint.
+	async function serverLoad(fingerprint){
+		const SERVER_URL = '/obf/cgi-bin/load.pl';
+		
+		console.log("Attempting Server Load with\nFingerprint: " + fingerprint); 
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/html',
+			},
+			body: JSON.stringify({
+				fingerprint: fingerprint,
+			}),
+		})
+		return response.json()
+	}//serverLoad()
+
+	// Server communication function. Endpoint store.pl will attempt to store 
+	// input encrypted data at the input fingerprint location.
+	async function serverStore(fingerprint, data){
+		const SERVER_URL = '/obf/cgi-bin/store.pl';
+		
+		console.log("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/html',
+			},
+			body: JSON.stringify({
+				fingerprint: fingerprint,
+				data: data,
+			}),
+		})
+		return response.json()
+	}//serverStore()
+
+	async function computeFingerprint(codeword, pass_2, pass_3){
+		// sub all lowercase
+		const cw_lower = codeword.toLowerCase();
+		// take sha256 hash of codeword, pass 2, pass 3
+		const enc = new TextEncoder();
+		const cw_buf = enc.encode(cw_lower);
+		const p2_buf = enc.encode(pass_2);
+		const p3_buf = enc.encode(pass_3);
+		const cw_hash = await crypto.subtle.digest('SHA-256', cw_buf);
+		const p2_hash = await crypto.subtle.digest('SHA-256', p2_buf);
+		const p3_hash = await crypto.subtle.digest('SHA-256', p3_buf);
+		// concatenate: fingerprint = cw_hash + p2_hash + p3_hash;
+		const cw_and_p2_hash = concatBuffer(cw_hash, p2_hash)
+		const concatenated_hashes = concatBuffer(cw_and_p2_hash, p3_hash)
+		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
+		const fingerprint = new Uint8Array(fp_hash);
+		//console.log("fingerprint: " + fingerprint);
+		const fp_hex = buf2hex(fingerprint);
+		return fp_hex;
+	}//computeFingerprint
+
+	function getKeyMaterial(password) {
+		const enc = new TextEncoder();
+		return window.crypto.subtle.importKey(
+			"raw",
+			enc.encode(password),
+			"PBKDF2",
+			false,
+			["deriveBits", "deriveKey"],
+		);
+	}//getKeyMaterial()
+
+
+	async function encOpenSSL(plaintext, pass) {
+
+		// Encode plaintext in utf8 and store in Uint8Array inputbytes.
+		const inputbytes = new TextEncoder().encode( plaintext );
+		// Make the plaintext look like a file by adding a single newline
+		// char to the end of the string.
+		const single_newline = new Uint8Array(1);
+		single_newline[0] = 10;
+		const plaintextbytes_buf = concatBuffer(inputbytes, single_newline);
+		// plaintext is now in a form that is ready to give to the encryption function.
+		const plaintextbytes = new Uint8Array(plaintextbytes_buf);
+
+		// Generate random salt.
+		const salt = window.crypto.getRandomValues(new Uint8Array(8));
+
+		// Prepare inputs for digest.
+		const keyMaterial = await getKeyMaterial(pass);
+		const iter = 10000;
+		const digest_hash = 'SHA-256';
+
+		// Use the key derivation function PBKDF2 to derive bits that will 
+		// be used to create the cryptoKey object needed for the main digest.
+		const derived_bits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				salt,
+				iterations: iter,
+				hash: digest_hash,
+			},
+			keyMaterial,
+			384,
+		);
+		const derivedKeyBuffer = new Uint8Array(derived_bits);
+
+		// OpenSSL derives the key and IV using the same PBKDF2 digest.
+		// The first 256 bits are used as key, the last 128 are used for IV.
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				name: 'AES-CBC', 
+				length: 256
+			}, 
+			false, 
+			['encrypt']
+		);
+
+		// Main Function Call
+		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
+
+		// Copy the output array buffer into a new typed array.
+		const cipherbytes = new Uint8Array(encrypted_result);
+		// Convert to base64 for the next encryption step.
+		const result = bytesToBase64(encrypted_result);
+
+		// Combine constant salt, random salt, and encrypted result as array buffers, then convert to base64.
+		// out = Salted__ + <random salt> + <utf8 encoded ciphertext>
+		const const_salt = "Salted__";
+		const salt64 = new TextEncoder().encode(const_salt);
+		const two_salts = concatBuffer(salt64, salt);
+		// Merge salts with encoded ciphertext.
+		let encrypted_output_buf = concatBuffer(two_salts, cipherbytes);
+		encrypted_output_buf = new Uint8Array(encrypted_output_buf);
+		let out64 = bytesToBase64(encrypted_output_buf);
+		out64 = new Array(out64);
+
+		return out64;
+	}//encOpenSSL()
+
+	async function decOpenSSL(ciphertext64, pass) {
+
+		// ciphertext is now in a form that is ready to give to the encryption function.
+		const ciphertextby = base64ToBytes(ciphertext64);
+		const ciphertextbytes = new Uint8Array(ciphertextby);
+
+		const dec = new TextDecoder();
+		const input_string = dec.decode(ciphertextbytes);
+
+		const digest_hash = 'SHA-256';
+		const iter = 10000;
+		const salta = ciphertextbytes.slice(8,16);
+		const salt = new Uint8Array(salta);
+
+		// Prepare inputs for digest.
+		const keyMaterial = await getKeyMaterial(pass);
+
+		// Use the key derivation function PBKDF2 to derive bits that will 
+		// be used to create the cryptoKey object needed for the main digest.
+		const derived_bits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				salt,
+				iterations: iter,
+				hash: digest_hash,
+			},
+			keyMaterial,
+			384,
+		);
+		const derivedKeyBuffer = new Uint8Array(derived_bits);
+
+		// OpenSSL derives the key and IV using the same PBKDF2 digest.
+		// The first 256 bits are used as key, the last 128 are used for IV.
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+
+		// Extract the encrypted phrase from OpenSSL input
+		const cipherbytesphrase = ciphertextbytes.slice(16);
+
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				name: 'AES-CBC', 
+				length: 256
+			}, 
+			false, 
+			['decrypt']
+		);
+
+		// Main Function Call
+		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
+
+		plaintextbytes = new Uint8Array(decrypted_result);
+		let decrypted_string = new TextDecoder().decode( plaintextbytes );
+		// Pop single newline added in enc in order to output the same encrypted data as openssl command line.
+		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
+		return decrypted_string;
+	}//decOpenSSL()
+
+	async function getXOR(plaintext_binary, password){
+		// 1000 seems more reasonable if we're immediately going to chop it to 780.
+		const array_length = 1000;
+		// Prepare password side for XOR.
+		const pass_binary = await getPassHash(password, array_length);
+
+		// Perform the XOR bytewise in a loop.
+		let xor_result = new Array();
+		// XOR is a ^ in javascript
+		for (let i = 0; i < array_length; i++) {
+			xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
+		}
+
+		// Now that we have plenty of XOR'd binary data,
+		// we need to pop the number of bytes that will encode to exactly 1000 chars of base58 data.
+		let array_slice = xor_result.slice(0, 780);
+		let last_byte_popped;
+		let array_slice_hex;
+		let result_b58 = to_b58(array_slice);
+		// Start by popping whole bytes, then check if we encoded to 1000 exactly.
+		while( result_b58.length > 1000 ){
+			last_byte_popped = array_slice.pop();
+			result_b58 = to_b58(array_slice);
+		}
+		// If we don't encode to 1000 popping 8-bit bytes, try popping 4-bit words!
+		if( result_b58.length != 1000 ){
+			console.log("1000 char output missed. ADD MORE PRECISION!");
+			// Start by pushing back on the last popped byte.
+			array_slice.push(last_byte_popped);
+			// Convert to word array.
+			word_array = bytesToWords( array_slice );
+			// We have 4 words that are poppable.
+			let tries = 0;
+			while( result_b58.length != 1000){
+				console.log("word_array: " + word_array);
+				last_word_popped = word_array.pop();
+				result_b58 = to_b58_words(word_array);
+				console.log("b58 length: " + result_b58.length);
+				console.log("result_b58: " + result_b58);
+				tries++;
+				// Not sure how to test this as it may never trigger.
+				if( tries > 4 ){
+					throw new Error('MAJOR ERROR: additional precision not sufficient to reach 1000 characters of length. Ending.');
+				}
+			}
+		}	
+
+		console.log("RESULT: " + result_b58);
+		console.log("Data LENGTH: " + result_b58.length);
+		return result_b58;
+	}//getXOR()
+
+	async function obf1Encrypt(plaintext, password) {
+
+		// Prepare plaintext side for XOR.
+		let plaintext_binary = addCountstring(plaintext);
+
+		// XOR plaintext with password and return exactly 1000 base 58 chars.
+		const result_b58 = await getXOR(plaintext_binary, password);
+
+		// Check data length and type (check 2: 1000 char length, base 58).
+		//addStatus('Running Check 2...\n');
+		// If all b58 chars...
+		if( check_b58chars(result_b58) ){
+			//addStatus("Data type verified.\n");
+		}else{
+			//addStatus("Data type INVALID.\n");
+			//addStatus("Critical Failure! End.\n");
+			throw new Error('Obfuscation step 1 INVALID characters found!');
+			//return;
+		}
+
+		if( result_b58.length == 1000 ){ 
+			//addStatus("Data length verified.\n");
+		}else{
+			//addStatus("Data length INVALID. Length: " + result_b58.length + "\n");
+			//addStatus("Critical Failure! End.\n");
+			throw new Error('Obfuscation step 1 output length INVALID!');
+			//return;
+		}
+
+		return result_b58;
+	}//obf1Encrypt()
+
+	async function obf1Decrypt(compd_val, password) {
+
+		// Convert from base 58.
+		let decoded_b58_arr = from_b58(compd_val);
+
+		//const array_length = 732;
+		let array_length = decoded_b58_arr.length;
+
+		// Compute password for XOR.
+		let pass_binary = await getPassHash(password, array_length);
+
+		// Perform the bitwise XOR sequentially.
+		// Inverse of XOR is XOR and is communicative.
+		// XOR password and output to get input.
+		let xor_result = new Uint8Array(array_length);
+		for (let i = 0; i < array_length; i++) {
+			xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
+		}
+
+		let plaintextbytes = Array.from(xor_result);
+		// Strip off tailing zeros.
+		while(plaintextbytes[plaintextbytes.length - 1] == 0){
+			plaintextbytes.pop();
+		}
+		plaintextbytes = Uint8Array.from(plaintextbytes);
+		// utf8 to text
+		let decrypted_string = new TextDecoder().decode(plaintextbytes);
+
+		// data should now be in countstring form.
+
+		// use regex to see if decrypted_string looks like the countstring. 
+		// remove lead char (hopefully a 0) if not.
+		const regex = /^\d+:/;
+		if( !regex.test(decrypted_string) ){
+			console.log("NO MATCH: try stripping zero");
+			// Try stripping zero from function input and running the obf1 decrypt again.
+			try_stripped = compd_val.substr(1);
+			// Convert from base 58.
+			decoded_b58_arr = from_b58(try_stripped);
+			array_length = decoded_b58_arr.length;
+			// Compute password for XOR.
+			pass_binary = await getPassHash(password, array_length);
+			xor_result = new Uint8Array(array_length);
+			for (let i = 0; i < array_length; i++) {
+				xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
+			}
+
+			plaintextbytes = Array.from(xor_result);
+			// Strip off tailing zeros.
+			while(plaintextbytes[plaintextbytes.length - 1] == 0){
+				plaintextbytes.pop();
+			}
+			plaintextbytes = Uint8Array.from(plaintextbytes);
+			decrypted_string = new TextDecoder().decode(plaintextbytes);
+			
+			// Make sure this fixed it.
+			if( !regex.test(decrypted_string) ){
+				//addStatus("DECRYPT RETRY FAILED!\n");
+				//addLoadStatus("DECRYPT RETRY FAILED!\n");
+				throw new Error('DECRYPT RETRY FAILED!');
+			}
+		}
+
+		// Decode countstring
+		decrypted_string = decrypted_string.split(":").pop();
+
+		return decrypted_string;
+	}//obf1Decrypt
+
+
+	async function obf2Encrypt(input_data, password){
+
+		// Check input data for non-b58 chars
+		if( !check_b58chars(input_data) ){
+			console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
+			// Abort final step encode.
+			return;
+		}
+
+		// Get size of input data (should be 1000)
+		const input_length = input_data.length;
+
+		// Get hash+append of password, to length of input.
+		const pass_hash = await getPassHash(password, input_length);
+
+		// Convert password hash to base58
+		const pass_b58 = to_b58(pass_hash);
+
+		// Convert to b58 numerical equivalent 
+		let input_b58_num_arr = new Array(input_length);
+		let pass_b58_num_arr = new Array(input_length);
+		for (let i = 0; i < input_length; i++) {
+			input_b58_num_arr[i] = base58map.indexOf(input_data.charAt(i));
+			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
+		}
+
+		// Add the arrays piecewise, 
+		let sum_b58_num_arr = new Array(input_length);
+		for (let i = 0; i < input_length; i++) {
+			sum_b58_num_arr[i] = input_b58_num_arr[i] + pass_b58_num_arr[i];
+		}
+
+		// modulo 57, then store to new array.
+		for (let i = 0; i < input_length; i++) {
+			sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
+		}
+
+		// Convert numerical values to b58 chars.
+		let final_encrypted_string = '';
+		for (let i = 0; i < input_length; i++) {
+			final_encrypted_string += base58map.charAt(sum_b58_num_arr[i]);
+		}
+
+		return final_encrypted_string;
+	}//obf2Encrypt()
+
+	async function obf2Decrypt(final_encrypted, password){
+
+		// Get size of input data
+		const final_encrypted_length = final_encrypted.length;
+
+		// Get hash+append of password, to length of final_encrypted for now. 
+		const pass_hash = await getPassHash(password, final_encrypted_length);
+
+		// Convert password hash to base58
+		const pass_b58 = to_b58(pass_hash);
+
+		// Convert to b58 numerical equivalent 
+		let final_encrypted_b58_num_arr = new Array(final_encrypted_length);
+		let pass_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			final_encrypted_b58_num_arr[i] = base58map.indexOf(final_encrypted.charAt(i));
+			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
+		}
+
+		// Run the sum-and-58-modulo inverse function
+		let in_b58_num_arr = new Array(final_encrypted_length);
+		for (let i = 0; i < final_encrypted_length; i++) {
+			if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
+				final_encrypted_b58_num_arr[i] += 58;
+			}
+			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
+		}
+
+		// Convert numerical values to b58 chars.
+		let final_decrypted_string = '';
+		for (let i = 0; i < final_encrypted_length; i++) {
+			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
+		}
+
+		return final_decrypted_string;
+	}//obf2Decrypt()
+
+	function check_b58chars(input){
+		// From the first char(^) to the last($), match zero or more(*) of 
+		// 1-9A-HJ-NP-Za-km-z (false if any non-b58 chars).
+		const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
+		if( regex.test(input) ){
+			// Return true/valid: non-b58 chars were NOT found.
+			return 1;
+		}else{
+			// Return false/invalid: non-b58 chars were found.
+			return 0;
+		}
+	}//check_b58chars()
+
+	function check_init_input(){
+		let input = document.getElementById("plaintext_input").value;
+
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		//console.log("byte size: " + size);
+		//if( input.length > 500 ){
+		if( size > 500 ){
+			document.getElementById("input_warning").innerHTML= 'INPUT BYTE LENGTHS OVER 500 ARE INVALID. CURRENT LENGTH: ' + size;
+			document.getElementById("input_warning").style.display = 'inline';
+			//document.getElementById("encrypt_openssl_button").disabled = true;
+			document.getElementById("store_button").disabled = true;
+		}else{
+			document.getElementById("input_warning").style.display = 'none';
+			//document.getElementById("encrypt_openssl_button").disabled = false;
+			document.getElementById("store_button").disabled = false;
+		}
+	}//check_init_input()
+
+/*
+	// NOT USED
+	function check_input_obf2(){
+		let input = document.getElementById("obf2_input").value;
+		// Disable Final Step button if any non-base58 characters are entered.
+		if( check_b58chars(input) ){
+			//console.log("enable");
+			//enable button
+			document.getElementById("obf2Encrypt_button").disabled = false;
+			//document.getElementById("obf2_encrypt_output").value = "";
+		}else{
+			//console.log("Non-base 58 chars found in the Final Step input!");
+			//disable button
+			document.getElementById("obf2Encrypt_button").disabled = true;
+			//document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
+		}
+
+		if( input.length == 1000 ){
+			//document.getElementById("obf2Encrypt_button").disabled = false;
+			console.log("Obf2 input size verified as valid (exactly 1000 chars)");
+		}else{
+			//document.getElementById("obf2Encrypt_button").disabled = true;
+			console.log("Obf2 input size INVALID!");
+		}
+	}//check_input_obf2()
+*/
+
+
+	function addCountstring(data) {
+		// Count chars.
+		const num_chars = data.length;
+		// Form 'countstring'.
+		let countstring = num_chars + ':' + data;
+		// Convert to binary (Uint8Array).
+		const countstring_binary = new TextEncoder().encode(countstring);
+		// Copy to size 1000 array for XOR.
+		let big_arr = new Uint8Array(1000);
+		big_arr.set(countstring_binary);
+		return big_arr;
+	}//addCountstring()
+
+	async function getPassHash(pass, length) {
+		//console.log("entered password: " + pass);
+		// Convert to binary (Uint8Array).
+		const password_binary = new TextEncoder().encode(pass);
+		//console.log("password binary array: " + password_binary);
+
+		// Take initial SHA256.
+		let initial_sha = await crypto.subtle.digest('SHA-256', password_binary);
+		let sha_cumulative = initial_sha;
+		let	sha_result;
+
+		// Loop until we have 2000 bytes of data.
+		do{
+			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
+			// Append SHA256 of Hash(n-1)
+			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
+			sha_cumulative = new Uint8Array(sha_cumulative);
+			//console.log("sha_cumulative: " + sha_cumulative);
+		} while( sha_cumulative.length < length);
+		//console.log("sha_cumulative: " + sha_cumulative);
+
+		// Truncate array to size <length>
+		sha_cumulative = sha_cumulative.slice(0, length);
+
+		return sha_cumulative;
+	}//getPassHash()
+
+	// Outputs data in a typed array.
+	function concatBuffer(buffer1, buffer2) {
+	  var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+	  tmp.set(new Uint8Array(buffer1), 0);
+	  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+	  return tmp.buffer;
+	}//concatBuffer()
+
+
+	// MDN funcction Usage:
+	// bytesToBase64(new TextEncoder().encode("a Ā 𐀀 文 🦄")); // "YSDEgCDwkICAIOaWhyDwn6aE"
+	// new TextDecoder().decode(base64ToBytes("YSDEgCDwkICAIOaWhyDwn6aE")); // "a Ā 𐀀 文 🦄"
+
+	// MDN function
+	function base64ToBytes(base64) {
+		const binString = atob(base64);
+		return Uint8Array.from(binString, (m) => m.codePointAt(0));
+	}
+
+	// MDN function
+	function bytesToBase64(bytes) {
+		const binString = Array.from(bytes, (byte) =>
+			String.fromCodePoint(byte),
+		).join("");
+		return btoa(binString);
+	}
+
+	function _arrayBufferToBase64( buffer ) {
+		var binary = '';
+		var bytes = new Uint8Array( buffer );
+		var len = bytes.byteLength;
+		for (var i = 0; i < len; i++) {
+			binary += String.fromCharCode( bytes[ i ] );
+		}
+		return window.btoa( binary );
+	}//_arrayBufferToBase64()
+
+	function buf2hex(buffer) { // buffer is an ArrayBuffer
+		return [...new Uint8Array(buffer)]
+			.map(x => x.toString(16).padStart(2, '0'))
+			.join('');
+	}//buf2hex()
+	 // This function converts a hex string into an ArrayBuffer for hash processing.
+	function hex2buf(hexString){
+		// convert to a number array representing the hex bytes.
+		const hexBytesArray = new Array;
+		for(var i=0; i < hexString.length; i+=2){
+			hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
+		}
+		const hexArrayBuffer = new Uint8Array(hexBytesArray);
+		return hexArrayBuffer;
+	}//hex2buf()
+
+	function base64ToArrayBuffer(base64) {
+		var binaryString = atob(base64);
+		var bytes = new Uint8Array(binaryString.length);
+		for (var i = 0; i < binaryString.length; i++) {
+			bytes[i] = binaryString.charCodeAt(i);
+		}
+		return bytes.buffer;
+	}//base64ToArrayBuffer()
+/*
+	function encode64(){
+		let raw_text = document.getElementById("raw_64encode_text").value;
+		//console.log("Encoding the string: '" + raw_text + "'");
+		const encoded64 = btoa(raw_text);
+		//console.log("Encoded string: '" + encoded64 + "'");
+		document.getElementById("encoded64_text").value = encoded64;
+		document.getElementById("raw_64encoded_text").value = encoded64;
+	}//encode64()
+
+	function decode64(){
+		let decoded_text = document.getElementById("raw_64encoded_text").value;
+		//console.log("Decoding the string: '" + decoded_text + "'");
+		const decoded64 = atob(decoded_text);
+		//console.log("Decoded string: '" + decoded64 + "'");
+		document.getElementById("decoded64_text").value = decoded64;
+	}//decode64()
+*/
+
+////////////////////////////////////////////
+//////		End Merge	 	////////////////
+////////////////////////////////////////////
 
 </script>
 
