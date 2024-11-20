@@ -1,7 +1,7 @@
-#!/usr/bin/perl
+#!/home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin/perl5.10.1
 use strict;
 use warnings;
-use cPanelUserConfig;
+#use cPanelUserConfig;
 
 use Time::Piece;
 use CGI qw(:standard escapeHTML);
@@ -48,7 +48,7 @@ if ($q->param){
 	}
 
 	# First try to create new record. If that fails, modify the existing one.
-	my $dbh = DBI->connect("dbi:mysql:$db_name", $db_username, $db_pw);
+	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data) VALUES (?, ?)", undef, $fingerprint, $data);
 	# undef return indicates we need to modify the record instead.
 	if(not defined $response){
@@ -78,7 +78,7 @@ if ($q->param){
 
 # testing - print fingerprints
 	# ASC for ascending, DESC for descending
-	my $dbh = DBI->connect("dbi:mysql:$db_name", $db_username, $db_pw);
+	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	my $query = "SELECT fingerprint FROM $db_table";
 	#my $query = "SELECT sender, timestamp, content, screenname FROM $db_table_chat_messages WHERE chat_id=$chat_id ORDER BY timestamp ASC";
 	my $sth = $dbh->prepare($query);
@@ -91,7 +91,7 @@ if ($q->param){
 
 	}
 
-	my $dbh = DBI->connect("dbi:mysql:$db_name", $db_username, $db_pw);
+	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	#$dbh->do("UPDATE $db_table_misc_data SET name=?, value=? WHERE name='$name'", undef, $name, $value);
 #"INSERT INTO $db_table_contact_messages (ip, message) VALUES (?, ?)", undef, $ip, $message
 	$dbh->do("INSERT INTO $db_table (fingerprint, data) VALUES (?, ?)", undef, $value, $data);
@@ -105,7 +105,7 @@ if ($q->param){
 	my $user_id = $hash_ref->{id};
 	my $subscription = $hash_ref->{sub};
 
-	my $dbh = DBI->connect("dbi:mysql:$db_name", $db_username, $db_pw);
+	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	#$dbh->do("UPDATE $db_table_misc_data SET name=?, value=? WHERE name='$name'", undef, $name, $value);
 	$dbh->do("UPDATE $db_table_user_id SET subscription=? WHERE user_id='$user_id'", undef, $subscription);
 	$dbh->disconnect();
