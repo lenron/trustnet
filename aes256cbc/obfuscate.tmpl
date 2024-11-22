@@ -169,118 +169,120 @@
 		// faq();
 	}
 
-
-	// construction todo:
-	// import thread
-	// delete data
-
-
+	// Thread walk handler functions
 	function storeOne(){
-		console.log("hit storeOne()");
 		// Show elements with classes store AND two
 		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "flex");
 		// Hide elements with classes store AND one 
 		document.querySelectorAll(".store.one").forEach(a=>a.style.display = "none");
-
-		// hold code word
+		// autofocus must be changed in js because the html inputs are just shown/hidden
+		//document.getElementById('store_data').focus();
 	}
 
 	function storeTwo(){
-		console.log("hit storeTwo()");
-		// Show 
 		document.querySelectorAll(".store.three").forEach(a=>a.style.display = "flex");
-		// Hide 
 		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "none");
-
-		// hold data
+		document.getElementById('store_pass_1').focus();
 	}
 
 	function storeThree(){
-		console.log("store from three");
-		// Show 
 		document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
-		// Hide 
 		document.querySelectorAll(".store.three").forEach(a=>a.style.display = "none");
+		document.getElementById('store_pass_2').focus();
 
-		// hold p1
 	}
 
 	function storeFour(){
-		console.log("store from four");
-		// Show 
 		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "flex");
-		// Hide 
 		document.querySelectorAll(".store.four").forEach(a=>a.style.display = "none");
-
-		// hold p2
+		document.getElementById('store_pass_3').focus();
 	}
 
 	function storeFive(){
-		console.log("store from five");
-		// Show 
 		document.querySelectorAll(".store.six").forEach(a=>a.style.display = "flex");
-		// Hide 
 		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "none");
-
+		// Main Function Call
 		deepStore();
-
-		// hold p3
-		// deep store
 		// clear sensitive data / reload page
-
-		// last buttons go to:
-		// Load
-		// Learn More - FAQ?
 	}
 
 
 //////////////load
 	function loadOne(){
-		console.log("");
 		// Show elements with classes load AND two
 		document.querySelectorAll(".load.two").forEach(a=>a.style.display = "flex");
 		// Hide elements with classes load AND one 
 		document.querySelectorAll(".load.one").forEach(a=>a.style.display = "none");
-
-		// hold code word
+		document.getElementById('load_pass_1').focus();
 	}
 
 	function loadTwo(){
-		console.log("");
-		// Show 
 		document.querySelectorAll(".load.three").forEach(a=>a.style.display = "flex");
-		// Hide 
 		document.querySelectorAll(".load.two").forEach(a=>a.style.display = "none");
-
-		// hold p1
+		document.getElementById('load_pass_2').focus();
 	}
 
 	function loadThree(){
-		console.log("");
-		// Show 
 		document.querySelectorAll(".load.four").forEach(a=>a.style.display = "flex");
-		// Hide 
 		document.querySelectorAll(".load.three").forEach(a=>a.style.display = "none");
-
-		// hold p2
+		document.getElementById('load_pass_3').focus();
 	}
 
 	function loadFour(){
-		console.log("");
-		// Show 
 		document.querySelectorAll(".load.five").forEach(a=>a.style.display = "flex");
-		// Hide 
 		document.querySelectorAll(".load.four").forEach(a=>a.style.display = "none");
-
+		// Main Function Call
 		deepLoad();
+	}
 
-		// hold p3
-		// deep load
+	// Catch Enter on each page
+	// input.addEventListener(type, listener)
+	// .addEventListener('keydown', catchEnter);	or
+	// onkeydown = catchEnter()
+
+	function catchEnter(e){
+		console.log("keydown event key: " + e.key);
+		console.log("this target: " + e.target.id);
+		if( e.key == 'Enter'){
+			console.log("caught");
+			if( e.target.id == "store_codeword"){
+				storeOne();
+			}else if(e.target.id == "store_pass_1"){
+				storeThree();
+			}else if(e.target.id == "store_pass_2"){
+				storeFour();
+			}else if(e.target.id == "store_pass_3"){
+				storeFive();
+			}else if(e.target.id == "load_codeword"){
+				loadOne();
+			}else if(e.target.id == "load_pass_1"){
+				loadTwo();
+			}else if(e.target.id == "load_pass_2"){
+				loadThree();
+			}else if(e.target.id == "load_pass_3"){
+				loadFour();
+			}
+		}
+	}
+
+
+/*
+	function searchKeyPress(e, tar){
+		console.log("keyCode: " + e.keyCode);
+		console.log("target: " + tar);
+		// look for window.event in case event isn't passed in
+		e = e || window.event;
+		if (e.keyCode == 13){
+			if( tar == '
+
+			return false;
+		}
+		return true;
 	}
 
 	// Catch Enter key press with this in the HTML Object:
-	// onkeypress="return window.parent.searchKeyPress(event);"
-	function searchKeyPress(e){
+	// onkeypress="return window.parent.searchKeyPress(event, target);"
+	function searchKeyPress(e, tar){
 		console.log("keyCode: " + e.keyCode);
 		// look for window.event in case event isn't passed in
 		e = e || window.event;
@@ -293,6 +295,7 @@
 		}
 		return true;
 	}
+*/
 
 ////////////////////////////////////////////
 //////		Begin Merge 	////////////////
@@ -453,7 +456,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			document.getElementById("status_display_load").value += msg;
 	}//addLoadStatus()
 */
-	// Server communication function. Endpoint load.pl will attempt to load
+	// Server communication function. Endpoint exeload will attempt to load
 	// encrypted data corresponding to the input fingerprint.
 	async function serverLoad(fingerprint){
 		const SERVER_URL = '/obf/exeload';
@@ -471,7 +474,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		return response.json()
 	}//serverLoad()
 
-	// Server communication function. Endpoint store.pl will attempt to store 
+	// Server communication function. Endpoint exestore will attempt to store 
 	// input encrypted data at the input fingerprint location.
 	async function serverStore(fingerprint, data){
 		const SERVER_URL = '/obf/exestore';
