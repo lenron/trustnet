@@ -456,7 +456,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 	// Server communication function. Endpoint load.pl will attempt to load
 	// encrypted data corresponding to the input fingerprint.
 	async function serverLoad(fingerprint){
-		const SERVER_URL = '/obf/cgi-bin/load.pl';
+		const SERVER_URL = '/obf/exeload';
 		
 		console.log("Attempting Server Load with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
@@ -474,7 +474,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 	// Server communication function. Endpoint store.pl will attempt to store 
 	// input encrypted data at the input fingerprint location.
 	async function serverStore(fingerprint, data){
-		const SERVER_URL = '/obf/cgi-bin/store.pl';
+		const SERVER_URL = '/obf/exestore';
 		
 		console.log("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
 		const response = await fetch(SERVER_URL, {

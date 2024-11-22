@@ -1,12 +1,45 @@
 DirectoryIndex obfuscate.pl
 
+#ddRedirect 301 "/store" "https://chat.dance/obf/obfuscate.pl?id=store"
+#Redirect 301 "/load" "https://chat.dance/obf/obfuscate.pl?id=load"
+
 RewriteEngine On
-##Not sure what this do
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+RewriteBase /
+RewriteRule ^store obfuscate.pl?id=store
+RewriteRule ^load obfuscate.pl?id=load
+RewriteRule ^delete obfuscate.pl?id=delete
+#RewriteRule ^/load/execute /cgi-bin/load.pl
+#RewriteRule ^/store/execute /cgi-bin/store.pl
+RewriteRule ^exestore store.pl
+RewriteRule ^exeload load.pl
+
+#RewriteCond %{REQUEST_URI} ^/obfuscate.pl\?id\=(.*)
+#RewriteRule .* https://chat.dance/obf/$1 [L]
+
+#RewriteCond %{REQUEST_FILENAME} !-d  # if requested uri is not directory (!-d)
+#RewriteCond %{REQUEST_FILENAME}\.php -f # and if there is a file named URI+'.php' (-f)
+#RewriteRule ^(.*)$ $1.php # then if there is any thing in uri then rewrite it as uri+'.php'
+
+
+
+#RewriteBase /
+#RewriteCond %{REQUEST_URI} ^/obfuscate.pl\?id\=(.*)
+#RewriteRule .* https://chat.dance/obf/$1 [L]
+
+#obfuscate.pl?id=store
+
+
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
 #Try global re-route
 #RewriteRule ^(.*)$ /cgi-bin/obf.pl?test=$1 [NC,L,QSA]
 
+# Rule for obfuscate
+#RewriteRule ^store obfuscate.pl?id=store
+#RewriteRule ^load obfuscate.pl?id=load
+
+#Redirect 301 "/store" "https://chat.dance/obf/obfuscate.pl?id=store"
+#Redirect 301 "/load" "https://chat.dance/obf/obfuscate.pl?id=load"
 
 
 #RewriteRule ^(.*)$ /cgi-bin/rewrite.pl [L,QSA]

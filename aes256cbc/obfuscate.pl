@@ -19,9 +19,9 @@ my $main = qq{
 			<div id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div id="button_div" style="display:flex; justify-content: center">
-					<button class="obf_button" id='go_store_thread' onclick="location.href='https://chat.dance/obf/obfuscate.pl?id=store';">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_thread' onclick="location.href='https://chat.dance/obf/obfuscate.pl?id=load';">ACCESS SECRET DATA</button>
-					<button class="obf_button" id='go_import_thread' onclick="location.href='https://chat.dance/obf/obfuscate.pl?id=delete';">IMPORT SECRET DATA</button>
+					<button class="obf_button" id='go_store_thread' onclick="location.href='https://chat.dance/obf/store';">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_load_thread' onclick="location.href='https://chat.dance/obf/load';">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_import_thread' onclick="location.href='https://chat.dance/obf/delete';">IMPORT SECRET DATA</button>
 				</div>
 			</div>
 
