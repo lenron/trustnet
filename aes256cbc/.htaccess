@@ -8,6 +8,8 @@ RewriteBase /
 RewriteRule ^store obfuscate.pl?id=store
 RewriteRule ^load obfuscate.pl?id=load
 RewriteRule ^delete obfuscate.pl?id=delete
+RewriteRule ^faq obfuscate.pl?id=faq
+RewriteRule ^how obfuscate.pl?id=how
 #RewriteRule ^/load/execute /cgi-bin/load.pl
 #RewriteRule ^/store/execute /cgi-bin/store.pl
 RewriteRule ^exestore store.pl

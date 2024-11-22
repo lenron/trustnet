@@ -21,7 +21,7 @@ my $main = qq{
 				<div id="button_div" style="display:flex; justify-content: center">
 					<button class="obf_button" id='go_store_thread' onclick="location.href='https://chat.dance/obf/store';">STORE SECRET DATA</button>
 					<button class="obf_button" id='go_load_thread' onclick="location.href='https://chat.dance/obf/load';">ACCESS SECRET DATA</button>
-					<button class="obf_button" id='go_import_thread' onclick="location.href='https://chat.dance/obf/delete';">IMPORT SECRET DATA</button>
+					<button class="obf_button" id='go_delete_thread' onclick="location.href='https://chat.dance/obf/delete';">DELETE SECRET DATA</button>
 				</div>
 			</div>
 
@@ -78,8 +78,8 @@ my $store = qq{
 			<div class="gen store six" id="generated_html" style="display:none">
 				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
 				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='accessdata' style="width:400px;" onclick="loadOne()">ACCESS DATA</button>
-					<button class="" id='learnmore' style="width:400px;" onclick="faq()">LEARN MORE</button>
+					<button class="" id='accessdata' style="width:400px;" onclick="location.href='https://chat.dance/obf/store';">ACCESS DATA</button>
+					<button class="" id='learnmore' style="width:400px;" onclick="location.href='https://chat.dance/obf/how';">LEARN MORE</button>
 				</div>
 			</div>
 <!--  store  --!>
@@ -131,16 +131,36 @@ my $load = qq{
 				<label>&#10004; SUCCESS</label>
 				<textarea value="" id="output_display" rows="8" cols="50">i luv lamp ;-)</textarea>
 				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">ACCESS MORE DATA</button>
-					<button class="" id='' style="flex-grow:1;" onclick="">STORE MORE DATA</button>
+					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS MORE DATA</button>
+					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
 				</div>
 			</div>
 
 <!--   load  --!>
 };
 
-my $import = qq{
+my $how = qq{
+<!--   how	--!>
+			<div class="gen how" id="generated_html" style="">
+				<h3>How it Works Section</h3>
+			</div>
+<!--   how	--!>
+};
 
+my $faq = qq{
+<!--   faq	--!>
+			<div class="gen faq" id="generated_html" style="">
+				<h3>FAQ Section</h3>
+			</div>
+<!--   faq	 --!>
+};
+
+my $delete = qq{
+<!--   delete	--!>
+			<div class="gen delete" id="generated_html" style="">
+				<h3>DELETE RECORD</h3>
+			</div>
+<!--   delete	 --!>
 };
 
 
@@ -148,8 +168,12 @@ if( $id eq 'store'){
 	$template->param(htmlblock => $store);
 }elsif( $id eq 'load'){
 	$template->param(htmlblock => $load);
-}elsif( $id eq 'import'){
-	$template->param(htmlblock => $import);
+}elsif( $id eq 'how'){
+	$template->param(htmlblock => $how);
+}elsif( $id eq 'faq'){
+	$template->param(htmlblock => $faq);
+}elsif( $id eq 'delete'){
+	$template->param(htmlblock => $delete);
 }else{
 	$template->param(htmlblock => $main);
 }
