@@ -47,7 +47,7 @@ my $store = qq{
 				<h2>ENTER SECRET WORD 1</h2>
 				<input onkeydown="catchEnter(event)" value="" id="store_pass_1" style="">
 				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>
+	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>	--!>
 					<button class="" id='sf3' style="flex-grow:1;" onclick="storeThree()">ENHANCE SECURITY</button>
 				</div>
 			</div>
@@ -58,7 +58,7 @@ my $store = qq{
 				<h2>ENTER SECRET WORD 2</h2>
 				<input onkeydown="catchEnter(event)" value="" id="store_pass_2" style="">
 				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>
+	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>	--!>
 					<button class="" id='sf4' style="flex-grow:1;" onclick="storeFour()">ENHANCE SECURITY</button>
 				</div>
 			</div>
