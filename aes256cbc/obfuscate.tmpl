@@ -198,13 +198,19 @@
 		document.getElementById('store_pass_3').focus();
 	}
 
-	function storeFive(){
-		document.querySelectorAll(".store.six").forEach(a=>a.style.display = "flex");
+	async function storeFive(){
 		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "none");
+
 		// Main Function Call
-		deepStore();
-		// clear sensitive data / reload page
-	}
+		let outcome = await deepStore();
+
+		if( outcome == 1 ){	//Success
+			document.querySelectorAll(".store.six").forEach(a=>a.style.display = "flex");
+		}else{	//Fail
+			document.querySelectorAll(".store.seven").forEach(a=>a.style.display = "flex");
+		}
+		// clear sensitive data / reload page  ?
+}
 
 
 //////////////load
@@ -229,17 +235,17 @@
 	}
 
 	function loadFour(){
-		document.querySelectorAll(".load.five").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".load.four").forEach(a=>a.style.display = "none");
 		// Main Function Call
 		deepLoad();
+
+		document.querySelectorAll(".load.five").forEach(a=>a.style.display = "flex");
+		document.querySelectorAll(".load.four").forEach(a=>a.style.display = "none");
 	}
 
 	// Catch Enter on each page
 	// input.addEventListener(type, listener)
 	// .addEventListener('keydown', catchEnter);	or
 	// onkeydown = catchEnter()
-
 	function catchEnter(e){
 		console.log("keydown event key: " + e.key);
 		console.log("this target: " + e.target.id);
@@ -251,8 +257,9 @@
 				storeThree();
 			}else if(e.target.id == "store_pass_2"){
 				storeFour();
-			}else if(e.target.id == "store_pass_3"){
+/*			}else if(e.target.id == "store_pass_3"){
 				storeFive();
+*/
 			}else if(e.target.id == "load_codeword"){
 				loadOne();
 			}else if(e.target.id == "load_pass_1"){
@@ -266,45 +273,12 @@
 	}
 
 
-/*
-	function searchKeyPress(e, tar){
-		console.log("keyCode: " + e.keyCode);
-		console.log("target: " + tar);
-		// look for window.event in case event isn't passed in
-		e = e || window.event;
-		if (e.keyCode == 13){
-			if( tar == '
-
-			return false;
-		}
-		return true;
-	}
-
-	// Catch Enter key press with this in the HTML Object:
-	// onkeypress="return window.parent.searchKeyPress(event, target);"
-	function searchKeyPress(e, tar){
-		console.log("keyCode: " + e.keyCode);
-		// look for window.event in case event isn't passed in
-		e = e || window.event;
-		if (e.keyCode == 13){
-		console.log("keyCode is 13!!! ~" + e.keyCode + "~");
-			// Run the function directly instead of using a .click of the button,
-			// which seemed to cause issues.
-			check_captcha();
-			return false;
-		}
-		return true;
-	}
-*/
-
 ////////////////////////////////////////////
 //////		Begin Merge 	////////////////
 ////////////////////////////////////////////
 
-
 // Base 58 character map.
 const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
 
 	async function encryptStack(plaintext, pass1, pass2, pass3){
 		// OpenSSL Encrypt (base 64 encoded)
@@ -383,13 +357,12 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		// Report Results
 		if( encrypted_data  === sr_load.response ){
+			return 1;
 			//addStatus("Data successfully saved to server.\n\n");
 		}else{
+			return 0;
 			//addStatus("Data failed to save to server!\n\n");
-
-			/////////////////////////////
 			// Maybe delete the record (once I write that sub) if it fails to load correctly?????
-			////////////////////////
 		}
 
 	}//deepStore()
@@ -423,28 +396,12 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			return;
 		}
 
-		const enc_data = String(sr_load.response);
-
-		//const plaintext = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
-		//console.log("plaintext: " + plaintext);
 		// Triple Decrypt
-		const obf2_decrypted = await obf2Decrypt(enc_data, pass_3);
-		console.log("obf2dec: " + obf2_decrypted);
-		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass_2);
-		console.log("obf1dec: " + obf1_decrypted);
-		plaintext = await decOpenSSL(obf1_decrypted, pass_1);
-		//const decrypted = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
-		//console.log("decrypted: " + decrypted);
+		const decrypted = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
+		console.log("decrypted: " + decrypted);
 		// Report Results 
-		//document.getElementById("output_display").value = decrypted;
-		document.getElementById("output_display").value = plaintext;
-/*
-		if( decrypted ){
-			//addLoadStatus("Completed Successfully.\n");
-		}else{
-			//addLoadStatus("Failed.\n");
-		}
-*/
+		document.getElementById("output_display").value = decrypted;
+
 	}//deepLoad()
 
 /*
