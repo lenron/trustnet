@@ -32,7 +32,7 @@ if ($q->param){
 	# If log exists, we know q->param caught data.
 	my $filename = './log.txt';
 	# Append to existing file if it exists, create new otherwise.
-	open(my $fh, '>>', $filename) or die;
+	open(my $fh, '>>', $filename); # or die;
 	print $fh "STORE\n";
 	print $fh "$time\n";
 	print $fh "fingerprint: $fingerprint\n";
@@ -52,7 +52,7 @@ if ($q->param){
 	my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data) VALUES (?, ?)", undef, $fingerprint, $data);
 	# undef return indicates we need to modify the record instead.
 	if(not defined $response){
-		$response = $dbh->do("UPDATE $db_table SET data=? WHERE fingerprint='$fingerprint'", undef, $data) or die $dbh->errstr;
+		$response = $dbh->do("UPDATE $db_table SET data=? WHERE fingerprint=?", undef, $data, $fingerprint) or die $dbh->errstr;
 	}
 	$dbh->disconnect();
 
