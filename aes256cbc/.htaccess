@@ -15,6 +15,11 @@ RewriteRule ^how obfuscate.pl?id=how
 RewriteRule ^exestore store.pl
 RewriteRule ^exeload load.pl
 
+
+<Files "log.txt">  
+  Require all denied
+</Files>
+
 #RewriteCond %{REQUEST_URI} ^/obfuscate.pl\?id\=(.*)
 #RewriteRule .* https://chat.dance/obf/$1 [L]
 
