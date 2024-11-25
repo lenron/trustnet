@@ -162,9 +162,54 @@ my $faq = qq{
 };
 
 my $delete = qq{
-<!--   delete	--!>
-			<div class="gen delete" id="generated_html" style="">
-				<h3>DELETE RECORD</h3>
+<!--   delete	 --!>
+			<div class="gen delete one" id="delete1" style="">
+				<label>DELETE DATA</label>
+				<h2>ENTER CODE WORD</h2>
+				<input autofocus onkeydown="catchEnter(event)" value="" id="delete_codeword" style="">
+				<button class="" id='lf1' style="width: 250px;" onclick="deleteOne()">NEXT</button>
+			</div>
+
+			<div class="gen delete two" id="delete2" style="display:none">
+				<label>&#10004; CODE WORD ENTERED</label> 
+				<h2>ENTER SECRET WORD 1</h2>
+				<input onkeydown="catchEnter(event)" value="" id="delete_pass_1" style="">
+				<div class="button_pair" id="button_pair" style="display:flex;">
+	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>     --!>
+					<button class="" id='lf2' style="flex-grow:1;" onclick="deleteTwo()">NEXT</button>
+				</div>
+			</div>
+
+			<div class="gen delete three" id="delete3" style="display:none">
+				<label>&#10004; CODE WORD ENTERED</label> 
+				<label>&#10004; SECRET WORD 1 ENTERED</label> 
+				<h2>ENTER SECRET WORD 2</h2>
+				<input onkeydown="catchEnter(event)" value="" id="delete_pass_2" style="">
+				<div class="button_pair" id="button_pair" style="display:flex;">
+	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>     --!>
+					<button class="" id='lf3' style="flex-grow:1;" onclick="deleteThree()">NEXT</button>
+				</div>
+			</div>
+
+			<div class="gen delete four" id="delete4" style="display:none">
+				<label>&#10004; CODE WORD ENTERED</label> 
+				<label>&#10004; SECRET WORD 1 ENTERED</label> 
+				<label>&#10004; SECRET WORD 2 ENTERED</label> 
+				<h2>ENTER SECRET WORD 3</h2>
+				<input onkeydown="catchEnter(event)" value="" id="delete_pass_3" style="">
+				<div class="button_pair" id="button_pair" style="display:flex;">
+	<!--				<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>     --!>
+					<button class="" id='lf4' style="flex-grow:1;" onclick="deleteFour()">ACCESS DATA</button>
+				</div>
+			</div>
+
+			<div class="gen delete five" id="delete5" style="display:none">
+				<label>&#10004; SUCCESS</label>
+				<div class="button_pair" id="button_pair" style="display:flex;">
+					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<button class="obf_button" id='go_delete_thread' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>
+				</div>
 			</div>
 <!--   delete	 --!>
 };

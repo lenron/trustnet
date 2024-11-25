@@ -14,6 +14,7 @@ RewriteRule ^how obfuscate.pl?id=how
 #RewriteRule ^/store/execute /cgi-bin/store.pl
 RewriteRule ^exestore store.pl
 RewriteRule ^exeload load.pl
+RewriteRule ^exedelete delete.pl
 
 
 <Files "log.txt">  

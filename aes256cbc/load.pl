@@ -49,7 +49,7 @@ if ($q->param){
 	# If log exists, we know q->param caught data.
 	my $filename = './log.txt';
 	# Append to existing file if it exists, create new otherwise.
-	open(my $fh, '>>', $filename) or die;
+	open(my $fh, '>>', $filename); # or die;
 	print $fh "LOAD\n";
 	print $fh "$time\n";
 	print $fh "fingerprint: $fingerprint\n";

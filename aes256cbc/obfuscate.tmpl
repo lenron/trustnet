@@ -242,6 +242,38 @@
 		document.querySelectorAll(".load.four").forEach(a=>a.style.display = "none");
 	}
 
+//////////////delete
+	function deleteOne(){
+		// Show elements with classes delete AND two
+		document.querySelectorAll(".delete.two").forEach(a=>a.style.display = "flex");
+		// Hide elements with classes delete AND one 
+		document.querySelectorAll(".delete.one").forEach(a=>a.style.display = "none");
+		document.getElementById('delete_pass_1').focus();
+	}
+
+	function deleteTwo(){
+		document.querySelectorAll(".delete.three").forEach(a=>a.style.display = "flex");
+		document.querySelectorAll(".delete.two").forEach(a=>a.style.display = "none");
+		document.getElementById('delete_pass_2').focus();
+	}
+
+	function deleteThree(){
+		document.querySelectorAll(".delete.four").forEach(a=>a.style.display = "flex");
+		document.querySelectorAll(".delete.three").forEach(a=>a.style.display = "none");
+		document.getElementById('delete_pass_3').focus();
+	}
+
+	function deleteFour(){
+		// Main Function Call
+		//let result = await serverDelete();
+		//let result = await deepDelete();
+		deepDelete();
+
+		document.querySelectorAll(".delete.five").forEach(a=>a.style.display = "flex");
+		document.querySelectorAll(".delete.four").forEach(a=>a.style.display = "none");
+	}
+
+
 	// Catch Enter on each page
 	// input.addEventListener(type, listener)
 	// .addEventListener('keydown', catchEnter);	or
@@ -268,6 +300,14 @@
 				loadThree();
 			}else if(e.target.id == "load_pass_3"){
 				loadFour();
+			}else if(e.target.id == "delete_codeword"){
+				deleteOne();
+			}else if(e.target.id == "delete_pass_1"){
+				deleteTwo();
+			}else if(e.target.id == "delete_pass_2"){
+				deleteThree();
+			}else if(e.target.id == "delete_pass_3"){
+				deleteFour();
 			}
 		}
 	}
@@ -404,6 +444,34 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 	}//deepLoad()
 
+
+	async function deepDelete(){
+
+		// Get code/passwords from user.
+		const codeword = document.getElementById("delete_codeword").value;
+		const pass_1 = document.getElementById("delete_pass_1").value;
+		const pass_2 = document.getElementById("delete_pass_2").value;
+		const pass_3 = document.getElementById("delete_pass_3").value;
+		console.log("DELETE code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
+
+		// Compute Fingerprint
+		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
+		console.log("fingerprint hex: " + fp_hex);
+		console.log("fingerprint length: " + fp_hex.length);
+		// fingerprint length check
+		if( fp_hex.length != 64 ){
+			//addStatus("Fingerprint length problem! Ending.\n");
+			throw new Error('Fingerprint length INVALID!');
+		}
+
+		// Load from server
+		const sr_delete = await serverDelete(fp_hex);
+		console.log("Server Response from DELETE: " + "~" + sr_delete.response + "~");
+		console.log(sr_delete);
+
+		return sr_delete.response;
+	}//deepLoad()
+
 /*
 	function addStatus( msg ){
 			document.getElementById("status_display_store").value += msg;
@@ -449,6 +517,23 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		})
 		return response.json()
 	}//serverStore()
+
+	// Endpoint exedelete will attempt to delete
+	async function serverDelete(fingerprint){
+		const SERVER_URL = '/obf/exedelete';
+		
+		console.log("Attempting Server Delete with\nFingerprint: " + fingerprint); 
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/html',
+			},
+			body: JSON.stringify({
+				fingerprint: fingerprint,
+			}),
+		})
+		return response.json()
+	}//serverDelete()
 
 	async function computeFingerprint(codeword, pass_2, pass_3){
 		// sub all lowercase
