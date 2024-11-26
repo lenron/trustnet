@@ -29,11 +29,36 @@ my $main = qq{
 
 my $store = qq{
 <!--   store  --!>
+		<!-- hidden input --!>
+		<input value="" id="upload_data" style="display:none;">
+
 			<div class="gen store one" id="store1" style="">
 				<label>STORE DATA</label>
 				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
 				<input autofocus onkeydown="catchEnter(event)" value="" id="store_codeword" style="">
 				<button class="" id='sf1' style="width: 250px;" onclick="storeOne()">NEXT</button>
+			</div>
+
+			<div class="gen store choose" id="store_choose" style="display:none">
+				<h2 style="align-self:center;">YOU MUST CHOOSE THE FIRST LEVEL OF ENCRYPTION</h2>
+				<div class="button_pair" id="button_pair" style="display:flex;">
+					<button class="" id='choose_default' style="width:400px;" onclick="storeDefault()">OUR ENCRYPTION - Default</button>
+					<button class="" id='choose_upload' style="width:400px;" onclick="storeUpload()">YOUR OWN - File</button>
+				</div>
+			</div>
+
+			<div class="gen store upload" id="store_upload" style="display:none">
+				<h2>UPLOAD FILE</h3>
+				<input onchange="catchUpload(event)" id="store_upload" style="" type="file">
+				<br>
+				<label>OpenSSL Linux Commands:</label>
+				<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
+					<label>Encode:</label>
+					<b>openssl enc -aes-256-cbc -e -p -pbkdf2 -in &lt;plaintext file&gt; -out &lt;encoded file&gt;</b>
+					<br>
+					<label>Decode:</label>
+					<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
+				</div>
 			</div>
 
 			<div class="gen store two" id="store2" style="display:none">

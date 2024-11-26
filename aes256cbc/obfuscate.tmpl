@@ -168,15 +168,30 @@
 		location.href = "https://chat.dance/obf/faq";
 		// faq();
 	}
+	
+	// global flag
+	let upload_flag = 'false';
 
 	// Thread walk handler functions
 	function storeOne(){
-		// Show elements with classes store AND two
-		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "flex");
+		// Show elements with classes store AND choose
+		document.querySelectorAll(".store.choose").forEach(a=>a.style.display = "flex");
 		// Hide elements with classes store AND one 
 		document.querySelectorAll(".store.one").forEach(a=>a.style.display = "none");
 		// autofocus must be changed in js because the html inputs are just shown/hidden
 		//document.getElementById('store_data').focus();
+	}
+
+	function storeDefault(){
+		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "flex");
+		document.querySelectorAll(".store.choose").forEach(a=>a.style.display = "none");
+	}
+
+	function storeUpload(){
+		console.log("set upload_flag: true");
+		upload_flag = 'true';
+		document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "flex");
+		document.querySelectorAll(".store.choose").forEach(a=>a.style.display = "none");
 	}
 
 	function storeTwo(){
@@ -273,6 +288,44 @@
 		document.querySelectorAll(".delete.four").forEach(a=>a.style.display = "none");
 	}
 
+/*
+  document.getElementById('binaryInput').addEventListener('change', async function(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+	  let buffer = e.target.result;
+      // Process the binary data
+      const info = `Buffer Length: ${buffer.byteLength} bytes`;
+      document.getElementById('binaryOutput').innerHTML = info;
+		buffer = new Uint8Array(buffer);
+		let arr = bytesToBase64(buffer);
+      console.log(arr);
+      console.log("arr: " + arr);
+    };
+    reader.readAsArrayBuffer(file);
+    
+  });
+*/
+
+	// Catch File Ingest
+	// listener is placed inline of the html
+	async function catchUpload(event){
+		const file = event.target.files[0];
+		const reader = new FileReader();
+		reader.readAsArrayBuffer(file);
+
+		reader.onload = function(e){
+			let buffer = e.target.result;
+			buffer = new Uint8Array(buffer);
+			let filedata = bytesToBase64(buffer);
+			console.log("uploaded file content:");
+			console.log(filedata);
+			document.getElementById("upload_data").value = filedata;
+			document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "none");
+			// skip data and pass1 input screens
+			document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
+		}
+	}
 
 	// Catch Enter on each page
 	// input.addEventListener(type, listener)
@@ -320,6 +373,17 @@
 // Base 58 character map.
 const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
+
+
+
+	async function encryptDouble(file_ingest_input, pass2, pass3){
+		// Obfuscation Step 1 Encrypt
+		const obf_s1_encrypted = await obf1Encrypt(file_ingest_input, pass2);
+		// Obfuscation Step 2 Encrypt
+		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, pass3);
+		return obf_s2_encrypted;
+	}//encryptStack()
+
 	async function encryptStack(plaintext, pass1, pass2, pass3){
 		// OpenSSL Encrypt (base 64 encoded)
 		const openssl_encrypted = await encOpenSSL(plaintext, pass1);
@@ -341,31 +405,47 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		// Get save data from user.
 		const plaintext = document.getElementById("store_data").value;
+		const uploadtext = document.getElementById("upload_data").value;
 		// Get code/passwords from user.
 		const codeword = document.getElementById("store_codeword").value;
 		const pass_1 = document.getElementById("store_pass_1").value;
 		const pass_2 = document.getElementById("store_pass_2").value;
 		const pass_3 = document.getElementById("store_pass_3").value;
-
+/*
 		// Make sure data isn't blank, and mandate that all 3 pw's are used in addition to the cw.
 		if( plaintext === '' || codeword === '' || pass_1 === '' || pass_2 === '' || pass_3 === '' ){
 			//addStatus("To proceed, please make sure no fields are blank.\n");
 			throw new Error('Empty fields found! Ending.');
 		}
+*/
 
-		// Triple Encrypt
-		const encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
-		//addStatus("Encrypt Completed Successfully.\n");
-
-		// Check Decrypt
-		const check_decrypt = await decryptStack(encrypted_data, pass_1, pass_2, pass_3);
-		if( plaintext == check_decrypt ){
-			//addStatus("Encrypted data integrity verified.\n");
+		let encrypted_data;
+		// Use flag set by storeUpload() to determine which enc stack to use.
+		if( upload_flag == 'true' ){
+			// reset flag once it is used
+			console.log("set upload_flag: false");
+			upload_flag = 'false';
+			// Double Encrypt
+			encrypted_data = await encryptDouble(uploadtext, pass_2, pass_3);
 		}else{
-			console.log("plaintext: ~" + plaintext + "~");
-			console.log("decrypted: ~" + check_decrypt + "~");
-			//addStatus("Unable to properly extract input data from encrypted! FAIL.\n");
-		} 
+			// Triple Encrypt
+			encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
+		}
+
+/*
+Don't think this is in spec
+
+
+			// Check Decrypt
+			const check_decrypt = await decryptStack(encrypted_data, pass_1, pass_2, pass_3);
+			if( plaintext == check_decrypt ){
+				//addStatus("Encrypted data integrity verified.\n");
+			}else{
+				console.log("plaintext: ~" + plaintext + "~");
+				console.log("decrypted: ~" + check_decrypt + "~");
+				//addStatus("Unable to properly extract input data from encrypted! FAIL.\n");
+			} 
+*/
 
 		// Compute Fingerprint
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
@@ -466,8 +546,6 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 		// Load from server
 		const sr_delete = await serverDelete(fp_hex);
-		console.log("Server Response from DELETE: " + "~" + sr_delete.response + "~");
-		console.log(sr_delete);
 
 		return sr_delete.response;
 	}//deepLoad()
