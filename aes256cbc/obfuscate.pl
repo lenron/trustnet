@@ -42,8 +42,8 @@ my $store = qq{
 			<div class="gen store choose" id="store_choose" style="display:none">
 				<h2 style="align-self:center;">YOU MUST CHOOSE THE FIRST LEVEL OF ENCRYPTION</h2>
 				<div class="button_pair" id="button_pair" style="display:flex;">
-					<button class="" id='choose_default' style="width:400px;" onclick="storeDefault()">OUR ENCRYPTION - Default</button>
-					<button class="" id='choose_upload' style="width:400px;" onclick="storeUpload()">YOUR OWN - File</button>
+					<button class="" id='choose_default' style="width:400px;" onclick="storeDefault()">OUR ENCRYPTION - Text Input</button>
+					<button class="" id='choose_upload' style="width:400px;" onclick="storeUpload()">YOUR ENCRYPTION - File Input</button>
 				</div>
 			</div>
 
