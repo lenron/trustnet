@@ -183,8 +183,10 @@
 	}
 
 	function storeDefault(){
+		upload_flag = 'false';
 		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "flex");
 		document.querySelectorAll(".store.choose").forEach(a=>a.style.display = "none");
+		document.getElementById('store_data').focus();
 	}
 
 	function storeUpload(){
@@ -192,6 +194,14 @@
 		upload_flag = 'true';
 		document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "flex");
 		document.querySelectorAll(".store.choose").forEach(a=>a.style.display = "none");
+	}
+
+	function storeBack(){
+		if( upload_flag === 'true' ){
+			showPage('store_upload');
+		}else{
+			showPage('store3');
+		}
 	}
 
 	function storeTwo(){
@@ -224,8 +234,81 @@
 		}else{	//Fail
 			document.querySelectorAll(".store.seven").forEach(a=>a.style.display = "flex");
 		}
-		// clear sensitive data / reload page  ?
+	}
+	// clear sensitive data / reload page  ?
+
+	// show target pane in page set
+	// target is element ID of html generated pane
+	function showPage(target){
+		let generated_html_pages;
+		// fill generated_html_pages with set of objects including generated html
+		generated_html_pages = document.getElementsByClassName('gen');
+		// hide all generated_html_pages
+		for (let i = 0; i < generated_html_pages.length; i++) {
+			generated_html_pages[i].style.display = "none";
+		}
+		// show target 
+		document.getElementById(target).style.display = "flex";
+	}
+/*
+	function showStore(target){
+		let storepages;
+		// fill storepages with set of objects having 'store' class
+		storepages = document.getElementsByClassName("store");
+		// hide all store pages
+		for (let i = 0; i < storepages.length; i++) {
+			storepages[i].style.display = "none";
+		}
+		// show target 
+		document.getElementById(target).style.display = "flex";
+	}
+
+	function showDelete(target){
+		let deletepages;
+		// fill storepages with set of objects having 'store' class
+		deletepages = document.getElementsByClassName("delete");
+		// hide all store pages
+		for (let i = 0; i < deletepages.length; i++) {
+			deletepages[i].style.display = "none";
+		}
+		// show target 
+		document.getElementById(target).style.display = "flex";
+	}
+
+	function showLoad(target){
+		let pages;
+		// fill storepages with set of objects having 'store' class
+		storepages = document.getElementsByClassName("store");
+		// hide all store pages
+		for (let i = 0; i < storepages.length; i++) {
+			storepages[i].style.display = "none";
+		}
+		// show target 
+		document.getElementById(target).style.display = "flex";
+	}
+/*
+
+function openCity(evt, cityName) {
+  var i, tabcontent, tablinks;
+  //fill tabcontent array with every object having class 'tabcontent'
+  tabcontent = document.getElementsByClassName("tabcontent");
+  //hide every tabcontent pane
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  //fill tablinks array with every object containing 'tablinks' class
+  tablinks = document.getElementsByClassName("tablinks");
+  //remove active class flag from every tablink object
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  // show target tabcontent pane
+  document.getElementById(cityName).style.display = "block";
+  // append class flag to target object class set
+  evt.currentTarget.className += " active";
 }
+
+*/
 
 
 //////////////load
@@ -337,11 +420,16 @@
 		if( e.key == 'Enter'){
 			console.log("caught");
 			if( e.target.id == "store_codeword"){
-				storeOne();
+				//storeOne();
+				showPage('store_choose');
 			}else if(e.target.id == "store_pass_1"){
-				storeThree();
+				//storeThree();
+				showPage('store4');
+				document.getElementById('store_pass_2').focus();
 			}else if(e.target.id == "store_pass_2"){
-				storeFour();
+				//storeFour();
+				showPage('store5');
+				document.getElementById('store_pass_3').focus();
 /*			}else if(e.target.id == "store_pass_3"){
 				storeFive();
 */
