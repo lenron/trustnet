@@ -46,7 +46,7 @@ my $store = qq{
 			<div class="gen store choose" id="store_choose" style="display:none">
 				<h2 style="align-self:center;">YOU MUST CHOOSE THE FIRST LEVEL OF ENCRYPTION</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="width: 150px;" onclick="showPage('store1')">GO BACK</button>
+					<button class="" id='' style="width: 150px;" onclick="showPage('store1')">BACK</button>
 					<button class="" id='choose_default' style="width:350px;" onclick="storeDefault()">OUR ENCRYPTION - Text Input</button>
 					<button class="" id='choose_upload' style="width:350px;" onclick="storeUpload()">YOUR ENCRYPTION - File Input</button>
 				</div>
@@ -64,7 +64,7 @@ my $store = qq{
 					<label>Decode:</label>
 					<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
 				</div>
-					<button class="" id='' style="width: 250px;" onclick="showPage('store_choose')">GO BACK test</button>
+					<button class="" id='' style="width: 250px;" onclick="showPage('store_choose')">BACK test</button>
 			</div>
 
 			<div class="gen store two" id="store2" style="display:none">
@@ -72,7 +72,7 @@ my $store = qq{
 				<textarea value="" id="store_data" rows="8" cols="45" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
 		<!--		<button class="" id='sf2' style="width: 250px; align-self:center;" onclick="storeTwo()">ENCRYPT DATA</button>	--!>
-					<button class="" id='' style="flex-grow:1" onclick="showPage('store_choose')">GO BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_choose')">BACK</button>
 					<button class="" id='sf2' style="flex-grow:1" onclick="showPage('store3')">ENCRYPT DATA</button>
 				</div>
 			</div>
@@ -84,7 +84,7 @@ my $store = qq{
 				<div class="button_pair" id="" style="display:flex;">
 	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>	--!>
 					<!--<button class="" id='sf3' style="flex-grow:1;" onclick="storeThree()">ENHANCE SECURITY</button>--!>
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store2')">GO BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store2')">BACK</button>
 					<button class="" id='sf3' style="flex-grow:1;" onclick="showPage('store4')">ENHANCE SECURITY</button>
 				</div>
 			</div>
@@ -97,7 +97,7 @@ my $store = qq{
 				<div class="button_pair" id="" style="display:flex;">
 	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>	--!>
 					<!--<button class="" id='sf4' style="flex-grow:1;" onclick="storeFour()">ENHANCE SECURITY</button>--!>
-					<button class="" id='' style="flex-grow:1;" onclick="storeBack()">GO BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="storeBack()">BACK</button>
 					<button class="" id='sf4' style="flex-grow:1;" onclick="showPage('store5')">ENHANCE SECURITY</button>
 				</div>
 			</div>
@@ -109,7 +109,7 @@ my $store = qq{
 				<h2>ENTER SECRET WORD 3</h2>
 				<input onkeydown="catchEnter(event)" value="" id="store_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store4')">GO BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store4')">BACK</button>
 					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="storeFive()">DEEP STORE DATA</button>
 				</div>
 			</div>
@@ -138,7 +138,11 @@ my $load = qq{
 				<label>ACCESS DATA</label>
 				<h2>ENTER CODE WORD</h2>
 				<input autofocus onkeydown="catchEnter(event)" value="" id="load_codeword" style="">
-				<button class="" id='lf1' style="width: 250px;" onclick="loadOne()">NEXT</button>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf';">BACK</button>
+					<!--<button class="" id='lf1' style="flex-grow:1" onclick="loadOne()">NEXT</button>--!>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('load2')">NEXT</button>
+				</div>
 			</div>
 
 			<div class="gen load two" id="load2" style="display:none">
@@ -147,7 +151,9 @@ my $load = qq{
 				<input onkeydown="catchEnter(event)" value="" id="load_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>     --!>
-					<button class="" id='lf2' style="flex-grow:1;" onclick="loadTwo()">NEXT</button>
+					<!--<button class="" id='lf2' style="flex-grow:1;" onclick="loadTwo()">NEXT</button>--!>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('load1')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('load3')">NEXT</button>
 				</div>
 			</div>
 
@@ -158,7 +164,8 @@ my $load = qq{
 				<input onkeydown="catchEnter(event)" value="" id="load_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>     --!>
-					<button class="" id='lf3' style="flex-grow:1;" onclick="loadThree()">NEXT</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('load2')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('load4')">NEXT</button>
 				</div>
 			</div>
 
@@ -170,6 +177,7 @@ my $load = qq{
 				<input onkeydown="catchEnter(event)" value="" id="load_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 	<!--				<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>     --!>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('load3')">BACK</button>
 					<button class="" id='lf4' style="flex-grow:1;" onclick="loadFour()">ACCESS DATA</button>
 				</div>
 			</div>
@@ -181,6 +189,7 @@ my $load = qq{
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
 					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>
 				</div>
 			</div>
 
@@ -209,7 +218,11 @@ my $delete = qq{
 				<label>DELETE DATA</label>
 				<h2>ENTER CODE WORD</h2>
 				<input autofocus onkeydown="catchEnter(event)" value="" id="delete_codeword" style="">
-				<button class="" id='lf1' style="width: 250px;" onclick="deleteOne()">NEXT</button>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf';">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('delete2')">NEXT</button>
+				</div>
+				<!--<button class="" id='lf1' style="width: 250px;" onclick="deleteOne()">NEXT</button>--!>
 			</div>
 
 			<div class="gen delete two" id="delete2" style="display:none">
@@ -218,7 +231,9 @@ my $delete = qq{
 				<input onkeydown="catchEnter(event)" value="" id="delete_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>     --!>
-					<button class="" id='lf2' style="flex-grow:1;" onclick="deleteTwo()">NEXT</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('delete1')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('delete3')">NEXT</button>
+					<!--<button class="" id='lf2' style="flex-grow:1;" onclick="deleteTwo()">NEXT</button>--!>
 				</div>
 			</div>
 
@@ -229,7 +244,9 @@ my $delete = qq{
 				<input onkeydown="catchEnter(event)" value="" id="delete_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>     --!>
-					<button class="" id='lf3' style="flex-grow:1;" onclick="deleteThree()">NEXT</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('delete2')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('delete4')">NEXT</button>
+					<!--<button class="" id='lf3' style="flex-grow:1;" onclick="deleteThree()">NEXT</button>--!>
 				</div>
 			</div>
 
@@ -241,7 +258,8 @@ my $delete = qq{
 				<input onkeydown="catchEnter(event)" value="" id="delete_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 	<!--				<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="">BACK</button>     --!>
-					<button class="" id='lf4' style="flex-grow:1;" onclick="deleteFour()">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('delete3')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="deleteFour()">DELETE DATA</button>
 				</div>
 			</div>
 
@@ -250,7 +268,7 @@ my $delete = qq{
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
 					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
-					<button class="obf_button" id='go_delete_thread' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>
+					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>
 				</div>
 			</div>
 <!--   delete	 --!>

@@ -336,8 +336,9 @@ function openCity(evt, cityName) {
 		// Main Function Call
 		deepLoad();
 
-		document.querySelectorAll(".load.five").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".load.four").forEach(a=>a.style.display = "none");
+		showPage('load5');
+		//document.querySelectorAll(".load.five").forEach(a=>a.style.display = "flex");
+		//document.querySelectorAll(".load.four").forEach(a=>a.style.display = "none");
 	}
 
 //////////////delete
@@ -367,8 +368,9 @@ function openCity(evt, cityName) {
 		//let result = await deepDelete();
 		deepDelete();
 
-		document.querySelectorAll(".delete.five").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".delete.four").forEach(a=>a.style.display = "none");
+		showPage('delete5');
+		//document.querySelectorAll(".delete.five").forEach(a=>a.style.display = "flex");
+		//document.querySelectorAll(".delete.four").forEach(a=>a.style.display = "none");
 	}
 
 /*
@@ -425,30 +427,45 @@ function openCity(evt, cityName) {
 			}else if(e.target.id == "store_pass_1"){
 				//storeThree();
 				showPage('store4');
-				document.getElementById('store_pass_2').focus();
+				document.getElementById('store_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "store_pass_2"){
 				//storeFour();
 				showPage('store5');
+				// only works when enter is hit in this setup
 				document.getElementById('store_pass_3').focus();
 /*			}else if(e.target.id == "store_pass_3"){
 				storeFive();
 */
 			}else if(e.target.id == "load_codeword"){
-				loadOne();
+				//loadOne();
+				showPage('load2');
+				document.getElementById('load_pass_1').focus(); // only works when enter is hit
 			}else if(e.target.id == "load_pass_1"){
-				loadTwo();
+				//loadTwo();
+				showPage('load3');
+				document.getElementById('load_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "load_pass_2"){
-				loadThree();
+				//loadThree();
+				showPage('load4');
+				document.getElementById('load_pass_3').focus(); // only works when enter is hit
 			}else if(e.target.id == "load_pass_3"){
 				loadFour();
+				document.getElementById('load_pass_4').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_codeword"){
-				deleteOne();
+				//deleteOne();
+				showPage('delete2');
+				document.getElementById('delete_pass_1').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_pass_1"){
-				deleteTwo();
+				//deleteTwo();
+				showPage('delete3');
+				document.getElementById('delete_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_pass_2"){
-				deleteThree();
+				//deleteThree();
+				showPage('delete4');
+				document.getElementById('delete_pass_3').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_pass_3"){
 				deleteFour();
+				document.getElementById('delete_pass_4').focus(); // only works when enter is hit
 			}
 		}
 	}
