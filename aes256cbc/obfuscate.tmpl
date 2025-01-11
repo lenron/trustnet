@@ -212,6 +212,8 @@
 		}
 	}
 
+	// Store thread walk finisher.
+	// async needed to handle crypto functionality
 	async function storeExecute(){
 		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "none");
 
@@ -224,142 +226,20 @@
 			document.querySelectorAll(".store.seven").forEach(a=>a.style.display = "flex");
 		}
 	}
-	// clear sensitive data / reload page  ?
+	// clear sensitive data / reload page for security?
 
-	// show target pane in page set
-	// target is element ID of html generated pane
-	function showPage(target){
-		let generated_html_pages;
-		// fill generated_html_pages with set of objects including generated html
-		generated_html_pages = document.getElementsByClassName('gen');
-		// hide all generated_html_pages
-		for (let i = 0; i < generated_html_pages.length; i++) {
-			generated_html_pages[i].style.display = "none";
-		}
-		// show target 
-		document.getElementById(target).style.display = "flex";
-	}
-/*
-	function showStore(target){
-		let storepages;
-		// fill storepages with set of objects having 'store' class
-		storepages = document.getElementsByClassName("store");
-		// hide all store pages
-		for (let i = 0; i < storepages.length; i++) {
-			storepages[i].style.display = "none";
-		}
-		// show target 
-		document.getElementById(target).style.display = "flex";
-	}
-
-	function showDelete(target){
-		let deletepages;
-		// fill storepages with set of objects having 'store' class
-		deletepages = document.getElementsByClassName("delete");
-		// hide all store pages
-		for (let i = 0; i < deletepages.length; i++) {
-			deletepages[i].style.display = "none";
-		}
-		// show target 
-		document.getElementById(target).style.display = "flex";
-	}
-
-	function showLoad(target){
-		let pages;
-		// fill storepages with set of objects having 'store' class
-		storepages = document.getElementsByClassName("store");
-		// hide all store pages
-		for (let i = 0; i < storepages.length; i++) {
-			storepages[i].style.display = "none";
-		}
-		// show target 
-		document.getElementById(target).style.display = "flex";
-	}
-/*
-
-function openCity(evt, cityName) {
-  var i, tabcontent, tablinks;
-  //fill tabcontent array with every object having class 'tabcontent'
-  tabcontent = document.getElementsByClassName("tabcontent");
-  //hide every tabcontent pane
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
-  //fill tablinks array with every object containing 'tablinks' class
-  tablinks = document.getElementsByClassName("tablinks");
-  //remove active class flag from every tablink object
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-  // show target tabcontent pane
-  document.getElementById(cityName).style.display = "block";
-  // append class flag to target object class set
-  evt.currentTarget.className += " active";
-}
-
-*/
-
-
-//////////////load
-	function loadOne(){
-		// Show elements with classes load AND two
-		document.querySelectorAll(".load.two").forEach(a=>a.style.display = "flex");
-		// Hide elements with classes load AND one 
-		document.querySelectorAll(".load.one").forEach(a=>a.style.display = "none");
-		document.getElementById('load_pass_1').focus();
-	}
-
-	function loadTwo(){
-		document.querySelectorAll(".load.three").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".load.two").forEach(a=>a.style.display = "none");
-		document.getElementById('load_pass_2').focus();
-	}
-
-	function loadThree(){
-		document.querySelectorAll(".load.four").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".load.three").forEach(a=>a.style.display = "none");
-		document.getElementById('load_pass_3').focus();
-	}
-
-	function loadFour(){
+	// Load thread walk finisher.
+	function loadExecute(){
 		// Main Function Call
 		deepLoad();
-
 		showPage('load5');
-		//document.querySelectorAll(".load.five").forEach(a=>a.style.display = "flex");
-		//document.querySelectorAll(".load.four").forEach(a=>a.style.display = "none");
 	}
 
-//////////////delete
-	function deleteOne(){
-		// Show elements with classes delete AND two
-		document.querySelectorAll(".delete.two").forEach(a=>a.style.display = "flex");
-		// Hide elements with classes delete AND one 
-		document.querySelectorAll(".delete.one").forEach(a=>a.style.display = "none");
-		document.getElementById('delete_pass_1').focus();
-	}
-
-	function deleteTwo(){
-		document.querySelectorAll(".delete.three").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".delete.two").forEach(a=>a.style.display = "none");
-		document.getElementById('delete_pass_2').focus();
-	}
-
-	function deleteThree(){
-		document.querySelectorAll(".delete.four").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".delete.three").forEach(a=>a.style.display = "none");
-		document.getElementById('delete_pass_3').focus();
-	}
-
-	function deleteFour(){
+	// Delete thread walk finisher.
+	function deleteExecute(){
 		// Main Function Call
-		//let result = await serverDelete();
-		//let result = await deepDelete();
 		deepDelete();
-
 		showPage('delete5');
-		//document.querySelectorAll(".delete.five").forEach(a=>a.style.display = "flex");
-		//document.querySelectorAll(".delete.four").forEach(a=>a.style.display = "none");
 	}
 
 /*
@@ -416,7 +296,6 @@ function openCity(evt, cityName) {
 				showPage('store4');
 				document.getElementById('store_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "store_pass_2"){
-				//storeFour();
 				showPage('store5');
 				// only works when enter is hit in this setup
 				document.getElementById('store_pass_3').focus();
@@ -424,34 +303,28 @@ function openCity(evt, cityName) {
 				storeFive();
 */
 			}else if(e.target.id == "load_codeword"){
-				//loadOne();
 				showPage('load2');
 				document.getElementById('load_pass_1').focus(); // only works when enter is hit
 			}else if(e.target.id == "load_pass_1"){
-				//loadTwo();
 				showPage('load3');
 				document.getElementById('load_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "load_pass_2"){
-				//loadThree();
 				showPage('load4');
 				document.getElementById('load_pass_3').focus(); // only works when enter is hit
 			}else if(e.target.id == "load_pass_3"){
-				loadFour();
+				loadExecute();
 				document.getElementById('load_pass_4').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_codeword"){
-				//deleteOne();
 				showPage('delete2');
 				document.getElementById('delete_pass_1').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_pass_1"){
-				//deleteTwo();
 				showPage('delete3');
 				document.getElementById('delete_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_pass_2"){
-				//deleteThree();
 				showPage('delete4');
 				document.getElementById('delete_pass_3').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_pass_3"){
-				deleteFour();
+				deleteExectue();
 				document.getElementById('delete_pass_4').focus(); // only works when enter is hit
 			}
 		}
@@ -464,9 +337,6 @@ function openCity(evt, cityName) {
 
 // Base 58 character map.
 const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
-
-
 
 	async function encryptDouble(file_ingest_input, pass2, pass3){
 		// Obfuscation Step 1 Encrypt
