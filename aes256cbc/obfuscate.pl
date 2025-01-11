@@ -37,7 +37,6 @@ my $store = qq{
 				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
 				<input autofocus onkeydown="catchEnter(event)" value="" id="store_codeword" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<!--<button class="" id='sf1' style="width: 250px;" onclick="storeOne()">NEXT</button>--!>
 					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf';">BACK</button>
 					<button class="" id='sf1' style="flex-grow:1;" onclick="showPage('store_choose')">NEXT</button>
 				</div>
@@ -71,7 +70,6 @@ my $store = qq{
 				<label>STORE DATA</label>
 				<textarea value="" id="store_data" rows="8" cols="45" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
-		<!--		<button class="" id='sf2' style="width: 250px; align-self:center;" onclick="storeTwo()">ENCRYPT DATA</button>	--!>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store_choose')">BACK</button>
 					<button class="" id='sf2' style="flex-grow:1" onclick="showPage('store3')">ENCRYPT DATA</button>
 				</div>
@@ -82,8 +80,6 @@ my $store = qq{
 				<h2>ENTER SECRET WORD 1</h2>
 				<input onkeydown="catchEnter(event)" value="" id="store_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
-	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>	--!>
-					<!--<button class="" id='sf3' style="flex-grow:1;" onclick="storeThree()">ENHANCE SECURITY</button>--!>
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store2')">BACK</button>
 					<button class="" id='sf3' style="flex-grow:1;" onclick="showPage('store4')">ENHANCE SECURITY</button>
 				</div>
@@ -95,8 +91,6 @@ my $store = qq{
 				<h2>ENTER SECRET WORD 2</h2>
 				<input onkeydown="catchEnter(event)" value="" id="store_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
-	<!--			<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="deepStore()">DEEP STORE DATA</button>	--!>
-					<!--<button class="" id='sf4' style="flex-grow:1;" onclick="storeFour()">ENHANCE SECURITY</button>--!>
 					<button class="" id='' style="flex-grow:1;" onclick="storeBack()">BACK</button>
 					<button class="" id='sf4' style="flex-grow:1;" onclick="showPage('store5')">ENHANCE SECURITY</button>
 				</div>
@@ -110,7 +104,7 @@ my $store = qq{
 				<input onkeydown="catchEnter(event)" value="" id="store_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store4')">BACK</button>
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="storeFive()">DEEP STORE DATA</button>
+					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="storeExecute()">DEEP STORE DATA</button>
 				</div>
 			</div>
 

@@ -172,16 +172,22 @@
 	// global flag
 	let upload_flag = 'false';
 
-	// Thread walk handler functions
-	function storeOne(){
-		// Show elements with classes store AND choose
-		document.querySelectorAll(".store.choose").forEach(a=>a.style.display = "flex");
-		// Hide elements with classes store AND one 
-		document.querySelectorAll(".store.one").forEach(a=>a.style.display = "none");
-		// autofocus must be changed in js because the html inputs are just shown/hidden
-		//document.getElementById('store_data').focus();
+// Thread walk handler functions
+	// show target pane in page set
+	// target is element ID of html generated pane
+	function showPage(target){
+		let generated_html_pages;
+		// fill generated_html_pages with set of objects including generated html
+		generated_html_pages = document.getElementsByClassName('gen');
+		// hide all generated_html_pages
+		for (let i = 0; i < generated_html_pages.length; i++) {
+			generated_html_pages[i].style.display = "none";
+		}
+		// show target 
+		document.getElementById(target).style.display = "flex";
 	}
 
+	// needed because of upload_flag functionality
 	function storeDefault(){
 		upload_flag = 'false';
 		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "flex");
@@ -189,6 +195,7 @@
 		document.getElementById('store_data').focus();
 	}
 
+	// needed because of upload_flag functionality
 	function storeUpload(){
 		console.log("set upload_flag: true");
 		upload_flag = 'true';
@@ -196,6 +203,7 @@
 		document.querySelectorAll(".store.choose").forEach(a=>a.style.display = "none");
 	}
 
+	// needed because of upload_flag functionality
 	function storeBack(){
 		if( upload_flag === 'true' ){
 			showPage('store_upload');
@@ -204,26 +212,7 @@
 		}
 	}
 
-	function storeTwo(){
-		document.querySelectorAll(".store.three").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "none");
-		document.getElementById('store_pass_1').focus();
-	}
-
-	function storeThree(){
-		document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".store.three").forEach(a=>a.style.display = "none");
-		document.getElementById('store_pass_2').focus();
-
-	}
-
-	function storeFour(){
-		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".store.four").forEach(a=>a.style.display = "none");
-		document.getElementById('store_pass_3').focus();
-	}
-
-	async function storeFive(){
+	async function storeExecute(){
 		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "none");
 
 		// Main Function Call
@@ -422,10 +411,8 @@ function openCity(evt, cityName) {
 		if( e.key == 'Enter'){
 			console.log("caught");
 			if( e.target.id == "store_codeword"){
-				//storeOne();
 				showPage('store_choose');
 			}else if(e.target.id == "store_pass_1"){
-				//storeThree();
 				showPage('store4');
 				document.getElementById('store_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "store_pass_2"){
