@@ -185,22 +185,30 @@
 		}
 		// show target 
 		document.getElementById(target).style.display = "flex";
+		// focus input or textbox
+		let inputs_array = document.getElementById(target).getElementsByTagName('input');
+		let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
+		// There is only 1 input of 1 textarea per div in our setup.
+		// If we found more than zero inputs in the array, focus the first and only one.
+		if( inputs_array.length > 0 ){
+			inputs_array[0].focus();
+		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
+		}else if( textareas_array.length > 0 ){
+			textareas_array[0].focus();
+		}
 	}
 
 	// needed because of upload_flag functionality
 	function storeDefault(){
 		upload_flag = 'false';
-		document.querySelectorAll(".store.two").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".store.choose").forEach(a=>a.style.display = "none");
-		document.getElementById('store_data').focus();
+		showPage('store2');
 	}
 
 	// needed because of upload_flag functionality
 	function storeUpload(){
 		console.log("set upload_flag: true");
 		upload_flag = 'true';
-		document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "flex");
-		document.querySelectorAll(".store.choose").forEach(a=>a.style.display = "none");
+		showPage('store3');
 	}
 
 	// needed because of upload_flag functionality
@@ -294,38 +302,27 @@
 				showPage('store_choose');
 			}else if(e.target.id == "store_pass_1"){
 				showPage('store4');
-				document.getElementById('store_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "store_pass_2"){
 				showPage('store5');
-				// only works when enter is hit in this setup
-				document.getElementById('store_pass_3').focus();
 /*			}else if(e.target.id == "store_pass_3"){
 				storeFive();
 */
 			}else if(e.target.id == "load_codeword"){
 				showPage('load2');
-				document.getElementById('load_pass_1').focus(); // only works when enter is hit
 			}else if(e.target.id == "load_pass_1"){
 				showPage('load3');
-				document.getElementById('load_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "load_pass_2"){
 				showPage('load4');
-				document.getElementById('load_pass_3').focus(); // only works when enter is hit
 			}else if(e.target.id == "load_pass_3"){
 				loadExecute();
-				document.getElementById('load_pass_4').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_codeword"){
 				showPage('delete2');
-				document.getElementById('delete_pass_1').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_pass_1"){
 				showPage('delete3');
-				document.getElementById('delete_pass_2').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_pass_2"){
 				showPage('delete4');
-				document.getElementById('delete_pass_3').focus(); // only works when enter is hit
 			}else if(e.target.id == "delete_pass_3"){
-				deleteExectue();
-				document.getElementById('delete_pass_4').focus(); // only works when enter is hit
+				deleteExecute();
 			}
 		}
 	}
