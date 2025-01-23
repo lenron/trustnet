@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html>
-<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-<meta content="utf-8" http-equiv="encoding">
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+<meta content="utf-8" http-equiv="encoding" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -102,7 +103,7 @@
 
 	input {
 		height: 80px;
-		width: 800px;
+		width: 600px;
 		background-color: #272727;
 		border: 2px solid;
 		padding: 8px;
@@ -114,6 +115,7 @@
 	}
 
 	textarea {
+		width: 600px;
 		background-color: #272727;
 		border: 2px solid;
 		padding: 8px;
@@ -122,6 +124,29 @@
 		color: #54c597;
 		font-size: 25px;
 		border-radius: 30px;
+	}
+
+	/* Set minimum page Width to 350*/
+	@media screen and (max-width: 350px){ html,body {min-width: 350px} }
+
+	/* Set minimum page Height to 400*/
+	@media screen and (max-height: 400px){ html,body {min-height: 400px} }	
+
+	/* Responsive Design: When the viewport is fewer than 600px wide, activate the following CSS. */
+	@media screen and (max-width:600px) {
+
+		input {
+			width: 400px;
+		}
+
+		textarea {
+			width: 400px;
+		}
+/*
+		.button_pair{
+			flex-direction: column;
+		}
+*/
 	}
 	
 </style>
@@ -188,7 +213,7 @@
 		// focus input or textbox
 		let inputs_array = document.getElementById(target).getElementsByTagName('input');
 		let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
-		// There is only 1 input of 1 textarea per div in our setup.
+		// There is only 1 input or 1 textarea per div in our setup.
 		// If we found more than zero inputs in the array, focus the first and only one.
 		if( inputs_array.length > 0 ){
 			inputs_array[0].focus();

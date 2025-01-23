@@ -18,10 +18,10 @@ my $main = qq{
 
 			<div id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
-				<div id="button_div" style="display:flex; justify-content: center">
-					<button class="obf_button" id='go_store_thread' onclick="location.href='https://chat.dance/obf/store';">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_thread' onclick="location.href='https://chat.dance/obf/load';">ACCESS SECRET DATA</button>
-					<button class="obf_button" id='go_delete_thread' onclick="location.href='https://chat.dance/obf/delete';">DELETE SECRET DATA</button>
+				<div class="button_pair" id="button_pair" style="display:flex; justify-content: center">
+					<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/store';">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_load_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/load';">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_delete_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/delete';">DELETE SECRET DATA</button>
 				</div>
 			</div>
 
@@ -29,25 +29,23 @@ my $main = qq{
 # 						onclick="openCity('Tokyo')"
 my $store = qq{
 <!--   store  --!>
-		<!-- hidden input --!>
-		<input value="" id="upload_data" style="display:none;">
 
-			<div class="gen store one" id="store1" style="">
+			<div class="gen store one" id="store1" style="display:flex">
 				<label>STORE DATA</label>
 				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
 				<input autofocus onkeydown="catchEnter(event)" value="" id="store_codeword" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf';">BACK</button>
-					<button class="" id='sf1' style="flex-grow:1;" onclick="showPage('store_choose')">NEXT</button>
+				<div class="button_pair" id="" style="display:flex">
+					<button class="" id='' style="flex-grow:1" onclick="location.href='https://chat.dance/obf';">BACK</button>
+					<button class="" id='sf1' style="flex-grow:1" onclick="showPage('store_choose')">NEXT</button>
 				</div>
 			</div>
 
 			<div class="gen store choose" id="store_choose" style="display:none">
 				<h2 style="align-self:center;">YOU MUST CHOOSE THE FIRST LEVEL OF ENCRYPTION</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="width: 150px;" onclick="showPage('store1')">BACK</button>
-					<button class="" id='choose_default' style="width:350px;" onclick="storeDefault()">OUR ENCRYPTION - Text Input</button>
-					<button class="" id='choose_upload' style="width:350px;" onclick="storeUpload()">YOUR ENCRYPTION - File Input</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store1')">BACK</button>
+					<button class="" id='choose_default' style="flex-grow:3" onclick="storeDefault()">OUR ENCRYPTION - Text Input</button>
+					<button class="" id='choose_upload' style="flex-grow:3" onclick="storeUpload()">YOUR ENCRYPTION - File Input</button>
 				</div>
 			</div>
 
@@ -123,6 +121,9 @@ my $store = qq{
 					<button class="" id='accessdata' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
 				</div>
 			</div>
+
+<!-- hidden input --!>
+<input value="" id="upload_data" style="display:none;">
 <!--  store  --!>
 };
 
