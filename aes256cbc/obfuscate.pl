@@ -16,12 +16,14 @@ my $template = HTML::Template->new(filename => 'obfuscate.tmpl');
 
 my $main = qq{
 
-			<div id="generated_html" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
+			<div class="gen home" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
-				<div class="button_pair" id="button_pair" style="display:flex; justify-content: center">
-					<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/store';">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/load';">ACCESS SECRET DATA</button>
-					<button class="obf_button" id='go_delete_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/delete';">DELETE SECRET DATA</button>
+				<div class="home_buttons" id="" style="display:flex; justify-content: center;">
+					<div class="" id="" style="display:flex; justify-content: center; flex-direction: row;">
+						<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/store';">STORE SECRET DATA</button>
+						<button class="obf_button" id='go_load_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/load';">ACCESS SECRET DATA</button>
+					</div>
+					<button class="obf_button" id='go_delete_thread' style="flex-grow:1; align-self: center;" onclick="location.href='https://chat.dance/obf/delete';">DELETE SECRET DATA</button>
 				</div>
 			</div>
 
@@ -51,7 +53,7 @@ my $store = qq{
 
 			<div class="gen store upload" id="store_upload" style="display:none">
 				<h2>UPLOAD FILE</h3>
-				<input onchange="catchUpload(event)" id="store_upload" style="" type="file">
+				<input onchange="catchUpload(event)" id="store_upload" style="border:none;" type="file">
 				<br>
 				<label>OpenSSL Linux Commands:</label>
 				<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
@@ -61,7 +63,7 @@ my $store = qq{
 					<label>Decode:</label>
 					<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
 				</div>
-					<button class="" id='' style="width: 250px;" onclick="showPage('store_choose')">BACK test</button>
+					<button class="" id='' style="width: 250px;" onclick="showPage('store_choose')">BACK</button>
 			</div>
 
 			<div class="gen store two" id="store2" style="display:none">

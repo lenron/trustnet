@@ -78,6 +78,7 @@
 
 	/* generated conetent */
 	.gen {
+		margin: 10px;
 		align-self: center;
 		display: flex;
 		flex-direction: column;
@@ -126,14 +127,14 @@
 		border-radius: 30px;
 	}
 
-	/* Set minimum page Width to 350*/
-	@media screen and (max-width: 350px){ html,body {min-width: 350px} }
+	/* Set minimum page Width to */
+	@media screen and (max-width: 340px){ html,body {min-width: 340px} }
 
 	/* Set minimum page Height to 400*/
 	@media screen and (max-height: 400px){ html,body {min-height: 400px} }	
 
 	/* Responsive Design: When the viewport is fewer than 600px wide, activate the following CSS. */
-	@media screen and (max-width:600px) {
+	@media screen and (max-width:700px) {
 
 		input {
 			width: 400px;
@@ -142,13 +143,46 @@
 		textarea {
 			width: 400px;
 		}
-/*
-		.button_pair{
+
+		.header {
 			flex-direction: column;
 		}
-*/
+
+		.home button {
+			width: 200px;
+			/*border-color: black;*/
+		}
+
+		.home_buttons {
+			flex-direction: column;
+		}
+
+		.choose button {
+			font-size: 14px;
+		}
+
+		.upload input {
+			font-size: 16px;
+		}
 	}
-	
+	@media screen and (max-width:500px) {
+				
+		input {
+			width: 300px;
+		}
+
+		textarea {
+			width: 300px;
+		}
+		.home button {
+			width: 150px;
+			font-size: 14px;
+			/*border-color: black;*/
+		}
+	}
+
+
+
 </style>
 <body>
 
@@ -233,7 +267,7 @@
 	function storeUpload(){
 		console.log("set upload_flag: true");
 		upload_flag = 'true';
-		showPage('store3');
+		showPage('store_upload');
 	}
 
 	// needed because of upload_flag functionality
