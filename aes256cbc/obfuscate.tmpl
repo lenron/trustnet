@@ -78,6 +78,7 @@
 
 	/* generated conetent */
 	.gen {
+		width: 700px;
 		margin: 10px;
 		align-self: center;
 		display: flex;
@@ -104,7 +105,7 @@
 
 	input {
 		height: 80px;
-		width: 600px;
+		width: 95%;
 		background-color: #272727;
 		border: 2px solid;
 		padding: 8px;
@@ -116,7 +117,9 @@
 	}
 
 	textarea {
-		width: 600px;
+		/*width: 600px;*/
+		width: 95%;
+		height: 150px;
 		background-color: #272727;
 		border: 2px solid;
 		padding: 8px;
@@ -125,6 +128,24 @@
 		color: #54c597;
 		font-size: 25px;
 		border-radius: 30px;
+	}
+
+	.deletecheck {
+		justify-content:center;
+		align-items:center;
+		z-index:10;
+		position:absolute;
+		width:100%;
+		height:200%;
+		display:none;
+		background-color:gray;
+		padding:8px;
+		margin-left:0;
+		margin-top:-40%;
+		flex-direction: column;
+		border:2px solid;
+		border-color:red; 
+		border-radius:30px;
 	}
 
 	/* Set minimum page Width to */
@@ -137,11 +158,11 @@
 	@media screen and (max-width:700px) {
 
 		input {
-			width: 400px;
+			width: 90%;
 		}
 
 		textarea {
-			width: 400px;
+			width: 90%;
 		}
 
 		.header {
@@ -154,7 +175,7 @@
 		}
 
 		.home_buttons {
-			flex-direction: column;
+			/*flex-direction: column;*/
 		}
 
 		.choose button {
@@ -164,20 +185,36 @@
 		.upload input {
 			font-size: 16px;
 		}
+
+		.deletecheck {
+			margin-top: -50%;
+			height: 220%;
+		}
+		
+		.content_html {
+			margin-top: -100px;
+		}
 	}
 	@media screen and (max-width:500px) {
-				
+/*
 		input {
-			width: 300px;
+			width: 400px;
 		}
 
 		textarea {
-			width: 300px;
+			width: 400px;
 		}
+*/
 		.home button {
 			width: 150px;
 			font-size: 14px;
 			/*border-color: black;*/
+		}
+
+		.deletecheck {
+			width: 95%;
+			margin-top: -75%;
+			height:250%;
 		}
 	}
 
@@ -252,9 +289,12 @@
 		if( inputs_array.length > 0 ){
 			inputs_array[0].focus();
 		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
-		}else if( textareas_array.length > 0 ){
+		}
+/*
+else if( textareas_array.length > 0 ){
 			textareas_array[0].focus();
 		}
+*/
 	}
 
 	// needed because of upload_flag functionality
@@ -302,11 +342,24 @@
 		showPage('load5');
 	}
 
+	function deleteCheckShow(){
+		// Show Overlay
+		document.getElementById("overlay").style.display = "flex";
+	}
+
+	function deleteCheckHide(){
+		// Show Overlay
+		document.getElementById("overlay").style.display = "none";
+	}
+
 	// Delete thread walk finisher.
 	function deleteExecute(){
 		// Main Function Call
 		deepDelete();
+		// Notify user of success
 		showPage('delete5');
+		// Return Home
+		//location.href = "https://chat.dance/obf";
 	}
 
 /*
@@ -544,12 +597,17 @@ Don't think this is in spec
 
 
 	async function deepDelete(){
-
-		// Get code/passwords from user.
+/*									Keeping Delete Thread code for now.
 		const codeword = document.getElementById("delete_codeword").value;
 		const pass_1 = document.getElementById("delete_pass_1").value;
 		const pass_2 = document.getElementById("delete_pass_2").value;
-		const pass_3 = document.getElementById("delete_pass_3").value;
+		const pass_3 = document.getElementById("delete_pass_3").value;			*/
+		// Get code/passwords from user.
+		// For Delete, we will now be in the Access thread and should be able to use already entered values.
+		const codeword = document.getElementById("load_codeword").value;
+		const pass_1 = document.getElementById("load_pass_1").value;
+		const pass_2 = document.getElementById("load_pass_2").value;
+		const pass_3 = document.getElementById("load_pass_3").value;
 		console.log("DELETE code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
 
 		// Compute Fingerprint

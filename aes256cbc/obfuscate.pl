@@ -19,11 +19,8 @@ my $main = qq{
 			<div class="gen home" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content: center;">
-					<div class="" id="" style="display:flex; justify-content: center; flex-direction: row;">
-						<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/store';">STORE SECRET DATA</button>
-						<button class="obf_button" id='go_load_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/load';">ACCESS SECRET DATA</button>
-					</div>
-					<button class="obf_button" id='go_delete_thread' style="flex-grow:1; align-self: center;" onclick="location.href='https://chat.dance/obf/delete';">DELETE SECRET DATA</button>
+					<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/store';">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_load_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/load';">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 
@@ -177,11 +174,30 @@ my $load = qq{
 			<div class="gen load five" id="load5" style="display:none">
 				<label>&#10004; SUCCESS</label>
 				<label>result:</label>
-				<textarea value="" id="output_display" rows="8" cols="50"></textarea>
+				<div class="overlay_container" style="position:relative">
+					<textarea value="" id="output_display" rows="8" cols="50"></textarea>
+					<div id="overlay" class="deletecheck" style="">
+						<h2>Are you sure you want to delete this data?</h2> 
+						<div class="button_pair" id="" style="display:flex;">
+							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide()">KEEP DATA</button>
+							<button class="" id='' style="flex-grow:1;" onclick="deleteExecute()">DELETE DATA</button>
+						</div>
+					</div>
+				</div>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
 					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow()">DELETE DATA</button>
+					<!--<button class="" id='' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>--!>
+				</div>
+			</div>
+
+			<div class="gen delete five" id="delete5" style="display:none">
+				<label>&#10004; SUCCESS</label>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>--!>
 				</div>
 			</div>
 
@@ -254,7 +270,7 @@ my $delete = qq{
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
 					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>--!>
 				</div>
 			</div>
 <!--   delete	 --!>
