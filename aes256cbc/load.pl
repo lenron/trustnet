@@ -35,12 +35,14 @@ if ($q->param){
 	}
 
 	my $data = '';
+	my $upload_flag= '';
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	my $query = "SELECT data FROM $db_table WHERE fingerprint = ?";
+	my $query = "SELECT data, upload_flag FROM $db_table WHERE fingerprint = ?";
 	my $sth = $dbh->prepare($query);
 	$sth->execute($fingerprint);
 	while ( my $row = $sth->fetchrow_hashref ){
 		$data = $row->{data};
+		$upload_flag = $row->{upload_flag};
 	}
 
 	# Get current time for log.
@@ -53,11 +55,13 @@ if ($q->param){
 	print $fh "LOAD\n";
 	print $fh "$time\n";
 	print $fh "fingerprint: $fingerprint\n";
-	print $fh "data: $data\n\n";
+	print $fh "data: $data\n";
+	print $fh "upload_flag: $upload_flag\n\n";
 
-	# Notify of success or failure
+	# 
 	print $q->header();
-	print qq{{"response":"$data"}};
+	#print qq{{"response":"$data"}};
+	print qq{{"data":"$data","upload_flag":"$upload_flag"}};
 }
 
 

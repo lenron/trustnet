@@ -465,6 +465,12 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		return obf_s2_encrypted;
 	}//encryptStack()
 
+	async function decryptDouble(encrypted, pass2, pass3){
+		const obf2_decrypted = await obf2Decrypt(encrypted, pass3);
+		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass2);
+		return obf1_decrypted;
+	}//decryptStack()
+
 	async function decryptStack(encrypted, pass1, pass2, pass3){
 		const obf2_decrypted = await obf2Decrypt(encrypted, pass3);
 		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass2);
@@ -490,15 +496,20 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		}
 */
 
+	
 		let encrypted_data;
+		let upload_flag_db;
 		// Use flag set by storeUpload() to determine which enc stack to use.
 		if( upload_flag == 'true' ){
+			// Grab upload_flag value for server database flag.
+			upload_flag_db = '1';
+			// Double Encrypt
+			encrypted_data = await encryptDouble(uploadtext, pass_2, pass_3);
 			// reset flag once it is used
 			console.log("set upload_flag: false");
 			upload_flag = 'false';
-			// Double Encrypt
-			encrypted_data = await encryptDouble(uploadtext, pass_2, pass_3);
 		}else{
+			upload_flag_db = '0';
 			// Triple Encrypt
 			encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
 		}
@@ -529,7 +540,7 @@ Don't think this is in spec
 		}
 
 		// Use fetch() for server communication
-		const server_response = await serverStore(fp_hex, encrypted_data);
+		const server_response = await serverStore(fp_hex, encrypted_data, upload_flag_db);
 		sr_store_result = server_response.response;
 		console.log("Server Response from STORE: " + "~" + sr_store_result + "~");
 		console.log(server_response);
@@ -543,11 +554,11 @@ Don't think this is in spec
 		// return of 0 means fingerprint form check fails
 		// return of empty means fingerprint returned nothing
 		const sr_load = await serverLoad(fp_hex);
-		console.log("Server Response from LOAD: " + "~" + sr_load.response + "~");
+		console.log("Server Response from LOAD (store final check): " + "~" + sr_load.data + "~");
 		console.log(sr_load);
 
 		// Report Results
-		if( encrypted_data  === sr_load.response ){
+		if( encrypted_data  === sr_load.data){
 			return 1;
 			//addStatus("Data successfully saved to server.\n\n");
 		}else{
@@ -580,21 +591,50 @@ Don't think this is in spec
 
 		// Load from server
 		const sr_load = await serverLoad(fp_hex);
-		console.log("Server Response from LOAD: " + "~" + sr_load.response + "~");
+//		console.log("Server Response from LOAD: " + "~" + sr_load.response + "~");
+		console.log("Access Server Response, data: " + sr_load.data + "\n" + "upload_flag: " + sr_load.upload_flag);
 		console.log(sr_load);
-		if( sr_load.response == '' ){
+		if( sr_load.data == '' ){
 			//addLoadStatus("Nothing Found.");
 			return;
 		}
 
+		// Grab upload flag from server.
+		const upload_flag_server = sr_load.upload_flag;
+		console.log("UPLOAD FLAG: " + upload_flag_server);
+/*
 		// Triple Decrypt
-		const decrypted = await decryptStack(sr_load.response, pass_1, pass_2, pass_3);
+		const decrypted = await decryptStack(sr_load.data , pass_1, pass_2, pass_3);
 		console.log("decrypted: " + decrypted);
 		// Report Results 
 		document.getElementById("output_display").value = decrypted;
-
+*/
+		// Your Encryption
+		if( upload_flag_server == '1' ){
+			// Double Decrypt
+			decrypted_data = await decryptDouble(sr_load.data, pass_2, pass_3);
+			let output_data = base64ToWords(decrypted_data);
+			let a = document.createElement('a');
+			let blob = new Blob([output_data], {'type':'text/plain'});
+			a.href = window.URL.createObjectURL(blob);
+			a.download = 'secretword_output_file.txt';
+			a.click();
+			document.getElementById("output_display").placeholder = "<file should automatically download>";
+		}else{ // Our Encryption
+			// Triple Decrypt
+			const decrypted = await decryptStack(sr_load.data , pass_1, pass_2, pass_3);
+			//console.log("decrypted: " + decrypted);
+			// Report Results 
+			document.getElementById("output_display").value = decrypted;
+		}
 	}//deepLoad()
 
+	function base64ToWords( data64 ){
+		const bytes = base64ToBytes( data64 );
+		const bytearray = new Uint8Array( bytes );
+		const dec = new TextDecoder();
+		return dec.decode( bytearray );
+	}
 
 	async function deepDelete(){
 /*									Keeping Delete Thread code for now.
@@ -655,10 +695,10 @@ Don't think this is in spec
 
 	// Server communication function. Endpoint exestore will attempt to store 
 	// input encrypted data at the input fingerprint location.
-	async function serverStore(fingerprint, data){
+	async function serverStore(fingerprint, data, upload_flag_db){
 		const SERVER_URL = '/obf/exestore';
 		
-		console.log("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
+		console.log("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -667,6 +707,7 @@ Don't think this is in spec
 			body: JSON.stringify({
 				fingerprint: fingerprint,
 				data: data,
+				upload_flag: upload_flag_db,  // Usually I like to make sure these are identical.
 			}),
 		})
 		return response.json()
