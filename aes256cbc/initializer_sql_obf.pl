@@ -25,7 +25,7 @@ $dbh->disconnect;
 
 $dbh = DBI->connect("dbi:mysql:$db_name", $db_username, $db_pw);
 # Create table to hold URL and fisher user data
-$dbh->do("CREATE TABLE IF NOT EXISTS $db_table_obf (fingerprint VARCHAR(64), data VARCHAR(1000), PRIMARY KEY(fingerprint) )"); 
+$dbh->do("CREATE TABLE IF NOT EXISTS $db_table_obf (fingerprint VARCHAR(64), data VARCHAR(1000), upload_flag VARCHAR(1), PRIMARY KEY(fingerprint) )"); 
 
 $dbh->disconnect;
 
