@@ -55,10 +55,10 @@ my $store = qq{
 				<label>OpenSSL Linux Commands:</label>
 				<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
 					<label>Encode:</label>
-					<b>openssl enc -base64 -aes-256-cbc -e -p -pbkdf2 -in &lt;plaintext file&gt; -out &lt;encoded file&gt;</b>
+					<b>openssl enc -aes-256-cbc -e -p -pbkdf2 -in &lt;plaintext file&gt; -out &lt;encoded file&gt;</b>
 					<br>
 					<label>Decode:</label>
-					<b>openssl enc -base64 -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
+					<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
 				</div>
 					<button class="" id='' style="width: 250px;" onclick="showPage('store_choose')">BACK</button>
 			</div>

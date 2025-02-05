@@ -613,9 +613,12 @@ Don't think this is in spec
 		if( upload_flag_server == '1' ){
 			// Double Decrypt
 			decrypted_data = await decryptDouble(sr_load.data, pass_2, pass_3);
-			let output_data = base64ToWords(decrypted_data);
+			//let output_data = base64ToWords(decrypted_data);
+			const bytes = base64ToBytes( decrypted_data );
+			//let blob = new Blob([output_data], {'type':'text/plain'});
+			let blob = new Blob([bytes]);
+
 			let a = document.createElement('a');
-			let blob = new Blob([output_data], {'type':'text/plain'});
 			a.href = window.URL.createObjectURL(blob);
 			a.download = 'secretword_output_file.txt';
 			a.click();
