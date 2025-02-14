@@ -394,10 +394,43 @@ else if( textareas_array.length > 0 ){
 			let filedata = bytesToBase64(buffer);
 			console.log("uploaded file content:");
 			console.log(filedata);
-			document.getElementById("upload_data").value = filedata;
-			document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "none");
-			// skip data and pass1 input screens
-			document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
+			// Input Data Length Check
+			if( checkInputLength(filedata) ){
+				// Data Length within parameters
+				document.getElementById("upload_data").value = filedata;
+				document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "none");
+				// skip data and pass1 input screens
+				document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
+				// for back functionality, we need a button to continue
+				document.getElementById("store_upload_continue").style.display = "inline";
+				document.getElementById("store_upload_input").style.border = "";
+				// add red warning text
+				document.getElementById("store_upload_warning").style.display = "none";
+			}else{
+				// Data Length too long! Show Warning.
+				// hide continue button
+				document.getElementById("store_upload_continue").style.display = "none";
+				// make border red
+				document.getElementById("store_upload_input").style.border = "thick solid red";
+				// add red warning text
+				document.getElementById("store_upload_warning").style.display = "inline";
+			}
+		}
+	}
+
+	// on change check the length of the text area
+	function checkTextInputLength(){
+		let input = document.getElementById("store_data").value;
+		if( checkInputLength(input) ){
+			// Length OK, turn off warning
+			document.getElementById("store_text_input_warning").style.display = "none";
+			// display button
+			document.getElementById("store_text_input_continue").style.display = "inline";
+		}else{
+			// remove button
+			document.getElementById("store_text_input_continue").style.display = "none";
+			// Length NOT OK, turn ON warning
+			document.getElementById("store_text_input_warning").style.display = "inline";
 		}
 	}
 
@@ -410,6 +443,7 @@ else if( textareas_array.length > 0 ){
 		console.log("this target: " + e.target.id);
 		if( e.key == 'Enter'){
 			console.log("caught");
+			// e.target.id is the ID of the div of the origin of the catchEnter function call.
 			if( e.target.id == "store_codeword"){
 				showPage('store_choose');
 			}else if(e.target.id == "store_pass_1"){
@@ -1150,24 +1184,26 @@ Don't think this is in spec
 		}
 	}//check_b58chars()
 
-	function check_init_input(){
-		let input = document.getElementById("plaintext_input").value;
+	function checkInputLength(input){
+		//let input = document.getElementById("plaintext_input").value;
 
 		// show input size in bytes
 		let size = new Blob([input]).size;
 		//console.log("byte size: " + size);
 		//if( input.length > 500 ){
 		if( size > 500 ){
-			document.getElementById("input_warning").innerHTML= 'INPUT BYTE LENGTHS OVER 500 ARE INVALID. CURRENT LENGTH: ' + size;
-			document.getElementById("input_warning").style.display = 'inline';
+			//document.getElementById("input_warning").innerHTML= 'INPUT BYTE LENGTHS OVER 500 ARE INVALID. CURRENT LENGTH: ' + size;
+			//document.getElementById("input_warning").style.display = 'inline';
 			//document.getElementById("encrypt_openssl_button").disabled = true;
-			document.getElementById("store_button").disabled = true;
+			//document.getElementById("store_button").disabled = true;
+			return 0; // Length Check Failed
 		}else{
-			document.getElementById("input_warning").style.display = 'none';
+			////document.getElementById("input_warning").style.display = 'none';
 			//document.getElementById("encrypt_openssl_button").disabled = false;
-			document.getElementById("store_button").disabled = false;
+			//document.getElementById("store_button").disabled = false;
+			return 1; // Length Check Passed
 		}
-	}//check_init_input()
+	}//checkInputLength()
 
 /*
 	// NOT USED

@@ -50,7 +50,8 @@ my $store = qq{
 
 			<div class="gen store upload" id="store_upload" style="display:none">
 				<h2>UPLOAD FILE</h3>
-				<input onchange="catchUpload(event)" id="store_upload" style="border:none;" type="file">
+				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 500 byte limit</h2>
+				<input onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
 				<br>
 				<label>OpenSSL Linux Commands:</label>
 				<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
@@ -60,15 +61,21 @@ my $store = qq{
 					<label>Decode:</label>
 					<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
 				</div>
-					<button class="" id='' style="width: 250px;" onclick="showPage('store_choose')">BACK</button>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="width:250px;" onclick="showPage('store_choose')">BACK</button>
+					<button class="" id='store_upload_continue' style="flex-grow:1;display:none;" onclick="showPage('store4')">CONTINUE</button>
+				</div>
 			</div>
 
 			<div class="gen store two" id="store2" style="display:none">
 				<label>STORE DATA</label>
-				<textarea value="" id="store_data" rows="8" cols="45" placeholder="ENTER YOUR SECRET DATA"></textarea>
+				<textarea value="" id="store_data" rows="8" cols="45" oninput="checkTextInputLength()" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store_choose')">BACK</button>
-					<button class="" id='sf2' style="flex-grow:1" onclick="showPage('store3')">ENCRYPT DATA</button>
+					<button class="" id='store_text_input_continue' style="flex-grow:1" onclick="showPage('store3')">ENCRYPT DATA</button>
+					<div id='store_text_input_warning' style="flex-grow:1;display:none;">
+						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
+					</div>
 				</div>
 			</div>
 
