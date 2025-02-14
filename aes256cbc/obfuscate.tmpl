@@ -1189,9 +1189,10 @@ Don't think this is in spec
 
 		// show input size in bytes
 		let size = new Blob([input]).size;
+		console.log("BLOB SIZE: " + size);
 		//console.log("byte size: " + size);
 		//if( input.length > 500 ){
-		if( size > 500 ){
+		if( size > 700 ){
 			//document.getElementById("input_warning").innerHTML= 'INPUT BYTE LENGTHS OVER 500 ARE INVALID. CURRENT LENGTH: ' + size;
 			//document.getElementById("input_warning").style.display = 'inline';
 			//document.getElementById("encrypt_openssl_button").disabled = true;

@@ -50,7 +50,7 @@ my $store = qq{
 
 			<div class="gen store upload" id="store_upload" style="display:none">
 				<h2>UPLOAD FILE</h3>
-				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 500 byte limit</h2>
+				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 700 byte limit</h2>
 				<input onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
 				<br>
 				<label>OpenSSL Linux Commands:</label>
