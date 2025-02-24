@@ -40,15 +40,28 @@ my $store = qq{
 			</div>
 
 			<div class="gen store choose" id="store_choose" style="display:none">
-				<h2 style="align-self:center;">YOU MUST CHOOSE THE FIRST LEVEL OF ENCRYPTION</h2>
+				<label>STORE DATA</label>
+				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store1')">BACK</button>
-					<button class="" id='choose_default' style="flex-grow:3" onclick="storeDefault()">OUR ENCRYPTION - Text Input</button>
-					<button class="" id='choose_upload' style="flex-grow:3" onclick="storeUpload()">YOUR ENCRYPTION - File Input</button>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="" id='choose_default' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="storeDefault()">
+							<span style="">BROWSER</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
+						</button>
+					</div>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="" id='choose_uplaod' style="display:flex; flex-direction:column; justify-content:center;" onclick="storeUpload()">
+							<span style="color:#ff00ff;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">COMMAND LINE</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
+						</button>
+						<label style="align-self:center; color:#ff00ff;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">More Secure</label>
+					</div>
 				</div>
 			</div>
 
 			<div class="gen store upload" id="store_upload" style="display:none">
+				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
 				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 700 byte limit</h2>
 				<input onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
