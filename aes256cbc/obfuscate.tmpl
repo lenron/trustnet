@@ -136,7 +136,7 @@
 		z-index:10;
 		position:absolute;
 		width:100%;
-		height:200%;
+		height:215%;
 		display:none;
 		background-color:gray;
 		padding:8px;
@@ -265,15 +265,16 @@
 		// faq();
 	}
 	
-	// global flag
+	// global flag requried for this design unfortunately
 	let upload_flag = 'false';
+	let download_flag = 'false';
 
 // Thread walk handler functions
 	// show target pane in page set
 	// target is element ID of html generated pane
 	function showPage(target){
 		let generated_html_pages;
-		// fill generated_html_pages with set of objects including generated html
+		// Fill generated_html_pages array with set of objects (divs in this case) that are tagged as generated html.
 		generated_html_pages = document.getElementsByClassName('gen');
 		// hide all generated_html_pages
 		for (let i = 0; i < generated_html_pages.length; i++) {
@@ -288,29 +289,30 @@
 		// If we found more than zero inputs in the array, focus the first and only one.
 		if( inputs_array.length > 0 ){
 			inputs_array[0].focus();
-		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
 		}
 /*
-else if( textareas_array.length > 0 ){
-			textareas_array[0].focus();
-		}
+		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
+		 else if( textareas_array.length > 0 ){
+			 textareas_array[0].focus();
+		 }
 */
 	}
 
-	// needed because of upload_flag functionality
+	// Standalone functions required to set upload_flag in javascript.
+	// User choose text input, set flag to false.
 	function storeDefault(){
 		upload_flag = 'false';
 		showPage('store2');
 	}
 
-	// needed because of upload_flag functionality
+	// User choose upload, set flag to true.
 	function storeUpload(){
 		console.log("set upload_flag: true");
 		upload_flag = 'true';
 		showPage('store_upload');
 	}
 
-	// needed because of upload_flag functionality
+	// On page store4, back either goes to text input or file input depending on previous user choice.
 	function storeBack(){
 		if( upload_flag === 'true' ){
 			showPage('store_upload');
@@ -328,28 +330,43 @@ else if( textareas_array.length > 0 ){
 		let outcome = await deepStore();
 
 		if( outcome == 1 ){	//Success
+			// Show page store6
 			document.querySelectorAll(".store.six").forEach(a=>a.style.display = "flex");
 		}else{	//Fail
 			document.querySelectorAll(".store.seven").forEach(a=>a.style.display = "flex");
 		}
+
+		// Also clear sensitive data / reload page for security?
 	}
-	// clear sensitive data / reload page for security?
+
+	// User choose text output, set flag to false.
+	function loadDefault(){
+		download_flag = 'false';
+		showPage('load2');
+	}
+
+	// User choose file output, set flag to true.
+	function loadDownload(){
+		console.log("set upload_flag: true");
+		download_flag = 'true';
+		showPage('load3');
+	}
 
 	// Load thread walk finisher.
 	function loadExecute(){
 		// Main Function Call
 		deepLoad();
-		showPage('load5');
+		//showPage('load5');
 	}
 
-	function deleteCheckShow(){
+	function deleteCheckShow(tar){
 		// Show Overlay
-		document.getElementById("overlay").style.display = "flex";
+		document.getElementById(tar).style.display = "flex";
 	}
 
-	function deleteCheckHide(){
+	function deleteCheckHide(tar){
 		// Show Overlay
-		document.getElementById("overlay").style.display = "none";
+		document.getElementById(tar).style.display = "none";
 	}
 
 	// Delete thread walk finisher.
@@ -361,25 +378,6 @@ else if( textareas_array.length > 0 ){
 		// Return Home
 		//location.href = "https://chat.dance/obf";
 	}
-
-/*
-  document.getElementById('binaryInput').addEventListener('change', async function(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-	  let buffer = e.target.result;
-      // Process the binary data
-      const info = `Buffer Length: ${buffer.byteLength} bytes`;
-      document.getElementById('binaryOutput').innerHTML = info;
-		buffer = new Uint8Array(buffer);
-		let arr = bytesToBase64(buffer);
-      console.log(arr);
-      console.log("arr: " + arr);
-    };
-    reader.readAsArrayBuffer(file);
-    
-  });
-*/
 
 	// Catch File Ingest
 	// listener is placed inline of the html
@@ -454,7 +452,7 @@ else if( textareas_array.length > 0 ){
 				storeFive();
 */
 			}else if(e.target.id == "load_codeword"){
-				showPage('load2');
+				showPage('load_choose');
 			}else if(e.target.id == "load_pass_1"){
 				showPage('load3');
 			}else if(e.target.id == "load_pass_2"){
@@ -628,23 +626,32 @@ Don't think this is in spec
 //		console.log("Server Response from LOAD: " + "~" + sr_load.response + "~");
 		console.log("Access Server Response, data: " + sr_load.data + "\n" + "upload_flag: " + sr_load.upload_flag);
 		console.log(sr_load);
+/*
 		if( sr_load.data == '' ){
 			//addLoadStatus("Nothing Found.");
 			return;
 		}
-
-		// Grab upload flag from server.
-		const upload_flag_server = sr_load.upload_flag;
-		console.log("UPLOAD FLAG: " + upload_flag_server);
+*/
 /*
+I think this was how initial browser decrypt site functionality was seen by users.
+
 		// Triple Decrypt
 		const decrypted = await decryptStack(sr_load.data , pass_1, pass_2, pass_3);
 		console.log("decrypted: " + decrypted);
 		// Report Results 
 		document.getElementById("output_display").value = decrypted;
 */
+/*
+I think swapping flag read from database with download_flag will justworkTM?
+
+		// Grab upload flag from server.
+		const upload_flag_server = sr_load.upload_flag;
+		console.log("UPLOAD FLAG: " + upload_flag_server);
+*/
 		// Your Encryption
-		if( upload_flag_server == '1' ){
+		//if( upload_flag_server == '1' ){
+		if( download_flag == 'true' ){
+			showPage('load_download');
 			// Double Decrypt
 			decrypted_data = await decryptDouble(sr_load.data, pass_2, pass_3);
 			//let output_data = base64ToWords(decrypted_data);
@@ -656,8 +663,9 @@ Don't think this is in spec
 			a.href = window.URL.createObjectURL(blob);
 			a.download = 'secretword_output_file.txt';
 			a.click();
-			document.getElementById("output_display").placeholder = "<file should automatically download>";
+			//document.getElementById("output_display").placeholder = "<file should automatically download>";
 		}else{ // Our Encryption
+			showPage('load_text');
 			// Triple Decrypt
 			const decrypted = await decryptStack(sr_load.data , pass_1, pass_2, pass_3);
 			//console.log("decrypted: " + decrypted);
