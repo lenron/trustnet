@@ -197,7 +197,7 @@ my $load = qq{
 				<h2>ENTER SECRET WORD 2</h2>
 				<input onkeydown="catchEnter(event)" value="" id="load_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('load2')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="loadBack()">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('load4')">NEXT</button>
 				</div>
 			</div>

@@ -87,7 +87,7 @@
 		color: #54c597;
 	}
 
-	/* obf button */
+	/* default button styling. HTML style="" will override. */
 	button {
 		/*width: 400px;*/
 		height: 65px;
@@ -130,6 +130,7 @@
 		border-radius: 30px;
 	}
 
+	/* 'Are you sure?' overlay */
 	.deletecheck {
 		justify-content:center;
 		align-items:center;
@@ -151,10 +152,10 @@
 	/* Set minimum page Width to */
 	@media screen and (max-width: 340px){ html,body {min-width: 340px} }
 
-	/* Set minimum page Height to 400*/
+	/* Set minimum page Height to 400 */
 	@media screen and (max-height: 400px){ html,body {min-height: 400px} }	
 
-	/* Responsive Design: When the viewport is fewer than 600px wide, activate the following CSS. */
+	/* Responsive Design: When the viewport is fewer than 700px wide, activate the following CSS. */
 	@media screen and (max-width:700px) {
 
 		input {
@@ -269,9 +270,8 @@
 	let upload_flag = 'false';
 	let download_flag = 'false';
 
-// Thread walk handler functions
-	// show target pane in page set
-	// target is element ID of html generated pane
+	// Show target page. 
+	// Target is the element ID of an html generated pane.
 	function showPage(target){
 		let generated_html_pages;
 		// Fill generated_html_pages array with set of objects (divs in this case) that are tagged as generated html.
@@ -298,9 +298,10 @@
 */
 	}
 
-	// Standalone functions required to set upload_flag in javascript.
+	// These standalone functions are required to set upload_flag in javascript.
 	// User choose text input, set flag to false.
 	function storeDefault(){
+		console.log("set upload_flag: false");
 		upload_flag = 'false';
 		showPage('store2');
 	}
@@ -341,15 +342,25 @@
 
 	// User choose text output, set flag to false.
 	function loadDefault(){
+		console.log("set download_flag: false");
 		download_flag = 'false';
 		showPage('load2');
 	}
 
 	// User choose file output, set flag to true.
 	function loadDownload(){
-		console.log("set upload_flag: true");
+		console.log("set download_flag: true");
 		download_flag = 'true';
 		showPage('load3');
+	}
+
+	// On page store4, back either goes to text input or file input depending on previous user choice.
+	function loadBack(){
+		if( download_flag === 'true' ){
+			showPage('load_choose');
+		}else{
+			showPage('load2');
+		}
 	}
 
 	// Load thread walk finisher.
@@ -609,7 +620,6 @@ Don't think this is in spec
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
-		console.log("code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
 
 		// Compute Fingerprint
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
