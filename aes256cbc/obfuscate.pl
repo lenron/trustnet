@@ -35,7 +35,7 @@ my $store = qq{
 				<input autofocus onkeydown="catchEnter(event)" value="" id="store_codeword" style="">
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='' style="flex-grow:1" onclick="location.href='https://chat.dance/obf';">BACK</button>
-					<button class="" id='sf1' style="flex-grow:1" onclick="showPage('store_choose')">NEXT</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_choose')">NEXT</button>
 				</div>
 			</div>
 
@@ -45,13 +45,13 @@ my $store = qq{
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store1')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='choose_default' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="storeDefault()">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="storeDefault()">
 							<span style="">BROWSER</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='choose_uplaod' style="display:flex; flex-direction:column; justify-content:center;" onclick="storeUpload()">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="storeUpload()">
 							<span style="color:#ff00ff;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">COMMAND LINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
 						</button>
@@ -98,7 +98,7 @@ my $store = qq{
 				<input onkeydown="catchEnter(event)" value="" id="store_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store2')">BACK</button>
-					<button class="" id='sf3' style="flex-grow:1;" onclick="showPage('store4')">ENHANCE SECURITY</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store4')">ENHANCE SECURITY</button>
 				</div>
 			</div>
 
@@ -109,7 +109,7 @@ my $store = qq{
 				<input onkeydown="catchEnter(event)" value="" id="store_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="storeBack()">BACK</button>
-					<button class="" id='sf4' style="flex-grow:1;" onclick="showPage('store5')">ENHANCE SECURITY</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store5')">ENHANCE SECURITY</button>
 				</div>
 			</div>
 
@@ -154,21 +154,44 @@ my $load = qq{
 				<input autofocus onkeydown="catchEnter(event)" value="" id="load_codeword" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf';">BACK</button>
-					<button class="" id='' style="flex-grow:1" onclick="showPage('load2')">NEXT</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('load_choose')">NEXT</button>
+				</div>
+			</div>
+
+			<div class="gen load choose" id="load_choose" style="display:none">
+				<label>ACCESS DATA</label>
+				<h2 style="align-self:center;">CHOOSE WHERE TO DECRYPT YOUR DATA</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('load1')">BACK</button>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="loadDefault()">
+							<span style="">BROWSER</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">Text Output</span>
+						</button>
+					</div>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="loadDownload()">
+							<span style="color:#ff00ff;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">COMMAND LINE</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">File Output</span>
+						</button>
+						<label style="align-self:center; color:#ff00ff;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">More Secure</label>
+					</div>
 				</div>
 			</div>
 
 			<div class="gen load two" id="load2" style="display:none">
+				<label>ACCESS DATA</label>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<h2>ENTER SECRET WORD 1</h2>
 				<input onkeydown="catchEnter(event)" value="" id="load_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('load1')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('load_choose')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('load3')">NEXT</button>
 				</div>
 			</div>
 
 			<div class="gen load three" id="load3" style="display:none">
+				<label>ACCESS DATA</label>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<h2>ENTER SECRET WORD 2</h2>
@@ -180,6 +203,7 @@ my $load = qq{
 			</div>
 
 			<div class="gen load four" id="load4" style="display:none">
+				<label>ACCESS DATA</label>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<label>&#10004; SECRET WORD 2 ENTERED</label> 
@@ -187,19 +211,19 @@ my $load = qq{
 				<input onkeydown="catchEnter(event)" value="" id="load_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('load3')">BACK</button>
-					<button class="" id='lf4' style="flex-grow:1;" onclick="loadExecute()">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1;" onclick="loadExecute()">ACCESS DATA</button>
 				</div>
 			</div>
 
-			<div class="gen load five" id="load5" style="display:none">
+			<div class="gen load text" id="load_text" style="display:none">
 				<label>&#10004; SUCCESS</label>
 				<label>result:</label>
 				<div class="overlay_container" style="position:relative">
 					<textarea value="" id="output_display" rows="8" cols="50"></textarea>
-					<div id="overlay" class="deletecheck" style="">
+					<div id="overlay_text" class="deletecheck" style="">
 						<h2>Are you sure you want to delete this data?</h2> 
 						<div class="button_pair" id="" style="display:flex;">
-							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide()">KEEP DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('overlay_text')">KEEP DATA</button>
 							<button class="" id='' style="flex-grow:1;" onclick="deleteExecute()">DELETE DATA</button>
 						</div>
 					</div>
@@ -207,8 +231,33 @@ my $load = qq{
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
 					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow()">DELETE DATA</button>
-					<!--<button class="" id='' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>--!>
+					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_text')">DELETE DATA</button>
+				</div>
+			</div>
+
+			<div class="gen load download" id="load_download" style="display:none">
+				<label>&#10004; SUCCESS</label>
+				<label>result:</label>
+				<div class="overlay_container" style="position:relative">
+					<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
+						<label>Encode:</label>
+						<b>openssl enc -aes-256-cbc -e -p -pbkdf2 -in &lt;plaintext file&gt; -out &lt;encoded file&gt;</b>
+						<br>
+						<label>Decode:</label>
+						<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
+					</div>
+					<div id="overlay_download" class="deletecheck" style="">
+						<h2>Are you sure you want to delete this data?</h2> 
+						<div class="button_pair" id="" style="display:flex;">
+							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('overlay_download')">KEEP DATA</button>
+							<button class="" id='' style="flex-grow:1;" onclick="deleteExecute()">DELETE DATA</button>
+						</div>
+					</div>
+				</div>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_download')">DELETE DATA</button>
 				</div>
 			</div>
 
@@ -217,7 +266,6 @@ my $load = qq{
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
 					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>--!>
 				</div>
 			</div>
 
