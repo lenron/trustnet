@@ -977,13 +977,11 @@ I think swapping flag read from database with download_flag will justworkTM?
 	}//getXOR()
 
 	async function obf1Encrypt(plaintext, password) {
-
 		// Prepare plaintext side for XOR.
+		// Adds our custom countstring to the data.
 		let plaintext_binary = addCountstring(plaintext);
-
 		// XOR plaintext with password and return exactly 1000 base 58 chars.
 		const result_b58 = await getXOR(plaintext_binary, password);
-
 		// Check data length and type (check 2: 1000 char length, base 58).
 		//addStatus('Running Check 2...\n');
 		// If all b58 chars...
@@ -1183,46 +1181,11 @@ I think swapping flag read from database with download_flag will justworkTM?
 		//console.log("byte size: " + size);
 		//if( input.length > 500 ){
 		if( size > 700 ){
-			//document.getElementById("input_warning").innerHTML= 'INPUT BYTE LENGTHS OVER 500 ARE INVALID. CURRENT LENGTH: ' + size;
-			//document.getElementById("input_warning").style.display = 'inline';
-			//document.getElementById("encrypt_openssl_button").disabled = true;
-			//document.getElementById("store_button").disabled = true;
 			return 0; // Length Check Failed
 		}else{
-			////document.getElementById("input_warning").style.display = 'none';
-			//document.getElementById("encrypt_openssl_button").disabled = false;
-			//document.getElementById("store_button").disabled = false;
 			return 1; // Length Check Passed
 		}
 	}//checkInputLength()
-
-/*
-	// NOT USED
-	function check_input_obf2(){
-		let input = document.getElementById("obf2_input").value;
-		// Disable Final Step button if any non-base58 characters are entered.
-		if( check_b58chars(input) ){
-			//console.log("enable");
-			//enable button
-			document.getElementById("obf2Encrypt_button").disabled = false;
-			//document.getElementById("obf2_encrypt_output").value = "";
-		}else{
-			//console.log("Non-base 58 chars found in the Final Step input!");
-			//disable button
-			document.getElementById("obf2Encrypt_button").disabled = true;
-			//document.getElementById("obf2_encrypt_output").value = "Non-base 58 chars found in the Final Step input!";
-		}
-
-		if( input.length == 1000 ){
-			//document.getElementById("obf2Encrypt_button").disabled = false;
-			console.log("Obf2 input size verified as valid (exactly 1000 chars)");
-		}else{
-			//document.getElementById("obf2Encrypt_button").disabled = true;
-			console.log("Obf2 input size INVALID!");
-		}
-	}//check_input_obf2()
-*/
-
 
 	function addCountstring(data) {
 		// Count chars.
@@ -1264,6 +1227,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return sha_cumulative;
 	}//getPassHash()
 
+	// Concatenates buffers: return = buffer1 + buffer2
 	// Outputs data in a typed array.
 	function concatBuffer(buffer1, buffer2) {
 	  var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
@@ -1291,22 +1255,14 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return btoa(binString);
 	}
 
-	function _arrayBufferToBase64( buffer ) {
-		var binary = '';
-		var bytes = new Uint8Array( buffer );
-		var len = bytes.byteLength;
-		for (var i = 0; i < len; i++) {
-			binary += String.fromCharCode( bytes[ i ] );
-		}
-		return window.btoa( binary );
-	}//_arrayBufferToBase64()
-
 	function buf2hex(buffer) { // buffer is an ArrayBuffer
 		return [...new Uint8Array(buffer)]
 			.map(x => x.toString(16).padStart(2, '0'))
 			.join('');
 	}//buf2hex()
-	 // This function converts a hex string into an ArrayBuffer for hash processing.
+
+	// Keeping unused function because it is symetrical to a used one.
+	// This function converts a hex string into an ArrayBuffer for hash processing.
 	function hex2buf(hexString){
 		// convert to a number array representing the hex bytes.
 		const hexBytesArray = new Array;
@@ -1317,36 +1273,6 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return hexArrayBuffer;
 	}//hex2buf()
 
-	function base64ToArrayBuffer(base64) {
-		var binaryString = atob(base64);
-		var bytes = new Uint8Array(binaryString.length);
-		for (var i = 0; i < binaryString.length; i++) {
-			bytes[i] = binaryString.charCodeAt(i);
-		}
-		return bytes.buffer;
-	}//base64ToArrayBuffer()
-/*
-	function encode64(){
-		let raw_text = document.getElementById("raw_64encode_text").value;
-		//console.log("Encoding the string: '" + raw_text + "'");
-		const encoded64 = btoa(raw_text);
-		//console.log("Encoded string: '" + encoded64 + "'");
-		document.getElementById("encoded64_text").value = encoded64;
-		document.getElementById("raw_64encoded_text").value = encoded64;
-	}//encode64()
-
-	function decode64(){
-		let decoded_text = document.getElementById("raw_64encoded_text").value;
-		//console.log("Decoding the string: '" + decoded_text + "'");
-		const decoded64 = atob(decoded_text);
-		//console.log("Decoded string: '" + decoded64 + "'");
-		document.getElementById("decoded64_text").value = decoded64;
-	}//decode64()
-*/
-
-////////////////////////////////////////////
-//////		End Merge	 	////////////////
-////////////////////////////////////////////
 
 </script>
 
