@@ -370,13 +370,13 @@
 		//showPage('load5');
 	}
 
+	// Show Overlay
 	function deleteCheckShow(tar){
-		// Show Overlay
 		document.getElementById(tar).style.display = "flex";
 	}
 
+	// Hide Overlay
 	function deleteCheckHide(tar){
-		// Show Overlay
 		document.getElementById(tar).style.display = "none";
 	}
 
@@ -386,8 +386,6 @@
 		deepDelete();
 		// Notify user of success
 		showPage('delete5');
-		// Return Home
-		//location.href = "https://chat.dance/obf";
 	}
 
 	// Catch File Ingest
@@ -448,8 +446,8 @@
 	// .addEventListener('keydown', catchEnter);	or
 	// onkeydown = catchEnter()
 	function catchEnter(e){
-		console.log("keydown event key: " + e.key);
-		console.log("this target: " + e.target.id);
+		//console.log("keydown event key: " + e.key);
+		//console.log("this target: " + e.target.id);
 		if( e.key == 'Enter'){
 			console.log("caught");
 			// e.target.id is the ID of the div of the origin of the catchEnter function call.
@@ -490,6 +488,7 @@
 // Base 58 character map.
 const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
+	// Encrypt stack used in the case user chooses command line.
 	async function encryptDouble(file_ingest_input, pass2, pass3){
 		// Obfuscation Step 1 Encrypt
 		const obf_s1_encrypted = await obf1Encrypt(file_ingest_input, pass2);
@@ -498,6 +497,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		return obf_s2_encrypted;
 	}//encryptStack()
 
+	// Encrypt stack used in the case user chooses Browser.
 	async function encryptStack(plaintext, pass1, pass2, pass3){
 		// OpenSSL Encrypt (base 64 encoded)
 		const openssl_encrypted = await encOpenSSL(plaintext, pass1);
@@ -508,12 +508,14 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		return obf_s2_encrypted;
 	}//encryptStack()
 
+	// Decrypt stack used in the case user chooses Command Line.
 	async function decryptDouble(encrypted, pass2, pass3){
 		const obf2_decrypted = await obf2Decrypt(encrypted, pass3);
 		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass2);
 		return obf1_decrypted;
 	}//decryptStack()
 
+	// Decrypt stack used in the case user chooses Browser.
 	async function decryptStack(encrypted, pass1, pass2, pass3){
 		const obf2_decrypted = await obf2Decrypt(encrypted, pass3);
 		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass2);
@@ -521,8 +523,8 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		return plaintext;
 	}//decryptStack()
 
+	// Main Store Function Handler
 	async function deepStore(){
-
 		// Get save data from user.
 		const plaintext = document.getElementById("store_data").value;
 		const uploadtext = document.getElementById("upload_data").value;
@@ -556,7 +558,6 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 			encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
 		}
 
-		// Compute Fingerprint
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
 		console.log("fingerprint hex: " + fp_hex);
 		console.log("fingerprint length: " + fp_hex.length);
@@ -571,7 +572,7 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 		console.log("Server Response from STORE: " + "~" + sr_store_result + "~");
 		console.log(server_response);
 		// Store returned 0 (fail).
-		if( Number(sr_store_result)  != 1){
+		if( Number(sr_store_result) != 1){
 			//addStatus("There was a problem storing the data! End.\n\n");
 			throw new Error('STORE ERROR!');
 		}
@@ -593,16 +594,14 @@ const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 	}//deepStore()
 
-
+	// Main Access Function Handler
 	async function deepLoad(){
-
 		// Get code/passwords from user.
 		const codeword = document.getElementById("load_codeword").value;
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
 
-		// Compute Fingerprint
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
 		console.log("fingerprint hex: " + fp_hex);
 		console.log("fingerprint length: " + fp_hex.length);
@@ -645,7 +644,6 @@ I think swapping flag read from database with download_flag will justworkTM?
 			showPage('load_download');
 			// Double Decrypt
 			decrypted_data = await decryptDouble(sr_load.data, pass_2, pass_3);
-			//let output_data = base64ToWords(decrypted_data);
 			const bytes = base64ToBytes( decrypted_data );
 			//let blob = new Blob([output_data], {'type':'text/plain'});
 			let blob = new Blob([bytes]);
@@ -665,13 +663,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 		}
 	}//deepLoad()
 
-	function base64ToWords( data64 ){
-		const bytes = base64ToBytes( data64 );
-		const bytearray = new Uint8Array( bytes );
-		const dec = new TextDecoder();
-		return dec.decode( bytearray );
-	}
-
+	// Main Delete Function Handler
 	async function deepDelete(){
 		// Get code/passwords from user.
 		// For Delete, we will now be in the Access thread and should be able to use already entered values.
@@ -681,13 +673,11 @@ I think swapping flag read from database with download_flag will justworkTM?
 		const pass_3 = document.getElementById("load_pass_3").value;
 		console.log("DELETE code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
 
-		// Compute Fingerprint
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
 		console.log("fingerprint hex: " + fp_hex);
 		console.log("fingerprint length: " + fp_hex.length);
 		// fingerprint length check
 		if( fp_hex.length != 64 ){
-			//addStatus("Fingerprint length problem! Ending.\n");
 			throw new Error('Fingerprint length INVALID!');
 		}
 
@@ -697,7 +687,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return sr_delete.response;
 	}//deepLoad()
 
-	// Server communication function. Endpoint exeload will attempt to load
+	// Server communication function. Endpoint /obf/exeload will attempt to load
 	// encrypted data corresponding to the input fingerprint. This type of URI used
 	// instead of a direct link to the file for security.
 	async function serverLoad(fingerprint){
@@ -736,7 +726,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return response.json()
 	}//serverStore()
 
-	// Endpoint exedelete will attempt to delete
+	// Endpoint /obf/exedelete will attempt to delete
 	async function serverDelete(fingerprint){
 		const SERVER_URL = '/obf/exedelete';
 		
@@ -753,10 +743,12 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return response.json()
 	}//serverDelete()
 
+	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
+	// Inputs are plaintext, Output is in hexadecimal.
 	async function computeFingerprint(codeword, pass_2, pass_3){
-		// sub all lowercase
+		// Convert to lowercase.
 		const cw_lower = codeword.toLowerCase();
-		// take sha256 hash of codeword, pass 2, pass 3
+		// Take SHA-256 hash of codeword, pass 2, pass 3.
 		const enc = new TextEncoder();
 		const cw_buf = enc.encode(cw_lower);
 		const p2_buf = enc.encode(pass_2);
@@ -764,33 +756,34 @@ I think swapping flag read from database with download_flag will justworkTM?
 		const cw_hash = await crypto.subtle.digest('SHA-256', cw_buf);
 		const p2_hash = await crypto.subtle.digest('SHA-256', p2_buf);
 		const p3_hash = await crypto.subtle.digest('SHA-256', p3_buf);
-		// concatenate: fingerprint = cw_hash + p2_hash + p3_hash;
+		// Concatenate: fingerprint = cw_hash + p2_hash + p3_hash
 		const cw_and_p2_hash = concatBuffer(cw_hash, p2_hash)
 		const concatenated_hashes = concatBuffer(cw_and_p2_hash, p3_hash)
+		// SHA-256 hash the result.
 		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
 		const fingerprint = new Uint8Array(fp_hash);
-		//console.log("fingerprint: " + fingerprint);
+		//console.log("Computed Fingerprint: " + fingerprint);
 		const fp_hex = buf2hex(fingerprint);
 		return fp_hex;
 	}//computeFingerprint
 
+	// Import plaintext password.
+	// Then proccess into and return subtlecrypto-usable key object.
 	function getKeyMaterial(password) {
 		const enc = new TextEncoder();
 		// importKey(format, keyData, algorithm, extractable, keyUsages)
 		return window.crypto.subtle.importKey(
 			"raw",
-			enc.encode(password),
+			enc.encode(password),	// plaintext -> binary
 			"PBKDF2",
 			false,
 			["deriveBits", "deriveKey"],
 		);
 	}//getKeyMaterial()
 
-
 	// Our implementation of OpenSSL's encrypt function.
 	// Both inputs are plaintext.
 	async function encOpenSSL(plaintext, pass) {
-
 		// Prepare plaintext for encryption.
 		// Encode plaintext in utf8 and store in Uint8Array inputbytes.
 		const inputbytes = new TextEncoder().encode( plaintext );
@@ -812,7 +805,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 
 		// Salt is used when hashing, IV (Initialization Vector) for encryption.
 
-		// Import password into a subtle crypto usable key object.
+		// Import password into a subtlecrypto-usable key object.
 		const keyMaterial = await getKeyMaterial(pass);
 		// Derives input bits used for the PBKDF2 cryptoKey object AND the IV.
 		const derived_bits = await window.crypto.subtle.deriveBits(
@@ -865,7 +858,6 @@ I think swapping flag read from database with download_flag will justworkTM?
 	// Our implementation of OpenSSL's decrypt function.
 	// ciphertext64 is in base64. pass is plaintext.
 	async function decOpenSSL(ciphertext64, pass) {
-
 		// Convert input base 64 to binary.
 		const ciphertextbytes = base64ToBytes(ciphertext64);
 		// ciphertext is now in a form that is ready to give to the encryption function.
@@ -924,6 +916,9 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return decrypted_string;
 	}//decOpenSSL()
 
+	// Inputs: plintext_binary is an array, password is plaintext.
+	// Returns: array of the XOR result.
+	// 
 	async function getXOR(plaintext_binary, password){
 		// 1000 seems more reasonable if we're immediately going to chop it to 780.
 		const array_length = 1000;
@@ -937,34 +932,53 @@ I think swapping flag read from database with download_flag will justworkTM?
 			xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
 		}
 
-		// Now that we have plenty of XOR'd binary data,
-		// we need to pop the number of bytes that will encode to exactly 1000 chars of base58 data.
+		////////////////////////////////////////////////////
+		// Encode to exactly 1000 characters of base58 data.
+		////////////////////////////////////////////////////
+		// Try 8-bit Bytes:
+		// Chop unnecessary data, keeping the important slice.
 		let array_slice = xor_result.slice(0, 780);
 		let last_byte_popped;
 		let array_slice_hex;
+		// Without actually doing the conversion to base58, output length is unclear.
 		let result_b58 = to_b58(array_slice);
-		// Start by popping whole bytes, then check if we encoded to 1000 exactly.
+		// Start Try: 
+		// Pop WHOLE bytes until length is 1000 or less.
 		while( result_b58.length > 1000 ){
+			// Pop an 8-bit Byte. Keep it in case we need for 4-bit word precision.
 			last_byte_popped = array_slice.pop();
+			// Convert array_slice to base58 string.
 			result_b58 = to_b58(array_slice);
 		}
-		// If we don't encode to 1000 popping 8-bit bytes, try popping 4-bit words!
+
+		///////////////////////////////////////////////////
+		// Try Failed: 4-bit Word Precision Needed.
+		// In this case, we missed 1000 byte length: looks something like length=1001 then length=999.
+			// This happens irregularly because of the bit order conversion missmatch between base64 and base58 (I think).
 		if( result_b58.length != 1000 ){
+			// Since we can't get to 1000 bytes by popping 8-bit bytes, increase precision by popping 4-bit words.
+				// The result of the below function in practice appears equivalent to prepending a zero. The inverse function handles this by 
+				// popping a character before trying the decrypt if the beginning of the ciphertext doesn't look like an encrypted countstring. /^\d+:/
 			console.log("1000 char output missed. ADD MORE PRECISION!");
-			// Start by pushing back on the last popped byte.
+			// Start by adding back the popped byte we saved.
 			array_slice.push(last_byte_popped);
-			// Convert to word array.
-			word_array = bytesToWords( array_slice );
-			// We have 4 words that are poppable.
+			// Convert to word array:
+			// Instead of 64-bit bytes, use 16-bit words.
+			word_array = bytesToWords( array_slice ); // function resides base58.js
+			// We have 4 words that are poppable. (Makes sense, 4 * 16-bit words = 64-bit byte)
 			let tries = 0;
+			// Continue if we made it to length 1000 (success!).
 			while( result_b58.length != 1000){
 				console.log("word_array: " + word_array);
+				// Pop a 4-bit word.
 				last_word_popped = word_array.pop();
+				// Convert word_array to base58 string.
 				result_b58 = to_b58_words(word_array);
 				console.log("b58 length: " + result_b58.length);
 				console.log("result_b58: " + result_b58);
 				tries++;
-				// Not sure how to test this as it may never trigger.
+				// Not sure how to test this as it may never trigger, however...
+				// We should never miss a whole character of base58 length as long as we pop 16-bit chunks (I think-- pretty sure!).
 				if( tries > 4 ){
 					throw new Error('MAJOR ERROR: additional precision not sufficient to reach 1000 characters of length. Ending.');
 				}
@@ -1159,6 +1173,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return final_decrypted_string;
 	}//obf2Decrypt()
 
+	// Returns false if non-base58 characters are detected.
 	function check_b58chars(input){
 		// From the first char(^) to the last($), match zero or more(*) of 
 		// 1-9A-HJ-NP-Za-km-z (false if any non-b58 chars).
@@ -1172,6 +1187,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 		}
 	}//check_b58chars()
 
+	// Returns false if the input length (in bytes) is over 700.
 	function checkInputLength(input){
 		//let input = document.getElementById("plaintext_input").value;
 
@@ -1187,6 +1203,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 		}
 	}//checkInputLength()
 
+	// Prepends a string equal to the number of characters in data to the front of data.
 	function addCountstring(data) {
 		// Count chars.
 		const num_chars = data.length;
@@ -1196,19 +1213,19 @@ I think swapping flag read from database with download_flag will justworkTM?
 		const countstring_binary = new TextEncoder().encode(countstring);
 		// Copy to size 1000 array for XOR.
 		let big_arr = new Uint8Array(1000);
+		// Looks like: dataxxxxxx00000000000000....
 		big_arr.set(countstring_binary);
 		return big_arr;
 	}//addCountstring()
 
+	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	async function getPassHash(pass, length) {
-		//console.log("entered password: " + pass);
 		// Convert to binary (Uint8Array).
 		const password_binary = new TextEncoder().encode(pass);
-		//console.log("password binary array: " + password_binary);
 
 		// Take initial SHA256.
-		let initial_sha = await crypto.subtle.digest('SHA-256', password_binary);
-		let sha_cumulative = initial_sha;
+		let sha_cumulative = await crypto.subtle.digest('SHA-256', password_binary);
+		//let sha_cumulative = initial_sha;
 		let	sha_result;
 
 		// Loop until we have 2000 bytes of data.
@@ -1240,7 +1257,6 @@ I think swapping flag read from database with download_flag will justworkTM?
 	// MDN funcction Usage:
 	// bytesToBase64(new TextEncoder().encode("a Ā 𐀀 文 🦄")); // "YSDEgCDwkICAIOaWhyDwn6aE"
 	// new TextDecoder().decode(base64ToBytes("YSDEgCDwkICAIOaWhyDwn6aE")); // "a Ā 𐀀 文 🦄"
-
 	// MDN function
 	function base64ToBytes(base64) {
 		const binString = atob(base64);
@@ -1255,6 +1271,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return btoa(binString);
 	}
 
+	// This function converts an ArrayBuffer into a hex string.
 	function buf2hex(buffer) { // buffer is an ArrayBuffer
 		return [...new Uint8Array(buffer)]
 			.map(x => x.toString(16).padStart(2, '0'))
@@ -1262,7 +1279,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 	}//buf2hex()
 
 	// Keeping unused function because it is symetrical to a used one.
-	// This function converts a hex string into an ArrayBuffer for hash processing.
+	// This function converts a hex string into an ArrayBuffer.
 	function hex2buf(hexString){
 		// convert to a number array representing the hex bytes.
 		const hexBytesArray = new Array;
