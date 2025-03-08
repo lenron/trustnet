@@ -916,9 +916,40 @@ I think swapping flag read from database with download_flag will justworkTM?
 		return decrypted_string;
 	}//decOpenSSL()
 
+	// Inputs: plaintext64 is base64, password is plaintext
+	// Outputs: 1000 characters of base58 string
+	async function obf1Encrypt(plaintext64, password) {
+		// Prepare plaintext side for XOR.
+		// Adds our custom countstring to the data.
+		let plaintext_binary = addCountstring(plaintext64);
+		// XOR plaintext with password and return exactly 1000 base 58 chars.
+		const result_b58 = await getXOR(plaintext_binary, password);
+
+		// Check data length and type (specification check 2: 1000 char length, base 58).
+		//addStatus('Running Check 2...\n');
+		// If all b58 chars...
+		if( check_b58chars(result_b58) ){
+			//addStatus("Data type verified.\n");
+		}else{
+			//addStatus("Data type INVALID.\n");
+			//addStatus("Critical Failure! End.\n");
+			throw new Error('Obfuscation step 1 INVALID characters found!');
+			//return;
+		}
+
+		if( result_b58.length == 1000 ){ 
+			//addStatus("Data length verified.\n");
+		}else{
+			//addStatus("Data length INVALID. Length: " + result_b58.length + "\n");
+			//addStatus("Critical Failure! End.\n");
+			throw new Error('Obfuscation step 1 output length INVALID!');
+			//return;
+		}
+		return result_b58;
+	}//obf1Encrypt()
+
 	// Inputs: plintext_binary is an array, password is plaintext.
 	// Returns: array of the XOR result.
-	// 
 	async function getXOR(plaintext_binary, password){
 		// 1000 seems more reasonable if we're immediately going to chop it to 780.
 		const array_length = 1000;
@@ -984,50 +1015,18 @@ I think swapping flag read from database with download_flag will justworkTM?
 				}
 			}
 		}	
-
 		console.log("RESULT: " + result_b58);
 		console.log("Data LENGTH: " + result_b58.length);
 		return result_b58;
 	}//getXOR()
 
-	async function obf1Encrypt(plaintext, password) {
-		// Prepare plaintext side for XOR.
-		// Adds our custom countstring to the data.
-		let plaintext_binary = addCountstring(plaintext);
-		// XOR plaintext with password and return exactly 1000 base 58 chars.
-		const result_b58 = await getXOR(plaintext_binary, password);
-		// Check data length and type (check 2: 1000 char length, base 58).
-		//addStatus('Running Check 2...\n');
-		// If all b58 chars...
-		if( check_b58chars(result_b58) ){
-			//addStatus("Data type verified.\n");
-		}else{
-			//addStatus("Data type INVALID.\n");
-			//addStatus("Critical Failure! End.\n");
-			throw new Error('Obfuscation step 1 INVALID characters found!');
-			//return;
-		}
-
-		if( result_b58.length == 1000 ){ 
-			//addStatus("Data length verified.\n");
-		}else{
-			//addStatus("Data length INVALID. Length: " + result_b58.length + "\n");
-			//addStatus("Critical Failure! End.\n");
-			throw new Error('Obfuscation step 1 output length INVALID!');
-			//return;
-		}
-
-		return result_b58;
-	}//obf1Encrypt()
-
-	async function obf1Decrypt(compd_val, password) {
-
+	// Inputs: ciphertext58 is a base58 string, password is plaintext
+	// Output: decrypted_string is a base64 string
+	async function obf1Decrypt(ciphertext58, password) {
 		// Convert from base 58.
-		let decoded_b58_arr = from_b58(compd_val);
-
-		//const array_length = 732;
+		let decoded_b58_arr = from_b58(ciphertext58);
+		// Compute array length.
 		let array_length = decoded_b58_arr.length;
-
 		// Compute password for XOR.
 		let pass_binary = await getPassHash(password, array_length);
 
@@ -1040,22 +1039,22 @@ I think swapping flag read from database with download_flag will justworkTM?
 		}
 
 		let plaintextbytes = Array.from(xor_result);
-		// Strip off tailing zeros.
+		// Strip off tailing zeros from the RIGHT.
 		while(plaintextbytes[plaintextbytes.length - 1] == 0){
 			plaintextbytes.pop();
 		}
 		plaintextbytes = Uint8Array.from(plaintextbytes);
-		// utf8 to text
+		// Convert utf-8 to string
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
 
-		// data should now be in countstring form.
-
+		// Data should now be in countstring form.
 		// use regex to see if decrypted_string looks like the countstring. 
 		// remove lead char (hopefully a 0) if not.
 		const regex = /^\d+:/;
 		if( !regex.test(decrypted_string) ){
 			console.log("NO MATCH: try stripping zero");
 			// Try stripping zero from function input and running the obf1 decrypt again.
+			// Strip from the LEFT. This is equivalent to enc1Obf/getXOR's popping because the base58 converter function inverts the order.
 			try_stripped = compd_val.substr(1);
 			// Convert from base 58.
 			decoded_b58_arr = from_b58(try_stripped);
@@ -1066,12 +1065,13 @@ I think swapping flag read from database with download_flag will justworkTM?
 			for (let i = 0; i < array_length; i++) {
 				xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
 			}
-
+			// Create new Array from xor_result.
 			plaintextbytes = Array.from(xor_result);
 			// Strip off tailing zeros.
 			while(plaintextbytes[plaintextbytes.length - 1] == 0){
 				plaintextbytes.pop();
 			}
+			// Create new Uint8Array from plaintextbytes.
 			plaintextbytes = Uint8Array.from(plaintextbytes);
 			decrypted_string = new TextDecoder().decode(plaintextbytes);
 			
@@ -1083,9 +1083,8 @@ I think swapping flag read from database with download_flag will justworkTM?
 			}
 		}
 
-		// Decode countstring
+		// Decode (pop) countstring. It's done its job.
 		decrypted_string = decrypted_string.split(":").pop();
-
 		return decrypted_string;
 	}//obf1Decrypt
 
@@ -1193,7 +1192,7 @@ I think swapping flag read from database with download_flag will justworkTM?
 
 		// show input size in bytes
 		let size = new Blob([input]).size;
-		console.log("BLOB SIZE: " + size);
+		//console.log("Input (blob) size: " + size);
 		//console.log("byte size: " + size);
 		//if( input.length > 500 ){
 		if( size > 700 ){
