@@ -29,6 +29,12 @@ my $main = qq{
 my $store = qq{
 <!--   store  --!>
 
+<!--
+Multiline comment placeholder
+
+
+-->
+
 			<div class="gen store one" id="store1" style="display:flex">
 				<label>STORE DATA</label>
 				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
@@ -52,10 +58,10 @@ my $store = qq{
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
 						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="storeUpload()">
-							<span style="color:#ff00ff;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">COMMAND LINE</span>
+							<span class="coolpink" style="">COMMAND LINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
 						</button>
-						<label style="align-self:center; color:#ff00ff;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">More Secure</label>
+						<label class="coolpink" style="align-self:center;">More Secure</label>
 					</div>
 				</div>
 			</div>
@@ -66,13 +72,13 @@ my $store = qq{
 				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 700 byte limit</h2>
 				<input onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
 				<br>
-				<label>OpenSSL Linux Commands:</label>
+				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 				<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
-					<label>Encode:</label>
-					<b>openssl enc -aes-256-cbc -e -p -pbkdf2 -in &lt;plaintext file&gt; -out &lt;encoded file&gt;</b>
+					<label>Encrypt:</label>
+					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -p -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 					<br>
-					<label>Decode:</label>
-					<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
+					<label>Decrypt:</label>
+					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -p -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.dec</span></label>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="width:250px;" onclick="showPage('store_choose')">BACK</button>
@@ -237,14 +243,16 @@ my $load = qq{
 
 			<div class="gen load download" id="load_download" style="display:none">
 				<label>&#10004; SUCCESS</label>
-				<label>result:</label>
+				<label>File should automatically download.</label>
+				<br>
 				<div class="overlay_container" style="position:relative">
+					<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 					<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
-						<label>Encode:</label>
-						<b>openssl enc -aes-256-cbc -e -p -pbkdf2 -in &lt;plaintext file&gt; -out &lt;encoded file&gt;</b>
+						<label>Encrypt:</label>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -p -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 						<br>
-						<label>Decode:</label>
-						<b>openssl enc -aes-256-cbc -d -p -pbkdf2 -in &lt;encoded file&gt; -out &lt;decoded file&gt;</b>
+						<label>Decrypt:</label>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -p -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.dec</span></label>
 					</div>
 					<div id="overlay_download" class="deletecheck" style="">
 						<h2>Are you sure you want to delete this data?</h2> 
