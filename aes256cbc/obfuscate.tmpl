@@ -275,6 +275,12 @@
 	// Show target page. 
 	// Input: Target is the element ID of an html generated pane.
 	function showPage(target){
+		// Hide all password warnings.
+		pass_warn_elements = document.getElementsByClassName('pass_length_warn');
+		for (let i = 0; i < pass_warn_elements.length; i++) {
+			pass_warn_elements[i].style.display = "none";
+		}
+
 		let generated_html_pages;
 		// Fill generated_html_pages array with set of objects (divs in this case) that are tagged as generated html.
 		generated_html_pages = document.getElementsByClassName('gen');
@@ -298,6 +304,42 @@
 			 textareas_array[0].focus();
 		 }
 */
+	}
+
+	// Used to check password length as user flows through interface.
+	// Inputs: input_div is
+	// 		   next_div is the id of the next page in the thread which will be accessed if the password length is validated.
+	// Output: Warns user and doesn't pass if length outside constraints.
+	function checkPassLength(current_div, next_div){
+		// Get all inputs in the active user-shown div (should only be 1).
+		let input_array = document.getElementById(current_div).getElementsByTagName('input');
+		if( input_array.length > 1 ){
+			throw new Error('More than 1 input found in active div. This should never trigger.');
+		}
+		// Get the current length of the value in the password/codeword field.
+		let length = input_array[0].value.length;
+		// Change global password length constraints here.
+		// Start at 1 to catch empty passowords/codeword. Can change later.
+		if( length < 1 ){
+			// Activate text informing user of error.
+			//document.getElementById("password_length_warning").style.display = "inline";
+			
+			// Show all password warnings.
+			pass_warn_elements = document.getElementsByClassName('pass_length_warn');
+			// hide all generated_html_pages
+			for (let i = 0; i < pass_warn_elements.length; i++) {
+				pass_warn_elements[i].style.display = "inline";
+			}
+		}else{
+			// User may access next function.
+			if( next_div === 'executeStore' ){
+				storeExecute();
+			}else if( next_div === 'executeLoad' ){
+				loadExecute();
+			}else{
+				showPage(next_div);
+			}
+		}
 	}
 
 	// These standalone functions are required to set upload_flag in javascript.
@@ -443,46 +485,6 @@
 		}
 	}
 
-	// Catch Enter on each page
-	// input.addEventListener(type, listener)
-	// .addEventListener('keydown', catchEnter);	or
-	// onkeydown = catchEnter()
-	function catchEnter(e){
-		//console.log("keydown event key: " + e.key);
-		//console.log("this target: " + e.target.id);
-		if( e.key == 'Enter'){
-			console.log("caught");
-			// e.target.id is the ID of the div of the origin of the catchEnter function call.
-			if( e.target.id == "store_codeword"){
-				showPage('store_choose');
-			}else if(e.target.id == "store_pass_1"){
-				showPage('store4');
-			}else if(e.target.id == "store_pass_2"){
-				showPage('store5');
-/*			}else if(e.target.id == "store_pass_3"){
-				storeFive();
-*/
-			}else if(e.target.id == "load_codeword"){
-				showPage('load_choose');
-			}else if(e.target.id == "load_pass_1"){
-				showPage('load3');
-			}else if(e.target.id == "load_pass_2"){
-				showPage('load4');
-			}else if(e.target.id == "load_pass_3"){
-				loadExecute();
-			}else if(e.target.id == "delete_codeword"){
-				showPage('delete2');
-			}else if(e.target.id == "delete_pass_1"){
-				showPage('delete3');
-			}else if(e.target.id == "delete_pass_2"){
-				showPage('delete4');
-			}else if(e.target.id == "delete_pass_3"){
-				deleteExecute();
-			}
-		}
-	}
-
-
 	//////////////////////////////////////////////////////////////
 	//			Main Handler Functions						    //
 	//////////////////////////////////////////////////////////////
@@ -499,15 +501,14 @@
 		const pass_1 = document.getElementById("store_pass_1").value;
 		const pass_2 = document.getElementById("store_pass_2").value;
 		const pass_3 = document.getElementById("store_pass_3").value;
-/*
-		// We will need to figure out a minimum length for passwords/input, then activate something like this.
-		//
-		// Make sure data isn't blank, and mandate that all 3 pw's are used in addition to the cw.
-		if( plaintext === '' || codeword === '' || pass_1 === '' || pass_2 === '' || pass_3 === '' ){
-			//addStatus("To proceed, please make sure no fields are blank.\n");
-			throw new Error('Empty fields found! Ending.');
-		}
-*/
+
+		// First check lengths as user moves through interface then maybe:
+		// Final check:
+		//		Make sure data isn't blank, and mandate that all 3 pw's are used in addition to the cw.
+		//if( plaintext === '' || codeword === '' || pass_1 === '' || pass_2 === '' || pass_3 === '' ){
+		//if( plaintext.length === '' || codeword.length < 8 || pass_1.length < 8 || pass_2.length < 8 || pass_3.length < 8 ){
+			//throw new Error('Empty fields found! Ending.');
+		//}
 	
 		let encrypted_data;
 		let upload_flag_db;
@@ -620,10 +621,11 @@
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
 		console.log("DELETE code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
+		
 
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
-		console.log("fingerprint hex: " + fp_hex);
-		console.log("fingerprint length: " + fp_hex.length);
+		//console.log("fingerprint hex: " + fp_hex);
+		//console.log("fingerprint length: " + fp_hex.length);
 		// fingerprint length check
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');

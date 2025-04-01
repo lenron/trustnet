@@ -34,12 +34,15 @@ Multiline Comment Reminder
 -->
 
 			<div class="gen store one" id="store1" style="display:flex">
-				<label>STORE DATA</label>
+				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+					<label>STORE DATA</label>
+					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+				</div>
 				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
-				<input type="password" autofocus onkeydown="catchEnter(event)" value="" id="store_codeword" style="">
+				<input type="password" autofocus id="store_codeword" style="">
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='' style="flex-grow:1" onclick="location.href='https://chat.dance/obf';">BACK</button>
-					<button class="" id='' style="flex-grow:1" onclick="showPage('store_choose')">NEXT</button>
+					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('store1','store_choose')">NEXT</button>
 				</div>
 			</div>
 
@@ -85,7 +88,10 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store two" id="store2" style="display:none">
-				<label>STORE DATA</label>
+				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+					<label>STORE DATA</label>
+					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+				</div>
 				<textarea value="" id="store_data" rows="8" cols="45" oninput="checkTextInputLength()" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store_choose')">BACK</button>
@@ -97,35 +103,47 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store three" id="store3" style="display:none">
+				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+					<label>STORE DATA</label>
+					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+				</div>
 				<label>&#10004; SECRET DATA SAVED</label>
 				<h2>ENTER SECRET WORD 1</h2>
-				<input type="password" onkeydown="catchEnter(event)" value="" id="store_pass_1" style="">
+				<input type="password" value="" id="store_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store2')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store4')">ENHANCE SECURITY</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('store3','store4')">ENHANCE SECURITY</button>
 				</div>
 			</div>
 
 			<div class="gen store four" id="store4" style="display:none">
+				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+					<label>STORE DATA</label>
+					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+				</div>
 				<label>&#10004; SECRET DATA SAVED</label>
 				<label>&#10004; SECRET WORD 1 SAVED</label>
 				<h2>ENTER SECRET WORD 2</h2>
-				<input type="password" onkeydown="catchEnter(event)" value="" id="store_pass_2" style="">
+				<input type="password" value="" id="store_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="storeBack()">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store5')">ENHANCE SECURITY</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('store4','store5')">ENHANCE SECURITY</button>
 				</div>
 			</div>
 
 			<div class="gen store five" id="store5" style="display:none">
+				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+					<label>STORE DATA</label>
+					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+				</div>
 				<label>&#10004; SECRET DATA SAVED</label>
 				<label>&#10004; SECRET WORD 1 SAVED</label>
 				<label>&#10004; SECRET WORD 2 SAVED</label>
 				<h2>ENTER SECRET WORD 3</h2>
-				<input type="password" onkeydown="catchEnter(event)" value="" id="store_pass_3" style="">
+				<input type="password" value="" id="store_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store4')">BACK</button>
-					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="storeExecute()">DEEP STORE DATA</button>
+					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="checkPassLength('store5','executeStore')">DEEP STORE DATA</button>
 				</div>
 			</div>
 
@@ -153,12 +171,15 @@ Multiline Comment Reminder
 my $load = qq{
 <!--   load  --!>
 			<div class="gen load one" id="load1" style="">
-				<label>ACCESS DATA</label>
+				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+					<label>ACCESS DATA</label>
+					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+				</div>
 				<h2>ENTER CODE WORD</h2>
-				<input type="password" autofocus onkeydown="catchEnter(event)" value="" id="load_codeword" style="">
+				<input type="password" autofocus  value="" id="load_codeword" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf';">BACK</button>
-					<button class="" id='' style="flex-grow:1" onclick="showPage('load_choose')">NEXT</button>
+					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('load1','load_choose')">NEXT</button>
 				</div>
 			</div>
 
@@ -184,38 +205,47 @@ my $load = qq{
 			</div>
 
 			<div class="gen load two" id="load2" style="display:none">
-				<label>ACCESS DATA</label>
+				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+					<label>ACCESS DATA</label>
+					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+				</div>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<h2>ENTER SECRET WORD 1</h2>
-				<input type="password" onkeydown="catchEnter(event)" value="" id="load_pass_1" style="">
+				<input type="password"  value="" id="load_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('load_choose')">BACK</button>
-					<button class="" id='' style="flex-grow:1" onclick="showPage('load3')">NEXT</button>
+					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('load2','load3')">NEXT</button>
 				</div>
 			</div>
 
 			<div class="gen load three" id="load3" style="display:none">
-				<label>ACCESS DATA</label>
+				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+					<label>ACCESS DATA</label>
+					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+				</div>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<h2>ENTER SECRET WORD 2</h2>
-				<input type="password" onkeydown="catchEnter(event)" value="" id="load_pass_2" style="">
+				<input type="password"  value="" id="load_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="loadBack()">BACK</button>
-					<button class="" id='' style="flex-grow:1" onclick="showPage('load4')">NEXT</button>
+					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('load3','load4')">NEXT</button>
 				</div>
 			</div>
 
 			<div class="gen load four" id="load4" style="display:none">
-				<label>ACCESS DATA</label>
+				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+					<label>ACCESS DATA</label>
+					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+				</div>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<label>&#10004; SECRET WORD 2 ENTERED</label> 
 				<h2>ENTER SECRET WORD 3</h2>
-				<input type="password" onkeydown="catchEnter(event)" value="" id="load_pass_3" style="">
+				<input type="password"  value="" id="load_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('load3')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="loadExecute()">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('load4','executeLoad')">ACCESS DATA</button>
 				</div>
 			</div>
 
@@ -299,7 +329,7 @@ my $delete = qq{
 			<div class="gen delete one" id="delete1" style="">
 				<label>DELETE DATA</label>
 				<h2>ENTER CODE WORD</h2>
-				<input type="password" autofocus onkeydown="catchEnter(event)" value="" id="delete_codeword" style="">
+				<input type="password" autofocus  value="" id="delete_codeword" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf';">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete2')">NEXT</button>
@@ -309,7 +339,7 @@ my $delete = qq{
 			<div class="gen delete two" id="delete2" style="display:none">
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<h2>ENTER SECRET WORD 1</h2>
-				<input type="password" onkeydown="catchEnter(event)" value="" id="delete_pass_1" style="">
+				<input type="password"  value="" id="delete_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete1')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete3')">NEXT</button>
@@ -320,7 +350,7 @@ my $delete = qq{
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<h2>ENTER SECRET WORD 2</h2>
-				<input type="password" onkeydown="catchEnter(event)" value="" id="delete_pass_2" style="">
+				<input type="password"  value="" id="delete_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete2')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete4')">NEXT</button>
@@ -332,7 +362,7 @@ my $delete = qq{
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<label>&#10004; SECRET WORD 2 ENTERED</label> 
 				<h2>ENTER SECRET WORD 3</h2>
-				<input type="password" onkeydown="catchEnter(event)" value="" id="delete_pass_3" style="">
+				<input type="password"  value="" id="delete_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete3')">BACK</button>
 					<button class="" id='' style="flex-grow:1;" onclick="deleteExecute()">DELETE DATA</button>
