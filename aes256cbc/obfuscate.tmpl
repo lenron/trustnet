@@ -773,7 +773,6 @@
 		let encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
 		encrypted_output_buf = new Uint8Array(encrypted_output_buf);
 		let out64 = bytesToBase64(encrypted_output_buf);
-		out64 = new Array(out64);
 		return out64;
 	}//encOpenSSL()
 
@@ -1208,8 +1207,10 @@
 	function addCountstring(data) {
 		// Count chars.
 		const num_chars = data.length;
+		console.log("countstring number of chars: " + num_chars);
 		// Form 'countstring'.
 		let countstring = num_chars + ':' + data;
+		console.log("countstring: " + countstring);
 		// Convert to binary (Uint8Array).
 		const countstring_binary = new TextEncoder().encode(countstring);
 		// Copy to size 1000 array for XOR.
@@ -1218,7 +1219,7 @@
 		// Looks like: I:dataxxxxxx00000000000000....
 		// where I is an integer equal to the length of input data.
 		big_arr.set(countstring_binary);
-console.log("countstring extension: " + big_arr);
+		console.log("countstring extension: " + big_arr);
 		return big_arr;
 	}//addCountstring()
 
