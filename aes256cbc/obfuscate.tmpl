@@ -542,7 +542,6 @@
 		console.log(server_response);
 		// Store returned 0 (fail).
 		if( Number(sr_store_result) != 1){
-			//addStatus("There was a problem storing the data! End.\n\n");
 			throw new Error('STORE ERROR!');
 		}
 
@@ -867,24 +866,13 @@
 		const result_b58 = await getXOR(plaintext_binary, password);
 
 		// Check data length and type (specification check 2: 1000 char length, base 58).
-		//addStatus('Running Check 2...\n');
 		// If all b58 chars...
-		if( check_b58chars(result_b58) ){
-			//addStatus("Data type verified.\n");
-		}else{
-			//addStatus("Data type INVALID.\n");
-			//addStatus("Critical Failure! End.\n");
+		if( !check_b58chars(result_b58) ){
 			throw new Error('Obfuscation step 1 INVALID characters found!');
-			//return;
 		}
 
-		if( result_b58.length == 1000 ){ 
-			//addStatus("Data length verified.\n");
-		}else{
-			//addStatus("Data length INVALID. Length: " + result_b58.length + "\n");
-			//addStatus("Critical Failure! End.\n");
+		if( !result_b58.length == 1000 ){ 
 			throw new Error('Obfuscation step 1 output length INVALID!');
-			//return;
 		}
 		return result_b58;
 	}//obf1Encrypt()
@@ -904,7 +892,6 @@
 		for (let i = 0; i < array_length; i++) {
 			xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
 		}
-
 		// In order to encode to exactly 1000 characters of base58 data, start by popping byte size chunks,
 		// running the conversion, then checking the length of base58 result.
 		// Try 8-bit Bytes:
@@ -964,32 +951,9 @@
 	// Inputs: ciphertext58 is a base58 string, password is plaintext
 	// Output: decrypted_string is a base64 string
 	async function obf1Decrypt(ciphertext58, password) {
-console.log("ciphertext58: " + ciphertext58);
-		// Convert to Uint8Array from base 58.
-		let decoded_b58_arr = from_b58(ciphertext58);
-		// Compute array length.
-		let array_length = decoded_b58_arr.length;
-		// Compute password for XOR.
-		let pass_binary = await getPassHash(password, array_length);
-
-		// Inverse of XOR is XOR and is communicative.
-		// XOR password and output to get input.
-		let xor_result = new Uint8Array(array_length);
-		for (let i = 0; i < array_length; i++) {
-			// Perform the XOR.
-			xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
-		}
-console.log("xor_result: " + xor_result);
-		let plaintextbytes = Array.from(xor_result);
-		// Strip off tailing zeros from the RIGHT.
-		while(plaintextbytes[plaintextbytes.length - 1] == 0){
-			plaintextbytes.pop();
-		}
-		plaintextbytes = Uint8Array.from(plaintextbytes);
-console.log("plaintextbytes: " + plaintextbytes);
-		// Convert utf-8 to string
-		let decrypted_string = new TextDecoder().decode(plaintextbytes);
-console.log("decrypted_string: " + decrypted_string);
+		console.log("ciphertext58: " + ciphertext58);
+		// Obfuscate 1 Decrypt core function.
+		let decrypted_string = await xorInverse(ciphertext58, password);
 
 		// Data should now be in countstring form.
 		// use regex to see if decrypted_string looks like the countstring. 
@@ -1000,42 +964,50 @@ console.log("decrypted_string: " + decrypted_string);
 			// Try stripping zero (if not a zero this should fail in the same way) from function input and running the obf1 decrypt again.
 			// Strip from the LEFT. This is equivalent to enc1Obf/getXOR's popping because the base58 converter function inverts the order.
 			try_stripped = ciphertext58.substr(1);
-console.log("try_stripped: " + try_stripped);
-			// Convert from base 58.
-			decoded_b58_arr = from_b58(try_stripped);
-			array_length = decoded_b58_arr.length;
-			// Compute password for XOR.
-			pass_binary = await getPassHash(password, array_length);
-			xor_result = new Uint8Array(array_length);
-			for (let i = 0; i < array_length; i++) {
-				xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
-			}
-console.log("xor_result: " + xor_result);
-			// Create new Array from xor_result.
-			plaintextbytes = Array.from(xor_result);
-			// Strip off tailing zeros.
-			while(plaintextbytes[plaintextbytes.length - 1] == 0){
-				plaintextbytes.pop();
-			}
-			// Create new Uint8Array from plaintextbytes.
-			plaintextbytes = Uint8Array.from(plaintextbytes);
-console.log("plaintextbytes: " + plaintextbytes);
-			decrypted_string = new TextDecoder().decode(plaintextbytes);
-console.log("decrypted_string: " + decrypted_string);
-			
+			// Try running the decrypt a second time.
+			decrypted_string = await xorInverse(try_stripped, password);
 			// Make sure this fixed it.
 			if( !regex.test(decrypted_string) ){
-				//addStatus("DECRYPT RETRY FAILED!\n");
-				//addLoadStatus("DECRYPT RETRY FAILED!\n");
 				throw new Error('DECRYPT RETRY FAILED!');
 			}
 		}
-
-		// Decode (pop) countstring
+		// Remove (pop) countstring.
 		decrypted_string = decrypted_string.split(":").pop();
-console.log("popped decrypted_string: " + decrypted_string);
+		console.log("popped decrypted_string: " + decrypted_string);
 		return decrypted_string;
 	}//obf1Decrypt
+
+	// Runs the cryptographic core functions of obf1Decrypt, which will run twice if the encrypt required 4-bit word precision.
+	// Input same data, password as parent function obf1Decrypt.
+	// Output data which includes the countstring in string form.
+	async function xorInverse(data, password){
+		console.log("xorInverse hit");
+		// Convert to Uint8Array from base 58.
+		let decoded_b58_arr = from_b58(data);
+		// Compute array length.
+		let array_length = decoded_b58_arr.length;
+		// Compute password for XOR.
+		let pass_binary = await getPassHash(password, array_length);
+		// Inverse of XOR is XOR and is communicative.
+		// XOR password and output to get input.
+		let xor_result = new Uint8Array(array_length);
+		for (let i = 0; i < array_length; i++) {
+			// Perform the XOR.
+			xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
+		}
+		console.log("xor_result: " + xor_result);
+		let plaintextbytes = Array.from(xor_result);
+		// Strip off tailing zeros from the RIGHT.
+		while(plaintextbytes[plaintextbytes.length - 1] == 0){
+			plaintextbytes.pop();
+		}
+		plaintextbytes = Uint8Array.from(plaintextbytes);
+		console.log("plaintextbytes: " + plaintextbytes);
+		// Convert utf-8 to string
+		let decrypted_string = new TextDecoder().decode(plaintextbytes);
+		console.log("decrypted_string: " + decrypted_string);
+		return decrypted_string;
+	}
 
 	// Encrypting function that adds each index pair of the input_data and password,
 	// then takes the modulo of that result to build an ecrypted string of 1000 base58 characters.
