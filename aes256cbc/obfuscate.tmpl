@@ -560,7 +560,6 @@
 			return 0;
 			// Maybe delete the record if it fails to load correctly?
 		}
-
 	}//deepStore()
 
 	// Main Access Function Handler
@@ -702,7 +701,7 @@
 	}//serverDelete()
 
 	//////////////////////////////////////////////////////////////
-	//			Hardcore Cryptographic Functions			    //
+	//				Cryptographic Functions					    //
 	//////////////////////////////////////////////////////////////
 	// Our implementation of OpenSSL's encrypt function.
 	// Inputs: Plaintext.
@@ -894,19 +893,20 @@
 	// Inputs: plintext_binary is a Uint8Array typed array, password is plaintext.
 	// Returns: array of the XOR result.
 	async function getXOR(plaintext_binary, password){
-		// 1000 seems more reasonable if we're immediately going to chop it to 780.
+		// Start at 1000, will immediately be chopped to 780, which guarantees a converstion to more than 1000 b58 chars.
 		const array_length = 1000;
 		// Prepare password side for XOR.
 		const pass_binary = await getPassHash(password, array_length);
 
-		// Perform the XOR bytewise in a loop.
+		// Perform the XOR bitwise byte by byte.
 		let xor_result = new Array();
 		// XOR is a ^ in javascript
 		for (let i = 0; i < array_length; i++) {
 			xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
 		}
 
-		// Encode to exactly 1000 characters of base58 data.
+		// In order to encode to exactly 1000 characters of base58 data, start by popping byte size chunks,
+		// running the conversion, then checking the length of base58 result.
 		// Try 8-bit Bytes:
 		// Chop unnecessary data, keeping the important slice.
 		let array_slice = xor_result.slice(0, 780);
@@ -917,7 +917,7 @@
 		// Start Try: 
 		// Pop WHOLE bytes until length is 1000 or less.
 		while( result_b58.length > 1000 ){
-			// Pop an 8-bit Byte. Keep it in case we need for 4-bit word precision.
+			// Pop an 8-bit Byte. Keep it in case we need its data for 4-bit word precision tries.
 			last_byte_popped = array_slice.pop();
 			// Convert array_slice to base58 string.
 			result_b58 = to_b58(array_slice);
@@ -964,29 +964,32 @@
 	// Inputs: ciphertext58 is a base58 string, password is plaintext
 	// Output: decrypted_string is a base64 string
 	async function obf1Decrypt(ciphertext58, password) {
-		// Convert from base 58.
+console.log("ciphertext58: " + ciphertext58);
+		// Convert to Uint8Array from base 58.
 		let decoded_b58_arr = from_b58(ciphertext58);
 		// Compute array length.
 		let array_length = decoded_b58_arr.length;
 		// Compute password for XOR.
 		let pass_binary = await getPassHash(password, array_length);
 
-		// Perform the bitwise XOR sequentially.
 		// Inverse of XOR is XOR and is communicative.
 		// XOR password and output to get input.
 		let xor_result = new Uint8Array(array_length);
 		for (let i = 0; i < array_length; i++) {
+			// Perform the XOR.
 			xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
 		}
-
+console.log("xor_result: " + xor_result);
 		let plaintextbytes = Array.from(xor_result);
 		// Strip off tailing zeros from the RIGHT.
 		while(plaintextbytes[plaintextbytes.length - 1] == 0){
 			plaintextbytes.pop();
 		}
 		plaintextbytes = Uint8Array.from(plaintextbytes);
+console.log("plaintextbytes: " + plaintextbytes);
 		// Convert utf-8 to string
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
+console.log("decrypted_string: " + decrypted_string);
 
 		// Data should now be in countstring form.
 		// use regex to see if decrypted_string looks like the countstring. 
@@ -994,9 +997,10 @@
 		const regex = /^\d+:/;
 		if( !regex.test(decrypted_string) ){
 			console.log("NO MATCH: try stripping zero");
-			// Try stripping zero from function input and running the obf1 decrypt again.
+			// Try stripping zero (if not a zero this should fail in the same way) from function input and running the obf1 decrypt again.
 			// Strip from the LEFT. This is equivalent to enc1Obf/getXOR's popping because the base58 converter function inverts the order.
-			try_stripped = compd_val.substr(1);
+			try_stripped = ciphertext58.substr(1);
+console.log("try_stripped: " + try_stripped);
 			// Convert from base 58.
 			decoded_b58_arr = from_b58(try_stripped);
 			array_length = decoded_b58_arr.length;
@@ -1006,6 +1010,7 @@
 			for (let i = 0; i < array_length; i++) {
 				xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
 			}
+console.log("xor_result: " + xor_result);
 			// Create new Array from xor_result.
 			plaintextbytes = Array.from(xor_result);
 			// Strip off tailing zeros.
@@ -1014,7 +1019,9 @@
 			}
 			// Create new Uint8Array from plaintextbytes.
 			plaintextbytes = Uint8Array.from(plaintextbytes);
+console.log("plaintextbytes: " + plaintextbytes);
 			decrypted_string = new TextDecoder().decode(plaintextbytes);
+console.log("decrypted_string: " + decrypted_string);
 			
 			// Make sure this fixed it.
 			if( !regex.test(decrypted_string) ){
@@ -1026,6 +1033,7 @@
 
 		// Decode (pop) countstring
 		decrypted_string = decrypted_string.split(":").pop();
+console.log("popped decrypted_string: " + decrypted_string);
 		return decrypted_string;
 	}//obf1Decrypt
 
@@ -1234,9 +1242,11 @@
 		const countstring_binary = new TextEncoder().encode(countstring);
 		// Copy to size 1000 array for XOR.
 		let big_arr = new Uint8Array(1000);
+		// Really looks like: binarydataxxxxxxxxxx00000000000000000000000...
 		// Looks like: I:dataxxxxxx00000000000000....
 		// where I is an integer equal to the length of input data.
 		big_arr.set(countstring_binary);
+console.log("countstring extension: " + big_arr);
 		return big_arr;
 	}//addCountstring()
 
