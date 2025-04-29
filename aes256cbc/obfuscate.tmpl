@@ -348,14 +348,14 @@
 	// These standalone functions are required to set upload_flag in javascript.
 	// User choose text input, set flag to false.
 	function storeDefault(){
-		console.log("set upload_flag: false");
+		debug("Threadwalker Flow -- set upload_flag: false");
 		upload_flag = 'false';
 		showPage('store2');
 	}
 
 	// User choose upload, set flag to true.
 	function storeUpload(){
-		console.log("set upload_flag: true");
+		debug("Threadwalker Flow -- set upload_flag: true");
 		upload_flag = 'true';
 		showPage('store_upload');
 	}
@@ -389,14 +389,14 @@
 
 	// User choose text output, set flag to false.
 	function loadDefault(){
-		console.log("set download_flag: false");
+		debug("Threadwalker Flow -- set download_flag: false");
 		download_flag = 'false';
 		showPage('load2');
 	}
 
 	// User choose file output, set flag to true.
 	function loadDownload(){
-		console.log("set download_flag: true");
+		debug("Threadwalker Flow -- set download_flag: true");
 		download_flag = 'true';
 		showPage('load3');
 	}
@@ -446,7 +446,7 @@
 			let buffer = e.target.result;
 			buffer = new Uint8Array(buffer);
 			let filedata = bytesToBase64(buffer);
-			debug("uploaded file content:");
+			debug("Data Flow catchUpload() -- uploaded file content:");
 			debug(filedata);
 			// Input Data Length Check
 			if( checkInputLength(filedata) ){
@@ -504,6 +504,13 @@
 		const pass_1 = document.getElementById("store_pass_1").value;
 		const pass_2 = document.getElementById("store_pass_2").value;
 		const pass_3 = document.getElementById("store_pass_3").value;
+		debug("Attempting Server STORE - deepStore()"); 
+		debug("Server Handling - deepStore() -- Browser Entered Plaintext Data:\n" + plaintext); 
+		debug("Server Handling - deepStore() -- Uploaded Encrypted Data:\n" + uploadtext); 
+		debug("Server Handling - deepStore() -- Codeword: " + codeword); 
+		debug("Server Handling - deepStore() -- Password 1: " + pass_1); 
+		debug("Server Handling - deepStore() -- Password 2: " + pass_2); 
+		debug("Server Handling - deepStore() -- Password 3: " + pass_3); 
 
 		// First check lengths as user moves through interface then maybe:
 		// Final check:
@@ -522,7 +529,6 @@
 			// Double Encrypt
 			encrypted_data = await encryptDouble(uploadtext, pass_2, pass_3);
 			// reset flag once it is used
-			console.log("set upload_flag: false");
 			upload_flag = 'false';
 		}else{
 			upload_flag_db = '0';
@@ -531,8 +537,6 @@
 		}
 
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
-		debug("fingerprint hex: " + fp_hex);
-		debug("fingerprint length: " + fp_hex.length);
 		// fingerprint length check
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
@@ -541,8 +545,7 @@
 		// Use fetch() for server communication
 		const server_response = await serverStore(fp_hex, encrypted_data, upload_flag_db);
 		sr_store_result = server_response.response;
-		console.log("Server Response from STORE: " + "~" + sr_store_result + "~");
-		console.log(server_response);
+		debug("Server Handling - deepStore() -- Response from STORE: " + "~" + sr_store_result + "~");
 		// Store returned 0 (fail).
 		if( Number(sr_store_result) != 1){
 			throw new Error('STORE ERROR!');
@@ -552,8 +555,7 @@
 		// return of 0 means fingerprint form check fails
 		// return of empty means fingerprint returned nothing
 		const sr_load = await serverLoad(fp_hex);
-		console.log("Server Response from LOAD (store final check): " + "~" + sr_load.data + "~");
-		console.log(sr_load);
+		debug("Server Handling - deepStore() -- Response from LOAD (store final check): " + "~" + sr_load.data + "~");
 
 		// Report Results
 		if( encrypted_data  === sr_load.data){
@@ -574,19 +576,29 @@
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
+		debug("Attempting Server LOAD - deepLoad()"); 
+		debug("Server Handling - deepLoad() -- Codeword: " + codeword); 
+		debug("Server Handling - deepLoad() -- Password 1: " + pass_1); 
+		debug("Server Handling - deepLoad() -- Password 2: " + pass_2); 
+		debug("Server Handling - deepLoad() -- Password 3: " + pass_3); 
+
 
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
-		debug("fingerprint hex: " + fp_hex);
-		debug("fingerprint length: " + fp_hex.length);
 		// fingerprint length check
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
 		}
 
 		// Load from server
+		debug("Server Handling - deepLoad() -- Attempting Load with fingerprint: " + fp_hex);
 		const sr_load = await serverLoad(fp_hex);
-		console.log("Access Server Response, data: " + sr_load.data + "\n" + "upload_flag: " + sr_load.upload_flag);
-		console.log(sr_load);
+		//debug("Access Server Response, data: " + sr_load.data + "\n" + "upload_flag: " + sr_load.upload_flag);
+		debug("Access Server Response, data: " + sr_load.data);
+		// If there is no data attached to this fingerprint, show nothing.
+		if( sr_load.data == "" ){
+			showPage('load_text');
+			return;
+		}
 
 		// Your Encryption
 		if( download_flag == 'true' ){
@@ -621,18 +633,23 @@
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
-		console.log("DELETE code:"+codeword+" p1:"+pass_1+" p2:"+pass_2+" p3:"+pass_3);
+		debug("Attempting Server DELETE - deepDelete()"); 
+		debug("Server Handling - deepDelete() -- Codeword: " + codeword); 
+		debug("Server Handling - deepDelete() -- Password 1: " + pass_1); 
+		debug("Server Handling - deepDelete() -- Password 2: " + pass_2); 
+		debug("Server Handling - deepDelete() -- Password 3: " + pass_3); 
 		
 
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
-		//console.log("fingerprint hex: " + fp_hex);
-		//console.log("fingerprint length: " + fp_hex.length);
+		//debug("fingerprint hex: " + fp_hex);
+		//debug("fingerprint length: " + fp_hex.length);
 		// fingerprint length check
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
 		}
 
 		// Load from server
+		debug("Server Handling - deepDelete() -- Attempting Delete with fingerprint: " + fp_hex);
 		const sr_delete = await serverDelete(fp_hex);
 
 		return sr_delete.response;
@@ -648,7 +665,7 @@
 	async function serverLoad(fingerprint){
 		const SERVER_URL = '/obf/exeload';
 		
-		console.log("Attempting Server Load with\nFingerprint: " + fingerprint); 
+		debug("serverLoad() -- Attempting Server Load with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -668,7 +685,8 @@
 	async function serverStore(fingerprint, data, upload_flag_db){
 		const SERVER_URL = '/obf/exestore';
 		
-		console.log("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
+		//debug("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
+		debug("serverStore() -- Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -689,7 +707,7 @@
 	async function serverDelete(fingerprint){
 		const SERVER_URL = '/obf/exedelete';
 		
-		console.log("Attempting Server Delete with\nFingerprint: " + fingerprint); 
+		debug("serverDelete() -- Attempting Server Delete with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -710,12 +728,12 @@
 	// Output: OpenSSL encrypted base64 string.
 	async function encOpenSSL(plaintext, pass) {
 		// Data Flow Window
-		debug("Data Flow encOpenSSL -- Plaintext data input:\n" + plaintext);
-		debug("Password Flow encOpenSSL -- Plaintext password input:\n" + pass);
+		debug("Data Flow encOpenSSL() -- Plaintext data input:\n" + plaintext);
+		debug("Password Flow encOpenSSL() -- Plaintext password input:\n" + pass);
 		// Prepare plaintext for encryption.
 		// Encode plaintext in utf8 and store in Uint8Array inputbytes.
 		const inputbytes = new TextEncoder().encode( plaintext );
-		debug("Data Flow encOpenSSL -- Plaintext, in binary form: " + inputbytes);
+		debug("Data Flow encOpenSSL() -- Plaintext, in binary form: " + inputbytes);
 		// Make the plaintext look like a file by adding a single newline
 		// char to the end of the string.
 		const single_newline = new Uint8Array(1);
@@ -725,7 +743,7 @@
 		const plaintextbytes_buf = concatBuffer(inputbytes, single_newline);
 		// plaintext is now in a form that is ready to give to the encryption function.
 		const plaintextbytes = new Uint8Array(plaintextbytes_buf);
-		debug("Data Flow encOpenSSL -- Plaintext, with single newline: " + plaintextbytes);
+		debug("Data Flow encOpenSSL() -- Plaintext, with single newline: " + plaintextbytes);
 
 		// Prepare inputs for digest.
 		const iter = 10000;
@@ -737,8 +755,6 @@
 
 		// Import password into a subtlecrypto-usable key object.
 		const keyMaterial = await getKeyMaterial(pass);
-		debug("Password Flow encOpenSSL -- CryptoKey:");//
-		debug(keyMaterial);
 		// Derives input bits used for the PBKDF2 cryptoKey object AND the IV.
 		const derived_bits = await window.crypto.subtle.deriveBits(
 			{
@@ -751,14 +767,14 @@
 			384,
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
-		debug("Password Flow encOpenSSL -- PBKDF2 Derived Bits - 384 bits:\n" + derivedKeyBuffer);
+		debug("Password Flow encOpenSSL() -- PBKDF2 Derived Bits - 384 bits:\n" + derivedKeyBuffer);
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
 		const keybytes = derivedKeyBuffer.slice(0, 32);
-		debug("Password Flow encOpenSSL -- PBKDF2 Derived Bits - Lower 256 - Key:\n" + keybytes);
+		debug("Password Flow encOpenSSL() -- PBKDF2 Derived Bits - Lower 256 - Key:\n" + keybytes);
 		const ivbytes = derivedKeyBuffer.slice(32);
-		debug("Password Flow encOpenSSL -- PBKDF2 Derived Bits - Upper 128 - Initialization Vector (IV):\n" + ivbytes);
+		debug("Password Flow encOpenSSL() -- PBKDF2 Derived Bits - Upper 128 - Initialization Vector (IV):\n" + ivbytes);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
@@ -773,19 +789,17 @@
 			false, 
 			['encrypt']
 		);
-		debug("Password Flow encOpenSSL -- PBKDF2 Derived Bits - Lower 256 - AES-CBC 256 Key: ");
+		debug("Data Flow encOpenSSL() -- AES-CBC 256 Encryption Inputs:");
+		debug("Data Flow encOpenSSL() -- AES-CBC 256 Input - Key:");
 		debug(key);
-		debug("Data Flow encOpenSSL -- AES-CBC 256 Encryption Inputs:");
-		debug("Data Flow encOpenSSL -- AES-CBC 256 Input - Key:");
-		debug(key);
-		debug("Data Flow encOpenSSL -- AES-CBC 256 Input - IV:\n" + ivbytes);
-		debug("Data Flow encOpenSSL -- AES-CBC 256 Input - Binary Data:\n" + plaintextbytes);
+		debug("Data Flow encOpenSSL() -- AES-CBC 256 Input - IV:\n" + ivbytes);
+		debug("Data Flow encOpenSSL() -- AES-CBC 256 Input - Binary Data:\n" + plaintextbytes);
 		// Main Function Digest
 		// MDN syntax: encrypt(algorithm, key, data)
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
 		// Data Flow Window
 		const log_encrypted_result = new Uint8Array(encrypted_result);
-		debug("Data Flow encOpenSSL -- AES-CBC 256 Encrypted Output Data:\n" + log_encrypted_result);
+		debug("Data Flow encOpenSSL() -- AES-CBC 256 Encrypted Output Data:\n" + log_encrypted_result);
 		// Combine (OpenSSL hardcoded) constant salt, random salt, and encrypted result as array buffers, then convert to base64.
 		const const_salt = "Salted__";	// OpenSSL hardcoded.
 		const saltbytes = new TextEncoder().encode(const_salt);
@@ -794,9 +808,9 @@
 		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
 		let encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
 		encrypted_output_buf = new Uint8Array(encrypted_output_buf);
-		debug("Data Flow encOpenSSL -- Encrypted Data with 2 added Salts:\n" + encrypted_output_buf);
+		debug("Data Flow encOpenSSL() -- Encrypted Data with 2 added Salts:\n" + encrypted_output_buf);
 		let out64 = bytesToBase64(encrypted_output_buf);
-		debug("Data Flow encOpenSSL -- Encrypted Data in base64 - encOpenSSL Output:\n" + out64);
+		debug("Data Flow encOpenSSL() -- Encrypted Data in base64 - encOpenSSL() Output:\n" + out64);
 		return out64;
 	}//encOpenSSL()
 
@@ -804,10 +818,10 @@
 	// Inputs: ciphertext64 is base64. pass is plaintext.
 	// Output: decrypted plaintext.
 	async function decOpenSSL(ciphertext64, pass) {
-		debug("Data Flow decOpenSSL -- Ciphertext Input - base64:\n" + ciphertext64);
+		debug("Data Flow decOpenSSL() -- Ciphertext Input - base64:\n" + ciphertext64);
 		// Convert input base 64 to binary.
 		const ciphertextbytes = base64ToBytes(ciphertext64);
-		debug("Data Flow decOpenSSL -- Ciphertext - Binary:\n" + ciphertextbytes);
+		debug("Data Flow decOpenSSL() -- Ciphertext - Binary:\n" + ciphertextbytes);
 		// ciphertext is now in a form that is ready to give to the encryption function.
 
 		// Prepare inputs for digest.
@@ -816,14 +830,12 @@
 		// Salt has been preserved from encrypt. Pull digits from their place in the ciphertext.
 		const salta = ciphertextbytes.slice(8,16);
 		const salt = new Uint8Array(salta);
-		debug("Data Flow decOpenSSL -- Ciphertext - Extracted Salt (bytes 8-15):\n" + salt);
+		debug("Data Flow decOpenSSL() -- Ciphertext - Extracted Salt (bytes 8-15):\n" + salt);
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
 		// be used to create the cryptoKey object needed for the main digest.
 		const keyMaterial = await getKeyMaterial(pass);
-		debug("Password Flow decOpenSSL -- Plaintext password input:\n" + pass);
-		debug("Password Flow decOpenSSL -- CryptoKey:");//
-		debug(keyMaterial);
+		debug("Password Flow decOpenSSL() -- Plaintext password input:\n" + pass);
 		const derived_bits = await window.crypto.subtle.deriveBits(
 			{
 				name: "PBKDF2",
@@ -845,10 +857,10 @@
 		const cipherbytesphrase = ciphertextbytes.slice(16);
 
 		// Data Window Logging
-		debug("Password Flow decOpenSSL -- PBKDF2 Derived Bits - 384 bits:\n" + derivedKeyBuffer);
+		debug("Password Flow decOpenSSL() -- PBKDF2 Derived Bits - 384 bits:\n" + derivedKeyBuffer);
 		//debug(derivedKeyBuffer);
-		debug("Password Flow decOpenSSL -- PBKDF2 Derived Bits - Lower 256 - Key:\n" + keybytes);
-		debug("Password Flow decOpenSSL -- PBKDF2 Derived Bits - Upper 128 - Initialization Vector (IV):\n" + ivbytes);
+		debug("Password Flow decOpenSSL() -- PBKDF2 Derived Bits - Lower 256 - Key:\n" + keybytes);
+		debug("Password Flow decOpenSSL() -- PBKDF2 Derived Bits - Upper 128 - Initialization Vector (IV):\n" + ivbytes);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
@@ -865,21 +877,21 @@
 		);
 
 		// Data Window Logging
-		debug("Data Flow decOpenSSL -- AES-CBC 256 Decryption Inputs:");
-		debug("Data Flow decOpenSSL -- AES-CBC 256 Decrypt - Key:");
+		debug("Data Flow decOpenSSL() -- AES-CBC 256 Decryption Inputs:");
+		debug("Data Flow decOpenSSL() -- AES-CBC 256 Decrypt - Key:");
 		debug(key);
-		debug("Data Flow decOpenSSL -- AES-CBC 256 Decrypt - IV:\n" + ivbytes);
-		debug("Data Flow decOpenSSL -- AES-CBC 256 Decrypt - Binary Data:\n" + cipherbytesphrase);
+		debug("Data Flow decOpenSSL() -- AES-CBC 256 Decrypt - IV:\n" + ivbytes);
+		debug("Data Flow decOpenSSL() -- AES-CBC 256 Decrypt - Binary Data:\n" + cipherbytesphrase);
 		// Main Function Call
 		// MDN syntax: decrypt(algorithm, key, data)
 		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
 		const log_decrypted_result = new Uint8Array(decrypted_result);
-		debug("Data Flow decOpenSSL -- Decrypted Binary Data:\n" + log_decrypted_result);
+		debug("Data Flow decOpenSSL() -- Decrypted Binary Data:\n" + log_decrypted_result);
 		// Convert bytes to string.
 		let decrypted_string = new TextDecoder().decode( decrypted_result );
 		// Pop single newline added in enc (openssl emulation).
 		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
-		debug("Data Flow decOpenSSL -- Decrypted String - decOpenSSL Output:");
+		debug("Data Flow decOpenSSL() -- Decrypted String - decOpenSSL() Output:");
 		debug(decrypted_string);
 		return decrypted_string;
 	}//decOpenSSL()
@@ -908,14 +920,14 @@
 	// Outputs: 1000 characters of base58 string.
 	async function obf1Encrypt(plaintext64, password) {
 		// Data Flow Window
-		debug("Data Flow obf1Encrypt -- base64 input: " + plaintext64);
+		debug("Data Flow obf1Encrypt() -- base64 input: " + plaintext64);
 		// Prepare plaintext side for XOR.
 		// Adds our custom countstring to the data.
 		let plaintext_binary = addCountstring(plaintext64);
-		debug("Data Flow obf1Encrypt -- Counstring added: " + plaintext_binary);
+		debug("Data Flow obf1Encrypt() -- Counstring added: " + plaintext_binary);
 		// XOR plaintext with password and return exactly 1000 base 58 chars.
 		const result_b58 = await getXOR(plaintext_binary, password);
-		debug("Data Flow obf1Encrypt -- Post getXOR - 1000 chars of base58 - obf1Encrypt Output: " + result_b58);
+		debug("Data Flow obf1Encrypt() -- Post getXOR - 1000 chars of base58 - obf1Encrypt() Output: " + result_b58);
 
 		// Check data length and type (specification check 2: 1000 char length, base 58).
 		// If all b58 chars...
@@ -1010,10 +1022,10 @@
 	// Inputs: ciphertext58 is a base58 string, password is plaintext
 	// Output: decrypted_string is a base64 string
 	async function obf1Decrypt(ciphertext58, password) {
-		debug("Data Flow obf1Decrypt -- base58 Ciphertext: " + ciphertext58);
+		debug("Data Flow obf1Decrypt() -- base58 Ciphertext: " + ciphertext58);
 		// Obfuscate 1 Decrypt core function.
 		let decrypted_string = await xorInverse(ciphertext58, password);
-		debug("Data Flow obf1Decrypt -- xorInverse() First Try Looking for Countstring: " + decrypted_string);
+		debug("Data Flow obf1Decrypt() -- xorInverse() First Try Looking for Countstring: " + decrypted_string);
 
 		// Data should now be in countstring form.
 		// use regex to see if decrypted_string looks like the countstring. 
@@ -1026,7 +1038,7 @@
 			try_stripped = ciphertext58.substr(1);
 			// Try running the decrypt a second time.
 			decrypted_string = await xorInverse(try_stripped, password);
-			debug("Data Flow obf1Decrypt -- xorInverse() Second Try Looking for Countstring: " + decrypted_string);
+			debug("Data Flow obf1Decrypt() -- xorInverse() Second Try Looking for Countstring: " + decrypted_string);
 			// Make sure this fixed it.
 			if( !regex.test(decrypted_string) ){
 				throw new Error('DECRYPT RETRY FAILED!');
@@ -1034,7 +1046,7 @@
 		}
 		// Remove (pop) countstring.
 		decrypted_string = decrypted_string.split(":").pop();
-		debug("Data Flow obf1Decrypt -- Countstring Removed - obf1Decrypt Output " + decrypted_string);
+		debug("Data Flow obf1Decrypt() -- Countstring Removed - obf1Decrypt() Output " + decrypted_string);
 		return decrypted_string;
 	}//obf1Decrypt
 
@@ -1092,13 +1104,13 @@
 		// Hash, rehash, append password function.
 		// This results in 1000 bytes of length which might (will?) convert to over 4000 b58 chars
 		const pass_hash = await getPassHash(password, input_length);
-		debug("Password Flow obf2Encrypt -- Password Hash Binary: " + pass_hash);
+		debug("Password Flow obf2Encrypt() -- Password Hash Binary: " + pass_hash);
 
 		// Convert password hash byte array to base58 string.
 		// Over 4000 chars long at this point.
 		const pass_b58 = to_b58(pass_hash);
-		debug("Password Flow obf2Encrypt -- Password Hash base58: " + pass_b58);
-		debug("Data Flow obf2Encrypt -- Input Data: " + input_data);
+		debug("Password Flow obf2Encrypt() -- Password Hash base58: " + pass_b58);
+		debug("Data Flow obf2Encrypt() -- Input Data: " + input_data);
 
 		// Convert each operand b58 string to an array of corresponding indices.
 		// Create 2 arrays of length 1000.
@@ -1109,28 +1121,28 @@
 			input_b58_num_arr[i] = base58map.indexOf(input_data.charAt(i));		// 1000 chars long
 			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));		// there is more data in pass_b58 but we don't use it.
 		}
-		debug("Password Flow obf2Encrypt -- Password - Index Array: " + pass_b58_num_arr);
-		debug("Data Flow obf2Encrypt -- Data - Index Array: " + input_b58_num_arr);
+		debug("Password Flow obf2Encrypt() -- Password - Index Array: " + pass_b58_num_arr);
+		debug("Data Flow obf2Encrypt() -- Data - Index Array: " + input_b58_num_arr);
 
 		// Add each index pair and store in new array.
 		let sum_b58_num_arr = new Array(input_length);
 		for (let i = 0; i < input_length; i++) {
 			sum_b58_num_arr[i] = input_b58_num_arr[i] + pass_b58_num_arr[i];
 		}
-		debug("Data Flow obf2Encrypt -- Summed Index Array: " + sum_b58_num_arr);
+		debug("Data Flow obf2Encrypt() -- Summed Index Array: " + sum_b58_num_arr);
 
 		// Take the 58 modulo of each index.
 		for (let i = 0; i < input_length; i++) {
 			sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
 		}
-		debug("Data Flow obf2Encrypt -- Modulo 58'd Index Array: " + sum_b58_num_arr);
+		debug("Data Flow obf2Encrypt() -- Modulo 58'd Index Array: " + sum_b58_num_arr);
 
 		// Convert each processed index to b58 characters.
 		let final_encrypted_string = '';
 		for (let i = 0; i < input_length; i++) {
 			final_encrypted_string += base58map.charAt(sum_b58_num_arr[i]);
 		}
-		debug("Data Flow obf2Encrypt -- Return Index Array to base58 - obf2Encrypt Output: " + final_encrypted_string);
+		debug("Data Flow obf2Encrypt() -- Return Index Array to base58 - obf2Encrypt() Output: " + final_encrypted_string);
 
 		return final_encrypted_string;
 	}//obf2Encrypt()
@@ -1146,13 +1158,13 @@
 		// Hash, rehash, append password function.
 		// This results in 1000 bytes of length which might (will?) convert to over 4000 b58 chars
 		const pass_hash = await getPassHash(password, final_encrypted_length);
-		debug("Password Flow obf2Decrypt -- Password Hash: " + pass_hash);
+		debug("Password Flow obf2Decrypt() -- Password Hash: " + pass_hash);
 
 		// Convert password hash byte array to base58 string.
 		// Over 4000 chars long at this point.
 		const pass_b58 = to_b58(pass_hash);
-		debug("Password Flow obf2Decrypt -- Password - base58: " + pass_b58);
-		debug("Data Flow obf2Decrypt -- Input Data to be Decrypted: " + final_encrypted);
+		debug("Password Flow obf2Decrypt() -- Password - base58: " + pass_b58);
+		debug("Data Flow obf2Decrypt() -- Input Data to be Decrypted: " + final_encrypted);
 
 		// Convert each operand b58 string to an array of corresponding indices.
 		// Create 2 arrays of length 1000.
@@ -1163,8 +1175,8 @@
 			final_encrypted_b58_num_arr[i] = base58map.indexOf(final_encrypted.charAt(i));
 			pass_b58_num_arr[i] = base58map.indexOf(pass_b58.charAt(i));
 		}
-		debug("Password Flow obf2Decrypt -- Password - Index Array: " + pass_b58_num_arr);
-		debug("Data Flow obf2Decrypt -- Data - Index Array: " + final_encrypted_b58_num_arr);
+		debug("Password Flow obf2Decrypt() -- Password - Index Array: " + pass_b58_num_arr);
+		debug("Data Flow obf2Decrypt() -- Data - Index Array: " + final_encrypted_b58_num_arr);
 
 		// Run the inverse of the sum-and-58-modulo encrypt function.
 		let in_b58_num_arr = new Array(final_encrypted_length);
@@ -1176,14 +1188,14 @@
 			// Now we can decrypt by taking the difference of each index pair.
 			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
 		}
-		debug("Data Flow obf2Decrypt -- Decrypted Index Array: " + in_b58_num_arr);
+		debug("Data Flow obf2Decrypt() -- Decrypted Index Array: " + in_b58_num_arr);
 
 		// Convert the resulting numerical values to b58 chars.
 		let final_decrypted_string = '';
 		for (let i = 0; i < final_encrypted_length; i++) {
 			final_decrypted_string += base58map.charAt(in_b58_num_arr[i]);
 		}
-		debug("Data Flow obf2Decrypt -- Decrypted String - obf2Decrypt Output: " + in_b58_num_arr);
+		debug("Data Flow obf2Decrypt() -- Decrypted String - obf2Decrypt() Output: " + in_b58_num_arr);
 
 		return final_decrypted_string;
 	}//obf2Decrypt()
@@ -1229,22 +1241,32 @@
 	async function computeFingerprint(codeword, pass_2, pass_3){
 		// Convert to lowercase.
 		const cw_lower = codeword.toLowerCase();
+		debug("computeFingerprint() -- Lowercase Codeword: " + cw_lower); 
+		debug("computeFingerprint() -- Password 2: " + pass_2); 
+		debug("computeFingerprint() -- Password 3: " + pass_3); 
 		// Take SHA-256 hash of codeword, pass 2, pass 3.
 		const enc = new TextEncoder();
 		const cw_buf = enc.encode(cw_lower);
 		const p2_buf = enc.encode(pass_2);
 		const p3_buf = enc.encode(pass_3);
+		debug("computeFingerprint() -- Binary Codeword: " + cw_buf); 
+		debug("computeFingerprint() -- Binary Password 2: " + p2_buf); 
+		debug("computeFingerprint() -- Binary Password 3: " + p3_buf); 
 		const cw_hash = await crypto.subtle.digest('SHA-256', cw_buf);
 		const p2_hash = await crypto.subtle.digest('SHA-256', p2_buf);
 		const p3_hash = await crypto.subtle.digest('SHA-256', p3_buf);
 		// Concatenate: fingerprint = cw_hash + p2_hash + p3_hash
 		const cw_and_p2_hash = concatBuffer(cw_hash, p2_hash)
 		const concatenated_hashes = concatBuffer(cw_and_p2_hash, p3_hash)
+		const log_concat = new Uint8Array(concatenated_hashes);
+		debug("computeFingerprint() -- Concatenated Hashes:\n" + log_concat); 
 		// SHA-256 hash the result.
 		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
 		const fingerprint = new Uint8Array(fp_hash);
-		//console.log("Computed Fingerprint: " + fingerprint);
+		debug("computeFingerprint() -- Binary Fingerprint:\n" + fingerprint); 
+		//debug("Computed Fingerprint: " + fingerprint);
 		const fp_hex = buf2hex(fingerprint);
+		debug("computeFingerprint() -- base64 Fingerprint: " + fp_hex); 
 		return fp_hex;
 	}//computeFingerprint
 
@@ -1270,8 +1292,8 @@
 
 		// show input size in bytes
 		let size = new Blob([input]).size;
-		//console.log("Input (blob) size: " + size);
-		//console.log("byte size: " + size);
+		//debug("Input (blob) size: " + size);
+		//debug("byte size: " + size);
 		//if( input.length > 500 ){
 		if( size > 700 ){
 			return 0; // Length Check Failed.
@@ -1321,9 +1343,9 @@
 			// Append SHA256 of Hash(n-1)
 			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
 			sha_cumulative = new Uint8Array(sha_cumulative);
-			//console.log("sha_cumulative: " + sha_cumulative);
+			//debug("sha_cumulative: " + sha_cumulative);
 		} while( sha_cumulative.length < length);
-		//console.log("sha_cumulative: " + sha_cumulative);
+		//debug("sha_cumulative: " + sha_cumulative);
 
 		// Truncate array to size <length>
 		sha_cumulative = sha_cumulative.slice(0, length);

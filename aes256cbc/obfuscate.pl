@@ -71,7 +71,7 @@ Multiline Comment Reminder
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
 				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 700 byte limit</h2>
-				<input type="password" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
+				<input onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
 				<br>
 				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 				<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
