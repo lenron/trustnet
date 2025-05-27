@@ -345,6 +345,31 @@
 		}
 	}
 
+	// Clears all fields that could contain sensitive data.
+	// Resets delete overlay
+	function securityReset(){
+		// Reset delete overlay
+		deleteCheckHide('overlay_text');
+		deleteCheckHide('overlay_download');
+		// Clear store fields
+		document.getElementById("store_data").value = '';
+		document.getElementById("upload_data").value = '';
+		document.getElementById("store_codeword").value = '';
+		document.getElementById("store_pass_1").value = '';
+		document.getElementById("store_pass_2").value = '';
+		document.getElementById("store_pass_3").value = '';
+		// Clear load
+		document.getElementById("load_codeword").value = '';
+		document.getElementById("load_pass_1").value = '';
+		document.getElementById("load_pass_2").value = '';
+		document.getElementById("load_pass_3").value = '';
+		// Clear output display
+		document.getElementById("output_display").value = '';
+		// Reset download flag
+		download_flag = 'false';
+		
+	}
+
 	// These standalone functions are required to set upload_flag in javascript.
 	// User choose text input, set flag to false.
 	function storeDefault(){
@@ -372,6 +397,7 @@
 	// Store thread walk finisher.
 	// async needed to handle crypto functionality
 	async function storeExecute(){
+		// Hide classes that match 'store' & 'five'
 		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "none");
 
 		// Main Function Call
@@ -431,6 +457,8 @@
 	function deleteExecute(){
 		// Main Function Call
 		deepDelete();
+		// Also delete user inputted data.
+		securityReset();
 		// Notify user of success
 		showPage('delete5');
 	}
@@ -504,6 +532,13 @@
 		const pass_1 = document.getElementById("store_pass_1").value;
 		const pass_2 = document.getElementById("store_pass_2").value;
 		const pass_3 = document.getElementById("store_pass_3").value;
+		// Clear all passwords, data for security.
+		//document.getElementById("store_data").value = '';
+		//document.getElementById("upload_data").value = '';
+		//document.getElementById("store_codeword").value = '';
+		//document.getElementById("store_pass_1").value = '';
+		//document.getElementById("store_pass_2").value = '';
+		//document.getElementById("store_pass_3").value = '';
 		debug("Attempting Server STORE - deepStore()"); 
 		debug("Server Handling - deepStore() -- Browser Entered Plaintext Data:\n" + plaintext); 
 		debug("Server Handling - deepStore() -- Uploaded Encrypted Data:\n" + uploadtext); 
@@ -576,6 +611,17 @@
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
+		// Clear passwords for security.
+		//document.getElementById("load_codeword").value = '';
+		//document.getElementById("load_pass_1").value = '';
+		//document.getElementById("load_pass_2").value = '';
+		//document.getElementById("load_pass_3").value = '';
+
+		// Current plan
+		// Try Offline DB here first.
+		//searchOffline(codeword, pass_1, pass_2, pass_3);
+
+
 		debug("Attempting Server LOAD - deepLoad()"); 
 		debug("Server Handling - deepLoad() -- Codeword: " + codeword); 
 		debug("Server Handling - deepLoad() -- Password 1: " + pass_1); 

@@ -16,24 +16,21 @@ my $template = HTML::Template->new(filename => 'obfuscate.tmpl');
 
 my $main = qq{
 
-			<div class="gen home" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
+			<div class="gen home" id="home" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content: center;">
-					<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/store';">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_thread' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/load';">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="securityReset();showPage('store1')">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_load_thread' style="flex-grow:1" onclick="securityReset();showPage('load1')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
-
-};
-# 						onclick="openCity('Tokyo')"
-my $store = qq{
-<!--   store  --!>
 
 <!--
 Multiline Comment Reminder
 -->
 
-			<div class="gen store one" id="store1" style="display:flex">
+<!--   store  --!>
+
+			<div class="gen store one" id="store1" style="display:none">
 				<div style="display: flex; flex-direction: row; justify-content: space-between;">
 					<label>STORE DATA</label>
 					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
@@ -41,7 +38,7 @@ Multiline Comment Reminder
 				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
 				<input type="password" autofocus id="store_codeword" style="">
 				<div class="button_pair" id="" style="display:flex">
-					<button class="" id='' style="flex-grow:1" onclick="location.href='https://chat.dance/obf';">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('home')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('store1','store_choose')">NEXT</button>
 				</div>
 			</div>
@@ -151,26 +148,23 @@ Multiline Comment Reminder
 				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='learnmore' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/how';">LEARN MORE</button>
-					<button class="" id='accessdata' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<button class="" id='accessdata' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 				</div>
 			</div>
 
 			<div class="gen store seven" id="store7" style="display:none">
 				<h2>&#10060; FAILED </h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
-					<button class="" id='accessdata' style="flex-grow:1" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
+					<button class="" id='accessdata' style="flex-grow:1" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 				</div>
 			</div>
 
 <!-- Catch Upload Data --!>
 <input type="password" value="" id="upload_data" style="display:none;">
 <!--  store  --!>
-};
-
-my $load = qq{
 <!--   load  --!>
-			<div class="gen load one" id="load1" style="">
+			<div class="gen load one" id="load1" style="display:none;">
 				<div style="display: flex; flex-direction: row; justify-content: space-between;">
 					<label>ACCESS DATA</label>
 					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
@@ -178,7 +172,7 @@ my $load = qq{
 				<h2>ENTER CODE WORD</h2>
 				<input type="password" autofocus  value="" id="load_codeword" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf';">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('load1','load_choose')">NEXT</button>
 				</div>
 			</div>
@@ -263,8 +257,8 @@ my $load = qq{
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
-					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_text')">DELETE DATA</button>
 				</div>
 			</div>
@@ -291,8 +285,8 @@ my $load = qq{
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
-					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_download')">DELETE DATA</button>
 				</div>
 			</div>
@@ -300,8 +294,8 @@ my $load = qq{
 			<div class="gen delete five" id="delete5" style="display:none">
 				<label>&#10004; SUCCESS</label>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
-					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 				</div>
 			</div>
 
@@ -331,7 +325,7 @@ my $delete = qq{
 				<h2>ENTER CODE WORD</h2>
 				<input type="password" autofocus  value="" id="delete_codeword" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf';">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete2')">NEXT</button>
 				</div>
 			</div>
@@ -372,8 +366,8 @@ my $delete = qq{
 			<div class="gen delete five" id="delete5" style="display:none">
 				<label>&#10004; SUCCESS</label>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='go_store' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/store';">STORE DATA</button>
-					<button class="" id='go_load' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/load';">ACCESS DATA</button>
+					<button class="" id='go_store' style="flex-grow:1;" onclick="showPage('store1')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="showPage('load1')">ACCESS DATA</button>
 					<!--<button class="" id='' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/delete';">DELETE DATA</button>--!>
 				</div>
 			</div>
@@ -381,11 +375,11 @@ my $delete = qq{
 };
 
 
-if( $id eq 'store'){
-	$template->param(htmlblock => $store);
-}elsif( $id eq 'load'){
-	$template->param(htmlblock => $load);
-}elsif( $id eq 'how'){
+#if( $id eq 'store'){
+	#$template->param(htmlblock => $store);
+#}elsif( $id eq 'load'){
+	#$template->param(htmlblock => $load);
+if( $id eq 'how'){
 	$template->param(htmlblock => $how);
 }elsif( $id eq 'faq'){
 	$template->param(htmlblock => $faq);
