@@ -516,6 +516,100 @@
 		}
 	}
 
+	// Automatically run this function when page loads.
+	window.onload = function() {
+
+		// load offline dbase from server.
+		// If local dbase is empty, set localStorage to server version.
+		// If local dbase is not empty, check if different.
+		// 		If different, keep local version and update server.
+		// Not sure of behavior if we expect multiple users. Could do a location by location check and merge if there are no collisions.
+
+
+		// Load current offline database from server.
+		// For testing load smaller dbase in from hardcode.
+		// all passwords = save.
+		// 2 of the same data stacked on each other for testing.
+		//
+		// let loaded_offline_db = serverOfflineDBaseLoad(); 
+		
+		let loaded_offline_dbase = "4EyDw4rJ8Gb9wrcXuAeFkQHCfHDKEaMfGDLbyXBFx5YVe3AEJ3QCgAQysjYAPY1mNiQAM3PJf7Z8Xk9bnSy26Z8iRZvKsFQjTyGzSBnpckkzDLtnHziHQp9oToMpA7Fwj2SsSW6ECuEfMp8y19JvwM1HfuMdxkterjMx4C5Bzf9Y5r7ciqyDhA8VS5BSYUaSujxCaa4ZgiUk9bjeQwFFqXwPxVdNjacXfSTzSxZjoHCWNLGm3H9b3bokyB4GdpuhiS8YLsUNCp1kxcT4iHKqJ3Y8yCywtevUuRhFiBP3jg4xfUZfpw7mXqCTN9RceP6w7em7NgtgzSpC5eXxgMgGQJeBDttUgK8gT2rdb23WhHatxgd4WnfdvXDGyjuPQecjRsSAac4bk73u8jWqvYPz7YsL7GQQGJ4zfeFsdb4L1YVTnUuKxBxRWEQmrSeeV8UgC52UD1d3TrBTTBsJUhnoZfKcmoGyNuX3nABhhh1JDzZCfGVrofrmZkJkHYEapP5idL9JCnYEvDFSr23LDtUSkf9icpDjBckbpqCG1o8ADTvzhtdgzbkHHGckfvoGhhQMFha86Njd4oovotWiE2Cay2P38hTBPqdqqmDYG8EXpPhGtbsFay72e9yhBftdHVZiBqxLbHDiCjPPg7kdzQsZaZ5uWwef9Zw39X89pWJspDUkkCXswR7bjik9nHJGTspUCnZQhnuyaDFEFdagj1TGWkVFwyFmH9d9H4JXXNRa7YKAGQ57km9LxVWPAR4tAqxgKKEcss4z6DgfyTay57cuah2nY8ezgziU4dDMPbUxeErW6ANvB1Ndc23hqjZUQJS8t8kkfjMVJDNz67ez5guzgCKpySTfU1JM8bRBXf11uZAU3sxWp5MNCn8tBXsH3xkTEtFNHLHK9PJYCbfA7CKAyJJB7jiM6KEybqoKrpLaNnaABy7MNS2op8ApP8aWCfBcmytQQNTppZHeEfAX5Uwrg7RaPFCe412DTsbo7aWS4EyDw4rJ8Gb9wrcXuAeFkQHCfHDKEaMfGDLbyXBFx5YVe3AEJ3QCgAQysjYAPY1mNiQAM3PJf7Z8Xk9bnSy26Z8iRZvKsFQjTyGzSBnpckkzDLtnHziHQp9oToMpA7Fwj2SsSW6ECuEfMp8y19JvwM1HfuMdxkterjMx4C5Bzf9Y5r7ciqyDhA8VS5BSYUaSujxCaa4ZgiUk9bjeQwFFqXwPxVdNjacXfSTzSxZjoHCWNLGm3H9b3bokyB4GdpuhiS8YLsUNCp1kxcT4iHKqJ3Y8yCywtevUuRhFiBP3jg4xfUZfpw7mXqCTN9RceP6w7em7NgtgzSpC5eXxgMgGQJeBDttUgK8gT2rdb23WhHatxgd4WnfdvXDGyjuPQecjRsSAac4bk73u8jWqvYPz7YsL7GQQGJ4zfeFsdb4L1YVTnUuKxBxRWEQmrSeeV8UgC52UD1d3TrBTTBsJUhnoZfKcmoGyNuX3nABhhh1JDzZCfGVrofrmZkJkHYEapP5idL9JCnYEvDFSr23LDtUSkf9icpDjBckbpqCG1o8ADTvzhtdgzbkHHGckfvoGhhQMFha86Njd4oovotWiE2Cay2P38hTBPqdqqmDYG8EXpPhGtbsFay72e9yhBftdHVZiBqxLbHDiCjPPg7kdzQsZaZ5uWwef9Zw39X89pWJspDUkkCXswR7bjik9nHJGTspUCnZQhnuyaDFEFdagj1TGWkVFwyFmH9d9H4JXXNRa7YKAGQ57km9LxVWPAR4tAqxgKKEcss4z6DgfyTay57cuah2nY8ezgziU4dDMPbUxeErW6ANvB1Ndc23hqjZUQJS8t8kkfjMVJDNz67ez5guzgCKpySTfU1JM8bRBXf11uZAU3sxWp5MNCn8tBXsH3xkTEtFNHLHK9PJYCbfA7CKAyJJB7jiM6KEybqoKrpLaNnaABy7MNS2op8ApP8aWCfBcmytQQNTppZHeEfAX5Uwrg7RaPFCe412DTsbo7aWS";
+
+		// localStorage saves key/value pairs which persist across offline usage of localStorage.
+		// Verified offline persistent saves in firefox/chrome/brave but NOT between browsers!
+		//
+		// Don't clobber current database.
+		if( localStorage.getItem("offline_dbase") === null ){
+			console.log("Local offline database Not Found!");
+			localStorage.setItem("offline_dbase", loaded_offline_dbase);
+			console.log("Offline database loaded in:\n" + localStorage.getItem("offline_dbase"));
+		}else{
+			console.log("Found localStorage offline database.");
+		}
+	}
+
+	// Searches offline database using given credentials for a Save Location(s). Only tries to decode obf1, obf2 and returns location if decodes.
+	// Inputs: passwords 2 and 3 
+	// Outputs: Array of Save Locations found
+	async function searchOfflineDBase(pass2, pass3){
+		console.log("Searching offline database.");
+
+		// Read in offline database.
+		let offline_db = localStorage.getItem("offline_dbase");
+		console.log("Offline databse loaded for search:\n" + offline_db);
+		let offset;
+		let current_iter_enc;
+		let data_start;
+		let data_end;
+		let save_locations = new Array();
+
+		// Save these instead of just returning. We might check the rest of the offline databse for another decode to make sure we don't ever render data inaccessible.
+		let dec_data;
+
+		// Loop over all locations in offline database.
+		for( let i = 0; i < offline_db.length/1000; i++ ){
+			// Set offset for this iteration of the loop.
+			offset = i * 1000;
+			data_start = 0 + offset;
+			data_end = 1000 + offset; // slice must go to 1+ last requested return char.
+			data_end_log = data_end - 1;
+			console.log("Checking data at location:" + i);
+			console.log("Checking data from dbase index:" + data_start + " to dbase index:" + data_end_log);
+
+			// Extract encrypted data at location i.
+			// so, get chars from location 0 + i*1000 to 999 + i*1000
+			// Turns out the location is whatever is in the 1000's place of the index of a given char.
+			// Use string slice method for this.
+			current_iter_encrypted_data = offline_db.slice(data_start, data_end);
+			console.log("try obf decode on this data:\n" + current_iter_encrypted_data);
+
+			// Check if data decrypts.
+			try {
+				dec_data = await decryptDouble(current_iter_encrypted_data, pass2, pass3);		
+				console.log("Looks like we were able to decode data: " + dec_data);
+				// Push save location to return array if no error is caught.
+				save_locations.push(i);
+			} catch (error) {
+				console.log(error);
+				if( error ){
+					// Didn't find a Save Location, go to next loop iteration.
+					continue;
+				}else{
+					// If code in try{} doesn't error run this code:
+					save_location = i;
+					console.log("Found Save Location! location = " + save_location);
+					return save_location;
+				}
+			}
+		}
+		// Return after loop finishes in case we want to check the rest of the loop.
+		return save_locations;
+	}
+
+	function storeOfflineDBase(){
+
+	}
+
 	//////////////////////////////////////////////////////////////
 	//			Main Handler Functions						    //
 	//////////////////////////////////////////////////////////////
@@ -532,13 +626,6 @@
 		const pass_1 = document.getElementById("store_pass_1").value;
 		const pass_2 = document.getElementById("store_pass_2").value;
 		const pass_3 = document.getElementById("store_pass_3").value;
-		// Clear all passwords, data for security.
-		//document.getElementById("store_data").value = '';
-		//document.getElementById("upload_data").value = '';
-		//document.getElementById("store_codeword").value = '';
-		//document.getElementById("store_pass_1").value = '';
-		//document.getElementById("store_pass_2").value = '';
-		//document.getElementById("store_pass_3").value = '';
 		debug("Attempting Server STORE - deepStore()"); 
 		debug("Server Handling - deepStore() -- Browser Entered Plaintext Data:\n" + plaintext); 
 		debug("Server Handling - deepStore() -- Uploaded Encrypted Data:\n" + uploadtext); 
@@ -611,16 +698,16 @@
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
-		// Clear passwords for security.
-		//document.getElementById("load_codeword").value = '';
-		//document.getElementById("load_pass_1").value = '';
-		//document.getElementById("load_pass_2").value = '';
-		//document.getElementById("load_pass_3").value = '';
 
-		// Current plan
-		// Try Offline DB here first.
-		//searchOffline(codeword, pass_1, pass_2, pass_3);
-
+		// Check for Save Codes / Save Locations
+		// save_locs is an array with the set of locations the creds were able to decrypt.
+		// Not sure yet what to do with multiple decodes - same passwords decrypting multiple datas.
+		const save_locs = await searchOfflineDBase(pass_2, pass_3);
+		if( save_locs.length > 0 ){
+			console.log("Found Save Locations:" + save_locs);
+		} else {
+			console.log("Didn't find a Save Location!");
+		}
 
 		debug("Attempting Server LOAD - deepLoad()"); 
 		debug("Server Handling - deepLoad() -- Codeword: " + codeword); 
@@ -723,6 +810,28 @@
 		})
 		return response.json()
 	}//serverLoad()
+
+
+
+/*
+	async function serverOfflineDBaseLoad(fingerprint){
+		const SERVER_URL = '/obf/offlinedbaseload';
+		
+		debug("serverOfflineDBaseLoad() -- Attempting to Load Offline Database."); 
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/html',
+			},
+			body: JSON.stringify({
+				//fingerprint: fingerprint, not sure what to post for offline dbase load
+			}),
+		})
+		return response.json()
+	}//serverOfflineDBaseLoad()
+*/
+
+
 
 	// Endpoint exestore will attempt to store.
 	// input encrypted data at the input fingerprint location.
