@@ -245,6 +245,7 @@
 	</div>
 	<div>
 		<button id="toggle_debug_button" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
+		<button id="download_offline_dbase_button" onclick="saveOfflineDBase()">DOWNLOAD OFFLINE DBASE</button>
 	</div>
 
 	<p id="offline_dbase" style="display:none"></p>
@@ -552,7 +553,7 @@
 	// Searches offline database using given credentials for a Save Location(s). Only tries to decode obf1, obf2 and returns location if decodes.
 	// Inputs: passwords 2 and 3 
 	// Outputs: Array of Save Locations found
-	async function searchOfflineDBase(pass2, pass3){
+	async function findSaveLocations(pass2, pass3){
 		console.log("Searching offline database.");
 
 		// Read in offline database.
@@ -703,7 +704,7 @@
 		// Check for Save Codes / Save Locations
 		// save_locs is an array with the set of locations the creds were able to decrypt.
 		// Not sure yet what to do with multiple decodes - same passwords decrypting multiple datas.
-		const save_locs = await searchOfflineDBase(pass_2, pass_3);
+		const save_locs = await findSaveLocations(pass_2, pass_3);
 		if( save_locs.length > 0 ){
 			console.log("Found Save Locations:" + save_locs);
 		} else {
@@ -1588,26 +1589,16 @@
 			setDebug(false);
 			debug("Debug function deactivated! MAJOR ERROR if you can see this! Debug function should be turned off!");
 		}
+	}
 
+	// Grab currently running HTML and save it to standalone.html
+	// This saves the offline dbase in addition to creating and downloading a standalone version that can be used offline.
+	function saveOfflineDBase(){
 		// testing
 		document.getElementById("offline_dbase").innerHTML = loaded_offline_dbase;
-		let allhtml = document.querySelector("html").innerHTML;
+		let allhtml = "<!DOCTYPE HTML>";
+		allhtml += document.querySelector("html").innerHTML;
 		//console.log(allhtml);
-/*
-  // create a new handle
-  const newHandle = await window.showSaveFilePicker();
-console.log("file picker handle:" + newHandle);
-  // create a FileSystemWritableFileStream to write to
-  const writableStream = await newHandle.createWritable();
-
-  // write our file
-  await writableStream.write(allhtml);
-
-  // close the file and write the contents to disk.
-  await writableStream.close();
-		
-*/
-
 
 		let element = document.createElement('a');
 		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(allhtml));
@@ -1619,8 +1610,6 @@ console.log("file picker handle:" + newHandle);
 		element.click();
 
 		document.body.removeChild(element);
-
-	
 	}
 
 	// Logging function found on stackoverflow
