@@ -243,12 +243,13 @@
 
 		</div>
 	</div>
-		<div>
-			<button id="toggle_debug_button" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
-		</div>
+	<div>
+		<button id="toggle_debug_button" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
+	</div>
+
+	<p id="offline_dbase" style="display:none"></p>
 
 </body>
-<script src="base58.js"></script>
 <script>
 
 	// Set Title to link to Home.
@@ -516,6 +517,7 @@
 		}
 	}
 
+		let loaded_offline_dbase = "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";
 	// Automatically run this function when page loads.
 	window.onload = function() {
 
@@ -533,7 +535,6 @@
 		//
 		// let loaded_offline_db = serverOfflineDBaseLoad(); 
 		
-		let loaded_offline_dbase = "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";
 
 		// localStorage saves key/value pairs which persist across offline usage of localStorage.
 		// Verified offline persistent saves in firefox/chrome/brave but NOT between browsers!
@@ -1512,7 +1513,7 @@
 	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
 	// Output: return = buffer1 concatenated with buffer2 in order buffer1, then buffer2.
 	function concatBuffer(buffer1, buffer2) {
-	  var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+	  let tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
 	  tmp.set(new Uint8Array(buffer1), 0);
 	  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
 	  return tmp.buffer;
@@ -1554,7 +1555,7 @@
 	function hex2buf(hexString){
 		// convert to a number array representing the hex bytes.
 		const hexBytesArray = new Array;
-		for(var i=0; i < hexString.length; i+=2){
+		for(let i=0; i < hexString.length; i+=2){
 			hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
 		}
 		const hexArrayBuffer = new Uint8Array(hexBytesArray);
@@ -1570,7 +1571,7 @@
 	// Debug mode gets turned off with every page load. This is good for security so leave it.
 	setDebug(false);
 	// Use a toggle button for usage.
-	function toggleDebug(){
+	async function toggleDebug(){
 		if( debug_flag === "false"){
 			document.getElementById("toggle_debug_button").innerHTML = "Switch to Normal Mode";
 			// Toggle global flag.
@@ -1587,6 +1588,39 @@
 			setDebug(false);
 			debug("Debug function deactivated! MAJOR ERROR if you can see this! Debug function should be turned off!");
 		}
+
+		// testing
+		document.getElementById("offline_dbase").innerHTML = loaded_offline_dbase;
+		let allhtml = document.querySelector("html").innerHTML;
+		//console.log(allhtml);
+/*
+  // create a new handle
+  const newHandle = await window.showSaveFilePicker();
+console.log("file picker handle:" + newHandle);
+  // create a FileSystemWritableFileStream to write to
+  const writableStream = await newHandle.createWritable();
+
+  // write our file
+  await writableStream.write(allhtml);
+
+  // close the file and write the contents to disk.
+  await writableStream.close();
+		
+*/
+
+
+		let element = document.createElement('a');
+		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(allhtml));
+		element.setAttribute('download', 'standalone.html');
+
+		element.style.display = 'none';
+		document.body.appendChild(element);
+
+		element.click();
+
+		document.body.removeChild(element);
+
+	
 	}
 
 	// Logging function found on stackoverflow
@@ -1610,6 +1644,176 @@
 		}
 	}	
 
+	//Uint8Array raw byte input) 
+	function to_b58( B ){
+		let A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+		let d = [],   //the array for storing the stream of base58 digits
+			s = "",   //the result string variable that will be returned
+			i,        //the iterator variable for the byte input
+			j,        //the iterator variable for the base58 digit array (d)
+			c,        //the carry amount variable that is used to overflow from the current base58 digit to the next base58 digit
+			n;        //a temporary placeholder variable for the current base58 digit
+		for(i in B) { //loop through each byte in the input stream
+			j = 0,                           //reset the base58 digit iterator
+			c = B[i];                        //set the initial carry amount equal to the current byte amount
+			s += c || s.length ^ i ? "" : 1; //prepend the result string with a "1" (0 in base58) if the byte stream is zero and non-zero bytes haven't been seen yet (to ensure correct decode length)
+			while(j in d || c) {             //start looping through the digits until there are no more digits and no carry amount
+				n = d[j];                    //set the placeholder for the current base58 digit
+				n = n ? n * 256 + c : c;     //shift the current base58 one byte and add the carry amount (or just add the carry amount if this is a new digit)
+				c = n / 58 | 0;              //find the new carry amount (floored integer of current digit divided by 58)
+				d[j] = n % 58;               //reset the current base58 digit to the remainder (the carry amount will pass on the overflow)
+				j++                          //iterate to the next base58 digit
+			}
+		}
+		while(j--)        //since the base58 digits are backwards, loop through them in reverse order
+			s += A[d[j]]; //lookup the character associated with each base58 digit
+		return s          //return the final base58 string
+	}
+
+	//Base58 encoded string input
+	function from_b58( S ){
+		let A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+		let d = [],   //the array for storing the stream of decoded bytes
+			b = [],   //the result byte array that will be returned
+			i,        //the iterator variable for the base58 string
+			j,        //the iterator variable for the byte array (d)
+			c,        //the carry amount variable that is used to overflow from the current byte to the next byte
+			n;        //a temporary placeholder variable for the current byte
+		for(i in S) { //loop through each base58 character in the input string
+			j = 0,                             //reset the byte iterator
+			c = A.indexOf( S[i] );             //set the initial carry amount equal to the current base58 digit
+			if(c < 0)                          //see if the base58 digit lookup is invalid (-1)
+				return undefined;              //if invalid base58 digit, bail out and return undefined
+			c || b.length ^ i ? i : b.push(0); //prepend the result array with a zero if the base58 digit is zero and non-zero characters haven't been seen yet (to ensure correct decode length)
+			while(j in d || c) {               //start looping through the bytes until there are no more bytes and no carry amount
+				n = d[j];                      //set the placeholder for the current byte
+				n = n ? n * 58 + c : c;        //shift the current byte 58 units and add the carry amount (or just add the carry amount if this is a new byte)
+				c = n >> 8;                    //find the new carry amount (1-byte shift of current byte value)
+				d[j] = n % 256;                //reset the current byte to the remainder (the carry amount will pass on the overflow)
+				j++                            //iterate to the next byte
+			}
+		}
+		while(j--)               //since the byte array is backwards, loop through it in reverse order
+			b.push( d[j] );      //append each byte to the result
+		return new Uint8Array(b) //return the final byte array in Uint8Array format
+	}
+
+	//Uint8Array raw byte input
+	function to_b58_words( B ){
+		let A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+		let d = [],   //the array for storing the stream of base58 digits
+			s = "",   //the result string variable that will be returned
+			i,        //the iterator variable for the byte input
+			j,        //the iterator variable for the base58 digit array (d)
+			c,        //the carry amount variable that is used to overflow from the current base58 digit to the next base58 digit
+			n;        //a temporary placeholder variable for the current base58 digit
+		for(i in B) { //loop through each byte in the input stream
+			j = 0,                           //reset the base58 digit iterator
+			c = B[i];                        //set the initial carry amount equal to the current byte amount
+			s += c || s.length ^ i ? "" : 1; //prepend the result string with a "1" (0 in base58) if the byte stream is zero and non-zero bytes haven't been seen yet (to ensure correct decode length)
+			while(j in d || c) {             //start looping through the digits until there are no more digits and no carry amount
+				n = d[j];                    //set the placeholder for the current base58 digit
+				n = n ? n * 16 + c : c;     //shift the current base58 one byte and add the carry amount (or just add the carry amount if this is a new digit)
+				c = n / 58 | 0;              //find the new carry amount (floored integer of current digit divided by 58)
+				d[j] = n % 58;               //reset the current base58 digit to the remainder (the carry amount will pass on the overflow)
+				j++                          //iterate to the next base58 digit
+			}
+		}
+		while(j--)        //since the base58 digits are backwards, loop through them in reverse order
+			s += A[d[j]]; //lookup the character associated with each base58 digit
+		return s          //return the final base58 string
+	}
+
+	//Base58 encoded string input
+	function from_b58_words( S ){
+		let A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+		let d = [],   //the array for storing the stream of decoded bytes
+			b = [],   //the result byte array that will be returned
+			i,        //the iterator variable for the base58 string
+			j,        //the iterator variable for the byte array (d)
+			c,        //the carry amount variable that is used to overflow from the current byte to the next byte
+			n;        //a temporary placeholder variable for the current byte
+		for(i in S) { //loop through each base58 character in the input string
+			j = 0,                             //reset the byte iterator
+			c = A.indexOf( S[i] );             //set the initial carry amount equal to the current base58 digit
+			if(c < 0)                          //see if the base58 digit lookup is invalid (-1)
+				return undefined;              //if invalid base58 digit, bail out and return undefined
+			c || b.length ^ i ? i : b.push(0); //prepend the result array with a zero if the base58 digit is zero and non-zero characters haven't been seen yet (to ensure correct decode length)
+			while(j in d || c) {               //start looping through the bytes until there are no more bytes and no carry amount
+				n = d[j];                      //set the placeholder for the current byte
+				n = n ? n * 58 + c : c;        //shift the current byte 58 units and add the carry amount (or just add the carry amount if this is a new byte)
+				c = n >> 4;                    //find the new carry amount (1-byte shift of current byte value)
+				d[j] = n % 16;                //reset the current byte to the remainder (the carry amount will pass on the overflow)
+				j++                            //iterate to the next byte
+			}
+		}
+		while(j--)               //since the byte array is backwards, loop through it in reverse order
+			b.push( d[j] );      //append each byte to the result
+		//return new Uint8Array(b) //return the final byte array in Uint8Array format
+		return new Array(b) //return the final byte array in Uint8Array format
+	}
+
+	function wordsToBytes( words ){
+		bytes = new Array();
+		let bite;
+		let upper;
+		for(let i = 1; i < words.length; i+=2){
+			// add lower bite.
+			bite = words[i];
+			// add upper 
+			upper = words[i-1];
+			if( upper >> 3 ){
+				upper = upper - 8;
+				bite = bite + 128;
+			}
+			if( upper >> 2 ){
+				upper = upper - 4;
+				bite = bite + 64;
+			}
+			if( upper >> 1 ){
+				upper = upper - 2;
+				bite = bite + 32;
+			}
+			if( upper ){
+				bite = bite + 16;
+			}
+			bytes.push( bite );
+		}
+		return bytes;
+	}
+
+
+	function bytesToWords( bytes ){
+		words = new Array();
+		let upper;
+		let lower;
+		let bite;
+
+		for(i in bytes) {
+			bite = bytes[i];
+			upper = 0;
+			lower = 0;
+			if( bite >> 7 ){ 
+				upper += 8;
+				bite = bite - 128;
+			}
+			if( bite >> 6 ){ 
+				upper += 4;
+				bite = bite - 64;
+			}
+			if( bite >> 5 ){ 
+				upper += 2;
+				bite = bite - 32;
+			}
+			if( bite >> 4 ){ 
+				upper += 1;
+				bite = bite - 16;
+			}
+			words.push(upper);
+			words.push(bite);
+		}
+		return words;
+	}
 
 
 </script>
@@ -1617,14 +1821,6 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
 
 
 
