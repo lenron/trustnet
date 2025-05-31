@@ -268,9 +268,13 @@
 		// faq();
 	}
 
-	// Global flags requried for this design.
+	// global flags 
 	let upload_flag = 'false';
 	let download_flag = 'false';
+	let save_location_thread_flag = 'false';
+	let save_location;
+	let special_store_thread_flag = 'false';
+
 	// Base 58 character map.
 	const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
@@ -553,8 +557,12 @@
 	// Searches offline database using given credentials for a Save Location(s). Only tries to decode obf1, obf2 and returns location if decodes.
 	// Inputs: passwords 2 and 3 
 	// Outputs: Array of Save Locations found
-	async function findSaveLocations(pass2, pass3){
+	// maybe outputs encrypted_data at save location
+	async function getOfflineEncData(){
 		console.log("Searching offline database.");
+
+		const pass2 = document.getElementById("load_pass_2").value;
+		const pass3 = document.getElementById("load_pass_3").value;
 
 		// Read in offline database.
 		let offline_db = localStorage.getItem("offline_dbase");
@@ -590,7 +598,9 @@
 				dec_data = await decryptDouble(current_iter_encrypted_data, pass2, pass3);		
 				console.log("Looks like we were able to decode data: " + dec_data);
 				// Push save location to return array if no error is caught.
-				save_locations.push(i);
+				//save_locations.push(i);
+				// just return with the encrypted data on first save location found for now
+				return current_iter_encrypted_data;
 			} catch (error) {
 				console.log(error);
 				if( error ){
@@ -600,12 +610,16 @@
 					// If code in try{} doesn't error run this code:
 					save_location = i;
 					console.log("Found Save Location! location = " + save_location);
+					// I don't think this does anything.
 					return save_location;
 				}
 			}
 		}
 		// Return after loop finishes in case we want to check the rest of the loop.
-		return save_locations;
+		//return save_locations;
+		
+		// just return encrypted data until we figure out what to do with multiple save location finds
+		//return current_iter_encrypted_data;
 	}
 
 	function storeOfflineDBase(){
@@ -660,12 +674,16 @@
 			encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
 		}
 
+		//if( save_location_thread_flag === true ){
+		//	setSaveLocation( encrypted_data, save_location);
+		//	return;
+		//}
+
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
 		// fingerprint length check
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
 		}
-
 		// Use fetch() for server communication
 		const server_response = await serverStore(fp_hex, encrypted_data, upload_flag_db);
 		sr_store_result = server_response.response;
@@ -689,7 +707,44 @@
 			// Maybe delete the record if it fails to load correctly?
 		}
 	}//deepStore()
+/*
+	async function checkOfflineDBase(){
+		console.log("Checking offline database...");
 
+		// Check for Save Codes / Save Locations
+		// save_locs is an array with the set of locations the creds were able to decrypt.
+		// Not sure yet what to do with multiple decodes - same passwords decrypting multiple datas.
+		//const save_locs = await findSaveLocations();
+		const enc_data = await getOfflineEncData();
+		// Maoybe do something if there are more than 1 save locations found.
+			console.log("might be empty if no save location found: returned from getOfflineEncData:\n" + enc_data);
+		//if( save_locs.length > 0 ){
+		if( enc_data != null ){
+			//console.log("Found Save Locations:" + save_locs);
+			console.log("Found Save Locations. Encrypted Data returned from getOfflineEncData:\n" + enc_data);
+			// get offline database encrypted data
+			// pick the first save location found for now.
+			//const enc_data = getDataAtSaveLocation(save_locs[0]);
+			// decrypt / decrypt double block
+			// show user / download file
+			await decryptAndShowUser(enc_data);
+			console.log("returned from decryptAndShowUser into checkOfflineDBase");
+			// give option to Modify Save Location
+			// no - we're done - return
+			// yes - special Store Thread
+			// 	 set save_location_thread_flag
+			//   set save_location to the location to modify
+			//   set save location class to visible
+			//   go to top of store thread   --   just showPage(store1) ? no. have to break out of this function.
+			//	 showPage(store1);
+			//	 return;
+		} else {
+			console.log("Didn't find a Save Location!");
+		}
+		console.log("about to return anyway...");
+		//return;
+	}
+*/
 	// Main Access Function Handler
 	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
 	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
@@ -701,15 +756,43 @@
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
 
+		// First check offline database before querying server.		
+		//await checkOfflineDBase();
+		console.log("Checking offline database...");
+
 		// Check for Save Codes / Save Locations
 		// save_locs is an array with the set of locations the creds were able to decrypt.
 		// Not sure yet what to do with multiple decodes - same passwords decrypting multiple datas.
-		const save_locs = await findSaveLocations(pass_2, pass_3);
-		if( save_locs.length > 0 ){
-			console.log("Found Save Locations:" + save_locs);
+		//const save_locs = await findSaveLocations();
+		const enc_data = await getOfflineEncData();
+		// Maoybe do something if there are more than 1 save locations found.
+			console.log("might be empty if no save location found: returned from getOfflineEncData:\n" + enc_data);
+		//if( save_locs.length > 0 ){
+		if( enc_data != null ){
+			//console.log("Found Save Locations:" + save_locs);
+			console.log("Found Save Locations. Encrypted Data returned from getOfflineEncData:\n" + enc_data);
+			// get offline database encrypted data
+			// pick the first save location found for now.
+			//const enc_data = getDataAtSaveLocation(save_locs[0]);
+			// decrypt / decrypt double block
+			// show user / download file
+			await decryptAndShowUser(enc_data);
+			console.log("returned from decryptAndShowUser into checkOfflineDBase");
+			return;
+			// give option to Modify Save Location
+			// no - we're done - return
+			// yes - special Store Thread
+			// 	 set save_location_thread_flag
+			//   set save_location to the location to modify
+			//   set save location class to visible
+			//   go to top of store thread   --   just showPage(store1) ? no. have to break out of this function.
+			//	 showPage(store1);
+			//	 return;
 		} else {
 			console.log("Didn't find a Save Location!");
 		}
+		console.log("Continuing with deepLoad...");
+
 
 		debug("Attempting Server LOAD - deepLoad()"); 
 		debug("Server Handling - deepLoad() -- Codeword: " + codeword); 
@@ -723,6 +806,7 @@
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
 		}
+		console.log("Querying server...");
 
 		// Load from server
 		debug("Server Handling - deepLoad() -- Attempting Load with fingerprint: " + fp_hex);
@@ -735,6 +819,9 @@
 			return;
 		}
 
+		// Decrypt Block
+		await decryptAndShowUser(sr_load.data);
+/*
 		// Your Encryption
 		if( download_flag == 'true' ){
 			showPage('load_download');
@@ -755,7 +842,40 @@
 			// Report Results 
 			document.getElementById("output_display").value = decrypted;
 		}
+*/
 	}//deepLoad()
+
+	async function decryptAndShowUser(encrypted_data){
+		console.log("decryptAndShowUser entered.");
+		
+		const pass_1 = document.getElementById("load_pass_1").value;
+		const pass_2 = document.getElementById("load_pass_2").value;
+		const pass_3 = document.getElementById("load_pass_3").value;
+
+		// Your Encryption
+		if( download_flag == 'true' ){
+			console.log("File encryption - your encryption.");
+			showPage('load_download');
+			// Double Decrypt
+			decrypted_data = await decryptDouble(encrypted_data, pass_2, pass_3);
+			const bytes = base64ToBytes( decrypted_data );
+			// The Blob
+			let blob = new Blob([bytes]);
+
+			let a = document.createElement('a');
+			a.href = window.URL.createObjectURL(blob);
+			a.download = 'secretword_output_file.txt';
+			a.click();
+		}else{ // Our Encryption
+			console.log("our encryption.");
+			showPage('load_text');
+			// Triple Decrypt
+			const decrypted = await decryptStack(encrypted_data , pass_1, pass_2, pass_3);
+			console.log("decrypted: " + decrypted);
+			// Report Results 
+			document.getElementById("output_display").value = decrypted;
+		}
+	}
 
 	// Main Delete Function Handler
 	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
