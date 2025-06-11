@@ -248,7 +248,8 @@
 		<button id="download_offline_dbase_button" onclick="saveOfflineDBase()">DOWNLOAD OFFLINE DBASE</button>
 	</div>
 
-	<p id="offline_dbase" style="display:none"></p>
+	<!--	Offline Dbase hardcode for testing. Will use a TMPL_VAR to inject the production version with perl. 	--!>
+	<p id="offline_dbase" style="display:none">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</p>
 
 </body>
 <script>
@@ -272,8 +273,8 @@
 	let upload_flag = 'false';
 	let download_flag = 'false';
 	let save_location_thread_flag = 'false';
-	let save_location;
-	let special_store_thread_flag = 'false';
+	let special_button_flag = 'false';
+	let current_save_location;
 
 	// Base 58 character map.
 	const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -335,7 +336,6 @@
 			
 			// Show all password warnings.
 			pass_warn_elements = document.getElementsByClassName('pass_length_warn');
-			// hide all generated_html_pages
 			for (let i = 0; i < pass_warn_elements.length; i++) {
 				pass_warn_elements[i].style.display = "inline";
 			}
@@ -354,6 +354,7 @@
 	// Clears all fields that could contain sensitive data.
 	// Resets delete overlay
 	function securityReset(){
+		console.log("CLEARING FIELDS FOR SECURITY-- SECURITY RESET ENABLED");
 		// Reset delete overlay
 		deleteCheckHide('overlay_text');
 		deleteCheckHide('overlay_download');
@@ -373,7 +374,29 @@
 		document.getElementById("output_display").value = '';
 		// Reset download flag
 		download_flag = 'false';
-		
+
+		// These needs to be set in case the user wanders from the path.	
+		save_location_thread_flag = 'false';
+		special_button_flag = 'false';
+		setSaveLocationUI();
+	}
+
+	function setSaveLocationUI(){
+		// Show or Hide Special Store Thread UI indicator
+		if( save_location_thread_flag === 'true' ){
+			// We're in the Special Store Thread for gathering data to save new data to a Save Location.
+			// Turn on all UI indicators.
+			let ui_indicators = document.getElementsByClassName('special_store_thread_ui_indicator');
+			for (let i = 0; i < ui_indicators.length; i++) {
+				ui_indicators[i].style.display = "flex";
+			}
+		} else {
+			// Turn off all UI indicators.
+			let ui_indicators = document.getElementsByClassName('special_store_thread_ui_indicator');
+			for (let i = 0; i < ui_indicators.length; i++) {
+				ui_indicators[i].style.display = "none";
+			}
+		}
 	}
 
 	// These standalone functions are required to set upload_flag in javascript.
@@ -416,7 +439,10 @@
 			document.querySelectorAll(".store.seven").forEach(a=>a.style.display = "flex");
 		}
 
-		// Also clear sensitive data / reload page for security?
+		// Special Store Thread completed, flag has done its job.
+		if( save_location_thread_flag === 'true' ){
+			save_location_thread_flag = 'false';
+		}
 	}
 
 	// User choose text output, set flag to false.
@@ -467,6 +493,16 @@
 		securityReset();
 		// Notify user of success
 		showPage('delete5');
+	}
+
+	function specialStoreThread(){
+		// We're in the Special Store Thread!
+		save_location_thread_flag = 'true';
+		// This needs to turn it all off actually. Keep it off unless we're on the golden path.
+		//securityReset();
+		// Hide or show based on what flag says.
+		setSaveLocationUI();
+		showPage('store1');
 	}
 
 	// Catch File Ingest
@@ -522,37 +558,11 @@
 		}
 	}
 
-		let loaded_offline_dbase = "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";
+		//let loaded_offline_dbase = "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";
+
 	// Automatically run this function when page loads.
-	window.onload = function() {
-
-		// load offline dbase from server.
-		// If local dbase is empty, set localStorage to server version.
-		// If local dbase is not empty, check if different.
-		// 		If different, keep local version and update server.
-		// Not sure of behavior if we expect multiple users. Could do a location by location check and merge if there are no collisions.
-
-
-		// Load current offline database from server.
-		// For testing load smaller dbase in from hardcode.
-		// all passwords = save.
-		// 2 of the same data stacked on each other for testing.
-		//
-		// let loaded_offline_db = serverOfflineDBaseLoad(); 
-		
-
-		// localStorage saves key/value pairs which persist across offline usage of localStorage.
-		// Verified offline persistent saves in firefox/chrome/brave but NOT between browsers!
-		//
-		// Don't clobber current database.
-		if( localStorage.getItem("offline_dbase") === null ){
-			console.log("Local offline database Not Found!");
-			localStorage.setItem("offline_dbase", loaded_offline_dbase);
-			console.log("Offline database loaded in:\n" + localStorage.getItem("offline_dbase"));
-		}else{
-			console.log("Found localStorage offline database.");
-		}
-	}
+	//window.onload = function() {
+	//}
 
 	// Searches offline database using given credentials for a Save Location(s). Only tries to decode obf1, obf2 and returns location if decodes.
 	// Inputs: passwords 2 and 3 
@@ -565,7 +575,8 @@
 		const pass3 = document.getElementById("load_pass_3").value;
 
 		// Read in offline database.
-		let offline_db = localStorage.getItem("offline_dbase");
+		//let offline_db = localStorage.getItem("offline_dbase");
+		let offline_db = document.getElementById("offline_dbase").innerHTML;
 		console.log("Offline databse loaded for search:\n" + offline_db);
 		let offset;
 		let current_iter_enc;
@@ -597,6 +608,8 @@
 			try {
 				dec_data = await decryptDouble(current_iter_encrypted_data, pass2, pass3);		
 				console.log("Looks like we were able to decode data: " + dec_data);
+				current_save_location = i;
+				console.log("Setting current_save_location= " + current_save_location);
 				// Push save location to return array if no error is caught.
 				//save_locations.push(i);
 				// just return with the encrypted data on first save location found for now
@@ -608,10 +621,7 @@
 					continue;
 				}else{
 					// If code in try{} doesn't error run this code:
-					save_location = i;
-					console.log("Found Save Location! location = " + save_location);
-					// I don't think this does anything.
-					return save_location;
+					console.log("Found Save Location! location = " + current_save_location);
 				}
 			}
 		}
@@ -622,8 +632,12 @@
 		//return current_iter_encrypted_data;
 	}
 
-	function storeOfflineDBase(){
+	function storeOfflineDBase( encrypted_data, save_location){
+		console.log("storeOfflineDBase EXECUTED!!!!!");
+		console.log("storeOfflineDBase encrypted_data: " + encrypted_data);
+		console.log("storeOfflineDBase save_location: " + save_location);
 
+		console.log("storeOfflineDBase Ended.");
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -674,10 +688,12 @@
 			encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
 		}
 
-		//if( save_location_thread_flag === true ){
-		//	setSaveLocation( encrypted_data, save_location);
-		//	return;
-		//}
+		if( save_location_thread_flag === 'true' ){
+			storeOfflineDBase( encrypted_data, current_save_location );
+			//save_location_thread_flag = 'false';
+			// maybe check if it's in there before returning 'success'?
+			return 1;
+		}
 
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
 		// fingerprint length check
@@ -707,44 +723,7 @@
 			// Maybe delete the record if it fails to load correctly?
 		}
 	}//deepStore()
-/*
-	async function checkOfflineDBase(){
-		console.log("Checking offline database...");
 
-		// Check for Save Codes / Save Locations
-		// save_locs is an array with the set of locations the creds were able to decrypt.
-		// Not sure yet what to do with multiple decodes - same passwords decrypting multiple datas.
-		//const save_locs = await findSaveLocations();
-		const enc_data = await getOfflineEncData();
-		// Maoybe do something if there are more than 1 save locations found.
-			console.log("might be empty if no save location found: returned from getOfflineEncData:\n" + enc_data);
-		//if( save_locs.length > 0 ){
-		if( enc_data != null ){
-			//console.log("Found Save Locations:" + save_locs);
-			console.log("Found Save Locations. Encrypted Data returned from getOfflineEncData:\n" + enc_data);
-			// get offline database encrypted data
-			// pick the first save location found for now.
-			//const enc_data = getDataAtSaveLocation(save_locs[0]);
-			// decrypt / decrypt double block
-			// show user / download file
-			await decryptAndShowUser(enc_data);
-			console.log("returned from decryptAndShowUser into checkOfflineDBase");
-			// give option to Modify Save Location
-			// no - we're done - return
-			// yes - special Store Thread
-			// 	 set save_location_thread_flag
-			//   set save_location to the location to modify
-			//   set save location class to visible
-			//   go to top of store thread   --   just showPage(store1) ? no. have to break out of this function.
-			//	 showPage(store1);
-			//	 return;
-		} else {
-			console.log("Didn't find a Save Location!");
-		}
-		console.log("about to return anyway...");
-		//return;
-	}
-*/
 	// Main Access Function Handler
 	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
 	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
@@ -757,14 +736,12 @@
 		const pass_3 = document.getElementById("load_pass_3").value;
 
 		// First check offline database before querying server.		
-		//await checkOfflineDBase();
-		console.log("Checking offline database...");
-
 		// Check for Save Codes / Save Locations
 		// save_locs is an array with the set of locations the creds were able to decrypt.
 		// Not sure yet what to do with multiple decodes - same passwords decrypting multiple datas.
-		//const save_locs = await findSaveLocations();
+		//const save_locs = await getOfflineEncData();
 		const enc_data = await getOfflineEncData();
+		console.log("Did a Save Location get saved? current_save_location = ~" + current_save_location + "~");
 		// Maoybe do something if there are more than 1 save locations found.
 			console.log("might be empty if no save location found: returned from getOfflineEncData:\n" + enc_data);
 		//if( save_locs.length > 0 ){
@@ -776,22 +753,26 @@
 			//const enc_data = getDataAtSaveLocation(save_locs[0]);
 			// decrypt / decrypt double block
 			// show user / download file
+			
+			// Turn on Special Thread Flag which will show button to get there.
+			special_button_flag = 'true';
 			await decryptAndShowUser(enc_data);
-			console.log("returned from decryptAndShowUser into checkOfflineDBase");
-			return;
+			console.log("returned from decryptAndShowUser. we're on the found save location path.");
 			// give option to Modify Save Location
 			// no - we're done - return
 			// yes - special Store Thread
 			// 	 set save_location_thread_flag
-			//   set save_location to the location to modify
+			//   set current_save_location to the location to modify
 			//   set save location class to visible
 			//   go to top of store thread   --   just showPage(store1) ? no. have to break out of this function.
 			//	 showPage(store1);
-			//	 return;
+
+			// I think we're done here after we show user.
+			return;
 		} else {
 			console.log("Didn't find a Save Location!");
 		}
-		console.log("Continuing with deepLoad...");
+		console.log("Save Location Check Completed! Continuing with deepLoad...");
 
 
 		debug("Attempting Server LOAD - deepLoad()"); 
@@ -821,28 +802,7 @@
 
 		// Decrypt Block
 		await decryptAndShowUser(sr_load.data);
-/*
-		// Your Encryption
-		if( download_flag == 'true' ){
-			showPage('load_download');
-			// Double Decrypt
-			decrypted_data = await decryptDouble(sr_load.data, pass_2, pass_3);
-			const bytes = base64ToBytes( decrypted_data );
-			// The Blob
-			let blob = new Blob([bytes]);
 
-			let a = document.createElement('a');
-			a.href = window.URL.createObjectURL(blob);
-			a.download = 'secretword_output_file.txt';
-			a.click();
-		}else{ // Our Encryption
-			showPage('load_text');
-			// Triple Decrypt
-			const decrypted = await decryptStack(sr_load.data , pass_1, pass_2, pass_3);
-			// Report Results 
-			document.getElementById("output_display").value = decrypted;
-		}
-*/
 	}//deepLoad()
 
 	async function decryptAndShowUser(encrypted_data){
@@ -851,6 +811,22 @@
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
+
+		if( special_button_flag === 'true' ){
+			// I think we can always turn this off after it's been hit once.
+			special_button_flag = 'false';
+			// Show Special Thread Button
+			let sp_thread_button = document.getElementsByClassName('special_thread_button');
+			for (let i = 0; i < sp_thread_button.length; i++) {
+				sp_thread_button[i].style.display = "inline";
+			}
+		} else {
+			// Hide Special Thread Button
+			let sp_thread_button = document.getElementsByClassName('special_thread_button');
+			for (let i = 0; i < sp_thread_button.length; i++) {
+				sp_thread_button[i].style.display = "none";
+			}
+		}
 
 		// Your Encryption
 		if( download_flag == 'true' ){
@@ -936,6 +912,7 @@
 
 
 /*
+	// Likely need this later...
 	async function serverOfflineDBaseLoad(fingerprint){
 		const SERVER_URL = '/obf/offlinedbaseload';
 		

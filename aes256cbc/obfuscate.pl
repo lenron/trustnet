@@ -31,6 +31,9 @@ Multiline Comment Reminder
 <!--   store  --!>
 
 			<div class="gen store one" id="store1" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
 				<div style="display: flex; flex-direction: row; justify-content: space-between;">
 					<label>STORE DATA</label>
 					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
@@ -44,6 +47,9 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store choose" id="store_choose" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
@@ -65,6 +71,9 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store upload" id="store_upload" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
 				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 700 byte limit</h2>
@@ -85,6 +94,9 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store two" id="store2" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
 				<div style="display: flex; flex-direction: row; justify-content: space-between;">
 					<label>STORE DATA</label>
 					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
@@ -100,6 +112,9 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store three" id="store3" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
 				<div style="display: flex; flex-direction: row; justify-content: space-between;">
 					<label>STORE DATA</label>
 					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
@@ -114,6 +129,9 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store four" id="store4" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
 				<div style="display: flex; flex-direction: row; justify-content: space-between;">
 					<label>STORE DATA</label>
 					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
@@ -129,6 +147,9 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store five" id="store5" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
 				<div style="display: flex; flex-direction: row; justify-content: space-between;">
 					<label>STORE DATA</label>
 					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
@@ -145,6 +166,9 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store six" id="store6" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
 				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='learnmore' style="flex-grow:1;" onclick="location.href='https://chat.dance/obf/how';">LEARN MORE</button>
@@ -153,6 +177,9 @@ Multiline Comment Reminder
 			</div>
 
 			<div class="gen store seven" id="store7" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
 				<h2>&#10060; FAILED </h2>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
@@ -160,9 +187,10 @@ Multiline Comment Reminder
 				</div>
 			</div>
 
-<!-- Catch Upload Data --!>
-<input type="password" value="" id="upload_data" style="display:none;">
+	<!-- Catch Upload Data --!>
+	<input type="password" value="" id="upload_data" style="display:none;">
 <!--  store  --!>
+
 <!--   load  --!>
 			<div class="gen load one" id="load1" style="display:none;">
 				<div style="display: flex; flex-direction: row; justify-content: space-between;">
@@ -261,6 +289,9 @@ Multiline Comment Reminder
 					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_text')">DELETE DATA</button>
 				</div>
+				<div class="" id="special_button_div" style="display:flex;">
+					<button class="special_thread_button" id='' style="flex-grow:1;" onclick="specialStoreThread()">SAVE NEW DATA TO SAVE LOCATION</button>
+				</div>
 			</div>
 
 			<div class="gen load download" id="load_download" style="display:none">
@@ -288,6 +319,9 @@ Multiline Comment Reminder
 					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
 					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_download')">DELETE DATA</button>
+				</div>
+				<div class="" id="special_button_div" style="display:flex;">
+					<button class="special_thread_button" id='' style="flex-grow:1;" onclick="specialStoreThread()">SAVE NEW DATA TO SAVE LOCATION</button>
 				</div>
 			</div>
 
