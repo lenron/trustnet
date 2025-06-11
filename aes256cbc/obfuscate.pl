@@ -39,7 +39,7 @@ Multiline Comment Reminder
 					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
-				<input type="password" autofocus id="store_codeword" style="">
+				<input type="password" autocomplete="off" autofocus id="store_codeword" style="">
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('home')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('store1','store_choose')">NEXT</button>
@@ -77,7 +77,7 @@ Multiline Comment Reminder
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
 				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 700 byte limit</h2>
-				<input onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
+				<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
 				<br>
 				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 				<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
@@ -121,7 +121,7 @@ Multiline Comment Reminder
 				</div>
 				<label>&#10004; SECRET DATA SAVED</label>
 				<h2>ENTER SECRET WORD 1</h2>
-				<input type="password" value="" id="store_pass_1" style="">
+				<input autocomplete="off" type="password" value="" id="store_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store2')">BACK</button>
 					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('store3','store4')">ENHANCE SECURITY</button>
@@ -139,7 +139,7 @@ Multiline Comment Reminder
 				<label>&#10004; SECRET DATA SAVED</label>
 				<label>&#10004; SECRET WORD 1 SAVED</label>
 				<h2>ENTER SECRET WORD 2</h2>
-				<input type="password" value="" id="store_pass_2" style="">
+				<input autocomplete="off" type="password" value="" id="store_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="storeBack()">BACK</button>
 					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('store4','store5')">ENHANCE SECURITY</button>
@@ -158,7 +158,7 @@ Multiline Comment Reminder
 				<label>&#10004; SECRET WORD 1 SAVED</label>
 				<label>&#10004; SECRET WORD 2 SAVED</label>
 				<h2>ENTER SECRET WORD 3</h2>
-				<input type="password" value="" id="store_pass_3" style="">
+				<input autocomplete="off" type="password" value="" id="store_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store4')">BACK</button>
 					<button class="" id='deepstorebutton' style="flex-grow:1;" onclick="checkPassLength('store5','executeStore')">DEEP STORE DATA</button>
@@ -188,7 +188,7 @@ Multiline Comment Reminder
 			</div>
 
 	<!-- Catch Upload Data --!>
-	<input type="password" value="" id="upload_data" style="display:none;">
+	<input autocomplete="off" type="password" value="" id="upload_data" style="display:none;">
 <!--  store  --!>
 
 <!--   load  --!>
@@ -198,7 +198,7 @@ Multiline Comment Reminder
 					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODE WORD</h2>
-				<input type="password" autofocus  value="" id="load_codeword" style="">
+				<input autocomplete="off" type="password" autofocus  value="" id="load_codeword" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('load1','load_choose')">NEXT</button>
@@ -233,7 +233,7 @@ Multiline Comment Reminder
 				</div>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<h2>ENTER SECRET WORD 1</h2>
-				<input type="password"  value="" id="load_pass_1" style="">
+				<input autocomplete="off" type="password"  value="" id="load_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('load_choose')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('load2','load3')">NEXT</button>
@@ -248,7 +248,7 @@ Multiline Comment Reminder
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<h2>ENTER SECRET WORD 2</h2>
-				<input type="password"  value="" id="load_pass_2" style="">
+				<input autocomplete="off" type="password"  value="" id="load_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="loadBack()">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="checkPassLength('load3','load4')">NEXT</button>
@@ -264,7 +264,7 @@ Multiline Comment Reminder
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<label>&#10004; SECRET WORD 2 ENTERED</label> 
 				<h2>ENTER SECRET WORD 3</h2>
-				<input type="password"  value="" id="load_pass_3" style="">
+				<input autocomplete="off" type="password"  value="" id="load_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('load3')">BACK</button>
 					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('load4','executeLoad')">ACCESS DATA</button>
@@ -357,7 +357,7 @@ my $delete = qq{
 			<div class="gen delete one" id="delete1" style="">
 				<label>DELETE DATA</label>
 				<h2>ENTER CODE WORD</h2>
-				<input type="password" autofocus  value="" id="delete_codeword" style="">
+				<input autocomplete="off" type="password" autofocus  value="" id="delete_codeword" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete2')">NEXT</button>
@@ -367,7 +367,7 @@ my $delete = qq{
 			<div class="gen delete two" id="delete2" style="display:none">
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<h2>ENTER SECRET WORD 1</h2>
-				<input type="password"  value="" id="delete_pass_1" style="">
+				<input autocomplete="off" type="password"  value="" id="delete_pass_1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete1')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete3')">NEXT</button>
@@ -378,7 +378,7 @@ my $delete = qq{
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<h2>ENTER SECRET WORD 2</h2>
-				<input type="password"  value="" id="delete_pass_2" style="">
+				<input autocomplete="off" type="password"  value="" id="delete_pass_2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete2')">BACK</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete4')">NEXT</button>
@@ -390,7 +390,7 @@ my $delete = qq{
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
 				<label>&#10004; SECRET WORD 2 ENTERED</label> 
 				<h2>ENTER SECRET WORD 3</h2>
-				<input type="password"  value="" id="delete_pass_3" style="">
+				<input autocomplete="off" type="password"  value="" id="delete_pass_3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('delete3')">BACK</button>
 					<button class="" id='' style="flex-grow:1;" onclick="deleteExecute()">DELETE DATA</button>
