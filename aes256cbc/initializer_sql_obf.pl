@@ -17,13 +17,19 @@ my $db_username = 'chatriwe_admin';
 my $db_pw = 'Vuu_fQY1#qH,';
 my $db_name = 'chatriwe_obf';
 my $db_table_obf = 'obfuscation';
+my $db_table_offline_dbase = 'offline_dbase';
 
 # Create database
-my $dbh = DBI->connect('dbi:mysql:', $db_username, $db_pw);
+my $dbh = DBI->connect('dbi:MariaDB:', $db_username, $db_pw);
 $dbh->do("CREATE DATABASE IF NOT EXISTS $db_name");
 $dbh->disconnect;
 
-$dbh = DBI->connect("dbi:mysql:$db_name", $db_username, $db_pw);
+# Create database
+my $dbh = DBI->connect('dbi:MariaDB:', $db_username, $db_pw);
+$dbh->do("CREATE TABLE IF NOT EXISTS $db_table_offline_dbase (dbase VARCHAR(50000))");
+$dbh->disconnect;
+
+$dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 # Create table to hold URL and fisher user data
 $dbh->do("CREATE TABLE IF NOT EXISTS $db_table_obf (fingerprint VARCHAR(64), data VARCHAR(1000), upload_flag VARCHAR(1), PRIMARY KEY(fingerprint) )"); 
 
