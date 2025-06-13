@@ -26,7 +26,7 @@ $dbh->disconnect;
 
 # Create database
 my $dbh = DBI->connect('dbi:MariaDB:', $db_username, $db_pw);
-$dbh->do("CREATE TABLE IF NOT EXISTS $db_table_offline_dbase (dbase VARCHAR(50000))");
+$dbh->do("CREATE TABLE IF NOT EXISTS $db_table_offline_dbase (dbase VARCHAR(50000), name VARCHAR(10), PRIMARY KEY(name))");
 $dbh->disconnect;
 
 $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
