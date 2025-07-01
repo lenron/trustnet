@@ -1,5 +1,17 @@
 DirectoryIndex obfuscate.pl
 
+# This works for whole site
+#<Files get_offline_dbase.pl>
+	#AuthType Basic
+	#AuthName "restricted area"
+	#AuthUserFile "/home/chatriwe/.htpasswds/public_html/vidcaps/passwd"
+	#require valid-user
+#</Files>
+
+  Header set Access-Control-Allow-Origin "*"
+  Header set Access-Control-Allow-Methods "GET,POST,OPTIONS"
+  Header set Access-Control-Allow-Headers X-Requested-With
+
 #ddRedirect 301 "/store" "https://chat.dance/obf/obfuscate.pl?id=store"
 #Redirect 301 "/load" "https://chat.dance/obf/obfuscate.pl?id=load"
 
@@ -10,11 +22,11 @@ RewriteRule ^load obfuscate.pl?id=load
 RewriteRule ^delete obfuscate.pl?id=delete
 RewriteRule ^faq obfuscate.pl?id=faq
 RewriteRule ^how obfuscate.pl?id=how
-#RewriteRule ^/load/execute /cgi-bin/load.pl
-#RewriteRule ^/store/execute /cgi-bin/store.pl
+# Redirect calls from /obf/exestore to /obf/store.pl
 RewriteRule ^exestore store.pl
 RewriteRule ^exeload load.pl
 RewriteRule ^exedelete delete.pl
+# Redirects for Offline Database
 RewriteRule ^exe_offline_set set_offline_dbase.pl
 RewriteRule ^exe_offline_get get_offline_dbase.pl
 
@@ -22,6 +34,13 @@ RewriteRule ^exe_offline_get get_offline_dbase.pl
 <Files "log.txt">  
   Require all denied
 </Files>
+
+# Allow CORS
+#<IfModule mod_headers.c>
+  #Header add Access-Control-Allow-Origin "*"
+  #Header add Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
+#</IfModule>
+
 
 #RewriteCond %{REQUEST_URI} ^/obfuscate.pl\?id\=(.*)
 #RewriteRule .* https://chat.dance/obf/$1 [L]

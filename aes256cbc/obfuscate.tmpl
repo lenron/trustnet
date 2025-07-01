@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html>
-<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+<meta content="text/plain;charset=utf-8" http-equiv="Content-Type" />
 <meta content="utf-8" http-equiv="encoding" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <head>
@@ -236,6 +236,9 @@
 			</div>
 		</div>
 	</div>
+	<div class="offline_ui_inform" style="display:flex; justify-content:flex-end;">
+		<label id="offline_label">YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
+	</div>
 	<div class="center_html" id="center_html">
 		<div class="content_html" id="content_html">
 
@@ -248,7 +251,7 @@
 		<button id="download_offline_dbase_button" onclick="saveOfflineDBase()">DOWNLOAD OFFLINE DBASE</button>
 	</div>
 
-	<!--	Offline Dbase hardcode for testing. Will use a TMPL_VAR to inject the production version with perl. 	--!>
+	<!-- offline database resides here --!>
 	<p id="offline_dbase" style="display:none"></p>
 
 </body>
@@ -382,6 +385,20 @@
 		current_save_location = '';
 		special_button_flag = 'false';
 		setSaveLocationUI();
+		informOfflineStatus();
+	}
+
+	function informOfflineStatus(){
+
+		//
+		if( navigator.onLine ){
+			console.log("Navigator is returning ONLINE status.");
+
+		} else {
+			console.log("Navigator is OFFLINE!");
+
+		}
+
 	}
 
 	function setSaveLocationUI(){
@@ -563,6 +580,7 @@
 
 	// Automatically run this function when page loads.
 	window.onload = async function() {
+	//window.onload = function() {
 
 		// A command like this will clobber the server save of the offline database.
 		//await serverOfflineDBaseStore("lulz");
@@ -576,12 +594,12 @@
 
 		// get current offline dbase
 		const response_obj = await serverOfflineDBaseLoad();
-		console.log("GET OFFLINE DBASE from server: " + response_obj.dbase);
-		document.getElementById("offline_dbase").innerHTML = response_obj.dbase;
-		console.log("LOCAL COPY OF OFFLINE DBASE NOW SET TO: " + document.getElementById("offline_dbase").innerHTML);
-
+		//serverOfflineDBaseLoad().then((response_obj) => {
+			console.log("GET OFFLINE DBASE from server: " + response_obj.dbase);
+			document.getElementById("offline_dbase").innerHTML = response_obj.dbase;
+			console.log("LOCAL COPY OF OFFLINE DBASE NOW SET TO: " + document.getElementById("offline_dbase").innerHTML);
+		//});
 	}
-
 
 
 
@@ -938,13 +956,13 @@
 	// Input: fingerprint is hexadecimal.
 	// Output: POST message to server script which will attempt to Access.
 	async function serverLoad(fingerprint){
-		const SERVER_URL = '/obf/exeload';
+		const SERVER_URL = 'https://chat.dance/obf/exeload';
 		
 		debug("serverLoad() -- Attempting Server Load with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'text/html',
+				'Content-Type': 'text/plain',
 			},
 			body: JSON.stringify({
 				fingerprint: fingerprint,
@@ -958,14 +976,14 @@
 	// Inputs: fingerprint is hex, data is base58.
 	// Output: POST message to server script which will attempt to Store.
 	async function serverStore(fingerprint, data, upload_flag_db){
-		const SERVER_URL = '/obf/exestore';
+		const SERVER_URL = 'https://chat.dance/obf/exestore';
 		
 		//debug("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
 		debug("serverStore() -- Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'text/html',
+				'Content-Type': 'text/plain',
 			},
 			body: JSON.stringify({
 				fingerprint: fingerprint,
@@ -980,13 +998,13 @@
 	// Input: fingerprint is hexadecimal.
 	// Output: POST message to server script that will attempt to Delete.
 	async function serverDelete(fingerprint){
-		const SERVER_URL = '/obf/exedelete';
+		const SERVER_URL = 'https://chat.dance/obf/exedelete';
 		
 		debug("serverDelete() -- Attempting Server Delete with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'text/html',
+				'Content-Type': 'text/plain',
 			},
 			body: JSON.stringify({
 				fingerprint: fingerprint,
@@ -996,17 +1014,55 @@
 	}//serverDelete()
 
 
-
 	// 
 	async function serverOfflineDBaseLoad(){
-		const SERVER_URL = '/obf/exe_offline_get';
+	//function serverOfflineDBaseLoad(){
+		const SERVER_URL = 'https://chat.dance/obf/exe_offline_get';
+		//const SERVER_URL = '/obf/exe_offline_get';
+		const dbase_key = 'test';
+		
+		debug("serverOfflineDBaseLoad() -- Attempting to Load Offline Database."); 
+		const response = await fetch(SERVER_URL, {
+		//await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/plain',
+			},
+			body: JSON.stringify({
+				dbase_key: dbase_key,
+			}),
+			//credentials: 'include',
+		})
+/*
+		.then((response) => {
+			if (!response.ok) {
+				throw new Error(`HTTP error, status = ${response.status}`);
+			}
+			return response.json()
+		})
+*/
+		.catch((error) => {
+			console.log("Caught fetch Error: " + error.message);
+		});
+		if( response.ok ){
+			return response.json()
+		} else {
+			console.log("HTTP error. status: " + response.status);
+		}
+	}//serverOfflineDBaseLoad()
+
+
+/*
+	// 
+	async function serverOfflineDBaseLoad(){
+		const SERVER_URL = 'https://chat.dance/obf/exe_offline_get';
 		const dbase_key = 'test';
 		
 		debug("serverOfflineDBaseLoad() -- Attempting to Load Offline Database."); 
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'text/html',
+				'Content-Type': 'text/plain',
 			},
 			body: JSON.stringify({
 				//fingerprint: fingerprint, not sure what to post for offline dbase load
@@ -1015,17 +1071,17 @@
 		})
 		return response.json()
 	}//serverOfflineDBaseLoad()
-
+*/
 	// 
 	async function serverOfflineDBaseStore(offline_dbase){
-		const SERVER_URL = '/obf/exe_offline_set';
+		const SERVER_URL = 'https://chat.dance/obf/exe_offline_set';
 		const dbase_key = 'test';
 		
 		debug("serverOfflineDBaseStore() -- Attempting to STORE Offline Database."); 
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'text/html',
+				'Content-Type': 'text/plain',
 			},
 			body: JSON.stringify({
 				//fingerprint: fingerprint, not sure what to post for offline dbase load
