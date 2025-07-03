@@ -246,10 +246,13 @@
 
 		</div>
 	</div>
-	<div style="display:flex">
-		<button id="toggle_debug_button" style="flex-grow:1" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
-		<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
-		<button id="access_offline_dbase_button" style="flex-grow:1" onclick="accessExistingOfflineDBase()">ACCESS OFFLINE DBASE</button>
+	<div style="display:flex; flex-direction:column;">
+		<button id="connect_dbase_button" style="display:none; flex-grow:1" onclick="createNewOfflineDBase()">ACTIVATE SERVER BACKUP OF OFFLINE DATABASE</button>
+		<div style="display:flex">
+			<button id="toggle_debug_button" style="flex-grow:1" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
+			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
+			<button id="access_offline_dbase_button" style="flex-grow:1" onclick="accessExistingOfflineDBase()">ACCESS OFFLINE DBASE</button>
+		</div>
 	</div>
 
 	<div id="overlay_get_new_fingerprint" style="display:none; justify-content:center; align-items:center; z-index:10; position:absolute; width:100%; height:100%; flex-direction:column; background-color:white;">
@@ -405,16 +408,12 @@
 	}
 
 	function informOfflineStatus(){
-
 		//
 		if( navigator.onLine ){
 			console.log("Navigator is returning ONLINE status.");
-
 		} else {
 			console.log("Navigator is OFFLINE!");
-
 		}
-
 	}
 
 	function setSaveLocationUI(){
@@ -626,11 +625,58 @@
 			if( response_obj.dbase.length > 49999 ){
 				document.getElementById("offline_dbase").innerHTML = response_obj.dbase;
 				console.log("LOCAL COPY OF OFFLINE DBASE NOW SET TO: " + document.getElementById("offline_dbase").innerHTML);
+				// Save fingerprint for background updates.
+				document.getElementById("offline_dbase_fingerprint").innerHTML = fingerprint;
 			}else{
 				console.log("no dbase found");
 			}
 		}else{
 			console.log("invalid fingerprint! might have been CANCELLED.");
+		}
+	}
+
+	async function createNewOfflineDBase(){
+		document.getElementById("load_offline_dbase_label").style.display = "none";
+		document.getElementById("store_offline_dbase_label").style.display = "inline";
+		let new_fingerprint = await getNewOfflineDbaseFingerprint();
+
+		console.log("new fingerprint before regex: " + new_fingerprint);
+		// Only update server if we have a valid fingerprint.
+		const regex = /^[0-9a-f]{64}$/i;
+		if( regex.test(new_fingerprint) ){
+			// Set our potentially newly genrated new_fingerprint.
+			document.getElementById("offline_dbase_fingerprint").innerHTML = new_fingerprint;
+			// Update server.
+			const dbase_update = document.getElementById("offline_dbase").innerHTML;
+			//console.log("UPDATING SERVER STORED OFFLINE DBASE TO: " + dbase_update);
+			// Attempt to store offline dbase to server at fingerprint location.
+			const resp_obj = await serverOfflineDBaseStore(dbase_update, new_fingerprint);
+			console.log("REPONSE FROM SERVER: " + resp_obj.response);
+			if( resp_obj.response === '1'){
+				console.log("SERVER RESPONDED WITH SUCCESS. NEW OFFLINE DBASE SAVED! ");
+				// Inform user that offline dbase was saved.
+				// "Offline Database up to date."
+				document.getElementById("connect_dbase_button").style.display = "none";
+			}
+		}
+	}
+
+	async function serverUpdateOfflineDBase(){
+		const dbase_reference = document.getElementById("offline_dbase_fingerprint").innerHTML;
+		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
+
+		const regex = /^[0-9a-f]{64}$/i;
+		if( regex.test(dbase_reference) && offline_dbase.length > 49999 ){
+			// Data looks good for update.
+			const resp_obj = await serverOfflineDBaseStore(offline_dbase, dbase_reference);
+			console.log("REPONSE FROM SERVER: " + resp_obj.response);
+			if( resp_obj.response === '1'){
+				console.log("SERVER RESPONDED WITH SUCCESS STATUS!");
+				// Inform user that offline dbase was saved.
+				// "Offline Database up to date."
+			}
+		}else{
+			console.log("SERVER UPDATE FAILED! Data doesn't look valid.");
 		}
 	}
 
@@ -780,25 +826,14 @@
 			let new_fingerprint;
 			// Ask if user wants to set up new server save of user specific offline dbase.
 			if( document.getElementById("offline_dbase_fingerprint").innerHTML == "" ){
-				// empty offline dbase fingerprint means default just got its first modify!
-				// compute and save fingerprint which will be offline dbase reference.
-				document.getElementById("load_offline_dbase_label").style.display = "none";
-				document.getElementById("store_offline_dbase_label").style.display = "inline";
-				new_fingerprint = await getNewOfflineDbaseFingerprint();
+				// If we don't have a fingerprint saved, show user button so they can add one if they like and aren't forced to.
+				document.getElementById("connect_dbase_button").style.display = "inline";
 			}else{
+				serverUpdateOfflineDBase();
 				// Already have a reference for user specific offline dbase; use it.
-				new_fingerprint = document.getElementById("offline_dbase_fingerprint").innerHTML;
+				//new_fingerprint = document.getElementById("offline_dbase_fingerprint").innerHTML;
 			}
 /*
-		const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
-		if( regex.test(input) ){
-			// Return true/valid: non-b58 chars were NOT found.
-			return 1;
-		}else{
-			// Return false/invalid: non-b58 chars were found.
-			return 0;
-		}
-*/
 			console.log("new fingerprint before regex: " + new_fingerprint);
 			// Only update server if we have a valid fingerprint.
 			const regex = /^[0-9a-f]{64}$/i;
@@ -817,7 +852,7 @@
 					// "Offline Database up to date."
 				}
 			}
-
+*/
 			return 1;
 		}
 
