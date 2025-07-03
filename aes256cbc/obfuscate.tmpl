@@ -404,9 +404,10 @@
 		current_save_location = '';
 		special_button_flag = 'false';
 		setSaveLocationUI();
-		informOfflineStatus();
+		//informOfflineStatus();
+		updateOnlineStatus();
 	}
-
+/*
 	function informOfflineStatus(){
 		//
 		if( navigator.onLine ){
@@ -415,7 +416,7 @@
 			console.log("Navigator is OFFLINE!");
 		}
 	}
-
+*/
 	function setSaveLocationUI(){
 		// Show or Hide Special Store Thread UI indicator
 		if( save_location_thread_flag === 'true' ){
@@ -595,18 +596,41 @@
 
 	// Automatically run this function when page loads.
 	window.onload = async function() {
-	//window.onload = function() {
 
-		// A command like this will clobber the server save of the offline database.
-		//await serverOfflineDBaseStore("lulz");
-/*
-		// Set it to the hardcode for testing 
-		const dbase = document.getElementById("offline_dbase").innerHTML;
-		console.log("SET OFFLINE DBASE TO: " + dbase);
-		await serverOfflineDBaseStore(dbase);
-*/
+		await updateOnlineStatus();
 	}
 
+	async function updateOnlineStatus(){
+		document.getElementById("offline_label").innerHTML = "ONLINE STATUS PENDING...";
+		// Check if we're online
+		const online_status = await checkOnline();
+
+		console.log("Updating Online Status...");
+		if( online_status === "online" ){
+			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
+		}else{
+			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
+		}
+	}
+
+
+	async function checkOnline(){
+		const SERVER_URL = 'https://chat.dance/obf';
+		
+		console.log("Checking Online...");
+		const response = await fetch(SERVER_URL)
+		.catch((error) => {
+			console.log("Fetch Error on Online Check: " + error.message);
+			console.log("response FAILED");
+			return "offline";
+		});
+		if( response.ok ){
+			console.log("response OK");
+			return "online";
+		} else {
+			console.log("HTTP error. Status: " + response.status);
+		}
+	}
 
 
 	// 
