@@ -12,6 +12,10 @@ use DBI;
 #my $db_table_chat_messages = 'chat_messages';
 #my $db_table_contact_messages = 'contact_messages';
 
+##########################################################
+# This script kept mostly as a reference to SQL structure.
+##########################################################
+
 # Set SQL server/production variables
 my $db_username = 'chatriwe_admin';
 my $db_pw = 'Vuu_fQY1#qH,';
@@ -26,7 +30,7 @@ $dbh->disconnect;
 
 # Create database
 my $dbh = DBI->connect('dbi:MariaDB:', $db_username, $db_pw);
-$dbh->do("CREATE TABLE IF NOT EXISTS $db_table_offline_dbase (dbase VARCHAR(50000), name VARCHAR(10), PRIMARY KEY(name))");
+$dbh->do("CREATE TABLE IF NOT EXISTS offline_dbase (dbase VARCHAR(50000), reference VARCHAR(64), PRIMARY KEY(reference));");
 $dbh->disconnect;
 
 $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);

@@ -24,15 +24,15 @@ if ($q->param){
 	# Decode to hash ref to extract data.
 	my $hash_ref = $json->decode($q->param('POSTDATA'));
 	# test or otherwise
-	my $dbase_key = $hash_ref->{dbase_key};
+	my $fingerprint = $hash_ref->{fingerprint};
 
 	# Start with a test dbase.
-	#my $dbase_key = "test";
+	#my $fingerprint = "test";
 	my $dbase;
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	my $query = "SELECT dbase FROM $db_table WHERE name = ?";
+	my $query = "SELECT dbase FROM $db_table WHERE reference = ?";
 	my $sth = $dbh->prepare($query);
-	$sth->execute($dbase_key);
+	$sth->execute($fingerprint);
 	while ( my $row = $sth->fetchrow_hashref ){
 		$dbase = $row->{dbase};
 	}
@@ -47,6 +47,7 @@ if ($q->param){
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "OFFLINE_DBASE GET\n";
 	print $fh "$time\n";
+	print $fh "$fingerprint\n";
 
 	# Notify of success or failure
 	print $q->header();

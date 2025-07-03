@@ -290,7 +290,7 @@ Multiline Comment Reminder
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_text')">DELETE DATA</button>
 				</div>
 				<div class="" id="special_button_div" style="display:flex;">
-					<button class="special_thread_button" id='' style="flex-grow:1;" onclick="specialStoreThread()">SAVE NEW DATA TO SAVE LOCATION</button>
+					<button class="special_thread_button" id='' style="display:none; flex-grow:1;" onclick="specialStoreThread()">SAVE NEW DATA TO SAVE LOCATION</button>
 				</div>
 			</div>
 
@@ -321,7 +321,7 @@ Multiline Comment Reminder
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_download')">DELETE DATA</button>
 				</div>
 				<div class="" id="special_button_div" style="display:flex;">
-					<button class="special_thread_button" id='' style="flex-grow:1;" onclick="specialStoreThread()">SAVE NEW DATA TO SAVE LOCATION</button>
+					<button class="special_thread_button" id='' style="display:none; flex-grow:1;" onclick="specialStoreThread()">SAVE NEW DATA TO SAVE LOCATION</button>
 				</div>
 			</div>
 
