@@ -82,10 +82,10 @@ Multiline Comment Reminder
 				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 				<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
 					<label>Encrypt:</label>
-					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -p -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 					<br>
 					<label>Decrypt:</label>
-					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -p -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.dec</span></label>
+					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="width:250px;" onclick="showPage('store_choose')">BACK</button>
@@ -302,10 +302,10 @@ Multiline Comment Reminder
 					<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 					<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
 						<label>Encrypt:</label>
-						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -p -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 						<br>
 						<label>Decrypt:</label>
-						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -p -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.dec</span></label>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
 					</div>
 					<div id="overlay_download" class="deletecheck" style="">
 						<h2>Are you sure you want to delete this data?</h2> 
