@@ -224,7 +224,7 @@
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
-				<h1 id="titletext">SECRETWORD</h1>
+				<a id="titletext" style="font-size: 30px" href="https://chat.dance/obf">SECRETWORD</a>
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
@@ -277,9 +277,9 @@
 <script>
 
 	// Set Title to link to Home.
-	document.getElementById("titletext").onclick = function() {
-		location.href = "https://chat.dance/obf";
-	}
+	//document.getElementById("titletext").onclick = function() {
+		//location.href = "https://chat.dance/obf";
+	//}
 	// later
 	document.getElementById("howworks").onclick = function() {
 		location.href = "https://chat.dance/obf/how";
@@ -404,6 +404,9 @@
 		setSaveLocationUI();
 		//informOfflineStatus();
 		updateOnlineStatus();
+		// Clear uploaded file
+		document.getElementById("store_upload_input").value = null;
+
 	}
 /*
 	function informOfflineStatus(){
@@ -548,12 +551,20 @@
 
 		reader.onload = function(e){
 			let buffer = e.target.result;
-			buffer = new Uint8Array(buffer);
-			let filedata = bytesToBase64(buffer);
+console.log("init buffer size: " + buffer.length);
+console.log("init buffer: " + buffer);
+			const buffer_uint8a = new Uint8Array(buffer);
+console.log("new buffer size: " + buffer_uint8a.length);
+console.log("new buffer: " + buffer_uint8a);
+			let filedata = bytesToBase64(buffer_uint8a);
+			//let filedata = bytesToBase64(buffer_uint8a);
+console.log("filedata size (calculated bytes): " + filedata.length );
+console.log("filedata: " + filedata);
 			debug("Data Flow catchUpload() -- uploaded file content:");
 			debug(filedata);
 			// Input Data Length Check
-			if( checkInputLength(filedata) ){
+			//if( checkInputLength(filedata) ){
+			if( checkInputLength(buffer) ){
 				// Data Length within parameters
 				document.getElementById("upload_data").value = filedata;
 				document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "none");
@@ -1018,7 +1029,7 @@
 		debug("Access Server Response, data: " + sr_load.data);
 		// If there is no data attached to this fingerprint, show nothing.
 		if( sr_load.data == "" ){
-			showPage('load_text');
+			showPage('failed_to_access');
 			return;
 		}
 
@@ -1823,6 +1834,7 @@
 
 		// show input size in bytes
 		let size = new Blob([input]).size;
+console.log("check Input length size: " + size);
 		//debug("Input (blob) size: " + size);
 		//debug("byte size: " + size);
 		//if( input.length > 500 ){

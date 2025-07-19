@@ -325,6 +325,12 @@ Multiline Comment Reminder
 				</div>
 			</div>
 
+			<div class="gen failed_to_access" id="failed_to_access" style="display:none">
+				<label>&#10005; FAILED TO ACCESS</label>
+				<div class="button_pair" id="" style="display:flex;">
+				</div>
+			</div>
+
 			<div class="gen delete five" id="delete5" style="display:none">
 				<label>&#10004; SUCCESS</label>
 				<div class="button_pair" id="" style="display:flex;">
