@@ -25,7 +25,9 @@ if ($q->param){
 	my $hash_ref = $json->decode($q->param('POSTDATA'));
 	my $fingerprint = $hash_ref->{fingerprint};
 	my $data = $hash_ref->{data};
-	my $upload_flag = $hash_ref->{upload_flag};
+
+	# Get user ip.
+	my $ip = $ENV{REMOTE_ADDR};
 
 	# Get current time for log.
 	my $t = localtime;
@@ -36,9 +38,9 @@ if ($q->param){
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "STORE\n";
 	print $fh "$time\n";
+	print $fh "$ip\n";
 	print $fh "fingerprint: $fingerprint\n";
 	print $fh "data: $data\n";
-	print $fh "upload_flag: $upload_flag\n\n";
 
 	# Return fail if data isn't in the proper form.
 	# Match exactly 64 hex chars, (i)gnoring case.      Match exactly 1000 base58 chars.
@@ -51,10 +53,10 @@ if ($q->param){
 
 	# First try to create new record. If that fails, modify the existing one.
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data, upload_flag) VALUES (?, ?, ?)", undef, $fingerprint, $data, $upload_flag);
+	my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $fingerprint, $data, $ip);
 	# undef return indicates we need to modify the record instead.
 	if(not defined $response){
-		$response = $dbh->do("UPDATE $db_table SET data=?, upload_flag=? WHERE fingerprint=?", undef, $data, $upload_flag, $fingerprint) or die $dbh->errstr;
+		$response = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $data, $ip, $fingerprint) or die $dbh->errstr;
 	}
 	$dbh->disconnect();
 

@@ -25,6 +25,9 @@ if ($q->param){
 	my $hash_ref = $json->decode($q->param('POSTDATA'));
 	my $fingerprint = $hash_ref->{fingerprint};
 
+	#f Get user ip.
+	my $ip = $ENV{REMOTE_ADDR};
+
 	# Return fail if data isn't in the proper form.
 	# Match exactly 64 hex chars, (i)gnoring case.
 	if( !($fingerprint =~ /^[0-9a-f]{64}$/i) ){
@@ -37,12 +40,11 @@ if ($q->param){
 	my $data = '';
 	my $upload_flag= '';
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	my $query = "SELECT data, upload_flag FROM $db_table WHERE fingerprint = ?";
+	my $query = "SELECT data FROM $db_table WHERE fingerprint = ?";
 	my $sth = $dbh->prepare($query);
 	$sth->execute($fingerprint);
 	while ( my $row = $sth->fetchrow_hashref ){
 		$data = $row->{data};
-		$upload_flag = $row->{upload_flag};
 	}
 
 	# Get current time for log.
@@ -54,14 +56,14 @@ if ($q->param){
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "LOAD\n";
 	print $fh "$time\n";
+	print $fh "$ip\n";
 	print $fh "fingerprint: $fingerprint\n";
 	print $fh "data: $data\n";
-	print $fh "upload_flag: $upload_flag\n\n";
 
 	# 
 	print $q->header();
 	#print qq{{"response":"$data"}};
-	print qq{{"data":"$data","upload_flag":"$upload_flag"}};
+	print qq{{"data":"$data"}};
 }
 
 

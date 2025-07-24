@@ -837,17 +837,14 @@ console.log("filedata: " + filedata);
 		//}
 	
 		let encrypted_data;
-		let upload_flag_db;
 		// Use flag set by storeUpload() to determine which enc stack to use.
 		if( upload_flag == 'true' ){
 			// Grab upload_flag value for server database flag.
-			upload_flag_db = '1';
 			// Double Encrypt
 			encrypted_data = await encryptDouble(uploadtext, pass_2, pass_3);
 			// reset flag once it is used
 			upload_flag = 'false';
 		}else{
-			upload_flag_db = '0';
 			// Triple Encrypt
 			encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
 		}
@@ -895,7 +892,7 @@ console.log("filedata: " + filedata);
 			throw new Error('Fingerprint length INVALID!');
 		}
 		// Use fetch() for server communication
-		const server_response = await serverStore(fp_hex, encrypted_data, upload_flag_db);
+		const server_response = await serverStore(fp_hex, encrypted_data);
 		sr_store_result = server_response.response;
 		debug("Server Handling - deepStore() -- Response from STORE: " + "~" + sr_store_result + "~");
 		// Store returned 0 (fail).
@@ -1146,7 +1143,7 @@ console.log("filedata: " + filedata);
 	// input encrypted data at the input fingerprint location.
 	// Inputs: fingerprint is hex, data is base58.
 	// Output: POST message to server script which will attempt to Store.
-	async function serverStore(fingerprint, data, upload_flag_db){
+	async function serverStore(fingerprint, data){
 		const SERVER_URL = 'https://chat.dance/obf/exestore';
 		
 		//debug("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
@@ -1159,7 +1156,6 @@ console.log("filedata: " + filedata);
 			body: JSON.stringify({
 				fingerprint: fingerprint,
 				data: data,
-				upload_flag: upload_flag_db,  // Usually I like to make sure these are identical.
 			}),
 		})
 		return response.json()
