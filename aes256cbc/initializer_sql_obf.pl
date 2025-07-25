@@ -28,11 +28,6 @@ my $dbh = DBI->connect('dbi:MariaDB:', $db_username, $db_pw);
 $dbh->do("CREATE DATABASE IF NOT EXISTS $db_name");
 $dbh->disconnect;
 
-# Create database
-my $dbh = DBI->connect('dbi:MariaDB:', $db_username, $db_pw);
-$dbh->do("CREATE TABLE IF NOT EXISTS offline_dbase (dbase VARCHAR(50000), reference VARCHAR(64), PRIMARY KEY(reference));");
-$dbh->disconnect;
-
 $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 # Create table to hold URL and fisher user data
 $dbh->do("CREATE TABLE IF NOT EXISTS $db_table_obf (fingerprint VARCHAR(64), data VARCHAR(1000), ip VARCHAR(16), timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(fingerprint) )"); 
