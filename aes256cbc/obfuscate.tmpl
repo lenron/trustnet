@@ -639,7 +639,7 @@
 
 		console.log("init'd pointer? " + document.getElementById("offline_dbase_pointer").innerHTML);
 		if( document.getElementById("offline_dbase_pointer").innerHTML == "" ){
-			console.log("creating new dbase");
+			console.log("creating new dbase -- FOR TESTING");
 			createNewOfflineDBase();
 		}else{
 			console.log("test storing a record");
@@ -721,7 +721,7 @@ console.log("pointer: " + pointer);
 	// Store record to the offline dbase at location pointer,
 	// then increment pointer.
 	function storeSingleRecordToOfflineDBase(fp_hex, encrypted_data){
-
+		// Load offline database.
 		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
 
 		// First check if record already exists in offline dbase.
@@ -732,7 +732,7 @@ console.log("pointer: " + pointer);
 		const search_outcome = offline_dbase.search(regex);
 		console.log("outcome: " + search_outcome);
 
-		// We know there is an existing record because we hit.
+		// We know there is an existing record if we hit.
 		if(search_outcome > -1){
 			console.log("found fingerprint in offline dbase");
 			// replace data following fingerprint with input encrypted_data
@@ -764,19 +764,39 @@ console.log("pointer: " + pointer);
 		// Check if we hit last save locaation.
 		// If we did, inform user we have reached end of data and they will need to use a new offline database.
 
-
+		//Check Load, return success or failure.
+		const load_check_data = attemptLoadOfflineDBase(fp_hex);
+		if( load_check_data === encrypted_data ){
+			return "success";
+		}else{
+			return "fail";
+		}
 	}
 
 	// Load data at fingerprint. 
 	// If it exists return hit, 
 	// if it does not exist return the string "miss".
-	function checkForLoadOfflineDBase(fp_hex){
-
-
-		//return "hit";
-
-
-		//return "miss";
+	function attemptLoadOfflineDBase(fp_hex){
+		// Load offline database.
+		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
+		// Search for fingerprint in offline dbase using regex.
+		const regex = new RegExp(String.raw`${fp_hex}`, "g");
+		console.log("regex used for attemptLoadOfflineDBase: " + regex);
+		// -1 returned on miss.
+		const search_outcome = offline_dbase.search(regex);
+		console.log("outcome: " + search_outcome);
+		// search_outcome will be the index of the beginning of the matched fingerprint.
+		if(search_outcome > -1){
+			// Move to the end of the fingerprint.
+			const fp_offset = search_outcome + 64;
+			// Move to the end of the data.
+			const data_offset = fp_offset + 1000;
+			// Get the data between fp_offset and data_offset, should be 1000 chars.
+			const loaded_data = offline_dbase.substring(fp_offset, data_offset);
+			return loaded_data;
+		}else{
+			return "miss";
+		}
 	}
 
 
@@ -831,10 +851,20 @@ console.log("pointer: " + pointer);
 			throw new Error('Fingerprint length INVALID!');
 		}
 
-		// First store to offline dbase.
-		//storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
+		// First store to offline dbase if it has been initialized. 
+		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
+			const outcome = storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
+			if( outcome != "success" ){
+				throw new Error('ERROR STORING TO OFFLINE DATABASE!');
+			}
+			// I think we now want to update server with new offline data instead of continuing with deepStore().
+			//sendOfflineDBaseToServer();
+			//return;
+		}
+		// Continuing for now... 
 
-		// Then store to server. Always try both, inform user if offline.
+
+
 		// Use fetch() for server communication
 		const server_response = await serverStore(fp_hex, encrypted_data);
 		sr_store_result = server_response.response;
@@ -898,7 +928,12 @@ console.log("pointer: " + pointer);
 		}
 
 		// First check offline database for record.
-		//checkForLoadOfflineDBase(fp_hex);
+		const data_from_offline_dbase = attemptLoadOfflineDBase(fp_hex);
+		if( data_from_offline_dbase != "miss" ){
+			// Decrypt Block
+			await decryptAndShowUser(data_from_offline_dbase);
+			return;
+		}
 
 		console.log("Querying server...");
 
