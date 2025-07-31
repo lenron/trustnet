@@ -11,10 +11,10 @@
 <style>
 
 	* {
-	  font-family: "Orbitron", serif;
-	  font-optical-sizing: auto;
-	  font-weight: 600;
-	  font-style: normal;
+		font-family: "Orbitron", serif;
+		font-optical-sizing: auto;
+		font-weight: 600;
+		font-style: normal;
 	}
 
 	html {
@@ -247,7 +247,7 @@
 		</div>
 	</div>
 	<div style="display:flex; flex-direction:column;">
-		<button id="connect_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBase()">CREATE NEW OFFLINE DBASE</button>
+		<button id="connect_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseThread()">CREATE NEW OFFLINE DBASE</button>
 		<div style="display:flex">
 			<button id="toggle_debug_button" style="flex-grow:1" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
 			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
@@ -271,7 +271,7 @@
 
 	<!-- Default Offline Database. Access with 4x 'secret' --!>
 	<p id="offline_dbase" style="display:none"></p>
-	<p id="offline_dbase_fingerprint" style="display:none"></p>
+	<p id="offline_dbase_pointer" style="display:none"></p>
 
 </body>
 <script>
@@ -594,18 +594,6 @@
 		}
 	}
 
-	// Automatically run this function when page loads.
-	window.onload = async function() {
-
-		await updateOnlineStatus();
-
-		// testing
-		//getRandFingerprint();
-		//getRandData();
-		const test_offline_dbase = createNewOfflineDBase();
-		console.log("test offline dbase creation: " + test_offline_dbase);
-	}
-
 	async function updateOnlineStatus(){
 		document.getElementById("offline_label").innerHTML = "ONLINE STATUS PENDING...";
 		// Check if we're online
@@ -638,20 +626,61 @@
 		}
 	}
 
+	// Automatically run this function when page loads.
+	window.onload = async function() {
+
+		await updateOnlineStatus();
+
+		// testing
+		//getRandFingerprint();
+		//getRandData();
+		//const test_offline_dbase = createNewOfflineDBase();
+		//console.log("test offline dbase creation: " + test_offline_dbase);
+
+		console.log("init'd pointer? " + document.getElementById("offline_dbase_pointer").innerHTML);
+		if( document.getElementById("offline_dbase_pointer").innerHTML == "" ){
+			console.log("creating new dbase");
+			createNewOfflineDBase();
+		}else{
+			console.log("test storing a record");
+			storeSingleRecordToOfflineDBase("hihihi", "thedata");	
+		}
+
+		//console.log("test offline dbase data: " + document.getElementById("offline_dbase").innerHTML);
+		//console.log("test offline dbase pointer: " + document.getElementById("offline_dbase_pointer").innerHTML);
+	}
+
+	// Gather passwords to access existing records and gather them into a new offline dbase.
+	function createNewOfflineDBaseThread(){
+		
+		//createNewOfflineDBase();
+
+		// activate some html
+	
+		// loop over till user is done:	
+			// gather passwords 
+			// access data on server w/ those passwords
+			// store that data to offline dbase
+			//storeSingleRecordToOfflineDBase(fp, data);
+	}
+
 	// fill a new offline dbase with random fingerprints and datas.
 	function createNewOfflineDBase(){
 		// init pointer
-
+		const pointer = randomInt(0,90);
+console.log("pointer: " + pointer);
+		// I think this should work?
+		document.getElementById("offline_dbase_pointer").innerHTML = pointer;
 		
 		let offline_dbase = "";			// Init string.
-		let number_of_records = 100; 	// database size
-		let offset = 1064;				// 64 fingerprint hex chars followed by 1000 base58.
+		const number_of_records = 100; 	// database size
 
 		for(let i=0; i < number_of_records; i++ ){
 			offline_dbase += getRandFingerprint();	// Add a new random fingerprint.
 			offline_dbase += getRandData();			// Add a set of random data.
 		}
-		return offline_dbase;
+		//return offline_dbase;
+		document.getElementById("offline_dbase").innerHTML = offline_dbase;
 	}
 
 	// get 64 hex chars for a random fingerprint.
@@ -666,7 +695,7 @@
 			//console.log("random hex char: ~" + random_hex_char + "~");
 			new_fingerprint += random_hex_char;
 		}
-		console.log("completed random fingerprint: " + new_fingerprint);
+		//console.log("completed random fingerprint: " + new_fingerprint);
 		return new_fingerprint;
 	}
 
@@ -682,46 +711,68 @@
 			//console.log("random b58 char: " + random_b58_char);
 			new_data += random_b58_char;
 		}
-		console.log("completed random data: " + new_data);
+		//console.log("completed random data: " + new_data);
 		return new_data;
 	}
 
+	// Store record to the offline dbase at location pointer,
+	// then increment pointer.
+	function storeSingleRecordToOfflineDBase(fp_hex, encrypted_data){
 
-	/**
-	 * Returns a cryptographically secure random integer between min and max, inclusive.
-	 * Converted from stackoverflow.
-	 *
-	 * @param {number} min - the lowest integer in the desired range (inclusive)
-	 * @param {number} max - the highest integer in the desired range (inclusive)
-	 * @returns {number} Random number
-	 */
+		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
 
-	function randomInt(min, max){
-		const MAX_RANGE_SIZE = 2 ** 53;
-		const buffer = new Uint32Array(1024);
-		let offset = buffer.length;
+		// First check if record already exists in offline dbase.
+		const regex = new RegExp(String.raw`${fp_hex}`, "g");
+		console.log("regex used for storeSingleRecordToOfflineDBase: " + regex);
 
-		if (!(Number.isSafeInteger(min) && Number.isSafeInteger(max))) {
-			throw Error("min and max must be safe integers");
+		// -1 returned on miss.
+		const search_outcome = offline_dbase.search(regex);
+		console.log("outcome: " + search_outcome);
+
+		// We know there is an existing record because we hit.
+		if(search_outcome > -1){
+			console.log("found fingerprint in offline dbase");
+			// replace data following fingerprint with input encrypted_data
+			const fp_offset = search_outcome + 64;
+			const offset_end = search_outcome + 1064;
+			const replacement_offline_dbase = offline_dbase.substring(0, fp_offset) + encrypted_data + offline_dbase.substring(offset_end);
+			document.getElementById("offline_dbase").innerHTML = replacement_offline_dbase;
+			return;
 		}
-		if (min > max) {
-			throw Error("min must be less than or equal to max");
-		}
-		const rangeSize = max - min + 1;
-		if (rangeSize > MAX_RANGE_SIZE) {
-			throw Error("(max - min) must be <= Number.MAX_SAFE_INTEGER");
-		}
-		const rejectionThreshold = MAX_RANGE_SIZE - (MAX_RANGE_SIZE % rangeSize);
-		let result;
-		do {
-			if ((offset + 1) >= buffer.length) {
-				crypto.getRandomValues(buffer);
-				offset = 0;
-			}
-			result = (buffer[offset++] & 0x1f_ffff) * 0x1_0000_0000 + buffer[offset++];
-		} while (result >= rejectionThreshold);
-		return min + result % rangeSize;
+
+//let dbase_update = dbase.substring(0, offset) + encrypted_data + dbase.substring(offset_end);
+
+		// First check if fp exists. replace and you're done in this case.
+		// use regex to check database block for fingerprint (don't check if outside pointer)
+		// 
+
+		// otherwise input at pointer
+
+
+		//const offset = 1064;				// 64 fingerprint hex chars followed by 1000 base58.
+
+//		const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
+//		if( regex.test(input) ){
+
+		//const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
+		//if( regex.test(input) ){
+		
+
+
 	}
+
+	// Load data at fingerprint. 
+	// If it exists return hit, 
+	// if it does not exist return the string "miss".
+	function checkForLoadOfflineDBase(fp_hex){
+
+
+		//return "hit";
+
+
+		//return "miss";
+	}
+
 
 	//////////////////////////////////////////////////////////////
 	//			Main Handler Functions						    //
@@ -773,6 +824,11 @@
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
 		}
+
+		// First store to offline dbase.
+		//storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
+
+		// Then store to server. Always try both, inform user if offline.
 		// Use fetch() for server communication
 		const server_response = await serverStore(fp_hex, encrypted_data);
 		sr_store_result = server_response.response;
@@ -834,6 +890,10 @@
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
 		}
+
+		// First check offline database for record.
+		//checkForLoadOfflineDBase(fp_hex);
+
 		console.log("Querying server...");
 
 		// Load from server
@@ -1686,6 +1746,42 @@
 		return hexArrayBuffer;
 	}//hex2buf()
 
+	/**
+	 * Returns a cryptographically secure random integer between min and max, inclusive.
+	 * Converted from stackoverflow.
+	 *
+	 * @param {number} min - the lowest integer in the desired range (inclusive)
+	 * @param {number} max - the highest integer in the desired range (inclusive)
+	 * @returns {number} Random number
+	 */
+
+	function randomInt(min, max){
+		const MAX_RANGE_SIZE = 2 ** 53;
+		const buffer = new Uint32Array(1024);
+		let offset = buffer.length;
+
+		if (!(Number.isSafeInteger(min) && Number.isSafeInteger(max))) {
+			throw Error("min and max must be safe integers");
+		}
+		if (min > max) {
+			throw Error("min must be less than or equal to max");
+		}
+		const rangeSize = max - min + 1;
+		if (rangeSize > MAX_RANGE_SIZE) {
+			throw Error("(max - min) must be <= Number.MAX_SAFE_INTEGER");
+		}
+		const rejectionThreshold = MAX_RANGE_SIZE - (MAX_RANGE_SIZE % rangeSize);
+		let result;
+		do {
+			if ((offset + 1) >= buffer.length) {
+				crypto.getRandomValues(buffer);
+				offset = 0;
+			}
+			result = (buffer[offset++] & 0x1f_ffff) * 0x1_0000_0000 + buffer[offset++];
+		} while (result >= rejectionThreshold);
+		return min + result % rangeSize;
+	}
+
 	//////////////////////////////////////////
 	//				Logging
 	//////////////////////////////////////////
@@ -1733,8 +1829,6 @@
 
 		document.body.removeChild(element);
 	}
-
-
 
 	// Logging function found on stackoverflow
 	// For security, if function setDebug(true) isn't called, debug(log_message) will do nothing.
@@ -1895,7 +1989,6 @@
 		return bytes;
 	}
 
-
 	function bytesToWords( bytes ){
 		words = new Array();
 		let upper;
@@ -1927,7 +2020,6 @@
 		}
 		return words;
 	}
-
 
 </script>
 
