@@ -26,6 +26,7 @@ RewriteRule ^how obfuscate.pl?id=how
 RewriteRule ^exestore store.pl
 RewriteRule ^exeload load.pl
 RewriteRule ^exedelete delete.pl
+RewriteRule ^exeburststore burst_store.pl
 # Redirects for Offline Database
 #RewriteRule ^exe_offline_set set_offline_dbase.pl
 #RewriteRule ^exe_offline_get get_offline_dbase.pl

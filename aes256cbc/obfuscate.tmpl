@@ -651,8 +651,8 @@
 		if( document.getElementById("offline_dbase_pointer").innerHTML == "" ){
 			console.log("creating new dbase -- FOR TESTING");
 			createNewOfflineDBase();
-			const returned = convertOfflineDBaseToJSONString();
-			console.log("dbase jsonized: " + returned);
+			//const returned = convertOfflineDBaseToJSONString();
+			//console.log("dbase jsonized: " + returned);
 		}else{
 			console.log("test storing a record");
 			storeSingleRecordToOfflineDBase("hihihi", "thedata");	
@@ -880,11 +880,19 @@ console.log("pointer: " + pointer);
 					throw new Error('ERROR STORING TO OFFLINE DATABASE!');
 				}
 				// I think we now want to update server with new offline data instead of continuing with deepStore().
-				//sendOfflineDBaseToServer();
-				//return;
+				const burst_save_response = await sendOfflineDBaseToServer();
+				console.log("burst response: " + burst_save_response.response);
+				//await sendOfflineDBaseToServer();
+				// Not sure yet how I want to check that it worked.
+				//return 1;
+				if( burst_save_response.response === "success"){
+					return 1;
+				}else{
+					return 0;
+					// Maybe delete the record if it fails to load correctly?
+				}
 			}
 		}
-		// Continuing for now... 
 
 
 		// Use fetch() for server communication
@@ -1106,6 +1114,7 @@ console.log("pointer: " + pointer);
 		const offline_dbase_pointer = document.getElementById("offline_dbase_pointer").innerHTML;
 
 		// Compose the flat json string manually.
+		//let offline_dbase_json_flat = '{"records":[';
 		let offline_dbase_json_flat = '{"records":[';
 
 		let fp_start;
@@ -1119,54 +1128,33 @@ console.log("pointer: " + pointer);
 			offline_dbase_json_flat += '{"fingerprint":"' + offline_dbase.substring(fp_start, fp_end) + '",';
 			offline_dbase_json_flat += '"data":"' + offline_dbase.substring(fp_end, data_end) + '"},';
 		}
+		// Remove last error causing comma , 
+		offline_dbase_json_flat = offline_dbase_json_flat.slice(0, -1);
 		offline_dbase_json_flat += ']}';
 
 		return offline_dbase_json_flat;
 	}
-//json_flat = '{"page":"1","total":"2","ids":[{"id":"3085"},{"id":"3086"}]}';
-			//const fp_offset = search_outcome + 64;
-			//const offset_end = search_outcome + 1064;
-			//const replacement_offline_dbase = offline_dbase.substring(0, fp_offset) + encrypted_data + offline_dbase.substring(offset_end);
 
-
-	// Inputs: 
-	// Output: 
+	// Inputs: none but pulls data from offline dbase object.
+	// Output: sends a json string representation of the offline dbase 
+	// 		to server where it will be decoded and saved.
 	async function sendOfflineDBaseToServer(){
 		// Need a JSon object -- records: [ fp: fp, data: data ]
-		// Actually just make the string in a separate function
+		// Make the string in a separate function.
 		let offline_dbase_json_string = convertOfflineDBaseToJSONString();
+		console.log("manually composed json string: " + offline_dbase_json_string);
 
-		const SERVER_URL = 'https://chat.dance/obf/exestore';
-		//debug("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
-		debug("serverStore() -- Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
+		const SERVER_URL = 'https://chat.dance/obf/exeburststore';
+		//debug("Attempting Server BURST Store of the Offline Database.");
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/plain',
 			},
-		/*	body: JSON.stringify({
-				fingerprint: fingerprint,
-				data: data,
-			}),
-		*/
 			body: offline_dbase_json_string,
 		})
 		return response.json()
 	}//sendOfflineDBaseToServer()
-
-
-/*	target format
-			body: JSON.stringify({
-				"records": [
-					{
-						fingerprint: fingerprint,
-						data: data,
-					}
-				]
-			}),
-*/
-
-
 
 	// Endpoint /obf/exedelete will attempt to delete.
 	// Input: fingerprint is hexadecimal.
