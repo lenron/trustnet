@@ -94,7 +94,7 @@
 		border-radius: 15px;
 	}
 
-	input {
+	input[type="password"] {
 		height: 80px;
 		width: 95%;
 		background-color: #272727;
@@ -155,7 +155,7 @@
 	/* Responsive Design: When the viewport is fewer than 700px wide, activate the following CSS. */
 	@media screen and (max-width:700px) {
 
-		input {
+		input[type="password"] {
 			width: 90%;
 		}
 
@@ -216,8 +216,6 @@
 		}
 	}
 
-
-
 </style>
 <body>
 
@@ -236,8 +234,24 @@
 			</div>
 		</div>
 	</div>
-	<div class="offline_ui_inform" style="display:flex; justify-content:flex-end;">
-		<label id="offline_label">YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
+	<div id="offline_status_div" style="display:flex; justify-content:space-between;">
+		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
+<!--	Moving this to force user to pick buttons?
+
+		<div id="offline_database_info_div" style="display:flex; flex-direction:column;">
+			<fieldset>
+				<legend>Offline Database ACTIVE. Store to it?</legend>
+				<div>
+					<input type="radio" id="yes_save" name="offline_dbase_radiobuttons" value="yes_save" />
+					<label for="yes_save">YES</label>
+				</div>
+				<div>
+					<input type="radio" id="do_not_save" name="offline_dbase_radiobuttons" value="do_not_save" />
+					<label for="do_not_save">NO</label>
+				</div>
+			</fieldset>
+		</div>
+--!>
 	</div>
 	<div class="center_html" id="center_html">
 		<div class="content_html" id="content_html">
@@ -254,7 +268,7 @@
 		</div>
 	</div>
 
-				<!------ Delete this ---!>
+				<!------ Saving Overlay Page In Case It's Needed Later ---!>
 	<div id="overlay_get_new_fingerprint" style="display:none; justify-content:center; align-items:center; z-index:10; position:absolute; width:100%; height:100%; flex-direction:column; background-color:white;">
 		<h2 id="store_offline_dbase_label">You've successfully stored data to your user-specific Offline Database. If you would like to save it to the server, please enter passwords and hit SUBMIT. If not, hit CANCEL.</h2>
 		<h2 id="load_offline_dbase_label">ENTER PASSWORDS TO ACCESS OFFLINE DATABASE</h2>
@@ -269,7 +283,7 @@
 		</div>
 	</div>
 
-	<!-- Default Offline Database. Access with 4x 'secret' --!>
+	<!-- Offline Database --!>
 	<p id="offline_dbase" style="display:none"></p>
 	<p id="offline_dbase_pointer" style="display:none"></p>
 
@@ -304,7 +318,7 @@
 	//////////////////////////////////////////////////////////////
 	//		UI & Threadwalker Handler Functions					//
 	//////////////////////////////////////////////////////////////
-	// Show target page. 
+	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of an html generated pane.
 	function showPage(target){
 		// Hide all password warnings.
@@ -371,7 +385,7 @@
 				showPage(next_div);
 			}
 		}
-	}
+	} //checkPassLength()
 
 	// Clears all fields that could contain sensitive data.
 	// Resets delete overlay
@@ -454,24 +468,20 @@
 	// Store thread walk finisher.
 	// async needed to handle crypto functionality
 	async function storeExecute(){
-		// Hide classes that match 'store' & 'five'
-		document.querySelectorAll(".store.five").forEach(a=>a.style.display = "none");
-
 		// Main Function Call
 		let outcome = await deepStore();
 
 		if( outcome == 1 ){	//Success
-			// Show page store6
-			document.querySelectorAll(".store.six").forEach(a=>a.style.display = "flex");
+			showPage('store6');
 		}else{	//Fail
-			document.querySelectorAll(".store.seven").forEach(a=>a.style.display = "flex");
+			showPage('store7');
 		}
 
 		// Special Store Thread completed, flag has done its job.
 		if( save_location_thread_flag === 'true' ){
 			save_location_thread_flag = 'false';
 		}
-	}
+	}//storeExecute()
 
 	// User choose text output, set flag to false.
 	function loadDefault(){
@@ -851,18 +861,26 @@ console.log("pointer: " + pointer);
 			throw new Error('Fingerprint length INVALID!');
 		}
 
-		// First store to offline dbase if it has been initialized. 
+
+		// If offline dbase init'd, ask user if they want to store to it or just store normally to the online.
 		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
-			const outcome = storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
-			if( outcome != "success" ){
-				throw new Error('ERROR STORING TO OFFLINE DATABASE!');
+			// First show page
+			showPage('online_or_both_query');
+			// Then wait for user with a custom promise.
+			const user_picked = await waitForContinue();
+			console.log("user picked: " + user_picked);
+			if( user_picked === "yes_store_to_offline" ){
+				console.log("Storing to offline...");
+				const outcome = storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
+				if( outcome != "success" ){
+					throw new Error('ERROR STORING TO OFFLINE DATABASE!');
+				}
+				// I think we now want to update server with new offline data instead of continuing with deepStore().
+				//sendOfflineDBaseToServer();
+				//return;
 			}
-			// I think we now want to update server with new offline data instead of continuing with deepStore().
-			//sendOfflineDBaseToServer();
-			//return;
 		}
 		// Continuing for now... 
-
 
 
 		// Use fetch() for server communication
@@ -889,20 +907,18 @@ console.log("pointer: " + pointer);
 		}
 	}//deepStore()
 
-/*
 	// Leaving this for maybe using later
 	// This custom promise appears to work...
 	function waitForContinue() {
 		return new Promise(resolve => {
-			document.getElementById("continue_new_fingerprint").addEventListener('click', function (e) {
-				resolve("execute");
+			document.getElementById("store_to_both").addEventListener('click', function (e) {
+				resolve("yes_store_to_offline");
 			});
-			document.getElementById("cancel_new_fingerprint").addEventListener('click', function (e) {
-				resolve("cancel");
+			document.getElementById("only_store_to_online").addEventListener('click', function (e) {
+				resolve("no_only_store_to_online");
 			});
 		});
 	}
-*/
 
 	// Main Access Function Handler
 	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.

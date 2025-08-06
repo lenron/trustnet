@@ -187,6 +187,14 @@ Multiline Comment Reminder
 				</div>
 			</div>
 
+			<div class="gen store online_or_both_query" id="online_or_both_query" style="display:none">
+				<h2>OFFLINE DATABASE DETECTED. WOULD YOU LIKE TO STORE THIS DATA TO IT NOW?</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='store_to_both' style="flex-grow:1;">STORE TO OFFLINE DATABASE (BACKED UP BY ONLINE, STORING WILL TRIGGER BURST OBFUSCATION)</button>
+					<button class="" id='only_store_to_online' style="flex-grow:1">STORE ONLY TO ONLINE DATABASE</button>
+				</div>
+			</div>
+
 	<!-- Catch Upload Data --!>
 	<input autocomplete="off" type="password" value="" id="upload_data" style="display:none;">
 <!--  store  --!>
