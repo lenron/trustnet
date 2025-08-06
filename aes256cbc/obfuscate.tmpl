@@ -268,7 +268,7 @@
 		</div>
 	</div>
 
-				<!------ Saving Overlay Page In Case It's Needed Later ---!>
+				<!------ Probably use this for Init Store Thread??  ---!>
 	<div id="overlay_get_new_fingerprint" style="display:none; justify-content:center; align-items:center; z-index:10; position:absolute; width:100%; height:100%; flex-direction:column; background-color:white;">
 		<h2 id="store_offline_dbase_label">You've successfully stored data to your user-specific Offline Database. If you would like to save it to the server, please enter passwords and hit SUBMIT. If not, hit CANCEL.</h2>
 		<h2 id="load_offline_dbase_label">ENTER PASSWORDS TO ACCESS OFFLINE DATABASE</h2>
@@ -651,12 +651,16 @@
 		if( document.getElementById("offline_dbase_pointer").innerHTML == "" ){
 			console.log("creating new dbase -- FOR TESTING");
 			createNewOfflineDBase();
+			const returned = convertOfflineDBaseToJSONString();
+			console.log("dbase jsonized: " + returned);
 		}else{
 			console.log("test storing a record");
 			storeSingleRecordToOfflineDBase("hihihi", "thedata");	
 			storeSingleRecordToOfflineDBase("082abb44e1820841a597ba1eb16bda258667cb7b0dd377a9d92c980aae843ec", "p1KLtZGiAXZZ5wVNQkH6D27nX618x8NcdvnFkJZ6UiYH13tb9UgtB3mbQDxAtXpJppduY7TUjaXZbq2uJf4SBoG3zZNNcs2tFrbfzapUh35Q114pBiML2Xm9yPnBXMRvKwKJEqzzaNtMs5CpgmrPwtMLVPFR53nze5WKZ9AAGAbepcsnaVgpEMJMz2oT8JYYFqs1XTM78SedD4XSxhWVWCByyEKx9LXbpjXVKU9JrASV9GpJpjow55EZzBnRrRqsguUQ6xsMhfVK7564PKXsHKbCD6kfXFowNn2G8n4H77YVFRur7ZADjkdiUtcidQNjDQb2btw1iCo28299pkL36CdCzC8APkjcRoch3tti6KqbQ47W4TgZqEWUApZYg3ydH9AoV2J49wEkpmaqZNozvMdSLmXVMz2j92i8ywD4T3Ywqqg4jV2qgmDjNo8FdL9wgWrAHSuSzAdZerfi94SRcfYibva266bvpe3j79z8GttJPTrFrSwivmTUEeadatkcgK8WCN67zmFbvXgtkQgWuPJsGoYPvfu7eT7vBfzk829yyvXXMojAPBAoST6qSAfYfUtjxBVusGbVUm6eoXgxUhbVnNutewjZQJQjPTEH9CTaQjtkPXTWermizWhvjpgKt27K5XtLQWSHPyGmdQCK2rg25x2cgigpKWwuqhtpd99pGmotijMuJBHoKZFCC1zH1FMHbLZMxm8vSX1zp92Wx1u8S23bJ8KBJim7RxbATNGHbALXE6SSxkEbEEKPCwvFRGTwD8tLZ3ma3AYmWoboERHQjPQmNZJbAA1x7mNkrxppLCTHWJCuYn8Wi7ZBZTaWWpMvM5GpQdK7t7EVmyLQfbTSAUVN74kyqZLBe7CG8rerx9pFZnuphSMnBKwzdzXZvfmept2bhzgvzZ3DGzdHFAu7F6ueKEucDRzBzQ1WfuKozuxntXPhXWjumPnBMTxZsguFMkgP1JMFv6CjETnyhEeGH8ifPmhaifHNWtnqf");	
 			storeSingleRecordToOfflineDBase("999999999999999999999999999999999999999999999999999999999999999", "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzNcdvnFkJZ6UiYH13tb9UgtB3mbQDxAtXpJppduY7TUjaXZbq2uJf4SBoG3zZNNcs2tFrbfzapUh35Q114pBiML2Xm9yPnBXMRvKwKJEqzzaNtMs5CpgmrPwtMLVPFR53nze5WKZ9AAGAbepcsnaVgpEMJMz2oT8JYYFqs1XTM78SedD4XSxhWVWCByyEKx9LXbpjXVKU9JrASV9GpJpjow55EZzBnRrRqsguUQ6xsMhfVK7564PKXsHKbCD6kfXFowNn2G8n4H77YVFRur7ZADjkdiUtcidQNjDQb2btw1iCo28299pkL36CdCzC8APkjcRoch3tti6KqbQ47W4TgZqEWUApZYg3ydH9AoV2J49wEkpmaqZNozvMdSLmXVMz2j92i8ywD4T3Ywqqg4jV2qgmDjNo8FdL9wgWrAHSuSzAdZerfi94SRcfYibva266bvpe3j79z8GttJPTrFrSwivmTUEeadatkcgK8WCN67zmFbvXgtkQgWuPJsGoYPvfu7eT7vBfzk829yyvXXMojAPBAoST6qSAfYfUtjxBVusGbVUm6eoXgxUhbVnNutewjZQJQjPTEH9CTaQjtkPXTWermizWhvjpgKt27K5XtLQWSHPyGmdQCK2rg25x2cgigpKWwuqhtpd99pGmotijMuJBHoKZFCC1zH1FMHbLZMxm8vSX1zp92Wx1u8S23bJ8KBJim7RxbATNGHbALXE6SSxkEbEEKPCwvFRGTwD8tLZ3ma3AYmWoboERHQjPQmNZJbAA1x7mNkrxppLCTHWJCuYn8Wi7ZBZTaWWpMvM5GpQdK7t7EVmyLQfbTSAUVN74kyqZLBe7CG8rerx9pFZnuphSMnBKwzdzXZvfmept2bhzgvzZ3DGzdHFAu7F6ueKEucDRzBzQ1WfuKozuxntXPhXWjumPnBMTxZsguFMkgP1JMFv6CjETnyhEeGH8ifPmhaifHNWtnqf");	
 			storeSingleRecordToOfflineDBase("111111111111111111111111111111111111111111111111111111111111111", "VVVVVVVzzzzzzzzzzzzzzzzzzzzzzzNcdvnFkJZ6UiYH13tb9UgtB3mbQDxAtXpJppduY7TUjaXZbq2uJf4SBoG3zZNNcs2tFrbfzapUh35Q114pBiML2Xm9yPnBXMRvKwKJEqzzaNtMs5CpgmrPwtMLVPFR53nze5WKZ9AAGAbepcsnaVgpEMJMz2oT8JYYFqs1XTM78SedD4XSxhWVWCByyEKx9LXbpjXVKU9JrASV9GpJpjow55EZzBnRrRqsguUQ6xsMhfVK7564PKXsHKbCD6kfXFowNn2G8n4H77YVFRur7ZADjkdiUtcidQNjDQb2btw1iCo28299pkL36CdCzC8APkjcRoch3tti6KqbQ47W4TgZqEWUApZYg3ydH9AoV2J49wEkpmaqZNozvMdSLmXVMz2j92i8ywD4T3Ywqqg4jV2qgmDjNo8FdL9wgWrAHSuSzAdZerfi94SRcfYibva266bvpe3j79z8GttJPTrFrSwivmTUEeadatkcgK8WCN67zmFbvXgtkQgWuPJsGoYPvfu7eT7vBfzk829yyvXXMojAPBAoST6qSAfYfUtjxBVusGbVUm6eoXgxUhbVnNutewjZQJQjPTEH9CTaQjtkPXTWermizWhvjpgKt27K5XtLQWSHPyGmdQCK2rg25x2cgigpKWwuqhtpd99pGmotijMuJBHoKZFCC1zH1FMHbLZMxm8vSX1zp92Wx1u8S23bJ8KBJim7RxbATNGHbALXE6SSxkEbEEKPCwvFRGTwD8tLZ3ma3AYmWoboERHQjPQmNZJbAA1x7mNkrxppLCTHWJCuYn8Wi7ZBZTaWWpMvM5GpQdK7t7EVmyLQfbTSAUVN74kyqZLBe7CG8rerx9pFZnuphSMnBKwzdzXZvfmept2bhzgvzZ3DGzdHFAu7F6ueKEucDRzBzQ1WfuKozuxntXPhXWjumPnBMTxZsguFMkgP1JMFv6CjETnyhEeGH8ifPmhaifHNWtnqf");	
+			//const returned = convertOfflineDBaseToJSONString();
+			//console.log("dbase jsonized: " + returned);
 		}
 
 		//console.log("test offline dbase data: " + document.getElementById("offline_dbase").innerHTML);
@@ -1096,6 +1100,73 @@ console.log("pointer: " + pointer);
 		})
 		return response.json()
 	}//serverStore()
+
+	function convertOfflineDBaseToJSONString(){
+		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
+		const offline_dbase_pointer = document.getElementById("offline_dbase_pointer").innerHTML;
+
+		// Compose the flat json string manually.
+		let offline_dbase_json_flat = '{"records":[';
+
+		let fp_start;
+		let fp_end;
+		let data_end;
+		for(let i=0; i < offline_dbase_pointer; i++ ){
+			fp_start = i * 1064;
+			fp_end = fp_start + 64;
+			data_end = fp_end + 1000;
+
+			offline_dbase_json_flat += '{"fingerprint":"' + offline_dbase.substring(fp_start, fp_end) + '",';
+			offline_dbase_json_flat += '"data":"' + offline_dbase.substring(fp_end, data_end) + '"},';
+		}
+		offline_dbase_json_flat += ']}';
+
+		return offline_dbase_json_flat;
+	}
+//json_flat = '{"page":"1","total":"2","ids":[{"id":"3085"},{"id":"3086"}]}';
+			//const fp_offset = search_outcome + 64;
+			//const offset_end = search_outcome + 1064;
+			//const replacement_offline_dbase = offline_dbase.substring(0, fp_offset) + encrypted_data + offline_dbase.substring(offset_end);
+
+
+	// Inputs: 
+	// Output: 
+	async function sendOfflineDBaseToServer(){
+		// Need a JSon object -- records: [ fp: fp, data: data ]
+		// Actually just make the string in a separate function
+		let offline_dbase_json_string = convertOfflineDBaseToJSONString();
+
+		const SERVER_URL = 'https://chat.dance/obf/exestore';
+		//debug("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
+		debug("serverStore() -- Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/plain',
+			},
+		/*	body: JSON.stringify({
+				fingerprint: fingerprint,
+				data: data,
+			}),
+		*/
+			body: offline_dbase_json_string,
+		})
+		return response.json()
+	}//sendOfflineDBaseToServer()
+
+
+/*	target format
+			body: JSON.stringify({
+				"records": [
+					{
+						fingerprint: fingerprint,
+						data: data,
+					}
+				]
+			}),
+*/
+
+
 
 	// Endpoint /obf/exedelete will attempt to delete.
 	// Input: fingerprint is hexadecimal.
