@@ -283,12 +283,60 @@
 		</div>
 	</div>
 
+				<!------ Create New Offline DBase  ---!>
+	<div id="create_new_offline_dbase_div" style="display:none;">
+		<h2 id="store_offline_dbase_label">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
+		<h3 id="store_offline_dbase_label">Please enter the following passwords to Access the data you wish to be stored in the offline database.</h3>
+		<div style="display:flex; flex-direction:column;">
+			<label id="">ENTER CODEWORD:</label>
+			<input autocomplete="off" type="password"  value="" id="gather_codeword" style="">
+			<label id="">ENTER PASSWORD2:</label>
+			<input autocomplete="off" type="password"  value="" id="gather_password2" style="">
+			<label id="">ENTER PASSWORD3:</label>
+			<input autocomplete="off" type="password"  value="" id="gather_password3" style="">
+		</div>
+		<div style="display:flex; flex-direction:row;">
+			<button id="new_offline_dbase_access_data_button" style="" onclick="accessDataForOfflineDBaseCreation()">SUBMIT PASSWORDS</button>
+			<button id="new_offline_dbase_cancel_button" style="">CANCEL</button>
+		</div>
+	</div>
+
 	<!-- Offline Database --!>
 	<p id="offline_dbase" style="display:none"></p>
 	<p id="offline_dbase_pointer" style="display:none"></p>
 
 </body>
 <script>
+
+	async function accessDataForOfflineDBaseCreation(){
+		const codeword = document.getElementById("gather_codeword").value;
+		const pass_2 = document.getElementById("gather_password2").value;
+		const pass_3 = document.getElementById("gather_password3").value;
+
+
+		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
+		// fingerprint length check
+		if( fp_hex.length != 64 ){
+			throw new Error('Fingerprint length INVALID!');
+		}
+
+		console.log("Querying server...");
+		const sr_load = await serverLoad(fp_hex);
+		debug("Access Server Response, data: " + sr_load.data);
+		// Inform user Access failed.
+		if( sr_load.data == "" ){
+			// Inform user access failed, continue on same page.
+
+		}else{
+			// Add data to new offline dbase
+
+		}
+
+
+	}//deepLoad()
+
+
+	}
 
 	// Set Title to link to Home.
 	//document.getElementById("titletext").onclick = function() {
