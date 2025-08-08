@@ -258,10 +258,30 @@
 
 			<TMPL_VAR NAME=htmlblock>
 
+						<!------ Create New Offline DBase  ---!>
+			<div id="create_new_offline_dbase_div" class="gen" style="display:none; ">
+				<h2 id="create_offline_dbase_label_h2">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
+				<h3 id="create_offline_dbase_label_h3">Please enter the following passwords to Access the data you wish to be stored in the offline database.</h3>
+				<div style="display:flex; flex-direction:column;">
+					<label id="">ENTER CODEWORD:</label>
+					<input autocomplete="off" type="password"  value="" id="gather_codeword" style="">
+					<label id="">ENTER PASSWORD2:</label>
+					<input autocomplete="off" type="password"  value="" id="gather_password2" style="">
+					<label id="">ENTER PASSWORD3:</label>
+					<input autocomplete="off" type="password"  value="" id="gather_password3" style="">
+				</div>
+				<div style="display:flex; flex-direction:row;">
+					<button id="new_offline_dbase_access_data_button" style="flex-grow:1; " onclick="accessDataForOfflineDBaseCreation()">SUBMIT PASSWORDS</button>
+					<button id="new_offline_dbase_cancel_button" style="flex-grow:1; " onclick="cancelNewOfflineDBase()">CANCEL</button>
+					<button id="new_offline_dbase_completed_button" style="flex-grow:1; display:none;" onclick="doneNewOfflineDBase()">DONE</button>
+				</div>
+				<h3 id="status_label" style="align-self:center; display:none; color:red;">placeholder</h3>
+			</div>
+
 		</div>
 	</div>
 	<div style="display:flex; flex-direction:column;">
-		<button id="connect_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseThread()">CREATE NEW OFFLINE DBASE</button>
+		<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseThread()">CREATE NEW OFFLINE DBASE</button>
 		<div style="display:flex">
 			<button id="toggle_debug_button" style="flex-grow:1" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
 			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
@@ -283,24 +303,6 @@
 		</div>
 	</div>
 
-				<!------ Create New Offline DBase  ---!>
-	<div id="create_new_offline_dbase_div" style="display:none;">
-		<h2 id="store_offline_dbase_label">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
-		<h3 id="store_offline_dbase_label">Please enter the following passwords to Access the data you wish to be stored in the offline database.</h3>
-		<div style="display:flex; flex-direction:column;">
-			<label id="">ENTER CODEWORD:</label>
-			<input autocomplete="off" type="password"  value="" id="gather_codeword" style="">
-			<label id="">ENTER PASSWORD2:</label>
-			<input autocomplete="off" type="password"  value="" id="gather_password2" style="">
-			<label id="">ENTER PASSWORD3:</label>
-			<input autocomplete="off" type="password"  value="" id="gather_password3" style="">
-		</div>
-		<div style="display:flex; flex-direction:row;">
-			<button id="new_offline_dbase_access_data_button" style="" onclick="accessDataForOfflineDBaseCreation()">SUBMIT PASSWORDS</button>
-			<button id="new_offline_dbase_cancel_button" style="">CANCEL</button>
-		</div>
-	</div>
-
 	<!-- Offline Database --!>
 	<p id="offline_dbase" style="display:none"></p>
 	<p id="offline_dbase_pointer" style="display:none"></p>
@@ -308,11 +310,44 @@
 </body>
 <script>
 
+	// Gather passwords to access existing records and gather them into a new offline dbase.
+	function createNewOfflineDBaseThread(){
+		createNewOfflineDBase();
+		// activate some html
+		showPage("create_new_offline_dbase_div");
+	}
+
+	function deleteOfflineDBase(){
+		console.log("DELETING offline dbase...");
+		document.getElementById("offline_dbase_pointer").innerHTML = "";
+		document.getElementById("offline_dbase").innerHTML = "";
+	}
+
+	function doneNewOfflineDBase(){
+		// hide create button while dbase exists
+		document.getElementById("create_dbase_button").style.display = "none";
+		showPage("home");
+	}
+
+	function cancelNewOfflineDBase(){
+		deleteOfflineDBase();
+		// hide create button while dbase exists
+		//document.getElementById("create_dbase_button").style.display = "none";
+		showPage("home");
+	}
+
+	function hideCancelButton(){
+		document.getElementById("new_offline_dbase_cancel_button").style.display = "none";
+		document.getElementById("new_offline_dbase_completed_button").style.display = "inline";
+	}
+
 	async function accessDataForOfflineDBaseCreation(){
 		const codeword = document.getElementById("gather_codeword").value;
 		const pass_2 = document.getElementById("gather_password2").value;
 		const pass_3 = document.getElementById("gather_password3").value;
-
+		document.getElementById("gather_codeword").value = "";
+		document.getElementById("gather_password2").value = "";
+		document.getElementById("gather_password3").value = "";
 
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
 		// fingerprint length check
@@ -320,22 +355,28 @@
 			throw new Error('Fingerprint length INVALID!');
 		}
 
-		console.log("Querying server...");
+		console.log("offline dbase creation: Querying server...");
 		const sr_load = await serverLoad(fp_hex);
-		debug("Access Server Response, data: " + sr_load.data);
+		console.log("offline dbase creation: Access Server Response, data: " + sr_load.data);
 		// Inform user Access failed.
 		if( sr_load.data == "" ){
 			// Inform user access failed, continue on same page.
-
+			document.getElementById("status_label").innerHTML = "FAILED TO ACCESS DATA FROM SERVER";
+			document.getElementById("status_label").style.display = "flex";
 		}else{
+			console.log("DATA ACCESSED FROM SERVER, ATTEMPTING TO ADD IT TO OFFLINE DATABASE.");
 			// Add data to new offline dbase
-
+			const result = storeSingleRecordToOfflineDBase(fp_hex, sr_load.data);
+			if( result == "success" ){
+				// hide cancel button
+				hideCancelButton();
+				document.getElementById("status_label").innerHTML = "SUCCESSFULLY ADDDED DATA TO OFFLINE DATABASE";
+				document.getElementById("status_label").style.display = "flex";
+			}else{
+				document.getElementById("status_label").innerHTML = "FAILED TO ADD DATA TO OFFLINE DATABASE";
+				document.getElementById("status_label").style.display = "flex";
+			}
 		}
-
-
-	}//deepLoad()
-
-
 	}
 
 	// Set Title to link to Home.
@@ -683,7 +724,6 @@
 			console.log("HTTP error. Status: " + response.status);
 		}
 	}
-
 	// Automatically run this function when page loads.
 	window.onload = async function() {
 
@@ -695,7 +735,12 @@
 		//const test_offline_dbase = createNewOfflineDBase();
 		//console.log("test offline dbase creation: " + test_offline_dbase);
 
-		console.log("init'd pointer? " + document.getElementById("offline_dbase_pointer").innerHTML);
+		// hide create button if already exists.
+		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
+			document.getElementById("create_dbase_button").style.display = "none";
+		}
+	}
+/*
 		if( document.getElementById("offline_dbase_pointer").innerHTML == "" ){
 			console.log("creating new dbase -- FOR TESTING");
 			createNewOfflineDBase();
@@ -710,30 +755,16 @@
 			//const returned = convertOfflineDBaseToJSONString();
 			//console.log("dbase jsonized: " + returned);
 		}
-
+*/
 		//console.log("test offline dbase data: " + document.getElementById("offline_dbase").innerHTML);
 		//console.log("test offline dbase pointer: " + document.getElementById("offline_dbase_pointer").innerHTML);
-	}
-
-	// Gather passwords to access existing records and gather them into a new offline dbase.
-	function createNewOfflineDBaseThread(){
-		
-		//createNewOfflineDBase();
-
-		// activate some html
-	
-		// loop over till user is done:	
-			// gather passwords 
-			// access data on server w/ those passwords
-			// store that data to offline dbase
-			//storeSingleRecordToOfflineDBase(fp, data);
-	}
 
 	// fill a new offline dbase with random fingerprints and datas.
 	function createNewOfflineDBase(){
+		console.log("creating new offline dbase...");
 		// init pointer
 		const pointer = randomInt(0,90);
-console.log("pointer: " + pointer);
+		console.log("pointer: " + pointer);
 		// I think this should work?
 		document.getElementById("offline_dbase_pointer").innerHTML = pointer;
 		
@@ -780,9 +811,37 @@ console.log("pointer: " + pointer);
 		return new_data;
 	}
 
+	function checkFingerprintIsValid(fingerprint){
+		// false if any non-hex chars or not 64 long.
+		const regex = /^[0-9a-f]{64}$/;
+		if( regex.test(fingerprint) ){
+			return 1;
+		}else{
+			return 0;
+		}
+	}
+
+	function checkDataIsValid(data){
+		// 1-9A-HJ-NP-Za-km-z (false if any non-b58 chars) or if not 1000 long.
+		const regex = /^[1-9A-HJ-NP-Za-km-z]{1000}$/;
+		if( regex.test(data) ){
+			return 1;
+		}else{
+			return 0;
+		}
+	}
+
 	// Store record to the offline dbase at location pointer,
 	// then increment pointer.
 	function storeSingleRecordToOfflineDBase(fp_hex, encrypted_data){
+		// Check that both fingerprint and data are valid.
+		if( !checkFingerprintIsValid(fp_hex) ){
+			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.');
+		}else{ console.log("FINGERPRINT IS VALID!");}
+		if( !checkDataIsValid(encrypted_data) ){
+			throw new Error('Attempt to store to offline dbase failed! DATA is invalid.');
+		}else{ console.log("DATA IS VALID!");}
+
 		// Load offline database.
 		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
 
@@ -803,7 +862,7 @@ console.log("pointer: " + pointer);
 			const replacement_offline_dbase = offline_dbase.substring(0, fp_offset) + encrypted_data + offline_dbase.substring(offset_end);
 			// Now save modified offline dbase back to html.
 			document.getElementById("offline_dbase").innerHTML = replacement_offline_dbase;
-			return;
+			return "success";
 		}
 
 		// Input new fingerprint and data at pointer location.
@@ -913,7 +972,27 @@ console.log("pointer: " + pointer);
 			throw new Error('Fingerprint length INVALID!');
 		}
 
-
+		// If offline dbase init'd, store to offline dbase and then send burst to server.
+		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
+			console.log("Storing to offline...");
+			const outcome = storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
+			if( outcome != "success" ){
+				throw new Error('ERROR STORING TO OFFLINE DATABASE!');
+			}
+			// I think we now want to update server with new offline data instead of continuing with deepStore().
+			const burst_save_response = await sendOfflineDBaseToServer();
+			console.log("burst response: " + burst_save_response.response);
+			//await sendOfflineDBaseToServer();
+			// Not sure yet how I want to check that it worked.
+			//return 1;
+			if( burst_save_response.response === "success"){
+				return 1;
+			}else{
+				return 0;
+				// Maybe delete the record if it fails to load correctly?
+			}
+		}
+/*
 		// If offline dbase init'd, ask user if they want to store to it or just store normally to the online.
 		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
 			// First show page
@@ -941,7 +1020,7 @@ console.log("pointer: " + pointer);
 				}
 			}
 		}
-
+*/
 
 		// Use fetch() for server communication
 		const server_response = await serverStore(fp_hex, encrypted_data);
@@ -1017,9 +1096,10 @@ console.log("pointer: " + pointer);
 		debug("Server Handling - deepLoad() -- Attempting Load with fingerprint: " + fp_hex);
 		const sr_load = await serverLoad(fp_hex);
 		//debug("Access Server Response, data: " + sr_load.data + "\n" + "upload_flag: " + sr_load.upload_flag);
-		debug("Access Server Response, data: " + sr_load.data);
 		// If there is no data attached to this fingerprint, show nothing.
-		if( sr_load.data == "" ){
+		//if(sr_load == "offline"){
+		if(sr_load.data == ""){
+			//console.log("WE'RE OFFLINE!");
 			showPage('failed_to_access');
 			return;
 		}
@@ -1132,9 +1212,25 @@ console.log("pointer: " + pointer);
 				fingerprint: fingerprint,
 			}),
 		})
-		return response.json()
+		return response.json();
+	}
+/*  Saving this working code for when I add offline error handling.
+		.catch((error) => {
+			console.log("Fetch Error on serverLoad!~: " + error.message);
+			console.log("response FAILED");
+			return "offline";
+		});
+		if( response.ok ){
+			console.log("response OK");
+			let json_resp = await response.json();
+			console.log("the data: " + json_resp.data);
+			return json_resp.data;
+		} else {
+			console.log("HTTP error. Status: " + response.status);
+			return "offline";
+		}
 	}//serverLoad()
-
+*/
 	// Endpoint exestore will attempt to store.
 	// input encrypted data at the input fingerprint location.
 	// Inputs: fingerprint is hex, data is base58.
