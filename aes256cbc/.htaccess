@@ -1,4 +1,4 @@
-DirectoryIndex obfuscate.pl
+#DirectoryIndex obfuscate.pl
 
 # This works for whole site
 #<Files get_offline_dbase.pl>
