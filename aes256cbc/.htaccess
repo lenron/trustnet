@@ -17,11 +17,11 @@
 
 RewriteEngine On
 RewriteBase /
-RewriteRule ^store obfuscate.pl?id=store
-RewriteRule ^load obfuscate.pl?id=load
-RewriteRule ^delete obfuscate.pl?id=delete
-RewriteRule ^faq obfuscate.pl?id=faq
-RewriteRule ^how obfuscate.pl?id=how
+#RewriteRule ^store obfuscate.pl?id=store
+#RewriteRule ^load obfuscate.pl?id=load
+#RewriteRule ^delete obfuscate.pl?id=delete
+#RewriteRule ^faq obfuscate.pl?id=faq
+#RewriteRule ^how obfuscate.pl?id=how
 # Redirect calls from /obf/exestore to /obf/store.pl
 RewriteRule ^exestore store.pl
 RewriteRule ^exeload load.pl

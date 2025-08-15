@@ -58,7 +58,7 @@
 		flex: 1 auto;
 		display: flex;
 		/*align-self: center;*/
-	}
+	
 
 	.content_html {
 		width: 100%;
@@ -718,7 +718,6 @@ Multiline Comment Reminder
 	//document.getElementById("titletext").onclick = function() {
 		//location.href = "https://chat.dance/obf";
 	//}
-/*
 	// later
 	document.getElementById("howworks").onclick = function() {
 		location.href = "/obf/how";
@@ -729,7 +728,7 @@ Multiline Comment Reminder
 		location.href = "/obf/faq";
 		// faq();
 	}
-*/
+
 	// global flags 
 	let upload_flag = 'false';
 	let download_flag = 'false';
@@ -1536,7 +1535,8 @@ Multiline Comment Reminder
 	// Input: fingerprint is hexadecimal.
 	// Output: POST message to server script which will attempt to Access.
 	async function serverLoad(fingerprint){
-		const SERVER_URL = '/obf/exeload';
+		//const SERVER_URL = '/obf/exeload';
+		const SERVER_URL = '/obf/load.pl';
 		
 		debug("serverLoad() -- Attempting Server Load with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
@@ -1572,8 +1572,14 @@ Multiline Comment Reminder
 	// Inputs: fingerprint is hex, data is base58.
 	// Output: POST message to server script which will attempt to Store.
 	async function serverStore(fingerprint, data){
-		const SERVER_URL = '/obf/exestore';
+		//const SERVER_URL = '/obf/exestore';
+		const SERVER_URL = '/obf/store.pl';
 		
+		const the_body = JSON.stringify({
+			fingerprint: fingerprint,
+			data: data,
+		});
+		console.log("stringified input: " + the_body);
 		//debug("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
 		debug("serverStore() -- Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
 		const response = await fetch(SERVER_URL, {
@@ -1640,7 +1646,8 @@ Multiline Comment Reminder
 	// Input: fingerprint is hexadecimal.
 	// Output: POST message to server script that will attempt to Delete.
 	async function serverDelete(fingerprint){
-		const SERVER_URL = '/obf/exedelete';
+		//const SERVER_URL = '/obf/exedelete';
+		const SERVER_URL = '/obf/delete.pl';
 		
 		debug("serverDelete() -- Attempting Server Delete with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {

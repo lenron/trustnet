@@ -9,11 +9,11 @@ use DBI;
 ##########################################################
 
 # Set username/password (sandbox side)
-my $db_username = 'testuser';
-my $db_pw = 'password';
+#my $db_username = 'testuser';
+#my $db_pw = 'password';
 # Set SQL server/production variables
-#my $db_username = 'chatriwe_admin';
-#my $db_pw = 'Vuu_fQY1#qH,';
+my $db_username = 'chatriwe_admin';
+my $db_pw = 'Vuu_fQY1#qH,';
 # Database + Table names should be the same
 my $db_name = 'chatriwe_obf';
 my $db_table_obf = 'obfuscation';
