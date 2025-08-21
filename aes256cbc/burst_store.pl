@@ -22,7 +22,7 @@ my $db_name = 'chatriwe_obf';
 if ($q->param){
 
 	# records: array of hashes
-	my $hash_ref = $json->decode($q->param('POSTDATA'));
+	my $hash_ref = $json->decode(scalar $q->param('POSTDATA'));
 
 	# Get user ip.
 	my $ip = $ENV{REMOTE_ADDR};
@@ -50,29 +50,49 @@ if ($q->param){
 	foreach my $record (@{$hash_ref->{records}}) {
 		# Count number of total records.
 		$num_records++;
-		#if( $go_flag == 1 || ($total_records - $num_dummy_data) == 1 ){
 		if( $go_flag == 1 ){
 			# Now we can try inserting first. Will return empty if the record already exists.
-			$response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $record->{fingerprint}, $record->{data}, $ip);
-			if(not defined $response){
+			#$response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $record->{fingerprint}, $record->{data}, $ip);
+			print $fh "checking fingerprint after edge found: $record->{fingerprint}\n";
+			my $try_response = $dbh->do("SELECT * FROM obfuscation WHERE fingerprint=?", undef, $record->{fingerprint});
+			print $fh "try_response: $try_response\n";
+			if( $try_response == 1){
+				print $fh "Record exists update it!  ";
 				# Record exists, update it.
-				$response = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $record->{data}, $ip, $record->{fingerprint}) or die $dbh->errstr;
+				my $response = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $record->{data}, $ip, $record->{fingerprint}) or die $dbh->errstr;
+				print $fh "response: $response\n";
 				$num_updated_records++;
 			}else{
+				print $fh "Record NO exists INSERT it!  ";
 				# Record didn't exist, increment count.
+				my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $record->{fingerprint}, $record->{data}, $ip);
+				print $fh "response: $response\n";
 				$num_new_records++;
 			}
 		# Loop through dummy data until we find a valid fingerprint.
 		}else{
-			$response = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $record->{data}, $ip, $record->{fingerprint}) or die $dbh->errstr;
-			# Switch to good data if we found updateable edge.
-			if($response == 1){
+
+			# Does the record exist? will return 1 if yes, 0 if no.
+			my $try_response = $dbh->do("SELECT * FROM obfuscation WHERE fingerprint=?", undef, $record->{fingerprint});
+			if($try_response == 1){
+				# Record exists: update it.
+				my $resp = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $record->{data}, $ip, $record->{fingerprint}) or die $dbh->errstr;
 				$go_flag = 1;
 				$num_updated_records++;
 			}else{
+				# Does not exist: just increment.
 				# The number of dummy data should equal number of invalid fingerprints.
 				$num_dummy_data++;
 			}
+			#$response = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $record->{data}, $ip, $record->{fingerprint}) or die $dbh->errstr;
+			# Switch to good data if we found updatable edge.
+			#if($response == 1){
+			#$go_flag = 1;
+			#$num_updated_records++;
+			#}else{
+			## The number of dummy data should equal number of invalid fingerprints.
+			#$num_dummy_data++;
+			#}
 		}
 	}
 
