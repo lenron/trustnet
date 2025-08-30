@@ -222,7 +222,8 @@
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
-				<a id="titletext" style="font-size: 30px" href="/obf">SECRETWORD</a>
+				<a id="titletext" style="font-size: 30px" >SECRETWORD</a>
+				<!--<a id="titletext" style="font-size: 30px" href="/obf">SECRETWORD</a>--!>
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
@@ -720,10 +721,11 @@ Multiline Comment Reminder
 		}
 	}
 
-	// Set Title to link to Home.
-	//document.getElementById("titletext").onclick = function() {
+	// Set Title to link to Home without dropping offline dbase.
+	document.getElementById("titletext").onclick = function() {
 		//location.href = "https://chat.dance/obf";
-	//}
+		showPage('home');
+	}
 /*
 	// later
 	document.getElementById("howworks").onclick = function() {
