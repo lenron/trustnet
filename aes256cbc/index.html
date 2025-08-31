@@ -699,11 +699,13 @@ Multiline Comment Reminder
 	function doneNewOfflineDBase(){
 		// hide create button while dbase exists
 		document.getElementById("create_dbase_button").style.display = "none";
+		document.getElementById("status_label").style.display = "none";
 		showPage("home");
 	}
 
 	function cancelNewOfflineDBase(){
 		deleteOfflineDBase();
+		document.getElementById("status_label").style.display = "none";
 		// hide create button while dbase exists
 		//document.getElementById("create_dbase_button").style.display = "none";
 		showPage("home");
@@ -1090,48 +1092,69 @@ Multiline Comment Reminder
 		console.log("Updating Online Status...");
 		if( online_status === "online" ){
 			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
-			//checkForPendingStoreAndExecute();
+			await checkForPendingStoreAndExecute();
 		}else{
 			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
 		}
 	}
 
 	// whenever burst store succeeds, clear the update flag so it doesn't get auto-updated when coming back online.
-	function clearUpdateFlag(){
+	function unsetUpdateFlag(){
+		console.log("Clearing pending Burst Store update flag.");
 		document.getElementById("offline_dbase_update_flag").innerHTML = "";
-		
-
 	}
 
-//offline_dbase_update_flag
-/*
+	function setUpdateFlag(){
+		console.log("Setting pending Burst Store update flag.");
+		document.getElementById("offline_dbase_update_flag").innerHTML = "pending";
+	}
+
 	// Check for pending offline dbase store and try to execute it.
-	function checkForPendingStoreAndExecute(){
-		document.getElementById("offline_dbase_update_flag").innerHTML = update_flag;
+	async function checkForPendingStoreAndExecute(){
+		console.log("Checking for pending Burst Store...");
+		const update_flag = document.getElementById("offline_dbase_update_flag").innerHTML;
 		if( update_flag !== ""){
+			console.log("Pending Burst Store found! Execute it.");
 			// if update_flag is NOT empty, we need to execute a burst store.
-
-			// On successful burst store, clear update_flag.
-
-			// On unsuccessful burst store, set update_flag.
+			const burst_save_response = await sendOfflineDBaseToServer();
+			if( burst_save_response != null){
+				console.log("Result of pending Burst Store response: " + burst_save_response.response);
+				if( burst_save_response.response === "success"){
+					console.log("Pending Burst Store successfully executed!");
+					// On successful burst store, clear update_flag.
+					unsetUpdateFlag();
+				}else{
+					console.log("Pending Burst Store FAILED!");
+					// On unsuccessful burst store, set update_flag.
+					setUpdateFlag();
+				}
+			}else{
+				console.log("Pending Burst Store FAILED!");
+				// On unsuccessful burst store, set update_flag.
+				setUpdateFlag();
+			}
 		}
 	}
-*/
 
 /*
 	//	Not yet sure if we're going to use this. 
 	function checkServerDeleteList(){
 		document.getElementById("offline_dbase_pending_delete_list").innerHTML = update_list_raw;
-
-
 	}
 */
+
 	// Check if we're online 
 	async function checkOnline(){
 		const SERVER_URL = '/obf';
+		//const SERVER_URL = 'https://chat.dance/obf';
 		
 		console.log("Checking Online...");
-		const response = await fetch(SERVER_URL)
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/plain',
+			},
+		})
 		.catch((error) => {
 			console.log("Fetch Error on Online Check: " + error.message);
 			console.log("response FAILED");
@@ -1443,12 +1466,11 @@ Multiline Comment Reminder
 				throw new Error('ERROR STORING TO OFFLINE DATABASE!');
 				return;
 			}
-			// I think we now want to update server with new offline data instead of continuing with deepStore().
+			// Run the Burst Store.
 			const burst_save_response = await sendOfflineDBaseToServer();
 			if( burst_save_response != null){
 				console.log("burst response: " + burst_save_response.response);
 				// Not sure yet how I want to check that it worked.
-				//return 1;
 				if( burst_save_response.response === "success"){
 					return 1;
 				}else{
@@ -1792,6 +1814,8 @@ Multiline Comment Reminder
 			console.log("Fetch Error on BURST Store (sendOfflineDBaseToServer)!~: " + error.message);
 			if( error.message == "Failed to fetch" ){
 				console.log("CAUGHT THE DISCONNECTED ERROR IN BURST STORE!~");
+				// Set pending Burst Store update flag == we failed to run it so need to when we next come online.
+				setUpdateFlag();
 			}
 		});
 		if( response ){
