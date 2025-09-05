@@ -1044,10 +1044,28 @@ Multiline Comment Reminder
 
 	// Check if we're online 
 	async function checkOnline(){
-		const SERVER_URL = '/obf';
+		// Check origin.
+		console.log("window.location.origin = " + window.location.origin);
+		const url_origin = window.location.origin;
+		let SERVER_URL = '';
+		// If we're standalone, set address to chat.dance. Check if it returns file.
+		const regex = /^file/;
+		if( regex.test(url_origin) ){
+			console.log("We're a standalone.html");
+			SERVER_URL = 'https://chat.dance/obf/exeonlinecheck';
+		}else{
+			console.log("We're NOT standalone.html");
+			SERVER_URL = '/obf/exeonlinecheck';
+		}
 		
 		console.log("Checking Online...");
-		const response = await fetch(SERVER_URL)
+		//const response = await fetch(SERVER_URL)
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/plain',
+			}
+		})
 		.catch((error) => {
 			console.log("Fetch Error on Online Check: " + error.message);
 			console.log("response FAILED");

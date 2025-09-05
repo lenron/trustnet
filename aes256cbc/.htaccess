@@ -1,6 +1,5 @@
-#DirectoryIndex obfuscate.pl
 
-# This works for whole site
+# This works for whole site. Authorization function.
 #<Files get_offline_dbase.pl>
 	#AuthType Basic
 	#AuthName "restricted area"
@@ -8,12 +7,10 @@
 	#require valid-user
 #</Files>
 
-  Header set Access-Control-Allow-Origin "*"
-  Header set Access-Control-Allow-Methods "GET,POST,OPTIONS"
-  Header set Access-Control-Allow-Headers X-Requested-With
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
+Header set Access-Control-Allow-Headers X-Requested-With
 
-#ddRedirect 301 "/store" "https://chat.dance/obf/obfuscate.pl?id=store"
-#Redirect 301 "/load" "https://chat.dance/obf/obfuscate.pl?id=load"
 
 RewriteEngine On
 RewriteBase /
@@ -27,6 +24,8 @@ RewriteRule ^exestore store.pl
 RewriteRule ^exeload load.pl
 RewriteRule ^exedelete delete.pl
 RewriteRule ^exeburststore burst_store.pl
+RewriteRule ^exeonlinecheck online_check.pl
+
 # Redirects for Offline Database
 #RewriteRule ^exe_offline_set set_offline_dbase.pl
 #RewriteRule ^exe_offline_get get_offline_dbase.pl
@@ -40,59 +39,13 @@ RewriteRule ^exeburststore burst_store.pl
 #<IfModule mod_headers.c>
   #Header add Access-Control-Allow-Origin "*"
   #Header add Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
+  #Header set Access-Control-Allow-Headers X-Requested-With
 #</IfModule>
-
-
-#RewriteCond %{REQUEST_URI} ^/obfuscate.pl\?id\=(.*)
-#RewriteRule .* https://chat.dance/obf/$1 [L]
-
-#RewriteCond %{REQUEST_FILENAME} !-d  # if requested uri is not directory (!-d)
-#RewriteCond %{REQUEST_FILENAME}\.php -f # and if there is a file named URI+'.php' (-f)
-#RewriteRule ^(.*)$ $1.php # then if there is any thing in uri then rewrite it as uri+'.php'
-
-
-
-#RewriteBase /
-#RewriteCond %{REQUEST_URI} ^/obfuscate.pl\?id\=(.*)
-#RewriteRule .* https://chat.dance/obf/$1 [L]
-
-#obfuscate.pl?id=store
-
-
-#RewriteCond %{REQUEST_FILENAME} !-f
-#RewriteCond %{REQUEST_FILENAME} !-d
-#Try global re-route
-#RewriteRule ^(.*)$ /cgi-bin/obf.pl?test=$1 [NC,L,QSA]
-
-# Rule for obfuscate
-#RewriteRule ^store obfuscate.pl?id=store
-#RewriteRule ^load obfuscate.pl?id=load
-
-#Redirect 301 "/store" "https://chat.dance/obf/obfuscate.pl?id=store"
-#Redirect 301 "/load" "https://chat.dance/obf/obfuscate.pl?id=load"
-
-
-#RewriteRule ^(.*)$ /cgi-bin/rewrite.pl [L,QSA]
-#RewriteRule ^(\w+)-(\w+)$ /cgi-bin/rewrite.pl?word1=$1&word2=$2 [QSA,L]
-#RewriteRule ^(\w+)-(\w+)$ /cgi-bin/receive_message.pl?word1=$1&word2=$2 [QSA,L]
-
-# Set up redirect for receiver side direct chat link
-#RewriteRule ^(\w+)-(\w+)$ /cgi-bin/chat.pl?word1=$1&word2=$2 [QSA,L]
-# Set up redirect for 9-card/link chat links room
-#RewriteRule ^chats/(\w+-\w+)$ /cgi-bin/chat.pl?keypair=$1 [QSA,L]
 
 # Service Workers shouldn't be cached for very long
 <FilesMatch "serviceworker.js">
   ExpiresDefault "now"
 </FilesMatch>
-
-#RewriteRule ^/testing/save-subscription$ /testing/save-subscription.pl [L,R]
-
-#Redirect 301 /testing/save-subscription /testing/save-subscription.pl
-#Redirect /testing/save-subscription /testing/save-subscription.pl [QSA,L,R=308]
-#Redirect /testing/save-subscription /testing/save-subscription.pl [L,R=201]
-#Redirect 301 /fetch /fetch
-#Redirect 301 /fetch/fetch /fetch/fetch.pl
 
 
 
