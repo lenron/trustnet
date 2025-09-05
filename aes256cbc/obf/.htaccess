@@ -5,3 +5,4 @@ RewriteEngine On
  RewriteRule ^exeload load.pl
  RewriteRule ^exedelete delete.pl
  RewriteRule ^exeburststore burst_store.pl
+ RewriteRule ^exeonlinecheck online_check.pl

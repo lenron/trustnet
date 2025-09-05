@@ -31,7 +31,6 @@ my $json = JSON->new;
 	my $response = "success";
 	print $q->header();
 	print qq{{"response":"$response"}};
-}
 
 
 
