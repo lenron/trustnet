@@ -1136,28 +1136,31 @@ Multiline Comment Reminder
 		}
 	}
 
-/*
-	//	Not yet sure if we're going to use this. 
-	function checkServerDeleteList(){
-		document.getElementById("offline_dbase_pending_delete_list").innerHTML = update_list_raw;
-	}
-*/
-
-	// Check if we're online 
-	async function checkOnline(){
+	// We need to set the origin differently depending if we're a standalone file or not.
+	// This function checks our origin and sets it to the server url to enable server
+	// functionality for a standalone.html.
+	// Returns the SERVER_URL to be used for server communication functions.
+	function getServerOrigin(){
 		// Check origin.
 		console.log("window.location.origin = " + window.location.origin);
 		const url_origin = window.location.origin;
-		let SERVER_URL = '';
+		let server_origin = '';
 		// If we're standalone, set address to chat.dance. Check if it returns file.
 		const regex = /^file/;
 		if( regex.test(url_origin) ){
-			console.log("We're a standalone.html");
-			SERVER_URL = 'https://chat.dance/obf/exeonlinecheck';
+			console.log("We're a standalone file!");
+			server_origin = 'https://chat.dance/obf/';
 		}else{
-			console.log("We're NOT standalone.html");
-			SERVER_URL = '/obf/exeonlinecheck';
+			console.log("We're NOT a standalone file!");
+			server_origin = '/obf/';
 		}
+		return server_origin;
+	}
+
+	// Check if we're online 
+	async function checkOnline(){
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exeonlinecheck';
 		
 		console.log("Checking Online...");
 		const response = await fetch(SERVER_URL, {
@@ -1709,7 +1712,8 @@ Multiline Comment Reminder
 	// Input: fingerprint is hexadecimal.
 	// Output: POST message to server script which will attempt to Access.
 	async function serverLoad(fingerprint){
-		const SERVER_URL = '/obf/exeload';
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exeload';
 		
 		debug("serverLoad() -- Attempting Server Load with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
@@ -1745,7 +1749,8 @@ Multiline Comment Reminder
 	// Inputs: fingerprint is hex, data is base58.
 	// Output: POST message to server script which will attempt to Store.
 	async function serverStore(fingerprint, data){
-		const SERVER_URL = '/obf/exestore';
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exestore;';
 		
 		//debug("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
 		debug("serverStore() -- Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
@@ -1812,7 +1817,8 @@ Multiline Comment Reminder
 		let offline_dbase_json_string = convertOfflineDBaseToJSONString();
 		console.log("manually composed json string: " + offline_dbase_json_string);
 
-		const SERVER_URL = '/obf/exeburststore';
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exeburststore;';
 		//debug("Attempting Server BURST Store of the Offline Database.");
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
@@ -1845,7 +1851,9 @@ Multiline Comment Reminder
 	// Input: fingerprint is hexadecimal.
 	// Output: POST message to server script that will attempt to Delete.
 	async function serverDelete(fingerprint){
-		const SERVER_URL = '/obf/exedelete';
+		//const SERVER_URL = '/obf/exedelete';
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exedelete;';
 		
 		debug("serverDelete() -- Attempting Server Delete with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
