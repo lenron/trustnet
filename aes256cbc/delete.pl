@@ -19,10 +19,13 @@ my $db_username = 'chatriwe_admin';
 my $db_pw = 'Vuu_fQY1#qH,';
 my $db_name = 'chatriwe_obf';
 
-if ($q->param){
-
+#if ($q->param){
+#my $test = '{"fingerprint":"8774e15f162f4e3a8f03bc7d4c5845bf9bee9bc9c4155802366f90ae92b47c90"}';
 	# Decode to hash ref to extract fingerprint
-	my $hash_ref = $json->decode($q->param('POSTDATA'));
+	my $input = scalar $q->param('POSTDATA');
+	#my $hash_ref = $json->decode(scalar $q->param('POSTDATA'));
+	my $hash_ref = $json->decode($input);
+	#my $hash_ref = $json->decode($test);
 	my $fingerprint = $hash_ref->{fingerprint};
 
 	# Get current time for log.
@@ -48,15 +51,15 @@ if ($q->param){
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	my $response = $dbh->do("DELETE FROM $db_table WHERE fingerprint=?", undef, $fingerprint);
 	$dbh->disconnect();
+	print $fh "response: $response\n";
 
 	# Notify of success or failure
-	#print $q->header();
-	#print qq{{"response":"$response"}};
-}
+	print $q->header();
+	print qq{{"response":"$response"}};
+	#}
 
 
 
-exit 0;
 
 
 

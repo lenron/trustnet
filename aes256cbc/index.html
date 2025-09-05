@@ -222,7 +222,8 @@
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
-				<a id="titletext" style="font-size: 30px" href="/obf">SECRETWORD</a>
+				<a id="titletext" style="font-size: 30px; text-decoration: underline;" >SECRETWORD</a>
+				<!--<a id="titletext" style="font-size: 30px" href="/obf">SECRETWORD</a>--!>
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
@@ -414,7 +415,8 @@ Multiline Comment Reminder
 				</div>
 				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='learnmore' style="flex-grow:1;" onclick="location.href='/obf/how';">LEARN MORE</button>
+					<!--<button class="" id='learnmore' style="flex-grow:1;" onclick="location.href='/obf/how';">LEARN MORE</button>--!>
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
 					<button class="" id='accessdata' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 				</div>
 			</div>
@@ -423,7 +425,19 @@ Multiline Comment Reminder
 				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
 					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
 				</div>
-				<h2>&#10060; FAILED </h2>
+				<h2>&#10060; FAILED TO STORE</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
+					<button class="" id='accessdata' style="flex-grow:1" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
+				</div>
+			</div>
+
+			<div class="gen store eight" id="store8" style="display:none">
+				<div class="special_store_thread_ui_indicator" style="display: flex; flex-direction: row; justify-content: center;">
+					<label class="special_store_thread_label" style="color:red; display: inline;">SPECIAL STORE THREAD. SAVING TO OFFLINE DATABASE.</label>
+				</div>
+				<h2>&#10004; SUCCESSFULLY STORED TO OFFLINE DATABASE BUT:</h2>
+				<h2>&#10060; FAILED TO STORE TO SERVER</h2>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
 					<button class="" id='accessdata' style="flex-grow:1" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
@@ -579,8 +593,12 @@ Multiline Comment Reminder
 			<div class="gen failed_to_access" id="failed_to_access" style="display:none">
 				<label>&#10005; FAILED TO ACCESS</label>
 				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 				</div>
 			</div>
+
+<!--   load  --!>
 
 			<div class="gen delete five" id="delete5" style="display:none">
 				<label>&#10004; SUCCESS</label>
@@ -590,7 +608,23 @@ Multiline Comment Reminder
 				</div>
 			</div>
 
-<!--   load  --!>
+			<div class="gen delete six" id="delete6" style="display:none">
+				<h2>&#10004; SUCCESSFULLY DELETED FROM OFFLINE DATABASE BUT:</h2>
+				<h2>&#10060; FAILED TO DELETE FROM SERVER</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
+				</div>
+			</div>
+
+			<div class="gen delete seven" id="delete7" style="display:none">
+				<h2>&#10060; FAILED TO DELETE</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
+				</div>
+			</div>
+
 
 
 						<!------ Create New Offline DBase  ---!>
@@ -641,6 +675,9 @@ Multiline Comment Reminder
 	<!-- Offline Database --!>
 	<p id="offline_dbase" style="display:none"></p>
 	<p id="offline_dbase_pointer" style="display:none"></p>
+	<!-- Offline Database indicator that we need to do a burst store when we come back online --!>
+	<p id="offline_dbase_update_flag" style="display:none"></p>
+	<!-- <p id="offline_dbase_pending_delete_list" style="display:none"></p> --!>
 
 </body>
 <script>
@@ -652,6 +689,7 @@ Multiline Comment Reminder
 		showPage("create_new_offline_dbase_div");
 	}
 
+	// Delete the entire offline dbase.
 	function deleteOfflineDBase(){
 		console.log("DELETING offline dbase...");
 		document.getElementById("offline_dbase_pointer").innerHTML = "";
@@ -661,11 +699,13 @@ Multiline Comment Reminder
 	function doneNewOfflineDBase(){
 		// hide create button while dbase exists
 		document.getElementById("create_dbase_button").style.display = "none";
+		document.getElementById("status_label").style.display = "none";
 		showPage("home");
 	}
 
 	function cancelNewOfflineDBase(){
 		deleteOfflineDBase();
+		document.getElementById("status_label").style.display = "none";
 		// hide create button while dbase exists
 		//document.getElementById("create_dbase_button").style.display = "none";
 		showPage("home");
@@ -694,30 +734,33 @@ Multiline Comment Reminder
 		const sr_load = await serverLoad(fp_hex);
 		console.log("offline dbase creation: Access Server Response, data: " + sr_load.data);
 		// Inform user Access failed.
-		if( sr_load.data == "" ){
-			// Inform user access failed, continue on same page.
-			document.getElementById("status_label").innerHTML = "FAILED TO ACCESS DATA FROM SERVER";
-			document.getElementById("status_label").style.display = "flex";
-		}else{
-			console.log("DATA ACCESSED FROM SERVER, ATTEMPTING TO ADD IT TO OFFLINE DATABASE.");
-			// Add data to new offline dbase
-			const result = storeSingleRecordToOfflineDBase(fp_hex, sr_load.data);
-			if( result == "success" ){
-				// hide cancel button
-				hideCancelButton();
-				document.getElementById("status_label").innerHTML = "SUCCESSFULLY ADDDED DATA TO OFFLINE DATABASE";
+		if(sr_load != null){
+			if( sr_load.data == "" ){
+				// Inform user access failed, continue on same page.
+				document.getElementById("status_label").innerHTML = "FAILED TO ACCESS DATA FROM SERVER";
 				document.getElementById("status_label").style.display = "flex";
 			}else{
-				document.getElementById("status_label").innerHTML = "FAILED TO ADD DATA TO OFFLINE DATABASE";
-				document.getElementById("status_label").style.display = "flex";
+				console.log("DATA ACCESSED FROM SERVER, ATTEMPTING TO ADD IT TO OFFLINE DATABASE.");
+				// Add data to new offline dbase
+				const result = storeSingleRecordToOfflineDBase(fp_hex, sr_load.data);
+				if( result == "success" ){
+					// hide cancel button
+					hideCancelButton();
+					document.getElementById("status_label").innerHTML = "SUCCESSFULLY ADDDED DATA TO OFFLINE DATABASE";
+					document.getElementById("status_label").style.display = "flex";
+				}else{
+					document.getElementById("status_label").innerHTML = "FAILED TO ADD DATA TO OFFLINE DATABASE";
+					document.getElementById("status_label").style.display = "flex";
+				}
 			}
-		}
+		}	
 	}
 
-	// Set Title to link to Home.
-	//document.getElementById("titletext").onclick = function() {
+	// Set Title to link to Home without dropping offline dbase.
+	document.getElementById("titletext").onclick = function() {
 		//location.href = "https://chat.dance/obf";
-	//}
+		showPage('home');
+	}
 /*
 	// later
 	document.getElementById("howworks").onclick = function() {
@@ -898,7 +941,9 @@ Multiline Comment Reminder
 
 		if( outcome == 1 ){	//Success
 			showPage('store6');
-		}else{	//Fail
+		}else if(outcome == "offline"){	//stored to offline dbase but not server
+			showPage('store8');
+		}else{
 			showPage('store7');
 		}
 
@@ -949,13 +994,23 @@ Multiline Comment Reminder
 	}
 
 	// Delete thread walk finisher.
-	function deleteExecute(){
+	async function deleteExecute(){
 		// Main Function Call
-		deepDelete();
+		const outcome = await deepDelete();
+		
+		if( outcome == "success" ){	
+			showPage('delete5');
+		}else if(outcome == "failed server"){ 
+			showPage('delete6');
+		}else if(outcome == "failed all"){ 
+			showPage('delete7');
+		}else{
+			console.log("error: delete inform failed.");
+			showPage('delete7');
+		}
+
 		// Also delete user inputted data.
 		securityReset();
-		// Notify user of success
-		showPage('delete5');
 	}
 
 	function specialStoreThread(){
@@ -1037,10 +1092,56 @@ Multiline Comment Reminder
 		console.log("Updating Online Status...");
 		if( online_status === "online" ){
 			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
+			await checkForPendingStoreAndExecute();
 		}else{
 			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
 		}
 	}
+
+	// whenever burst store succeeds, clear the update flag so it doesn't get auto-updated when coming back online.
+	function unsetUpdateFlag(){
+		console.log("Clearing pending Burst Store update flag.");
+		document.getElementById("offline_dbase_update_flag").innerHTML = "";
+	}
+
+	function setUpdateFlag(){
+		console.log("Setting pending Burst Store update flag.");
+		document.getElementById("offline_dbase_update_flag").innerHTML = "pending";
+	}
+
+	// Check for pending offline dbase store and try to execute it.
+	async function checkForPendingStoreAndExecute(){
+		console.log("Checking for pending Burst Store...");
+		const update_flag = document.getElementById("offline_dbase_update_flag").innerHTML;
+		if( update_flag !== ""){
+			console.log("Pending Burst Store found! Execute it.");
+			// if update_flag is NOT empty, we need to execute a burst store.
+			const burst_save_response = await sendOfflineDBaseToServer();
+			if( burst_save_response != null){
+				console.log("Result of pending Burst Store response: " + burst_save_response.response);
+				if( burst_save_response.response === "success"){
+					console.log("Pending Burst Store successfully executed!");
+					// On successful burst store, clear update_flag.
+					unsetUpdateFlag();
+				}else{
+					console.log("Pending Burst Store FAILED!");
+					// On unsuccessful burst store, set update_flag.
+					setUpdateFlag();
+				}
+			}else{
+				console.log("Pending Burst Store FAILED!");
+				// On unsuccessful burst store, set update_flag.
+				setUpdateFlag();
+			}
+		}
+	}
+
+/*
+	//	Not yet sure if we're going to use this. 
+	function checkServerDeleteList(){
+		document.getElementById("offline_dbase_pending_delete_list").innerHTML = update_list_raw;
+	}
+*/
 
 	// Check if we're online 
 	async function checkOnline(){
@@ -1059,7 +1160,6 @@ Multiline Comment Reminder
 		}
 		
 		console.log("Checking Online...");
-		//const response = await fetch(SERVER_URL)
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -1249,7 +1349,7 @@ Multiline Comment Reminder
 	}
 
 	// Load data at fingerprint. 
-	// If it exists return hit, 
+	// If it exists return data, 
 	// if it does not exist return the string "miss".
 	function attemptLoadOfflineDBase(fp_hex){
 		// Load offline database.
@@ -1271,6 +1371,49 @@ Multiline Comment Reminder
 			return loaded_data;
 		}else{
 			return "miss";
+		}
+	}
+
+
+	// Delete record from offline dbase at fingerprint location.
+	// then decrement pointer if found.
+	function deleteSingleRecordOfflineDBase(fp_hex){
+		// Check that fingerprint is valid.
+		if( !checkFingerprintIsValid(fp_hex) ){
+			throw new Error('Attempt to DELETE single record in offline dbase failed! FINGERPRINT is invalid.');
+		}else{ console.log("FINGERPRINT IS VALID!");}
+
+		// Load offline database.
+		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
+
+		// Find record in offline dbase if it exists.
+		const regex = new RegExp(String.raw`${fp_hex}`, "g");
+		console.log("regex used for deleteSingleRecordOfflineDBase: " + regex);
+
+		// -1 returned on miss.
+		const search_outcome = offline_dbase.search(regex);
+		console.log("regex search outcome for delete call: " + search_outcome);
+
+		// If the record exists, delete the fingerprint and data at search_outcome location.
+		if(search_outcome > -1){
+			console.log("found fingerprint in offline dbase");
+			// Remove all data from search_outcome to offset end, which should be the fingerprint and data of the found record.
+			const offset_end = search_outcome + 1064;
+			const replacement_offline_dbase = offline_dbase.substring(0, search_outcome) + offline_dbase.substring(offset_end);
+			// Now save modified offline dbase back to html.
+			document.getElementById("offline_dbase").innerHTML = replacement_offline_dbase;
+			// We've found and deleted the data, now decrement pointer.
+			console.log("pointer BEFORE delete: " + document.getElementById("offline_dbase_pointer").innerHTML);
+			let pointer = document.getElementById("offline_dbase_pointer").innerHTML;
+			// decrement pointer
+			pointer--;
+			// Save pointer back to persistent storage.
+			document.getElementById("offline_dbase_pointer").innerHTML = pointer;
+			console.log("Decremented pointer AFTER delete: " + document.getElementById("offline_dbase_pointer").innerHTML);
+			return "success";
+		}else{
+			// We didn't find it! return fail.
+			return "fail";
 		}
 	}
 
@@ -1332,57 +1475,36 @@ Multiline Comment Reminder
 			const outcome = storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
 			if( outcome != "success" ){
 				throw new Error('ERROR STORING TO OFFLINE DATABASE!');
+				return;
 			}
-			// I think we now want to update server with new offline data instead of continuing with deepStore().
+			// Run the Burst Store.
 			const burst_save_response = await sendOfflineDBaseToServer();
-			console.log("burst response: " + burst_save_response.response);
-			//await sendOfflineDBaseToServer();
-			// Not sure yet how I want to check that it worked.
-			//return 1;
-			if( burst_save_response.response === "success"){
-				return 1;
-			}else{
-				return 0;
-				// Maybe delete the record if it fails to load correctly?
-			}
-		}
-/*
-		// If offline dbase init'd, ask user if they want to store to it or just store normally to the online.
-		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
-			// First show page
-			showPage('online_or_both_query');
-			// Then wait for user with a custom promise.
-			const user_picked = await waitForContinue();
-			console.log("user picked: " + user_picked);
-			if( user_picked === "yes_store_to_offline" ){
-				console.log("Storing to offline...");
-				const outcome = storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
-				if( outcome != "success" ){
-					throw new Error('ERROR STORING TO OFFLINE DATABASE!');
-				}
-				// I think we now want to update server with new offline data instead of continuing with deepStore().
-				const burst_save_response = await sendOfflineDBaseToServer();
+			if( burst_save_response != null){
 				console.log("burst response: " + burst_save_response.response);
-				//await sendOfflineDBaseToServer();
 				// Not sure yet how I want to check that it worked.
-				//return 1;
 				if( burst_save_response.response === "success"){
 					return 1;
 				}else{
 					return 0;
 					// Maybe delete the record if it fails to load correctly?
 				}
+			}else{
+				// We've successfully stored to offline dbase BUT failed to store because we're offline.
+				return "offline";
 			}
 		}
-*/
 
 		// Use fetch() for server communication
 		const server_response = await serverStore(fp_hex, encrypted_data);
-		sr_store_result = server_response.response;
-		debug("Server Handling - deepStore() -- Response from STORE: " + "~" + sr_store_result + "~");
-		// Store returned 0 (fail).
-		if( Number(sr_store_result) != 1){
-			throw new Error('STORE ERROR!');
+		if( server_response != null){
+			sr_store_result = server_response.response;
+			debug("Server Handling - deepStore() -- Response from STORE: " + "~" + sr_store_result + "~");
+			// Store returned 0 (fail).
+			if( Number(sr_store_result) != 1){
+				throw new Error('STORE ERROR!');
+			}
+		}else{
+			return;
 		}
 
 		// Check Load
@@ -1392,11 +1514,15 @@ Multiline Comment Reminder
 		debug("Server Handling - deepStore() -- Response from LOAD (store final check): " + "~" + sr_load.data + "~");
 
 		// Report Results
-		if( encrypted_data  === sr_load.data){
-			return 1;
+		if(sr_load != null){
+			if( encrypted_data  === sr_load.data){
+				return 1;
+			}else{
+				return 0;
+				// Maybe delete the record if it fails to load correctly?
+			}
 		}else{
 			return 0;
-			// Maybe delete the record if it fails to load correctly?
 		}
 	}//deepStore()
 
@@ -1449,13 +1575,14 @@ Multiline Comment Reminder
 		// Load from server
 		debug("Server Handling - deepLoad() -- Attempting Load with fingerprint: " + fp_hex);
 		const sr_load = await serverLoad(fp_hex);
-		//debug("Access Server Response, data: " + sr_load.data + "\n" + "upload_flag: " + sr_load.upload_flag);
-		// If there is no data attached to this fingerprint, show nothing.
-		//if(sr_load == "offline"){
-		if(sr_load.data == ""){
-			//console.log("WE'RE OFFLINE!");
+		if(sr_load == null){
 			showPage('failed_to_access');
 			return;
+		}else{
+			if( sr_load.data == "" ){
+				showPage('failed_to_access');
+				return;
+			}
 		}
 
 		// Decrypt Block
@@ -1539,11 +1666,39 @@ Multiline Comment Reminder
 			throw new Error('Fingerprint length INVALID!');
 		}
 
+		let offline_dbase_delet_success = '';
+		// If there's an offline dbase, also try to delete it there.
+		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
+			//debug("deepDelete() -- Attempting Offline Database Delete with fingerprint: " + fp_hex);
+			console.log("deepDelete() -- Attempting Offline Database Delete with fingerprint: " + fp_hex);
+			const outcome = await deleteSingleRecordOfflineDBase(fp_hex);
+			if( outcome != "success" ){
+					console.log("failed offline dbase");
+				return "failed offline dbase";
+			}else{
+				offline_dbase_delete_success = '1';
+			}
+		}
+
 		// Load from server
 		debug("Server Handling - deepDelete() -- Attempting Delete with fingerprint: " + fp_hex);
 		const sr_delete = await serverDelete(fp_hex);
+		//return sr_delete.response;
+		if( sr_delete != null){
+			console.log("what is delete success response? 1?: " + "~" + sr_delete.response + "~");
+			if( sr_delete.response == '1' ){
+				console.log("success");
+				return "success";
+			}
+		}
 
-		return sr_delete.response;
+		if( offline_dbase_deleted ){
+				console.log("failed server");
+			return "failed server";
+		}else{
+				console.log("failed all");
+			return "failed all";
+		}
 	}//deepDelete()
 
 	//////////////////////////////////////////////////////////////
@@ -1566,24 +1721,24 @@ Multiline Comment Reminder
 				fingerprint: fingerprint,
 			}),
 		})
-		return response.json();
-	}
-/*  Saving this working code for when I add offline error handling.
 		.catch((error) => {
 			console.log("Fetch Error on serverLoad!~: " + error.message);
-			console.log("response FAILED");
-			return "offline";
+			if( error.message == "Failed to fetch" ){
+				console.log("WE'VE SUCCESSFULLY CAUGHT THE DISCONNECTED ERROR!~");
+			}
 		});
-		if( response.ok ){
-			console.log("response OK");
-			let json_resp = await response.json();
-			console.log("the data: " + json_resp.data);
-			return json_resp.data;
-		} else {
-			console.log("HTTP error. Status: " + response.status);
-			return "offline";
+		if( response ){
+			if( response.ok ){
+				console.log("response OK");
+				return response.json();
+			} else {
+				console.log("HTTP error. Status: " + response.status);
+				return response.json();
+			}
 		}
+		return;
 	}//serverLoad()
+/*  Saving this working code for when I add offline error handling.
 */
 	// Endpoint exestore will attempt to store.
 	// input encrypted data at the input fingerprint location.
@@ -1604,15 +1759,30 @@ Multiline Comment Reminder
 				data: data,
 			}),
 		})
-		return response.json()
+		.catch((error) => {
+			console.log("Fetch Error on serverStore!~: " + error.message);
+			if( error.message == "Failed to fetch" ){
+				console.log("CAUGHT THE DISCONNECTED ERROR IN STORE!~");
+			}
+		});
+		if( response ){
+			if( response.ok ){
+				console.log("response OK");
+				return response.json();
+			} else {
+				console.log("HTTP error. Status: " + response.status);
+				return response.json();
+			}
+		}
+		return;
 	}//serverStore()
 
+	// Create a json string containing every record in the offline dbase from 0 to pointer.
 	function convertOfflineDBaseToJSONString(){
 		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
 		const offline_dbase_pointer = document.getElementById("offline_dbase_pointer").innerHTML;
 
 		// Compose the flat json string manually.
-		//let offline_dbase_json_flat = '{"records":[';
 		let offline_dbase_json_flat = '{"records":[';
 
 		let fp_start;
@@ -1651,7 +1821,24 @@ Multiline Comment Reminder
 			},
 			body: offline_dbase_json_string,
 		})
-		return response.json()
+		.catch((error) => {
+			console.log("Fetch Error on BURST Store (sendOfflineDBaseToServer)!~: " + error.message);
+			if( error.message == "Failed to fetch" ){
+				console.log("CAUGHT THE DISCONNECTED ERROR IN BURST STORE!~");
+				// Set pending Burst Store update flag == we failed to run it so need to when we next come online.
+				setUpdateFlag();
+			}
+		});
+		if( response ){
+			if( response.ok ){
+				console.log("response OK");
+				return response.json();
+			} else {
+				console.log("HTTP error. Status: " + response.status);
+				return response.json();
+			}
+		}
+		return;
 	}//sendOfflineDBaseToServer()
 
 	// Endpoint /obf/exedelete will attempt to delete.
@@ -1670,7 +1857,22 @@ Multiline Comment Reminder
 				fingerprint: fingerprint,
 			}),
 		})
-		return response.json()
+		.catch((error) => {
+			console.log("Fetch Error on DELETE: " + error.message);
+			if( error.message == "Failed to fetch" ){
+				console.log("CAUGHT THE DISCONNECTED ERROR IN DELETE.");
+			}
+		});
+		if( response ){
+			if( response.ok ){
+				console.log("response OK");
+				return response.json();
+			} else {
+				console.log("HTTP error. Status: " + response.status);
+				return response.json();
+			}
+		}
+		return;
 	}//serverDelete()
 
 
@@ -2427,6 +2629,7 @@ Multiline Comment Reminder
 	// Grab currently running HTML and save it to standalone.html
 	// This saves the offline dbase in addition to creating and downloading a standalone version that can be used offline.
 	function saveOfflineDBase(){
+		// This line doesn't get applied with the innerHTML call below so add it manually.
 		let allhtml = "<!DOCTYPE HTML>";
 		// This will grab a copy of the currently running HTML.
 		allhtml += document.querySelector("html").innerHTML;
@@ -2456,7 +2659,7 @@ Multiline Comment Reminder
 			window.debug = window.console.log.bind(window.console, '%s');
 		} else {
 			// Turn off warning message.
-			const titletext = document.getElementById("titletext");
+			const tffitletext = document.getElementById("titletext");
 			titletext.style.color = "#54c597";
 			titletext.innerHTML = "SECRETWORD";
 

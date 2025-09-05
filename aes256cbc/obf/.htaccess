@@ -1,0 +1,7 @@
+RewriteEngine On
+ RewriteBase /
+ # Redirect calls from /obf/exestore to /obf/store.pl
+ RewriteRule ^exestore store.pl
+ RewriteRule ^exeload load.pl
+ RewriteRule ^exedelete delete.pl
+ RewriteRule ^exeburststore burst_store.pl

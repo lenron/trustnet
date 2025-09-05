@@ -20,14 +20,13 @@ my $db_pw = 'Vuu_fQY1#qH,';
 my $db_name = 'chatriwe_obf';
 
 if ($q->param){
-
-	# Decode to hash ref to extract fingerprint and data
-	my $hash_ref = $json->decode($q->param('POSTDATA'));
-	my $fingerprint = $hash_ref->{fingerprint};
-	my $data = $hash_ref->{data};
+#my $test = '{"fingerprint":"8774e15f162f4e3a8f03bc7d4c5845bf9bee9bc9c4155802366f90ae92b47c90","data":"RsmSMEJ3HPWbEMHeYmczY9RMEF9KsZCQZqeKMmGE5dUi6xrtavmNHV5T3sDgpziinMRNhRr9xJfAbwn36sV7ZUqefjHkUV4AYU13LzTVTwZcosaBJUFXmNzbp7Ta4qVBnqiWCe1vdVVCUBhCjwCFm6HntMj26BETP6x2rQwbd5X7i3YnmFiCy8CtdZLpGebKeBm6b4d22m5hr52pWxtGApZAuAhc6LtBNKFEP5Etv3yawn8sffwfbaK4wFRiAgpt4PmGKWGwqdSzpDTEi98r6BeHE2Ja67etiQUTjnmvfByGdwVkwsRumx8AV2ibZQ1rfyxMihACAu1qeX5YaMEUctbAm2BRYDMZyixSw49gZEUsX2AS9HzXW1PY2oFkkyhHtXHjQjy923eXanQ6QfFMUsnDdLVpSQ6cszgnuYakquc42qKbzR1cDbvtnU5qeQ9jYSJjcxHmSrF5GEtGsipW882eWztMZRtHcXoZVNfwN5gxv2NQYTbYBXpAx42t5NCcokPzLw9ifgiK5Sa2AxbFFF28u8MSERU67TE2fRwy2whYgWySsAoywpFEKkLoHFygaWNWXjua6Xr73UMY2WyTtU5MB1rCpAvUgeQwY441sZMTXqg5xydUuERzaSt5XALuRCufDzaE2XnY8zgTDPC59gDZPQuYUhz7bjFVPo7HE1maRgePHCu4WWKHuwbs2enYaHxf6cbBeoRq3ybG5siDYRBSNw1eowCztt6y9KZXWp2TxCrdBU75REg7tNKuyaevwMqK5w5VbCYEQsJewJR8UpqJdpVYQp44Mop8gLZxhYut16Tb5Zv7UdgByoPELF5Wdfphjj1DKcU2CGytfQLt5Wb38AxMygvPLiuWD1smdWkgMx4urAoSftSHa2YMngmjxVJKRdAHVYnoNcYLm9u2bp2jSkoci1jFbhya1HtB1AF7LPSL7XArDbTcjRsbdUbo4RUBxcQg9kvMricPDsU4fnfm3NGTEXzzb3burMm3"}';
+#
+#
 
 	# Get user ip.
 	my $ip = $ENV{REMOTE_ADDR};
+	#my $ip = "1.1.1.1";
 
 	# Get current time for log.
 	my $t = localtime;
@@ -36,9 +35,20 @@ if ($q->param){
 	my $filename = './log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
-	print $fh "STORE\n";
+	print $fh "\n\nSTORE\n";
 	print $fh "$time\n";
 	print $fh "$ip\n";
+
+	# Decode to hash ref to extract fingerprint and data
+	#my $hash_ref = $json->decode(scalar $q->param('POSTDATA'));
+	#my $hash_ref = $json->decode($test);
+	#
+	my $input = scalar $q->param('POSTDATA');
+	my $hash_ref = $json->decode($input);
+	my $fingerprint = $hash_ref->{fingerprint};
+	my $data = $hash_ref->{data};
+
+	print $fh "json input:\n $input\n\n";
 	print $fh "fingerprint: $fingerprint\n";
 	print $fh "data: $data\n";
 
@@ -51,84 +61,50 @@ if ($q->param){
 		exit 0;
 	}
 
-	# First try to create new record. If that fails, modify the existing one.
+	# Try checking for existence first because mariadb versions work differently.
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $fingerprint, $data, $ip);
-	# undef return indicates we need to modify the record instead.
-	if(not defined $response){
-		$response = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $data, $ip, $fingerprint) or die $dbh->errstr;
-	}
-	$dbh->disconnect();
+	my $try_response = $dbh->do("SELECT * FROM obfuscation WHERE fingerprint=?", undef, $fingerprint);
 
-	# Notify of success or failure
+	print $fh "1 if a record found, 0 if needs new record: $try_response\n";
+	my $response = 'init';
+	if( $try_response == 1 || $try_response eq '1'){
+		# found a record, use update
+		$response = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $data, $ip, $fingerprint);
+		print $fh "response after UPDATE: $response\n";
+	}else{
+		# no record found, use insert
+		$response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $fingerprint, $data, $ip);
+		print $fh "response after INSERT: $response\n";
+	}
 	print $q->header();
 	print qq{{"response":"$response"}};
+
+
+
 }
 
 
+	# First try to create new record. If that fails, modify the existing one.
+	#my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
+	#my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $fingerprint, $data, $ip);
+	#my $response = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $data, $ip, $fingerprint);
+	#print $fh "response after UPDATE: $response\n";
+	#$dbh->disconnect();
 
-=pod
-	if($test_fingerprint =~ /^[0-9a-f]{64}$/i){
-		print "fingerprint matched\n";
-	}else{
-		print "fingerprint not matched\n";
-	}
-
-	if($test_data =~ /^[1-9A-HJ-NP-Za-km-z]{1000}$/){
-		print "data matched\n";
-	}else{
-		print "data not matched\n";
-	}
-
-# testing - print fingerprints
-	# ASC for ascending, DESC for descending
-	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	my $query = "SELECT fingerprint FROM $db_table";
-	#my $query = "SELECT sender, timestamp, content, screenname FROM $db_table_chat_messages WHERE chat_id=$chat_id ORDER BY timestamp ASC";
-	my $sth = $dbh->prepare($query);
-	$sth->execute();
-	# Fill chat message array with rows containing an internal hash
-	my @chat_data_from_sql;
-	my $internal_hash;
-	while( my $row = $sth->fetchrow_hashref ){
-		print "fp: $row->{fingerprint}\n";
-
-	}
-
-	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	#$dbh->do("UPDATE $db_table_misc_data SET name=?, value=? WHERE name='$name'", undef, $name, $value);
-#"INSERT INTO $db_table_contact_messages (ip, message) VALUES (?, ?)", undef, $ip, $message
-	$dbh->do("INSERT INTO $db_table (fingerprint, data) VALUES (?, ?)", undef, $value, $data);
-	$dbh->disconnect();
-
-#save sub core
-if ($q->param){
-
-	# Decode to hash ref to extract user_id and subscription
-	my $hash_ref = $json->decode($q->param('POSTDATA'));
-	my $user_id = $hash_ref->{id};
-	my $subscription = $hash_ref->{sub};
-
-	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	#$dbh->do("UPDATE $db_table_misc_data SET name=?, value=? WHERE name='$name'", undef, $name, $value);
-	$dbh->do("UPDATE $db_table_user_id SET subscription=? WHERE user_id='$user_id'", undef, $subscription);
-	$dbh->disconnect();
+	# undef return indicates we need to modify the record instead.
+	# 0E0 means 0 rows effected.
+	#my $insert_response = "init";
+	#if(not defined $response || $response eq '0E0'){
+	#$dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
+	#$insert_response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $fingerprint, $data, $ip);
+	#$dbh->disconnect();
+	#}
+	#print $fh "response after INSERT: $insert_response\n";
 
 	# Notify of success or failure
-	print $q->header();
-	print '{"message":"success"}';;
-}
-
-#logging
-	# log user_id, message, and subscription for each time this 
-	my $filename = './log.txt';
-	open(my $fh, '>>', $filename) or die;
-	print $fh "browser: $browser\n";
-	print $fh "time: $time\n";
-	print $fh "user_id: $user_id\n";
-	print $fh "message: $msg\n";
-
-=cut
+	#print $q->header();
+	#print qq{{"response":"$response"}};
+	#}
 
 
 
