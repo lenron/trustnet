@@ -397,6 +397,15 @@
 				</div>
 			</div>
 
+			<div class="gen store nine" id="store9" style="display:none">
+				<h2>&#10060; FAILED TO STORE TO OFFLINE DATABASE BECAUSE IT'S FULL BUT:</h2>
+				<h2>&#10004; SUCCESSFULLY STORED TO SERVER</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
+					<button class="" id='accessdata' style="flex-grow:1" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
+				</div>
+			</div>
+
 	<!-- Catch Upload Data --!>
 	<input autocomplete="off" type="password" value="" id="upload_data" style="display:none;">
 <!--  store  --!>
@@ -780,6 +789,8 @@
 		if( outcome == 1 ){
 			//Success
 			showPage('store6');
+		}else if(outcome == "fullsuccess"){
+			showPage('store9');
 		}else if(outcome == "offline"){
 			// Stored to offline dbase but not to server.
 			showPage('store8');
@@ -1101,7 +1112,7 @@
 		if( pointer >= 99 ){
 			// Offline Database is full. Inform user.
 			document.getElementById("full_offline_dbase_warning").style.display = "inline";
-			return;	//End function.
+			return "full";	//End function.
 		}
 
 		// Load offline database.
@@ -1219,6 +1230,11 @@
 			let pointer = document.getElementById("offline_dbase_pointer").innerHTML;
 			// decrement pointer
 			pointer--;
+			// Check if offline database is no longer full.
+			if( pointer < 99 ){
+				// Offline Database is full. Inform user.
+				document.getElementById("full_offline_dbase_warning").style.display = "none";
+			}
 			// Save pointer back to persistent storage.
 			document.getElementById("offline_dbase_pointer").innerHTML = pointer;
 			console.log("Decremented pointer AFTER delete: " + document.getElementById("offline_dbase_pointer").innerHTML);
@@ -1228,6 +1244,35 @@
 			return "fail";
 		}
 	}
+
+	// Moving this code to a function aviods some nested if blocks.
+	// This function tries to store to offline dbase and returns the outcome.
+	async function handleOfflineDBaseStore(fp_hex, encrypted_data){
+		console.log("Attempting to store to offline dbase...");
+		const outcome = storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
+		if( outcome === "full" ){
+			return outcome;			
+		}else if( outcome != "success" ){
+			throw new Error('ERROR STORING TO OFFLINE DATABASE!');
+			return "error";
+		}
+		// Run the Burst Store.
+		const burst_save_response = await sendOfflineDBaseToServer();
+		if( burst_save_response != null){
+			console.log("burst response: " + burst_save_response.response);
+			// Not sure yet how I want to check that it worked.
+			if( burst_save_response.response === "success"){
+				return 1;
+			}else{
+				return 0;
+				// Maybe delete the record if it fails to load correctly?
+			}
+		}else{
+			// We've successfully stored to offline dbase BUT failed to store because we're offline.
+			return "offline";
+		}
+	}
+
 
 	//////////////////////////////////////////////////////////////
 	//					Core Functions						    //
@@ -1281,28 +1326,12 @@
 			throw new Error('Fingerprint length INVALID!');
 		}
 
-		// If offline dbase init'd, store to offline dbase and then send burst to server.
+		let offline_dbase_store_outcome;
 		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
-			console.log("Storing to offline...");
-			const outcome = storeSingleRecordToOfflineDBase(fp_hex, encrypted_data);
-			if( outcome != "success" ){
-				throw new Error('ERROR STORING TO OFFLINE DATABASE!');
-				return;
-			}
-			// Run the Burst Store.
-			const burst_save_response = await sendOfflineDBaseToServer();
-			if( burst_save_response != null){
-				console.log("burst response: " + burst_save_response.response);
-				// Not sure yet how I want to check that it worked.
-				if( burst_save_response.response === "success"){
-					return 1;
-				}else{
-					return 0;
-					// Maybe delete the record if it fails to load correctly?
-				}
-			}else{
-				// We've successfully stored to offline dbase BUT failed to store because we're offline.
-				return "offline";
+			offline_dbase_store_outcome = await handleOfflineDBaseStore(fp_hex, encrypted_data);
+			// Return from deepStore() unless the offline dbase is full, in which case store that single normally by not returning from deepStore.
+			if( offline_dbase_store_outcome != "full" ){
+				return offline_dbase_store_outcome;
 			}
 		}
 
@@ -1326,8 +1355,10 @@
 		debug("Server Handling - deepStore() -- Response from LOAD (store final check): " + "~" + sr_load.data + "~");
 
 		// Report Results
-		if(sr_load != null){
-			if( encrypted_data  === sr_load.data){
+		if(sr_load != null){ // Looks like we have to use this nested loop for null check or code will break.
+			if(encrypted_data  === sr_load.data && offline_dbase_store_outcome === "full"){
+				return "fullsuccess";
+			}else if(encrypted_data  === sr_load.data){
 				return 1;
 			}else{
 				return 0;
