@@ -238,6 +238,9 @@
 	<div id="offline_status_div" style="display:flex; justify-content:space-between;">
 		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
 	</div>
+	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
+		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS NOW FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
+	</div>
 	<div class="center_html" id="center_html">
 		<div class="content_html" id="content_html">
 
@@ -311,7 +314,7 @@
 			<div class="gen store two" id="store2" style="display:none">
 				<div style="display: flex; flex-direction: row; justify-content: space-between;">
 					<label>STORE DATA</label>
-					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+					<label id="data_length_label" style="color: black" ></label>
 				</div>
 				<textarea value="" id="store_data" rows="8" cols="45" oninput="checkTextInputLength()" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
@@ -722,7 +725,7 @@
 	// Input: Target is the element ID of an html generated pane.
 	function showPage(target){
 		// Hide all password warnings.
-		pass_warn_elements = document.getElementsByClassName('pass_length_warn');
+		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
 		for (let i = 0; i < pass_warn_elements.length; i++) {
 			pass_warn_elements[i].style.display = "none";
 		}
@@ -814,6 +817,8 @@
 		updateOnlineStatus();
 		// Clear uploaded file
 		document.getElementById("store_upload_input").value = null;
+		// Clear full offline database warning. Don't think we need this because why would you ever want it off?
+		//document.getElementById("full_offline_dbase_warning").style.display = "none";
 	}
 
 	// These standalone functions are required to set upload_flag in javascript.
@@ -1018,6 +1023,10 @@
 
 	// Fill a new offline dbase with random fingerprints and datas.
 	function createNewOfflineDBase(){
+		// Inform user of re-foll if button clicked while already in new offline dbase creation UI.
+		document.getElementById("status_label").innerHTML = "NEW OFFLINE DATABASE INITIALIZED.";
+		document.getElementById("status_label").style.display = "inline";
+
 		console.log("creating new offline dbase...");
 		// Init pointer.
 		const pointer = randomInt(0,90);
@@ -1098,6 +1107,15 @@
 		if( !checkDataIsValid(encrypted_data) ){
 			throw new Error('Attempt to store to offline dbase failed! DATA is invalid.');
 		}else{ console.log("DATA IS VALID!");}
+		// Input new fingerprint and data at pointer location.
+		let pointer = document.getElementById("offline_dbase_pointer").innerHTML;
+		console.log("pulled pointer from DOM object: " + pointer);
+		// Check if offline database is full.
+		if( pointer >= 99 ){
+			// Offline Database is full. Inform user.
+			document.getElementById("full_offline_dbase_warning").style.display = "inline";
+			return;	//End function.
+		}
 
 		// Load offline database.
 		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
@@ -1123,24 +1141,29 @@
 		}
 
 		// Input new fingerprint and data at pointer location.
-		let pointer = document.getElementById("offline_dbase_pointer").innerHTML;
-		console.log("pulled pointer from DOM object: " + pointer);
+		//let pointer = document.getElementById("offline_dbase_pointer").innerHTML;
+		//console.log("pulled pointer from DOM object: " + pointer);
 		const pointer_offset = pointer * 1064;
 		console.log("calculated offset: " + pointer_offset);
 		const pointer_end = pointer_offset + 1064;
 
 		// Replacing randomly generated data.
 		// If we've done our job, everything should line up.
-		const rep_offline_dbase = offline_dbase.substring(0, pointer_offset) + fp_hex + encrypted_data + offline_dbase.substring(pointer_end);
+		const replacement_offline_dbase = offline_dbase.substring(0, pointer_offset) + fp_hex + encrypted_data + offline_dbase.substring(pointer_end);
 		// Now save modified offline dbase back to html so it will persist when saving a standalone.html.
-		document.getElementById("offline_dbase").innerHTML = rep_offline_dbase;
+		document.getElementById("offline_dbase").innerHTML = replacement_offline_dbase;
 	
 		// Increment pointer.	
 		pointer++;
 		document.getElementById("offline_dbase_pointer").innerHTML = pointer;
 		console.log("Incremented pointer after dbase saved: " + document.getElementById("offline_dbase_pointer").innerHTML);
+
 		// Check if we hit last save locaation.
 		// If we did, inform user we have reached end of data and they will need to use a new offline database.
+		if( pointer >= 99 ){ // I think use 99 here because the randomInt() function states the input range is inclusive.
+			// Offline Database is now full. Inform user.
+			document.getElementById("full_offline_dbase_warning").style.display = "inline";
+		}
 
 		//Check Load, return success or failure.
 		const load_check_data = attemptLoadOfflineDBase(fp_hex);
@@ -2314,6 +2337,8 @@
 		}
 	}//check_b58chars()
 
+	// Still need to figure out what the hard limit is for this number.
+	//
 	// Input: input is a string.
 	// Output: Returns false if the input length (in bytes) is over 700.
 	function checkInputLength(input){
@@ -2321,6 +2346,11 @@
 
 		// show input size in bytes
 		let size = new Blob([input]).size;
+		let difference = 700 - size;
+		// Show running count of data length.
+		let size_string = "Number chars left: " + difference;
+		document.getElementById("data_length_label").innerHTML = size_string;
+		
 		//console.log("check Input length size: " + size);
 		//debug("Input (blob) size: " + size);
 		//debug("byte size: " + size);
