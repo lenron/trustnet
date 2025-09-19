@@ -1,0 +1,36 @@
+services:
+  obf_app:
+    build: .
+    restart: always
+    ports:
+      - "7800:80"
+    networks:
+      - obf_net
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:12.0.2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: Vuu_fQY1#qH,
+      MYSQL_DATABASE: chatriwe_obf
+      MYSQL_USER: chatriwe_admin
+      MYSQL_TCP_PORT: 3306
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+    networks:
+      - obf_net
+    #depends_on:
+      #- obf_app
+
+volumes:
+  mariadb_data:
+
+networks:
+  obf_net:
