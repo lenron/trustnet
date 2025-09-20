@@ -13,11 +13,11 @@ services:
     image: mariadb:12.0.2
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_PASSWORD: Vuu_fQY1#qH,
-      MYSQL_DATABASE: chatriwe_obf
-      MYSQL_USER: chatriwe_admin
-      MYSQL_TCP_PORT: 3306
+      MARIADB_ROOT_PASSWORD: pwd
+      MARIADB_DATABASE: chatriwe_obf
+      MARIADB_USER: chatriwe_admin
+      MARIADB_PASSWORD: Vuu_fQY1#qH,
+      MARIADB_TCP_PORT: 3306
     volumes:
       - mariadb_data:/var/lib/mysql
     ports:
