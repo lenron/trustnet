@@ -1,22 +1,11 @@
+# Install apache2 
 FROM httpd:2.4
+# Copy in conf to enable perl cgi, .htaccess, etc.
 COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
-# Copy server files into the apache container.
-COPY ./index.html /usr/local/apache2/htdocs
-COPY ./load.pl /usr/local/apache2/htdocs
-COPY ./store.pl /usr/local/apache2/htdocs
-COPY ./burst_store.pl /usr/local/apache2/htdocs
-COPY ./online_check.pl /usr/local/apache2/htdocs
-COPY ./.htaccess /usr/local/apache2/htdocs
-# Replace existing shebang line with this image's perl location.
-RUN sed -i '1c#!/usr/bin/perl' /usr/local/apache2/htdocs/load.pl
-RUN sed -i '1c#!/usr/bin/perl' /usr/local/apache2/htdocs/store.pl
-RUN sed -i '1c#!/usr/bin/perl' /usr/local/apache2/htdocs/burst_store.pl
-RUN sed -i '1c#!/usr/bin/perl' /usr/local/apache2/htdocs/online_check.pl
-RUN mkdir /usr/local/apache2/htdocs/obf
-COPY ./obf/.htaccess /usr/local/apache2/htdocs/obf
-# Make sure our scripts are executable.
-RUN chmod +x /usr/local/apache2/htdocs/*.pl
-# Install perl modules
+# Create link to perl inside container 
+RUN mkdir -p /home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin
+RUN ln -s /usr/bin/perl /home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin/perl5.10.1
+# Install perl modules. Prefer apt-get for scripts.
 RUN apt-get update
 RUN apt-get install -y make gcc cpanminus
 RUN apt-get install -y libmariadb-dev

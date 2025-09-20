@@ -2,5 +2,13 @@ Instructions to install our webapp into an apache image from scratch.
 
 First install Docker Engine: https://docs.docker.com/engine/install/
 
+Then download git repo. This file is in the repo so...
+	git clone https://github.com/lenron/trustnet.git
+
 Then run:
-	sudo ./build_docker_image_and_launch_server.sh
+	sudo docker compose up -d
+
+obf should now be up and fully functional at http://localhost:7800
+
+
+
