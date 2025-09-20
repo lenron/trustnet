@@ -1,7 +1,7 @@
 -- MariaDB set up script for lenron-obf
 
 -- Grant privileges to user (not sure if necessary)
-GRANT ALL PRIVILEGES ON *.* TO 'chatriwe_admin'@'localhost';
+--GRANT ALL PRIVILEGES ON *.* TO 'chatriwe_admin'@'localhost';
 
 -- Create Table on existing dbase
 USE chatriwe_obf;
