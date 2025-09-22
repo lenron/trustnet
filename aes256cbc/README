@@ -1,3 +1,13 @@
+Do it all script launch_webserver.sh will install docker, images for our webserver and launch it on localhost.
+
+MAKE SURE NO SQL SERVERS ARE RUNNING as there could be a conflict with Unix sockets.
+
+Launch script tailored for ubuntu based Linux like for example, Mint.
+
+With the instructions below, one could launch on anything that can run docker (theoretically).
+
+
+
 Instructions to install our webapp into an apache image from scratch.
 
 First install Docker Engine: https://docs.docker.com/engine/install/
