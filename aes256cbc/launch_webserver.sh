@@ -20,6 +20,6 @@ sudo apt-get update
 
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Run docker compose file compose.yaml. This fill will download images and run the httpd (apache) and MariaDB containers in the background.
+# Run docker compose file docker-compose.yaml. This fill will download images and run the httpd (apache) and MariaDB containers in the background.
 sudo docker compose up -d
 
