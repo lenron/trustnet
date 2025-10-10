@@ -148,6 +148,10 @@
 		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 	}
 
+	.openssl_enc_flowchart {
+		background-image: url('openssl_enc_flowchart_exported.drawio.svg');
+	}
+
 	/* Set minimum page Width to */
 	@media screen and (max-width: 340px){ html,body {min-width: 340px} }
 
@@ -636,12 +640,19 @@
 		<div>
 			<button id="dev_openssl_encrypt_button" style="" onclick="devOpenSSL()">ENCRYPT</button>
 		</div>
+	</div>
+	<div style="position: relative;">
 		<img src="openssl_enc_flowchart_exported.drawio.svg" alt="OpenSSL Diagram" />
+		<div style="position: absolute; top:20px; left:100px;">
+			<input type="text">
+		</div>
 	</div>
 
 
 </body>
 <script>
+			//<img src="openssl_enc_flowchart_exported.drawio.svg" alt="OpenSSL Diagram" />
+			//<div class="openssl_enc_flowchart" style="height:1000px; width:100%;">
 
 	// Dev Site Functions
 
