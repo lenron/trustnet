@@ -142,7 +142,10 @@
 	}
 
 	.devsite_inputs {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
 		color: black;
+		background-color: grey;
 	}
 
 	/* Add this class to a span or label (and other types?) to make it a cool looking pink */
@@ -684,18 +687,18 @@
 		<input id="dev_dec_openssl_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:14px; width:350px;">
 		<input id="dev_dec_openssl_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:14px; width:350px;">
 
+		<input id="dev_dec_openssl_ciphertext_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:460px; width:525px;">
+		<input id="dev_dec_openssl_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:460px; width:525px;">
+		<input id="dev_dec_openssl_ciphertext_extracted_bytes" class="devsite_inputs" type="text" style="position:absolute; top:210px; left:465px; width:525px;">
+
 		<input id="dev_dec_openssl_derivebits_algorithm" class="devsite_inputs" type="text" value="PBKDF2" style="position:absolute; top:342px; left:14px; width:183px; height:10px;">
 		<input id="dev_dec_openssl_derivebits_salt" class="devsite_inputs" type="text" style="position:absolute; top:291px; left:346px; width:183px; height:10px;">
 		<input id="dev_dec_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:393px; left:14px; width:183px; height:10px;">
 		<input id="dev_dec_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:444px; left:14px; width:183px; height:10px;">
 
-		<input id="dev_dec_openssl_encrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:600px; width:128px; height:10px;">
-		<textarea id="dev_dec_openssl_encrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:363px; left:528px; width:265px; height:34px;"></textarea>
-		<textarea id="dev_dec_openssl_encrypt_key" class="devsite_inputs" rows="3" style="position:absolute; top:450px; left:427px; width:350px; height:48px;"></textarea>
-
-		<input id="dev_dec_openssl_ciphertext_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:460px; width:525px;">
-		<input id="dev_dec_openssl_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:460px; width:525px;">
-		<input id="dev_dec_openssl_ciphertext_extracted_bytes" class="devsite_inputs" type="text" style="position:absolute; top:210px; left:465px; width:525px;">
+		<input id="dev_dec_openssl_decrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:600px; width:128px; height:10px;">
+		<textarea id="dev_dec_openssl_decrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:363px; left:528px; width:265px; height:34px;"></textarea>
+		<textarea id="dev_dec_openssl_decrypt_key" class="devsite_inputs" rows="3" style="position:absolute; top:450px; left:427px; width:350px; height:48px;"></textarea>
 
 		<input id="dev_dec_openssl_decrypted_bytes" class="devsite_inputs" type="text" style="position:absolute; top:561px; left:17px; width:950px;">
 		<input id="dev_dec_openssl_decrypted_plaintext" class="devsite_inputs" type="text" style="position:absolute; top:638px; left:17px; width:950px;">
@@ -708,7 +711,7 @@
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
 		<input id="dev_enc_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:380px;">
-		<input id="dev_enc_obf1_password_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:380px;">
+		<input id="dev_enc_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:380px;">
 
 		<input id="dev_enc_obf1_b64_input_data" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:512px; width:470px;">
 		<input id="dev_enc_obf1_b64_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:118px; left:512px; width:470px;">
@@ -726,15 +729,17 @@
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
 		<input id="dev_dec_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:374px;">
-		<input id="dev_dec_obf1_password_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:374px;">
+		<input id="dev_dec_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:374px;">
 
-		<textarea id="dev_dec_obf1_b58_ciphertext" class="devsite_inputs" rows="3" style="position:absolute; top:38px; left:462px; width:520px; height:160px;"></textarea>
+		<textarea id="dev_dec_obf1_b58_ciphertext" class="devsite_inputs" rows="3" style="position:absolute; top:38px; left:466px; width:526px; height:160px;"></textarea>
 
 		<input id="dev_dec_obf1_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:256px; left:48px; width:795px;">
 		<input id="dev_dec_obf1_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:319px; left:48px; width:795px;">
 
-		<input id="dev_dec_obf1_data_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:470px; left:37px; width:945px;">
-		<input id="dev_dec_obf1_data_b64_output" class="devsite_inputs" type="text" style="position:absolute; top:547px; left:37px; width:945px;">
+		<textarea id="dev_dec_obf1_xor_inversed_data" class="devsite_inputs" rows="3" style="position:absolute; top:405px; left:37px; width:960px; height:50px;"></textarea>
+
+		<input id="dev_dec_obf1_data_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:507px; left:37px; width:950px;">
+		<input id="dev_dec_obf1_data_b64_output" class="devsite_inputs" type="text" style="position:absolute; top:570px; left:37px; width:950px;">
 
 		<button id="dev_dec_obf1_decrypt_button" style="width:1000px;" onclick="devDecObf1()">DECRYPT</button>
 	</div>
@@ -773,6 +778,14 @@
 	}
 
 	async function devDecOpenSSL(){
+		const input_password = document.getElementById("dev_dec_openssl_password_input").value;
+		const input_plaintext = document.getElementById("dev_dec_openssl_ciphertext_input").value;
+		//const algorithm = document.getElementById("dev_enc_openssl_derivebits_algorithm").value;
+		//const iterations = document.getElementById("dev_enc_openssl_derivebits_iterations").value;
+		//const hash = document.getElementById("dev_enc_openssl_derivebits_hash").value;
+
+		const decrypted_plaintext = await decOpenSSL(input_plaintext, input_password);
+		document.getElementById("dev_dec_openssl_decrypted_plaintext").value = decrypted_plaintext;
 
 	}
 
@@ -785,6 +798,11 @@
 	}
 
 	async function devDecObf1(){
+		const input_password = document.getElementById("dev_dec_obf1_password_input").value;
+		const input_b58_encoded_data = document.getElementById("dev_dec_obf1_b58_ciphertext").value;
+
+		const output_b64 = await obf1Decrypt(input_b58_encoded_data, input_password);
+		document.getElementById("dev_dec_obf1_data_b64_output").value = output_b64;
 
 	}
 
@@ -2015,8 +2033,10 @@
 
 		// Salt is used when hashing, IV (Initialization Vector) for encryption.
 
+		const encoded_pass = new TextEncoder().encode(pass);
+		document.getElementById("dev_enc_openssl_password_bytes").value = encoded_pass;
 		// Import password into a subtlecrypto-usable key object.
-		const keyMaterial = await getKeyMaterial(pass);
+		const keyMaterial = await getKeyMaterial(encoded_pass);
 		// Derives input bits used for the PBKDF2 cryptoKey object AND the IV.
 		const derived_bits = await window.crypto.subtle.deriveBits(
 			{
@@ -2088,6 +2108,7 @@
 		//debug("Data Flow decOpenSSL() -- Ciphertext Input - base64:\n" + ciphertext64);
 		// Convert input base 64 to binary.
 		const ciphertextbytes = base64ToBytes(ciphertext64);
+		document.getElementById("dev_dec_openssl_ciphertext_bytes").value = ciphertextbytes;
 		//debug("Data Flow decOpenSSL() -- Ciphertext - Binary:\n" + ciphertextbytes);
 		// ciphertext is now in a form that is ready to give to the encryption function.
 
@@ -2096,12 +2117,15 @@
 		const iter = 10000;
 		// Salt has been preserved from encrypt. Pull digits from their place in the ciphertext.
 		const salta = ciphertextbytes.slice(8,16);
+		document.getElementById("dev_dec_openssl_derivebits_salt").value = salta;
 		const salt = new Uint8Array(salta);
 		//debug("Data Flow decOpenSSL() -- Ciphertext - Extracted Salt (bytes 8-15):\n" + salt);
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
 		// be used to create the cryptoKey object needed for the main digest.
-		const keyMaterial = await getKeyMaterial(pass);
+		const encoded_pass = new TextEncoder().encode(pass);
+		document.getElementById("dev_dec_openssl_password_bytes").value = encoded_pass;
+		const keyMaterial = await getKeyMaterial(encoded_pass);
 		//debug("Password Flow decOpenSSL() -- Plaintext password input:\n" + pass);
 		const derived_bits = await window.crypto.subtle.deriveBits(
 			{
@@ -2118,10 +2142,13 @@
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
 		const keybytes = derivedKeyBuffer.slice(0, 32);
+		document.getElementById("dev_dec_openssl_decrypt_key").value = keybytes;
 		const ivbytes = derivedKeyBuffer.slice(32);
+		document.getElementById("dev_dec_openssl_decrypt_iv").value = ivbytes;
 
 		// Extract the encrypted phrase (data) from OpenSSL input
 		const cipherbytesphrase = ciphertextbytes.slice(16);
+		document.getElementById("dev_dec_openssl_ciphertext_extracted_bytes").value = cipherbytesphrase;
 
 		// Data Window Logging
 		//debug("Password Flow decOpenSSL() -- PBKDF2 Derived Bits - 384 bits:\n" + derivedKeyBuffer);
@@ -2152,6 +2179,7 @@
 		// Main Function Call
 		// MDN syntax: decrypt(algorithm, key, data)
 		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
+		document.getElementById("dev_dec_openssl_decrypted_bytes").value = decrypted_result;
 		const log_decrypted_result = new Uint8Array(decrypted_result);
 		//debug("Data Flow decOpenSSL() -- Decrypted Binary Data:\n" + log_decrypted_result);
 		// Convert bytes to string.
@@ -2166,11 +2194,11 @@
 	// Process plaintext password into a Key Object usable by subtlecrypto functions.
 	// Input: Plaintext password.
 	// Output: Subtlecrypto usable Key Object.
-	function getKeyMaterial(password) {
+	function getKeyMaterial(encoded_pass) {
 		//const enc = new TextEncoder();
-		const encoded_pass = new TextEncoder().encode( password );
+		//const encoded_pass = new TextEncoder().encode( password );
 		//debug("Password Flow getKeyMaterial() -- Encoded Password: " + encoded_pass);
-		document.getElementById("dev_enc_openssl_password_bytes").value = encoded_pass;
+		//document.getElementById("dev_enc_openssl_password_bytes").value = encoded_pass;
 		// importKey(format, keyData, algorithm, extractable, keyUsages)
 		return window.crypto.subtle.importKey(
 			"raw",
@@ -2192,6 +2220,7 @@
 		// Prepare plaintext side for XOR.
 		// Adds our custom countstring to the data.
 		let plaintext_binary = addCountstring(plaintext64);
+		document.getElementById("dev_enc_obf1_zero_padded_data").value = plaintext_binary;
 		//debug("Data Flow obf1Encrypt() -- Counstring added: " + plaintext_binary);
 		// XOR plaintext with password and return exactly 1000 base 58 chars.
 		const result_b58 = await getXOR(plaintext_binary, password);
@@ -2218,7 +2247,9 @@
 
 		// Prepare password side for XOR.
 		const password_binary = new TextEncoder().encode(password);
+		document.getElementById("dev_enc_obf1_password_bytes").value = password_binary;
 		const pass_binary = await getPassHash(password_binary, array_length);
+		document.getElementById("dev_enc_obf1_sha_extended_bytes").value = pass_binary;
 
 		// Data Flow
 		//debug("Password Flow getXOR() -- Re-Hashed Password to be XOR'd: " + pass_binary);
@@ -2237,6 +2268,7 @@
 		// Try 8-bit Bytes:
 		// Chop unnecessary data, keeping the important slice.
 		let array_slice = xor_result.slice(0, 780);
+		document.getElementById("dev_enc_obf1_xord_data").value = array_slice;
 		let last_byte_popped;
 		let array_slice_hex;
 		// Without actually doing the conversion to base58, output length is unclear.
@@ -2326,12 +2358,15 @@
 		//debug("Data Flow xorInverse() -- base58 Input Data: " + data);
 		// Convert to Uint8Array from base 58.
 		let decoded_b58_arr = from_b58(data);
+		document.getElementById("dev_dec_obf1_ciphertext_bytes").value = decoded_b58_arr;
 		//debug("Data Flow xorInverse() -- Binary Input Data: " + decoded_b58_arr);
 		// Compute array length.
 		let array_length = decoded_b58_arr.length;
 		// Compute password for XOR.
 		const password_binary = new TextEncoder().encode(password);
+		document.getElementById("dev_dec_obf1_password_bytes").value = password_binary;
 		let pass_binary = await getPassHash(password_binary, array_length);
+		document.getElementById("dev_dec_obf1_sha_extended_bytes").value = pass_binary;
 		//debug("Password Flow xorInverse() -- Hashed Password: " + pass_binary);
 		// Inverse of XOR is XOR and is communicative.
 		// XOR password and output to get input.
@@ -2342,6 +2377,7 @@
 		}
 		//debug("Data Flow xorInverse() -- XOR Password and Data: " + xor_result);
 		let plaintextbytes = Array.from(xor_result);
+		document.getElementById("dev_dec_obf1_xor_inversed_data").value = plaintextbytes;
 		// Strip off tailing zeros from the RIGHT.
 		while(plaintextbytes[plaintextbytes.length - 1] == 0){
 			plaintextbytes.pop();
@@ -2350,6 +2386,7 @@
 		//debug("Data Flow xorInverse() -- Strip off Tailing Zeros: " + plaintextbytes);
 		// Convert utf-8 to string
 		let decrypted_string = new TextDecoder().decode(plaintextbytes);
+		document.getElementById("dev_dec_obf1_data_with_countstring").value = decrypted_string;
 		//debug("Data Flow xorInverse() -- Decrypted String: " + decrypted_string);
 		return decrypted_string;
 	}
@@ -2591,6 +2628,7 @@
 		//debug("countstring number of chars: " + num_chars);
 		// Form 'countstring'.
 		let countstring = num_chars + ':' + data;
+		document.getElementById("dev_enc_obf1_b64_with_countstring").value = countstring;
 		//debug("Data Flow addCountstring() -- Countstring added to base64 data: " + countstring);
 		// Convert to binary (Uint8Array).
 		const countstring_binary = new TextEncoder().encode(countstring);
