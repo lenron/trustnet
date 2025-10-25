@@ -707,13 +707,17 @@
 	<h3>Obf-1 Encrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
-		<input id="dev_enc_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:42px; left:54px; width:417px;">
-		<input id="dev_enc_obf1_password_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:14px; width:350px;">
+		<input id="dev_enc_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:380px;">
+		<input id="dev_enc_obf1_password_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:380px;">
 
+		<input id="dev_enc_obf1_b64_input_data" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:512px; width:470px;">
+		<input id="dev_enc_obf1_b64_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:118px; left:512px; width:470px;">
 
-		<input id="dev_enc_obf1_b64_input_data" class="devsite_inputs" type="text" style="position:absolute; top:42px; left:554px; width:417px;">
+		<input id="dev_enc_obf1_zero_padded_data" class="devsite_inputs" type="text" style="position:absolute; top:260px; left:48px; width:808px;">
+		<input id="dev_enc_obf1_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:324px; left:48px; width:808px;">
 
-		<textarea id="dev_enc_obf1_b58_output" class="devsite_inputs" rows="3" style="position:absolute; top:490px; left:116px; width:700px; height:100px;"></textarea>
+		<textarea id="dev_enc_obf1_xord_data" class="devsite_inputs" rows="3" style="position:absolute; top:398px; left:20px; width:965px; height:50px;"></textarea>
+		<textarea id="dev_enc_obf1_b58_output" class="devsite_inputs" rows="3" style="position:absolute; top:541px; left:20px; width:965px; height:102px;"></textarea>
 		<button id="dev_enc_obf1_encrypt_button" style="width:1000px;" onclick="devEncObf1()">ENCRYPT</button>
 	</div>
 	<br>
@@ -721,6 +725,18 @@
 	<h3>Obf-1 Decrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
+		<input id="dev_dec_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:374px;">
+		<input id="dev_dec_obf1_password_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:374px;">
+
+		<textarea id="dev_dec_obf1_b58_ciphertext" class="devsite_inputs" rows="3" style="position:absolute; top:38px; left:462px; width:520px; height:160px;"></textarea>
+
+		<input id="dev_dec_obf1_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:256px; left:48px; width:795px;">
+		<input id="dev_dec_obf1_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:319px; left:48px; width:795px;">
+
+		<input id="dev_dec_obf1_data_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:470px; left:37px; width:945px;">
+		<input id="dev_dec_obf1_data_b64_output" class="devsite_inputs" type="text" style="position:absolute; top:547px; left:37px; width:945px;">
+
+		<button id="dev_dec_obf1_decrypt_button" style="width:1000px;" onclick="devDecObf1()">DECRYPT</button>
 	</div>
 	<br>
 
