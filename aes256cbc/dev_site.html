@@ -748,12 +748,34 @@
 	<h3>Obf-2 Encrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
+
+		<input id="dev_enc_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
+		<input id="dev_enc_obf2_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:108px; left:15px; width:374px;">
+		<input id="dev_enc_obf2_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:259px; left:15px; width:730px;">
+
+		<textarea id="dev_enc_obf2_ciphertext_b58" class="devsite_inputs" rows="3" style="position:absolute; top:39px; left:443px; width:537px; height:168px;"></textarea>
+		<textarea id="dev_enc_obf2_password_b58" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
+
+		<textarea id="dev_enc_obf2_final_encrypted" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
+
+		<button id="dev_enc_obf2_encrypt_button" style="width:1000px;" onclick="devEncObf2()">ENCRYPT</button>
 	</div>
 	<br>
 
 	<h3>Obf-2 Decrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
+
+		<input id="dev_dec_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
+		<input id="dev_dec_obf2_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:108px; left:15px; width:374px;">
+		<input id="dev_dec_obf2_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:259px; left:15px; width:730px;">
+
+		<textarea id="dev_dec_obf2_final_encrypted" class="devsite_inputs" rows="3" style="position:absolute; top:39px; left:443px; width:537px; height:168px;"></textarea>
+		<textarea id="dev_dec_obf2_password_b58" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
+
+		<textarea id="dev_dec_obf2_ciphertext_b58" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
+
+		<button id="dev_dec_obf2_decrypt_button" style="width:1000px;" onclick="devDecObf2()">DECRYPT</button>
 	</div>
 	<br>
 
@@ -765,7 +787,7 @@
 
 	// Dev Site Functions
 
-	// Dev OpenSSL go function
+	// OpenSSL
 	async function devEncOpenSSL(){
 		const input_password = document.getElementById("dev_enc_openssl_password_input").value;
 		const input_plaintext = document.getElementById("dev_enc_openssl_plaintext_input").value;
@@ -775,6 +797,12 @@
 
 		const output_base64 = await encOpenSSL(input_plaintext, input_password, iterations, hash);
 		document.getElementById("dev_enc_openssl_encrypted_data_base64").value = output_base64;
+		// Propagate encrypt outputs to inverse decrypt function and next encrypt for now.
+		document.getElementById("dev_dec_openssl_password_input").value = input_password;
+		document.getElementById("dev_dec_openssl_ciphertext_input").value = output_base64;
+		// Proopagate to next encrypt step.
+		//document.getElementById("dev_enc_obf1_password_input").value = input_password;
+		document.getElementById("dev_enc_obf1_b64_input_data").value = output_base64;
 	}
 
 	async function devDecOpenSSL(){
@@ -786,15 +814,21 @@
 
 		const decrypted_plaintext = await decOpenSSL(input_plaintext, input_password);
 		document.getElementById("dev_dec_openssl_decrypted_plaintext").value = decrypted_plaintext;
-
 	}
 
+	// Obf 1
 	async function devEncObf1(){
 		const input_password = document.getElementById("dev_enc_obf1_password_input").value;
 		const input_b64_encoded_data = document.getElementById("dev_enc_obf1_b64_input_data").value;
 
 		const output_1000_b58 = await obf1Encrypt(input_b64_encoded_data, input_password);
 		document.getElementById("dev_enc_obf1_b58_output").value = output_1000_b58;
+		// Propagate encrypt outputs to decrypt.
+		document.getElementById("dev_dec_obf1_password_input").value = input_password;
+		document.getElementById("dev_dec_obf1_b58_ciphertext").value = output_1000_b58;
+		// Proopagate to next encrypt step.
+		//document.getElementById("dev_enc_obf2_password_input").value = input_password;
+		document.getElementById("dev_enc_obf2_ciphertext_b58").value = output_1000_b58;
 	}
 
 	async function devDecObf1(){
@@ -803,15 +837,26 @@
 
 		const output_b64 = await obf1Decrypt(input_b58_encoded_data, input_password);
 		document.getElementById("dev_dec_obf1_data_b64_output").value = output_b64;
-
 	}
 
+	// Obf 2
 	async function devEncObf2(){
+		const input_password = document.getElementById("dev_enc_obf2_password_input").value;
+		const input_b58_ciphertext = document.getElementById("dev_enc_obf2_ciphertext_b58").value;
 
+		const output_final = await obf2Encrypt(input_b58_ciphertext, input_password);
+		document.getElementById("dev_enc_obf2_final_encrypted").value = output_final;
+		// Propagate encrypt outputs to decrypt.
+		document.getElementById("dev_dec_obf2_password_input").value = input_password;
+		document.getElementById("dev_dec_obf2_final_encrypted").value = output_final;
 	}
 
 	async function devDecObf2(){
+		const input_password = document.getElementById("dev_dec_obf2_password_input").value;
+		const input_final_encrypted = document.getElementById("dev_dec_obf2_final_encrypted").value;
 
+		const output_ciphertext_b58 = await obf2Decrypt(input_final_encrypted, input_password);
+		document.getElementById("dev_dec_obf2_ciphertext_b58").value = output_ciphertext_b58;
 	}
 
 
@@ -2179,8 +2224,8 @@
 		// Main Function Call
 		// MDN syntax: decrypt(algorithm, key, data)
 		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
-		document.getElementById("dev_dec_openssl_decrypted_bytes").value = decrypted_result;
 		const log_decrypted_result = new Uint8Array(decrypted_result);
+		document.getElementById("dev_dec_openssl_decrypted_bytes").value = log_decrypted_result;
 		//debug("Data Flow decOpenSSL() -- Decrypted Binary Data:\n" + log_decrypted_result);
 		// Convert bytes to string.
 		let decrypted_string = new TextDecoder().decode( decrypted_result );
@@ -2411,12 +2456,15 @@
 		// Hash, rehash, append password function.
 		// This results in 1000 bytes of length which might (will?) convert to over 4000 b58 chars
 		const password_binary = new TextEncoder().encode(password);
+		document.getElementById("dev_enc_obf2_password_bytes").value = password_binary;
 		const pass_hash = await getPassHash(password_binary, input_length);
+		document.getElementById("dev_enc_obf2_sha_extended_bytes").value = pass_hash;
 		//debug("Password Flow obf2Encrypt() -- Password Hash Binary: " + pass_hash);
 
 		// Convert password hash byte array to base58 string.
 		// Over 4000 chars long at this point.
 		const pass_b58 = to_b58(pass_hash);
+		document.getElementById("dev_enc_obf2_password_b58").value = pass_b58;
 		//debug("Password Flow obf2Encrypt() -- Password Hash base58: " + pass_b58);
 		//debug("Data Flow obf2Encrypt() -- Input Data: " + input_data);
 
@@ -2466,12 +2514,15 @@
 		// Hash, rehash, append password function.
 		// This results in 1000 bytes of length which might (will?) convert to over 4000 b58 chars
 		const password_binary = new TextEncoder().encode(password);
+		document.getElementById("dev_dec_obf2_password_bytes").value = password_binary;
 		const pass_hash = await getPassHash(password_binary, final_encrypted_length);
+		document.getElementById("dev_dec_obf2_sha_extended_bytes").value = pass_hash;
 		//debug("Password Flow obf2Decrypt() -- Password Hash: " + pass_hash);
 
 		// Convert password hash byte array to base58 string.
 		// Over 4000 chars long at this point.
 		const pass_b58 = to_b58(pass_hash);
+		document.getElementById("dev_dec_obf2_password_b58").value = pass_b58;
 		//debug("Password Flow obf2Decrypt() -- Password - base58: " + pass_b58);
 		//debug("Data Flow obf2Decrypt() -- Input Data to be Decrypted: " + final_encrypted);
 
