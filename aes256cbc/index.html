@@ -228,6 +228,9 @@
 		</div>
 		<div class="header_content" id="header_right">
 			<div class="header_label" style="">
+				<label id="dev_site">DEVELOPMENT SITE</label>
+			</div>
+			<div class="header_label" style="">
 				<label id="howworks">HOW IT WORKS</label>
 			</div>
 			<div class="header_label" style="">
@@ -639,6 +642,13 @@
 		//location.href = "https://chat.dance/obf";
 		showPage('home');
 	}
+
+	// Link to Dev Site
+	document.getElementById("dev_site").onclick = function() {
+		location.href = "dev_site.html";
+		//showPage('home');
+	}
+
 /*
 	// later
 	document.getElementById("howworks").onclick = function() {
@@ -2018,7 +2028,8 @@
 		// Start at 1000, will immediately be chopped to 780, which guarantees a converstion to more than 1000 b58 chars.
 		const array_length = 1000;
 		// Prepare password side for XOR.
-		const pass_binary = await getPassHash(password, array_length);
+		const password_binary = new TextEncoder().encode(password);
+		const pass_binary = await getPassHash(password_binary, array_length);
 
 		// Data Flow
 		debug("Password Flow getXOR() -- Re-Hashed Password to be XOR'd: " + pass_binary);
@@ -2130,7 +2141,8 @@
 		// Compute array length.
 		let array_length = decoded_b58_arr.length;
 		// Compute password for XOR.
-		let pass_binary = await getPassHash(password, array_length);
+		const password_binary = new TextEncoder().encode(password);
+		let pass_binary = await getPassHash(password_binary, array_length);
 		debug("Password Flow xorInverse() -- Hashed Password: " + pass_binary);
 		// Inverse of XOR is XOR and is communicative.
 		// XOR password and output to get input.
@@ -2172,7 +2184,8 @@
 
 		// Hash, rehash, append password function.
 		// This results in 1000 bytes of length which might (will?) convert to over 4000 b58 chars
-		const pass_hash = await getPassHash(password, input_length);
+		const password_binary = new TextEncoder().encode(password);
+		const pass_hash = await getPassHash(password_binary, input_length);
 		debug("Password Flow obf2Encrypt() -- Password Hash Binary: " + pass_hash);
 
 		// Convert password hash byte array to base58 string.
@@ -2226,7 +2239,8 @@
 
 		// Hash, rehash, append password function.
 		// This results in 1000 bytes of length which might (will?) convert to over 4000 b58 chars
-		const pass_hash = await getPassHash(password, final_encrypted_length);
+		const password_binary = new TextEncoder().encode(password);
+		const pass_hash = await getPassHash(password_binary, final_encrypted_length);
 		debug("Password Flow obf2Decrypt() -- Password Hash: " + pass_hash);
 
 		// Convert password hash byte array to base58 string.
@@ -2403,10 +2417,10 @@
 	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	// Inputs: pass is plaintext, length is an integer 
 	// Output: binary byte array (Uint8Array).
-	async function getPassHash(pass, length) {
+	async function getPassHash(password_binary, length) {
 		// Convert to binary (Uint8Array).
-		const password_binary = new TextEncoder().encode(pass);
-		debug("Password Flow getPassHash() -- Password plaintext: " + pass);
+		//const password_binary = new TextEncoder().encode(pass);
+		//debug("Password Flow getPassHash() -- Password plaintext: " + pass);
 		debug("Password Flow getPassHash() -- Password binary: " + password_binary);
 
 		// Take initial SHA256.

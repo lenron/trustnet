@@ -1,9 +1,9 @@
 services:
-  obf_app:
+  obf:
     image: mkrlenron/lenron-obf:0.1
     restart: always
-    ports:
-      - "7800:80"
+      #ports:
+      #- "7800:80"
     volumes:
       - type: bind
         source: .
@@ -15,9 +15,25 @@ services:
         source: /tmp/mysqld
         target: /run/mysqld
     networks:
-      - obf_net
+      - proxy
     depends_on:
       - dbase
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.obf.entrypoints=http"
+      - "traefik.http.routers.obf.rule=Host(`obf.mkrsvr.org`)"
+      - "traefik.http.middlewares.obf-https-redirect.redirectscheme.scheme=https"
+        #- "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.obf.middlewares=obf-https-redirect"
+      - "traefik.http.routers.obf-secure.entrypoints=https"
+      - "traefik.http.routers.obf-secure.rule=Host(`obf.mkrsvr.org`)"
+      - "traefik.http.routers.obf-secure.tls=true"
+      - "traefik.http.routers.obf-secure.tls.certresolver=cloudflare"
+        #- "traefik.http.routers.traefik-secure.tls.domains[0].main=mkrsvr.org"
+        #- "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.mkrsvr.org"
+      - "traefik.http.routers.obf-secure.service=obf"
+      - "traefik.http.services.obf.loadbalancer.server.port=80"
 
   dbase:
     image: mariadb:12.0.2
@@ -37,10 +53,11 @@ services:
     ##expose:
       #- 3306
     networks:
-      - obf_net
+      - proxy 
 
 volumes:
   mariadb_data:
 
 networks:
-  obf_net:
+  proxy:
+    external: true
