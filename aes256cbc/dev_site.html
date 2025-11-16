@@ -653,6 +653,8 @@
 		<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:419px; left:20px; width:183px; height:10px;">
 		<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">
 
+		<button id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:336px; left:106px; width:100px; height:20px; font-size:10px; background-color:orange; color:black;" onclick="devManualSalt()">Roll Salt</button>
+
 		<input id="dev_enc_openssl_encrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:578px; width:128px; height:10px;">
 		<textarea id="dev_enc_openssl_encrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:357px; left:540px; width:265px; height:34px;"></textarea>
 		<textarea id="dev_enc_openssl_encrypt_key" class="devsite_inputs" rows="3" style="position:absolute; top:445px; left:439px; width:350px; height:48px;"></textarea>
@@ -786,6 +788,12 @@
 		//<div style="position: absolute; top:20px; left:100px;">
 
 	// Dev Site Functions
+
+	async function devManualSalt(){
+		const salt = window.crypto.getRandomValues(new Uint8Array(8));
+		document.getElementById("dev_enc_openssl_derivebits_salt").value = salt;
+		document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
+	}
 
 	// OpenSSL
 	async function devEncOpenSSL(){
@@ -2072,9 +2080,23 @@
 		//const iter = 10000;
 		//const digest_hash = 'SHA-256';
 		// Generate random salt.
-		const salt = window.crypto.getRandomValues(new Uint8Array(8));
-		document.getElementById("dev_enc_openssl_derivebits_salt").value = salt;
-		document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
+		//let salt = new Uint8Array(8);
+		let salt;
+		if( document.getElementById("dev_enc_openssl_derivebits_salt").value.trim() === ""){
+			salt = window.crypto.getRandomValues(new Uint8Array(8));
+			document.getElementById("dev_enc_openssl_derivebits_salt").value = salt;
+			document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
+		}else{
+			saltstring = document.getElementById("dev_enc_openssl_derivebits_salt").value;
+			const numbers = saltstring.split(',').map(Number);
+			console.log("numbers salt array length: " + numbers.length);
+			if( numbers.length != 8 ){
+				alert("Invalid Random Salt!\n\nManually inputted salt must be exactly 8 bytes in comma separated number form.");
+				throw new Error("Manually inputted salt must be exactly 8 bytes.");
+			}
+			salt = new Uint8Array(numbers);
+			document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
+		}
 
 		// Salt is used when hashing, IV (Initialization Vector) for encryption.
 
