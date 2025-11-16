@@ -648,12 +648,29 @@
 		<input id="dev_enc_openssl_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:20px; width:350px;">
 		<input id="dev_enc_openssl_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:20px; width:350px;">
 
-		<input id="dev_enc_openssl_derivebits_algorithm" class="devsite_inputs" type="text" value="PBKDF2" style="position:absolute; top:316px; left:20px; width:183px; height:10px;">
-		<input id="dev_enc_openssl_derivebits_salt" class="devsite_inputs" type="text" style="position:absolute; top:368px; left:20px; width:183px; height:10px;">
-		<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:419px; left:20px; width:183px; height:10px;">
-		<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">
+		<!--<input id="dev_enc_openssl_derivebits_algorithm" class="devsite_inputs" type="text" value="PBKDF2" style="position:absolute; top:316px; left:20px; width:183px; height:10px;">--!>
+		<input id="dev_enc_openssl_derivebits_salt" class="devsite_inputs" type="text" style="position:absolute; top:260px; left:26px; width:183px; height:10px;">
+		<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:310px; left:26px; width:183px; height:10px;">
+		<!--<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">--!>
 
-		<button id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:336px; left:106px; width:100px; height:20px; font-size:10px; background-color:orange; color:black;" onclick="devManualSalt()">Roll Salt</button>
+		<button id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:230px; left:106px; width:100px; height:20px; font-size:10px; background-color:orange; color:black;" onclick="devManualSalt()">Roll Salt</button>
+		<div style="background-color:orange; font-size:14px; position:absolute; top:360px; left:20px; ">
+			<fieldset >
+				<legend style="color:black;">Digest Hash:</legend>
+				<div>
+					<input type="radio" id="SHA-256" name="digest_hash" value="SHA-256" checked />
+					<label style="color:black;" for="SHA-256">SHA-256</label>
+				</div>
+				<div>
+					<input type="radio" id="SHA-384" name="digest_hash" value="SHA-384" />
+					<label style="color:black;" for="SHA-384">SHA-384</label>
+				</div>
+				<div>
+					<input type="radio" id="SHA-512" name="digest_hash" value="SHA-512" />
+					<label style="color:black;" for="SHA-512">SHA-512</label>
+				</div>
+			</fieldset>
+		</div>
 
 		<input id="dev_enc_openssl_encrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:578px; width:128px; height:10px;">
 		<textarea id="dev_enc_openssl_encrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:357px; left:540px; width:265px; height:34px;"></textarea>
@@ -693,10 +710,28 @@
 		<input id="dev_dec_openssl_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:460px; width:525px;">
 		<input id="dev_dec_openssl_ciphertext_extracted_bytes" class="devsite_inputs" type="text" style="position:absolute; top:210px; left:465px; width:525px;">
 
-		<input id="dev_dec_openssl_derivebits_algorithm" class="devsite_inputs" type="text" value="PBKDF2" style="position:absolute; top:342px; left:14px; width:183px; height:10px;">
+		<!--<input id="dev_dec_openssl_derivebits_algorithm" class="devsite_inputs" type="text" value="PBKDF2" style="position:absolute; top:342px; left:14px; width:183px; height:10px;">--!>
 		<input id="dev_dec_openssl_derivebits_salt" class="devsite_inputs" type="text" style="position:absolute; top:291px; left:346px; width:183px; height:10px;">
-		<input id="dev_dec_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:393px; left:14px; width:183px; height:10px;">
-		<input id="dev_dec_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:444px; left:14px; width:183px; height:10px;">
+		<input id="dev_dec_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:272px; left:16px; width:183px; height:10px;">
+		<!--<input id="dev_dec_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:444px; left:14px; width:183px; height:10px;">--!>
+
+		<div style="background-color:orange; font-size:14px; position:absolute; top:320px; left:20px; ">
+			<fieldset >
+				<legend style="color:black;">Digest Hash:</legend>
+				<div>
+					<input type="radio" id="SHA-256_dec" name="digest_hash_dec" value="SHA-256" checked />
+					<label style="color:black;" for="SHA-256_dec">SHA-256</label>
+				</div>
+				<div>
+					<input type="radio" id="SHA-384_dec" name="digest_hash_dec" value="SHA-384" />
+					<label style="color:black;" for="SHA-384_dec">SHA-384</label>
+				</div>
+				<div>
+					<input type="radio" id="SHA-512_dec" name="digest_hash_dec" value="SHA-512" />
+					<label style="color:black;" for="SHA-512_dec">SHA-512</label>
+				</div>
+			</fieldset>
+		</div>
 
 		<input id="dev_dec_openssl_decrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:600px; width:128px; height:10px;">
 		<textarea id="dev_dec_openssl_decrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:363px; left:528px; width:265px; height:34px;"></textarea>
@@ -783,9 +818,8 @@
 
 </body>
 <script>
-			//<img src="openssl_enc_flowchart_exported.drawio.svg" alt="OpenSSL Diagram" />
-			//<div class="openssl_enc_flowchart" style="height:1000px; width:100%;">
-		//<div style="position: absolute; top:20px; left:100px;">
+
+		//console.log("radiovalue: " + document.querySelector('input[type=radio][name=algo]:checked').value );
 
 	// Dev Site Functions
 
@@ -800,16 +834,25 @@
 		const input_password = document.getElementById("dev_enc_openssl_password_input").value;
 		const input_plaintext = document.getElementById("dev_enc_openssl_plaintext_input").value;
 		//const algorithm = document.getElementById("dev_enc_openssl_derivebits_algorithm").value;
+		//const key_derivation_algorithm = document.querySelector('input[type=radio][name=algo]:checked').value;
 		const iterations = document.getElementById("dev_enc_openssl_derivebits_iterations").value;
-		const hash = document.getElementById("dev_enc_openssl_derivebits_hash").value;
+		//const hash = document.getElementById("dev_enc_openssl_derivebits_hash").value;
+		const hash = document.querySelector('input[type=radio][name=digest_hash]:checked').value;
 
 		const output_base64 = await encOpenSSL(input_plaintext, input_password, iterations, hash);
 		document.getElementById("dev_enc_openssl_encrypted_data_base64").value = output_base64;
 		// Propagate encrypt outputs to inverse decrypt function and next encrypt for now.
 		document.getElementById("dev_dec_openssl_password_input").value = input_password;
 		document.getElementById("dev_dec_openssl_ciphertext_input").value = output_base64;
+		document.getElementById("dev_dec_openssl_derivebits_iterations").value = iterations;
+		if( hash === 'SHA-256' ){
+			document.getElementById("SHA-256_dec").checked = true;
+		}else if( hash === 'SHA-384' ){
+			document.getElementById("SHA-384_dec").checked = true;
+		}else if( hash === 'SHA-512' ){
+			document.getElementById("SHA-512_dec").checked = true;
+		}
 		// Proopagate to next encrypt step.
-		//document.getElementById("dev_enc_obf1_password_input").value = input_password;
 		document.getElementById("dev_enc_obf1_b64_input_data").value = output_base64;
 	}
 
@@ -817,10 +860,11 @@
 		const input_password = document.getElementById("dev_dec_openssl_password_input").value;
 		const input_plaintext = document.getElementById("dev_dec_openssl_ciphertext_input").value;
 		//const algorithm = document.getElementById("dev_enc_openssl_derivebits_algorithm").value;
-		//const iterations = document.getElementById("dev_enc_openssl_derivebits_iterations").value;
-		//const hash = document.getElementById("dev_enc_openssl_derivebits_hash").value;
+		const iterations = document.getElementById("dev_dec_openssl_derivebits_iterations").value;
+		//const hash = document.getElementById("dev_dec_openssl_derivebits_hash").value;
+		const hash = document.querySelector('input[type=radio][name=digest_hash_dec]:checked').value;
 
-		const decrypted_plaintext = await decOpenSSL(input_plaintext, input_password);
+		const decrypted_plaintext = await decOpenSSL(input_plaintext, input_password, iterations, hash);
 		document.getElementById("dev_dec_openssl_decrypted_plaintext").value = decrypted_plaintext;
 	}
 
@@ -2108,6 +2152,7 @@
 		const derived_bits = await window.crypto.subtle.deriveBits(
 			{
 				name: "PBKDF2",
+				//name: key_derivation_algo,
 				salt,
 				iterations: iter,
 				hash: digest_hash,
@@ -2171,7 +2216,7 @@
 	// Our implementation of OpenSSL's decrypt function.
 	// Inputs: ciphertext64 is base64. pass is plaintext.
 	// Output: decrypted plaintext.
-	async function decOpenSSL(ciphertext64, pass) {
+	async function decOpenSSL(ciphertext64, pass, iter, digest_hash) {
 		//debug("Data Flow decOpenSSL() -- Ciphertext Input - base64:\n" + ciphertext64);
 		// Convert input base 64 to binary.
 		const ciphertextbytes = base64ToBytes(ciphertext64);
@@ -2180,8 +2225,8 @@
 		// ciphertext is now in a form that is ready to give to the encryption function.
 
 		// Prepare inputs for digest.
-		const digest_hash = 'SHA-256';
-		const iter = 10000;
+		//const digest_hash = 'SHA-256';
+		//const iter = 10000;
 		// Salt has been preserved from encrypt. Pull digits from their place in the ciphertext.
 		const salta = ciphertextbytes.slice(8,16);
 		document.getElementById("dev_dec_openssl_derivebits_salt").value = salta;
@@ -2272,6 +2317,7 @@
 			//enc.encode(password),	// plaintext -> binary
 			encoded_pass,	// plaintext -> binary
 			"PBKDF2",
+			//algo,
 			false,
 			["deriveBits", "deriveKey"],
 		);
