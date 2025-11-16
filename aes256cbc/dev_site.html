@@ -833,15 +833,16 @@
 	async function devEncOpenSSL(){
 		const input_password = document.getElementById("dev_enc_openssl_password_input").value;
 		const input_plaintext = document.getElementById("dev_enc_openssl_plaintext_input").value;
-		//const algorithm = document.getElementById("dev_enc_openssl_derivebits_algorithm").value;
 		//const key_derivation_algorithm = document.querySelector('input[type=radio][name=algo]:checked').value;
 		const iterations = document.getElementById("dev_enc_openssl_derivebits_iterations").value;
 		//const hash = document.getElementById("dev_enc_openssl_derivebits_hash").value;
 		const hash = document.querySelector('input[type=radio][name=digest_hash]:checked').value;
+		const digest_algo = document.getElementById("dev_enc_openssl_encrypt_algorithm").value;
 
-		const output_base64 = await encOpenSSL(input_plaintext, input_password, iterations, hash);
+		const output_base64 = await encOpenSSL(input_plaintext, input_password, iterations, hash, digest_algo);
 		document.getElementById("dev_enc_openssl_encrypted_data_base64").value = output_base64;
 		// Propagate encrypt outputs to inverse decrypt function and next encrypt for now.
+		document.getElementById("dev_dec_openssl_decrypt_algorithm").value = digest_algo;
 		document.getElementById("dev_dec_openssl_password_input").value = input_password;
 		document.getElementById("dev_dec_openssl_ciphertext_input").value = output_base64;
 		document.getElementById("dev_dec_openssl_derivebits_iterations").value = iterations;
@@ -863,8 +864,9 @@
 		const iterations = document.getElementById("dev_dec_openssl_derivebits_iterations").value;
 		//const hash = document.getElementById("dev_dec_openssl_derivebits_hash").value;
 		const hash = document.querySelector('input[type=radio][name=digest_hash_dec]:checked').value;
+		const digest_algo = document.getElementById("dev_dec_openssl_decrypt_algorithm").value;
 
-		const decrypted_plaintext = await decOpenSSL(input_plaintext, input_password, iterations, hash);
+		const decrypted_plaintext = await decOpenSSL(input_plaintext, input_password, iterations, hash, digest_algo);
 		document.getElementById("dev_dec_openssl_decrypted_plaintext").value = decrypted_plaintext;
 	}
 
@@ -2097,7 +2099,7 @@
 	// Our implementation of OpenSSL's encrypt function.
 	// Inputs: Plaintext.
 	// Output: OpenSSL encrypted base64 string.
-	async function encOpenSSL(plaintext, pass, iter, digest_hash) {
+	async function encOpenSSL(plaintext, pass, iter, digest_hash, digest_algorithm) {
 		// Data Flow Window
 		//debug("Data Flow encOpenSSL() -- Plaintext data input:\n" + plaintext);
 		//debug("Password Flow encOpenSSL() -- Plaintext password input:\n" + pass);
@@ -2179,7 +2181,8 @@
 			'raw', 
 			keybytes, 
 			{
-				name: 'AES-CBC', 
+				//name: 'AES-CBC', 
+				name: digest_algorithm,
 				length: 256
 			}, 
 			false, 
@@ -2192,7 +2195,8 @@
 		//debug("Data Flow encOpenSSL() -- AES-CBC 256 Input - Binary Data:\n" + plaintextbytes);
 		// Main Function Digest
 		// MDN syntax: encrypt(algorithm, key, data)
-		const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
+		//const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
+		const encrypted_result = await window.crypto.subtle.encrypt({ name: digest_algorithm, iv: ivbytes }, key, plaintextbytes);
 		// Data Flow Window
 		const log_encrypted_result = new Uint8Array(encrypted_result);
 		//debug("Data Flow encOpenSSL() -- AES-CBC 256 Encrypted Output Data:\n" + log_encrypted_result);
@@ -2216,7 +2220,7 @@
 	// Our implementation of OpenSSL's decrypt function.
 	// Inputs: ciphertext64 is base64. pass is plaintext.
 	// Output: decrypted plaintext.
-	async function decOpenSSL(ciphertext64, pass, iter, digest_hash) {
+	async function decOpenSSL(ciphertext64, pass, iter, digest_hash, digest_algorithm) {
 		//debug("Data Flow decOpenSSL() -- Ciphertext Input - base64:\n" + ciphertext64);
 		// Convert input base 64 to binary.
 		const ciphertextbytes = base64ToBytes(ciphertext64);
@@ -2275,7 +2279,8 @@
 			'raw', 
 			keybytes, 
 			{
-				name: 'AES-CBC', 
+				//name: 'AES-CBC', 
+				name: digest_algorithm, 
 				length: 256
 			}, 
 			false, 
@@ -2290,7 +2295,8 @@
 		//debug("Data Flow decOpenSSL() -- AES-CBC 256 Decrypt - Binary Data:\n" + cipherbytesphrase);
 		// Main Function Call
 		// MDN syntax: decrypt(algorithm, key, data)
-		const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
+		//const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
+		const decrypted_result = await window.crypto.subtle.decrypt({ name: digest_algorithm, iv: ivbytes }, key, cipherbytesphrase);
 		const log_decrypted_result = new Uint8Array(decrypted_result);
 		document.getElementById("dev_dec_openssl_decrypted_bytes").value = log_decrypted_result;
 		//debug("Data Flow decOpenSSL() -- Decrypted Binary Data:\n" + log_decrypted_result);
