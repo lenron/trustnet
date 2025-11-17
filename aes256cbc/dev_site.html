@@ -633,6 +633,8 @@
 <!-- Dev Site --!>
 	<h2>Development Site -- Crypto Functions</h2>
 
+	
+
 	<div style="display:flex; flex-direction:row; justify-content: space-between; width: 1010px;">
 		<h3 style="color:magenta;">OpenSSL Encrypt</h3>
 			<div style="display:flex; flex-direction:column; justify-content:flex-end;">
@@ -652,6 +654,12 @@
 		<input id="dev_enc_openssl_derivebits_salt" class="devsite_inputs" type="text" style="position:absolute; top:260px; left:26px; width:183px; height:10px;">
 		<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:310px; left:26px; width:183px; height:10px;">
 		<!--<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">--!>
+
+		<input type="image" src="plus.jpg" style="position:absolute; top:200px; left:350px; height:50px; width:50px;" onclick="showTipImportKeyEnc()" onmouseover="showTipImportKeyEnc()">
+		<div id="dev_enc_openssl_tooltip_importkey"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:purple; color:black; border:5px solid;">
+			<p>This is some example text for a clickable (not) tooltip.<br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey">MDN importKey()</a></p>
+			<button onclick="hideTipImportKeyEnc()">Close</button>
+		</div>
 
 		<button id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:230px; left:106px; width:100px; height:20px; font-size:10px; background-color:orange; color:black;" onclick="devManualSalt()">Roll Salt</button>
 		<div style="background-color:orange; font-size:14px; position:absolute; top:360px; left:20px; ">
@@ -822,6 +830,30 @@
 		//console.log("radiovalue: " + document.querySelector('input[type=radio][name=algo]:checked').value );
 
 	// Dev Site Functions
+
+	// Close tooltips on ESC
+	window.addEventListener("keydown", function(event) {
+		if (event.key === "Escape") {
+			// Perform actions when Escape is pressed
+				hideTipImportKeyEnc();
+		}
+	});   
+
+	function mouseOver(){
+		console.log("MOUSEOVER!!!");
+	}
+
+	function showTip(){
+		console.log("SHOW ME YO TIP!!!");
+	}
+
+	function showTipImportKeyEnc(){
+		document.getElementById("dev_enc_openssl_tooltip_importkey").style.display = "inline";
+	}
+
+	function hideTipImportKeyEnc(){
+		document.getElementById("dev_enc_openssl_tooltip_importkey").style.display = "none";
+	}
 
 	async function devManualSalt(){
 		const salt = window.crypto.getRandomValues(new Uint8Array(8));
