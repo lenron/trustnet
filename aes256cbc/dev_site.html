@@ -33,7 +33,7 @@
 
 	.header {
 		display: none;
-		flex-direction: row;
+s		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
 		color: #54c597;
@@ -78,7 +78,7 @@
 		flex-direction: column;
 		justify-content: center; 
 		color: #54c597;
-	}
+s	}
 
 	/* default button styling. HTML style="" will override. */
 	button {
@@ -160,6 +160,22 @@
 
 	.openssl_decrypt_flowchart {
 		background-image: url('openssl_decrypt_flowchart.drawio.svg');
+	}
+
+	.glossy_button {
+		background: orange;
+		background: -moz-linear-gradient(top,  orange 0%, #aee850 100%);
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,orange), color-stop(100%,#aee850));
+		background: -webkit-linear-gradient(top,  orange 0%,#aee850 100%);
+		background: -o-linear-gradient(top,  orange 0%,#aee850 100%);
+		background: -ms-linear-gradient(top,  orange 0%,#aee850 100%);
+		background: linear-gradient(to bottom,  orange 0%,#aee850 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='orange', endColorstr='#aee850',GradientType=0 );
+		border: 1px solid #1d6511;
+		color: black;
+		font-size: 12px;
+		height: 30px;
+		cursor: pointer;
 	}
 
 	/* Set minimum page Width to */
@@ -631,19 +647,20 @@
 	<p id="offline_dbase_update_flag" style="display:none"></p>
 
 <!-- Dev Site --!>
+<!-- Dev Site --!>
+<!-- Dev Site --!>
+<!-- Dev Site --!>
+<!-- Dev Site --!>
+<!-- Dev Site --!>
+<!-- Dev Site --!>
+<!-- Dev Site --!>
+<!-- Dev Site --!>
+<!-- Dev Site --!>
+<!-- Dev Site --!>
+
 	<h2>Development Site -- Crypto Functions</h2>
-
-	
-
 	<div style="display:flex; flex-direction:row; justify-content: space-between; width: 1010px;">
-		<h3 style="color:magenta;">OpenSSL Encrypt</h3>
-			<div style="display:flex; flex-direction:column; justify-content:flex-end;">
-				<ul>MDN SubtleCrypto Documentation Links:
-					<li><a style="font-family:Arial;" href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt()</a></li>
-					<li><a style="font-family:Arial;" href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">importKey()</a></li>
-					<li><a style="font-family:Arial;" href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveBits" target="_blank">deriveBits()</a></li>
-				</ul>
-			</div>
+		<h3 style="color:black;">OpenSSL Encrypt</h3>
 	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="openssl_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Encrypt" />
@@ -655,14 +672,14 @@
 		<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:310px; left:26px; width:183px; height:10px;">
 		<!--<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">--!>
 
-		<input type="image" src="plus.jpg" style="position:absolute; top:200px; left:350px; height:50px; width:50px;" onclick="showTipImportKeyEnc()" onmouseover="showTipImportKeyEnc()">
-		<div id="dev_enc_openssl_tooltip_importkey"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:purple; color:black; border:5px solid;">
-			<p>This is some example text for a clickable (not) tooltip.<br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey">MDN importKey()</a></p>
-			<button onclick="hideTipImportKeyEnc()">Close</button>
-		</div>
+		<!--<input type="image" src="plus.jpg" style="position:absolute; top:200px; left:350px; height:50px; width:50px;" onclick="showTipImportKeyEnc()" onmouseover="showTipImportKeyEnc()">--!>
+		<button class="glossy_button" style="position:absolute; top:250px; left:318px;" onclick="showTipImportKeyEnc()">IMPORT KEY</button>
 
-		<button id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:230px; left:106px; width:100px; height:20px; font-size:10px; background-color:orange; color:black;" onclick="devManualSalt()">Roll Salt</button>
-		<div style="background-color:orange; font-size:14px; position:absolute; top:360px; left:20px; ">
+		<!-- Tooltip Object for OpenSSL Encrypt--!>
+		<div id="dev_enc_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:purple; color:black; border:5px solid;"></div>
+
+		<button class="glossy_button" id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:230px; left:106px; width:100px; height:20px; font-size:10px;" onclick="devManualSalt()">Roll Salt</button>
+		<div style="background-color:cornflowerblue; font-size:14px; position:absolute; top:360px; left:20px; ">
 			<fieldset >
 				<legend style="color:black;">Digest Hash:</legend>
 				<div>
@@ -680,6 +697,7 @@
 			</fieldset>
 		</div>
 
+		<button class="glossy_button" style="position:absolute; top:415px; left:270px; " onclick="showTipEncDeriveBits()">DERIVE BITS</button>
 		<input id="dev_enc_openssl_encrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:578px; width:128px; height:10px;">
 		<textarea id="dev_enc_openssl_encrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:357px; left:540px; width:265px; height:34px;"></textarea>
 		<textarea id="dev_enc_openssl_encrypt_key" class="devsite_inputs" rows="3" style="position:absolute; top:445px; left:439px; width:350px; height:48px;"></textarea>
@@ -688,6 +706,7 @@
 		<input id="dev_enc_openssl_plaintext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:465px; width:525px;">
 		<input id="dev_enc_openssl_plaintext_with_newline" class="devsite_inputs" type="text" style="position:absolute; top:230px; left:465px; width:525px;">
 
+		<button class="glossy_button" style="position:absolute; top:415px; left:900px; " onclick="showTipEncEncrypt()">ENCRYPT</button>
 		<input id="dev_enc_openssl_encrypted_data" class="devsite_inputs" type="text" style="position:absolute; top:542px; left:340px; width:642px;">
 		<input id="dev_enc_openssl_encrypted_salt_string" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:173px; width:200px; height:10px;">
 		<input id="dev_enc_openssl_encrypted_salt_random" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:400px; width:236px; height:10px;">
@@ -695,22 +714,23 @@
 		<input id="dev_enc_openssl_encrypted_data_two_salts" class="devsite_inputs" type="text" style="position:absolute; top:676px; left:31px; width:950px;">
 		<input id="dev_enc_openssl_encrypted_data_base64" class="devsite_inputs" type="text" style="position:absolute; top:752px; left:31px; width:950px;">
 
-		<button id="dev_enc_openssl_encrypt_button" style="color:magenta; width:1000px;" onclick="devEncOpenSSL()">OpenSSL ENCRYPT</button>
+		<button class="glossy_button"id="dev_enc_openssl_encrypt_button" style="width:1000px; height:50px; font-size:18px;" onclick="devEncOpenSSL()">OpenSSL ENCRYPT</button>
 	</div>
 	<br>
 
 	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
 		<h3 style="color:red;">OpenSSL Decrypt</h3>
-			<div style="display:flex; flex-direction:column; justify-content:flex-end;">
-				<ul>MDN SubtleCrypto Documentation Links:
-					<li><a style="font-family:Arial;" href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/decrypt" target="_blank">decrypt()</a></li>
-					<li><a style="font-family:Arial;" href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">importKey()</a></li>
-					<li><a style="font-family:Arial;" href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveBits" target="_blank">deriveBits()</a></li>
-				</ul>
-			</div>
 	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
+
+		<!-- Tooltip Object for OpenSSL Encrypt--!>
+		<div id="dev_dec_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:purple; color:black; border:5px solid;"></div>
+		<!-- Tooltip Buttons for OpenSSL Decrypt--!>
+		<button class="glossy_button" style="position:absolute; top:220px; left:270px;" onclick="showTipImportKeyDec()">IMPORT KEY</button>
+		<button class="glossy_button" style="position:absolute; top:415px; left:270px; " onclick="showTipDecDeriveBits()">DERIVE BITS</button>
+		<button class="glossy_button" style="position:absolute; top:400px; left:850px; " onclick="showTipDecDecrypt()">DECRYPT</button>
+
 		<input id="dev_dec_openssl_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:14px; width:350px;">
 		<input id="dev_dec_openssl_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:14px; width:350px;">
 
@@ -723,7 +743,7 @@
 		<input id="dev_dec_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:272px; left:16px; width:183px; height:10px;">
 		<!--<input id="dev_dec_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:444px; left:14px; width:183px; height:10px;">--!>
 
-		<div style="background-color:orange; font-size:14px; position:absolute; top:320px; left:20px; ">
+		<div style="background-color:cornflowerblue; font-size:14px; position:absolute; top:320px; left:20px; ">
 			<fieldset >
 				<legend style="color:black;">Digest Hash:</legend>
 				<div>
@@ -748,13 +768,20 @@
 		<input id="dev_dec_openssl_decrypted_bytes" class="devsite_inputs" type="text" style="position:absolute; top:561px; left:17px; width:950px;">
 		<input id="dev_dec_openssl_decrypted_plaintext" class="devsite_inputs" type="text" style="position:absolute; top:638px; left:17px; width:950px;">
 
-		<button id="dev_dec_openssl_decrypt_button" style="color:red; width:1000px;" onclick="devDecOpenSSL()">OpenSSL <span style="color:red">DECRYPT</span></button>
+		<button class="glossy_button"id="dev_dec_openssl_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecOpenSSL()">OpenSSL <span style="color:red">DECRYPT</span></button>
 	</div>
 	<br>
 
-	<h3 style="color:magenta;">Obf-1 Encrypt</h3>
+	<h3 style="color:black;">Obf-1 Encrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
+
+		<!-- Tooltip Object for Obf1 Encrypt--!>
+		<div id="dev_enc_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:purple; color:black; border:5px solid;"></div>
+		<!-- Tooltip Buttons for Obf1 Encrypt--!>
+		<button class="glossy_button" style="position:absolute; top:190px; left:320px;" onclick="showTipObf1EncShasum()">SHA SUM</button>
+		<button class="glossy_button" style="position:absolute; top:480px; left:650px;" onclick="showTipObf1EncConvert()">CONVERT</button>
+
 		<input id="dev_enc_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:380px;">
 		<input id="dev_enc_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:380px;">
 
@@ -766,13 +793,19 @@
 
 		<textarea id="dev_enc_obf1_xord_data" class="devsite_inputs" rows="3" style="position:absolute; top:398px; left:20px; width:965px; height:50px;"></textarea>
 		<textarea id="dev_enc_obf1_b58_output" class="devsite_inputs" rows="3" style="position:absolute; top:541px; left:20px; width:965px; height:102px;"></textarea>
-		<button id="dev_enc_obf1_encrypt_button" style="color:magenta; width:1000px;" onclick="devEncObf1()">Obf-1 ENCRYPT</button>
+		<button class="glossy_button"id="dev_enc_obf1_encrypt_button" style="color:black; width:1000px; height:50px; font-size:18px;" onclick="devEncObf1()">Obf-1 ENCRYPT</button>
 	</div>
 	<br>
 
 	<h3 style="color:red;">Obf-1 Decrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
+
+		<!-- Tooltip Object for Obf1 DECRYPT --!>
+		<div id="dev_dec_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:purple; color:black; border:5px solid;"></div>
+		<!-- Tooltip Buttons for Obf1 DECRYPT --!>
+		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf1DecShasum()">SHA SUM Obf1 decrypt</button>
+
 		<input id="dev_dec_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:374px;">
 		<input id="dev_dec_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:374px;">
 
@@ -786,13 +819,19 @@
 		<input id="dev_dec_obf1_data_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:507px; left:37px; width:950px;">
 		<input id="dev_dec_obf1_data_b64_output" class="devsite_inputs" type="text" style="position:absolute; top:570px; left:37px; width:950px;">
 
-		<button id="dev_dec_obf1_decrypt_button" style="color:red; width:1000px;" onclick="devDecObf1()">Obf-1 DECRYPT</button>
+		<button class="glossy_button"id="dev_dec_obf1_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecObf1()">Obf-1 DECRYPT</button>
 	</div>
 	<br>
 
-	<h3 style="color:magenta;">Obf-2 Encrypt</h3>
+	<h3 style="color:black;">Obf-2 Encrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
+
+		<!-- Tooltip Object for Obf2 ENCRYPT --!>
+		<div id="dev_enc_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:purple; color:black; border:5px solid;"></div>
+		<!-- Tooltip Buttons for Obf2 ENCRYPT --!>
+		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2EncShasum()">SHA SUM Obf2 ENCRYPT</button>
+		<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2EncModulo()">MODULO Obf2 ENCRYPT</button>
 
 		<input id="dev_enc_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
 		<input id="dev_enc_obf2_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:108px; left:15px; width:374px;">
@@ -803,13 +842,19 @@
 
 		<textarea id="dev_enc_obf2_final_encrypted" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
 
-		<button id="dev_enc_obf2_encrypt_button" style="color:magenta; width:1000px;" onclick="devEncObf2()">Obf-2 ENCRYPT</button>
+		<button class="glossy_button"id="dev_enc_obf2_encrypt_button" style="color:black; width:1000px; height:50px; font-size:18px;" onclick="devEncObf2()">Obf-2 ENCRYPT</button>
 	</div>
 	<br>
 
 	<h3 style="color:red;">Obf-2 Decrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
+
+		<!-- Tooltip Object for Obf2 DECRYPT --!>
+		<div id="dev_dec_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:purple; color:black; border:5px solid;"></div>
+		<!-- Tooltip Buttons for Obf2 DECRYPT --!>
+		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2DecShasum()">SHA SUM Obf2 DECRYPT</button>
+		<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2DecModulo()">MODULO Obf2 Decrypt</button>
 
 		<input id="dev_dec_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
 		<input id="dev_dec_obf2_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:108px; left:15px; width:374px;">
@@ -820,7 +865,7 @@
 
 		<textarea id="dev_dec_obf2_ciphertext_b58" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
 
-		<button id="dev_dec_obf2_decrypt_button" style="color:red; width:1000px;" onclick="devDecObf2()">Obf-2 DECRYPT</button>
+		<button class="glossy_button"id="dev_dec_obf2_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecObf2()">Obf-2 DECRYPT</button>
 	</div>
 	<br>
 
@@ -839,21 +884,192 @@
 		}
 	});   
 
+
+/*
+FOR REFERENCE:
+
 	function mouseOver(){
 		console.log("MOUSEOVER!!!");
 	}
-
 	function showTip(){
 		console.log("SHOW ME YO TIP!!!");
 	}
+*/
+
+
+	//OpenSSL Encrypt 
+	//OpenSSL Encrypt 
+	//OpenSSL Encrypt 
+	const html_openssl_enc_importkey = `
+		<p>This is some example text for a clickable (not) tooltip.<br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">MDN importKey()</a></p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_derivebits = `
+		<p>DeriveBits text. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveBits" target="_blank">MDN deriveBits()</a></p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_encrypt= `
+		<p>Encrypt tooltip text. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">MDN encrypt()</a></p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+
+	function showTipEncDeriveBits(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_derivebits;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
 
 	function showTipImportKeyEnc(){
-		document.getElementById("dev_enc_openssl_tooltip_importkey").style.display = "inline";
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_importkey;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
 	}
 
-	function hideTipImportKeyEnc(){
-		document.getElementById("dev_enc_openssl_tooltip_importkey").style.display = "none";
+	function showTipEncEncrypt(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_encrypt;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
 	}
+
+	function hideTipEnc(){
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "none";
+	}
+	//OpenSSL Encrypt Page
+	//OpenSSL Encrypt Page
+	//OpenSSL Encrypt Page
+
+	//OpenSSL Decrypt 
+	//OpenSSL Decrypt 
+	//OpenSSL Decrypt 
+	const html_openssl_dec_importkey = `
+		<p>OpenSSL DECRYPT importKey tooltip. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">MDN importKey()</a></p>
+		<button class="glossy_button" onclick="hideTipDec()">Close</button>
+	`;
+
+	const html_openssl_dec_derivebits = `
+		<p>openssl dec DeriveBits text. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveBits" target="_blank">MDN deriveBits()</a></p>
+		<button class="glossy_button" onclick="hideTipDec()">Close</button>
+	`;
+
+	const html_openssl_dec_decrypt= `
+		<p>openssl Decrypt tooltip text. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/decrypt" target="_blank">MDN decrypt()</a></p>
+		<button class="glossy_button" onclick="hideTipDec()">Close</button>
+	`;
+
+	function showTipDecDeriveBits(){
+		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_derivebits;
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipImportKeyDec(){
+		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_importkey;
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipDecDecrypt(){
+		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_decrypt;
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
+	}
+
+	function hideTipDec(){
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "none";
+	}
+	//OpenSSL Decrypt Page
+	//OpenSSL Decrypt Page
+	//OpenSSL Decrypt Page
+
+	//Obf1 Encrypt
+	const html_obf1_enc_shasum = `
+		<p>OBF1 ENCRYPT SHASUM TOOLTIP</p>
+		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
+	`;
+
+	const html_obf1_enc_convert = `
+		<p>OBF1 ENCRYPT convert to 1000 chars b58.</p>
+		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
+	`;
+
+	function showTipObf1EncShasum(){
+		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_shasum;
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
+	}
+
+	function showTipObf1EncConvert(){
+		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_convert;
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
+	}
+
+	function hideTipObf1Enc(){
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "none";
+	}
+	//Obf1 Encrypt
+
+	//Obf1 DECRYPT
+	const html_obf1_dec_shasum = `
+		<p>OBF1 DECRYPT SHASUM TOOLTIP</p>
+		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
+	`;
+
+	function showTipObf1DecShasum(){
+		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_shasum;
+		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
+	}
+
+	function hideTipObf1Dec(){
+		document.getElementById("dev_dec_obf1_tooltip").style.display = "none";
+	}
+	//Obf1 DECRYPT
+
+	//Obf2 Encrypt
+	const html_obf2_enc_shasum = `
+		<p>obf2 enCRYPT SHASUM TOOLTIP</p>
+		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
+	`;
+	const html_obf2_enc_modulo = `
+		<p>obf2 enCRYPT SUM AND MODULO FUNCTION</p>
+		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
+	`;
+
+	function showTipObf2EncShasum(){
+		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_shasum;
+		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
+	}
+
+	function showTipObf2EncModulo(){
+		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_modulo;
+		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
+	}
+
+	function hideTipObf2Enc(){
+		document.getElementById("dev_enc_obf2_tooltip").style.display = "none";
+	}
+	//Obf2 Encrypt
+
+	//Obf2 DECRYPT 
+	const html_obf2_dec_shasum = `
+		<p>obf2 decrypt SHASUM TOOLTIP</p>
+		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
+	`;
+	const html_obf2_dec_modulo = `
+		<p>obf2 decrypt SUM AND MODULO FUNCTION</p>
+		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
+	`;
+
+	function showTipObf2DecShasum(){
+		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_shasum;
+		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
+	}
+
+	function showTipObf2DecModulo(){
+		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_modulo;
+		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
+	}
+
+	function hideTipObf2Dec(){
+		document.getElementById("dev_dec_obf2_tooltip").style.display = "none";
+	}
+	//Obf2 DECRYPT
 
 	async function devManualSalt(){
 		const salt = window.crypto.getRandomValues(new Uint8Array(8));
