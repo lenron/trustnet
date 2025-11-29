@@ -725,7 +725,7 @@ s	}
 		<img src="openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
 
 		<!-- Tooltip Object for OpenSSL Encrypt--!>
-		<div id="dev_dec_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:midnightblue; color:black; border:5px solid;"></div>
+		<div id="dev_dec_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:midnightblue; color:black; border:5px solid black;"></div>
 		<!-- Tooltip Buttons for OpenSSL Decrypt--!>
 		<button class="glossy_button" style="position:absolute; top:220px; left:270px;" onclick="showTipImportKeyDec()">IMPORT KEY</button>
 		<button class="glossy_button" style="position:absolute; top:415px; left:270px; " onclick="showTipDecDeriveBits()">DERIVE BITS</button>
@@ -904,9 +904,9 @@ FOR REFERENCE:
 		<p>
 			importKey() is a method for importing key material (e.g. a password) in a secure way that adheres to the SubtleCrypto guidelines set by the World Wide Web Consortium (the top authority/consensus for web design).<br><br>
 
-In this recreation of OpenSSL’s command line encrypt functionality, we are using PBKDF2 as our key derivation algorithm because it offers a secure path to convert raw password key material into a cryptoKey object we can then feed into the SubtleCrypo encrypt() method which is currently the most secure way to encrypt data in a web browser. <br><br>
+			In this recreation of OpenSSL’s command line encrypt functionality, we are using PBKDF2 as our key derivation algorithm because it offers a secure path to convert raw password key material into a cryptoKey object we can then feed into the SubtleCrypo encrypt() method which is currently the most secure way to encrypt data in a web browser. <br><br>
 
-The ‘most secure way to encrypt data in a web browser’ is known because of the W3C Recommendation (an offical release) by the World Wide Web Consortium.<br><br>
+			The ‘most secure way to encrypt data in a web browser’ is known because of the W3C Recommendation (an offical release) by the World Wide Web Consortium.<br><br>
 
 			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">importKey() MDN Documentation</a><br>
 			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
@@ -917,21 +917,30 @@ The ‘most secure way to encrypt data in a web browser’ is known because of t
 	`;
 
 	const html_openssl_enc_derivebits = `
-		<p>DeriveBits text. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveBits" target="_blank">MDN deriveBits()</a></p>
+		<p>
+			deriveBits() computes raw data for both the Initialization Vector (IV) and Key required for the AES-CBC algorithm utilized in the encrypt() digest.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/derivebits" target="_blank">deriveBits() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-deriveBits" target="_blank">deriveBits() W3C Specification/Documentation</a><br>
+		</p>
 		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
 	`;
 
 	const html_openssl_enc_encrypt= `
-		<p>Encrypt tooltip text. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">MDN encrypt()</a></p>
+		<p>
+			encrypt() encrypts data using the specified algorithm (AES-CBC in this case) along with parameter datas like an IV.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-encrypt" target="_blank">encrypt() W3C Specification/Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+		</p>
 		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
 	`;
-
 
 	function showTipEncDeriveBits(){
 		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_derivebits;
 		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
 	}
-
 
 	function showTipImportKeyEnc(){
 		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_importkey;
@@ -954,17 +963,39 @@ The ‘most secure way to encrypt data in a web browser’ is known because of t
 	//OpenSSL Decrypt 
 	//OpenSSL Decrypt 
 	const html_openssl_dec_importkey = `
-		<p>OpenSSL DECRYPT importKey tooltip. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">MDN importKey()</a></p>
+		<p>
+			importKey() is a method for importing key material (e.g. a password) in a secure way that adheres to the SubtleCrypto guidelines set by the World Wide Web Consortium (the top authority/consensus for web design).<br><br>
+
+			In this recreation of OpenSSL’s command line DECRYPT functionality, we are using PBKDF2 as our key derivation algorithm because it offers a secure path to convert raw password key material into a cryptoKey object we can then feed into the SubtleCrypo encrypt() method which is currently the most secure way to encrypt data in a web browser. <br><br>
+
+			The ‘most secure way to encrypt data in a web browser’ is known because of the W3C Recommendation (an offical release) by the World Wide Web Consortium.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">importKey() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+			<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+		</p>
 		<button class="glossy_button" onclick="hideTipDec()">Close</button>
 	`;
 
 	const html_openssl_dec_derivebits = `
-		<p>openssl dec DeriveBits text. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveBits" target="_blank">MDN deriveBits()</a></p>
+		<p>
+			deriveBits() computes raw data for both the Initialization Vector (IV) and Key required for the AES-CBC algorithm utilized in the decrypt() digest.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/derivebits" target="_blank">deriveBits() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-deriveBits" target="_blank">deriveBits() W3C Specification/Documentation</a><br>
+		</p>
 		<button class="glossy_button" onclick="hideTipDec()">Close</button>
 	`;
 
 	const html_openssl_dec_decrypt= `
-		<p>openssl Decrypt tooltip text. <br><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/decrypt" target="_blank">MDN decrypt()</a></p>
+		<p>
+			decrypt() decrypts data using the specified algorithm (AES-CBC in this case) along with parameter datas like an IV.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/decrypt" target="_blank">decrypt() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-decrypt" target="_blank">decrypt() W3C Specification/Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+		</p>
 		<button class="glossy_button" onclick="hideTipDec()">Close</button>
 	`;
 
