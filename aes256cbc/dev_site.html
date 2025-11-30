@@ -78,7 +78,7 @@ s		flex-direction: row;
 		flex-direction: column;
 		justify-content: center; 
 		color: #54c597;
-s	}
+	}
 
 	/* default button styling. HTML style="" will override. */
 	button {
@@ -108,6 +108,19 @@ s	}
 		font-size: 25px;
 		border-radius: 20px;
 	}
+
+	a {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: blue;
+	}
+
+	p {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: black;
+	}
+
 /*
 	textarea {
 		width: 95%;
@@ -146,6 +159,12 @@ s	}
 		font-size: 16px;
 		color: black;
 		background-color: grey;
+	}
+
+	.tooltip {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: black;
 	}
 
 	/* Add this class to a span or label (and other types?) to make it a cool looking pink */
@@ -664,6 +683,10 @@ s	}
 	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="openssl_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Encrypt" />
+
+		<!-- Tooltip Object for OpenSSL Encrypt--!>
+		<div class="" id="dev_enc_openssl_tooltip" style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:lightgray; border:5px solid gold;"></div>
+
 		<input id="dev_enc_openssl_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:20px; width:350px;">
 		<input id="dev_enc_openssl_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:20px; width:350px;">
 
@@ -674,9 +697,6 @@ s	}
 
 		<!--<input type="image" src="plus.jpg" style="position:absolute; top:200px; left:350px; height:50px; width:50px;" onclick="showTipImportKeyEnc()" onmouseover="showTipImportKeyEnc()">--!>
 		<button class="glossy_button" style="position:absolute; top:250px; left:318px;" onclick="showTipImportKeyEnc()">IMPORT KEY</button>
-
-		<!-- Tooltip Object for OpenSSL Encrypt--!>
-		<div id="dev_enc_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:midnightblue; color:black; border:5px solid;"></div>
 
 		<button class="glossy_button" id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:230px; left:106px; width:100px; height:20px; font-size:10px;" onclick="devManualSalt()">Roll Salt</button>
 		<div style="background-color:cornflowerblue; font-size:14px; position:absolute; top:360px; left:20px; ">
@@ -725,7 +745,7 @@ s	}
 		<img src="openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
 
 		<!-- Tooltip Object for OpenSSL Encrypt--!>
-		<div id="dev_dec_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:midnightblue; color:black; border:5px solid black;"></div>
+		<div id="dev_dec_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for OpenSSL Decrypt--!>
 		<button class="glossy_button" style="position:absolute; top:220px; left:270px;" onclick="showTipImportKeyDec()">IMPORT KEY</button>
 		<button class="glossy_button" style="position:absolute; top:415px; left:270px; " onclick="showTipDecDeriveBits()">DERIVE BITS</button>
@@ -777,7 +797,7 @@ s	}
 		<img src="obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
 
 		<!-- Tooltip Object for Obf1 Encrypt--!>
-		<div id="dev_enc_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:midnightblue; color:black; border:5px solid;"></div>
+		<div id="dev_enc_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for Obf1 Encrypt--!>
 		<button class="glossy_button" style="position:absolute; top:190px; left:320px;" onclick="showTipObf1EncShasum()">SHA SUM</button>
 		<button class="glossy_button" style="position:absolute; top:480px; left:650px;" onclick="showTipObf1EncConvert()">CONVERT</button>
@@ -802,7 +822,7 @@ s	}
 		<img src="obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
 
 		<!-- Tooltip Object for Obf1 DECRYPT --!>
-		<div id="dev_dec_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:midnightblue; color:black; border:5px solid;"></div>
+		<div id="dev_dec_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for Obf1 DECRYPT --!>
 		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf1DecShasum()">SHA SUM Obf1 decrypt</button>
 
@@ -828,7 +848,7 @@ s	}
 		<img src="obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
 
 		<!-- Tooltip Object for Obf2 ENCRYPT --!>
-		<div id="dev_enc_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:midnightblue; color:black; border:5px solid;"></div>
+		<div id="dev_enc_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for Obf2 ENCRYPT --!>
 		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2EncShasum()">SHA SUM Obf2 ENCRYPT</button>
 		<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2EncModulo()">MODULO Obf2 ENCRYPT</button>
@@ -851,7 +871,7 @@ s	}
 		<img src="obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
 
 		<!-- Tooltip Object for Obf2 DECRYPT --!>
-		<div id="dev_dec_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:midnightblue; color:black; border:5px solid;"></div>
+		<div id="dev_dec_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for Obf2 DECRYPT --!>
 		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2DecShasum()">SHA SUM Obf2 DECRYPT</button>
 		<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2DecModulo()">MODULO Obf2 Decrypt</button>
