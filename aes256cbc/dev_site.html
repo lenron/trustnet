@@ -825,6 +825,7 @@ s		flex-direction: row;
 		<div id="dev_dec_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for Obf1 DECRYPT --!>
 		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf1DecShasum()">SHA SUM Obf1 decrypt</button>
+		<button class="glossy_button" style="position:absolute; top:330px; left:880px;" onclick="showTipObf1DecInverse()">INVERSE</button>
 
 		<input id="dev_dec_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:374px;">
 		<input id="dev_dec_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:374px;">
@@ -1079,10 +1080,23 @@ FOR REFERENCE:
 		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
 	`;
 
+	const html_obf1_dec_inverse = `
+		<p>OBF1 DECRYPT INVERSE</p>
+		<img src="obf1_inverse.svg" style="" alt="" />
+		<br>
+		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
+	`;
+
 	function showTipObf1DecShasum(){
 		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_shasum;
 		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
 	}
+
+	function showTipObf1DecInverse(){
+		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_inverse;
+		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
+	}
+
 
 	function hideTipObf1Dec(){
 		document.getElementById("dev_dec_obf1_tooltip").style.display = "none";
