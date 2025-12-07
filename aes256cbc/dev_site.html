@@ -2953,12 +2953,25 @@ FOR REFERENCE:
 		// Run the inverse of the sum-and-58-modulo encrypt function.
 		let in_b58_num_arr = new Array(final_encrypted_length);
 		for (let i = 0; i < final_encrypted_length; i++) {
+
+			// If the difference is negative, we know the input got modulo'd and needs that 58 back to produce the inverse data.
+			//if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
+				//final_encrypted_b58_num_arr[i] += 58;
+			//}
+			// Now we can decrypt by taking the difference of each index pair.
+			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
+
+			if( in_b58_num_arr[i] < 0 ){
+				in_b58_num_arr[i] += 58;
+			}
+/*
 			// If the difference is negative, we know the input got modulo'd and needs that 58 back to produce the inverse data.
 			if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
 				final_encrypted_b58_num_arr[i] += 58;
 			}
 			// Now we can decrypt by taking the difference of each index pair.
 			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
+*/
 		}
 		//debug("Data Flow obf2Decrypt() -- Decrypted Index Array: " + in_b58_num_arr);
 
