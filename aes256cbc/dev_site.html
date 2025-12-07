@@ -174,11 +174,11 @@ s		flex-direction: row;
 	}
 
 	.openssl_encrypt_flowchart {
-		background-image: url('openssl_encrypt_flowchart.drawio.svg');
+		background-image: url('./svg_images/openssl_encrypt_flowchart.drawio.svg');
 	}
 
 	.openssl_decrypt_flowchart {
-		background-image: url('openssl_decrypt_flowchart.drawio.svg');
+		background-image: url('./svg_images/openssl_decrypt_flowchart.drawio.svg');
 	}
 
 	.glossy_button {
@@ -682,7 +682,7 @@ s		flex-direction: row;
 		<h3 style="color:black;">OpenSSL Encrypt</h3>
 	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="openssl_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Encrypt" />
+		<img src="./svg_images/openssl_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Encrypt" />
 
 		<!-- Tooltip Object for OpenSSL Encrypt--!>
 		<div class="" id="dev_enc_openssl_tooltip" style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:lightgray; border:5px solid gold;"></div>
@@ -742,7 +742,7 @@ s		flex-direction: row;
 		<h3 style="color:red;">OpenSSL Decrypt</h3>
 	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
+		<img src="./svg_images/openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
 
 		<!-- Tooltip Object for OpenSSL Encrypt--!>
 		<div id="dev_dec_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:lightgray; color:black; border:5px solid gold;"></div>
@@ -794,7 +794,7 @@ s		flex-direction: row;
 
 	<h3 style="color:black;">Obf-1 Encrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
+		<img src="./svg_images/obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
 
 		<!-- Tooltip Object for Obf1 Encrypt--!>
 		<div id="dev_enc_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
@@ -819,7 +819,7 @@ s		flex-direction: row;
 
 	<h3 style="color:red;">Obf-1 Decrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
+		<img src="./svg_images/obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
 
 		<!-- Tooltip Object for Obf1 DECRYPT --!>
 		<div id="dev_dec_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
@@ -846,7 +846,7 @@ s		flex-direction: row;
 
 	<h3 style="color:black;">Obf-2 Encrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
+		<img src="./svg_images/obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
 
 		<!-- Tooltip Object for Obf2 ENCRYPT --!>
 		<div id="dev_enc_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
@@ -869,7 +869,7 @@ s		flex-direction: row;
 
 	<h3 style="color:red;">Obf-2 Decrypt</h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
+		<img src="./svg_images/obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
 
 		<!-- Tooltip Object for Obf2 DECRYPT --!>
 		<div id="dev_dec_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
@@ -1045,14 +1045,14 @@ FOR REFERENCE:
 	//Obf1 Encrypt
 	const html_obf1_enc_shasum = `
 		<p>OBF1 ENCRYPT SHASUM TOOLTIP</p>
-		<img src="shasum_extension.svg" style="" alt="" />
+		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
 		<br>
 		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
 	`;
 
 	const html_obf1_enc_convert = `
 		<p>OBF1 ENCRYPT convert to 1000 chars b58.</p>
-		<img src="get_1000_b58_chars.svg" style="" alt="" />
+		<img src="./svg_images/get_1000_b58_chars.svg" style="" alt="" />
 		<br>
 		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
 	`;
@@ -1075,14 +1075,14 @@ FOR REFERENCE:
 	//Obf1 DECRYPT
 	const html_obf1_dec_shasum = `
 		<p>OBF1 DECRYPT SHASUM TOOLTIP</p>
-		<img src="shasum_extension.svg" style="" alt="" />
+		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
 		<br>
 		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
 	`;
 
 	const html_obf1_dec_inverse = `
 		<p>OBF1 DECRYPT INVERSE</p>
-		<img src="obf1_inverse.svg" style="" alt="" />
+		<img src="./svg_images/obf1_inverse.svg" style="" alt="" />
 		<br>
 		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
 	`;
@@ -1106,13 +1106,13 @@ FOR REFERENCE:
 	//Obf2 Encrypt
 	const html_obf2_enc_shasum = `
 		<p>obf2 enCRYPT SHASUM TOOLTIP</p>
-		<img src="shasum_extension.svg" style="" alt="" />
+		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
 		<br>
 		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
 	`;
 	const html_obf2_enc_modulo = `
 		<p>obf2 enCRYPT SUM AND MODULO FUNCTION</p>
-		<img src="sum_and_modulo.svg" style="" alt="" />
+		<img src="./svg_images/sum_and_modulo.svg" style="" alt="" />
 		<br>
 		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
 	`;
@@ -1135,13 +1135,13 @@ FOR REFERENCE:
 	//Obf2 DECRYPT 
 	const html_obf2_dec_shasum = `
 		<p>obf2 decrypt SHASUM TOOLTIP</p>
-		<img src="shasum_extension.svg" style="" alt="" />
+		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
 		<br>
 		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
 	`;
 	const html_obf2_dec_modulo = `
 		<p>obf2 decrypt SUM AND MODULO FUNCTION</p>
-		<img src="inverse_sum_and_mod.svg" style="" alt="" />
+		<img src="./svg_images/inverse_sum_and_mod.svg" style="" alt="" />
 		<br>
 		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
 	`;
