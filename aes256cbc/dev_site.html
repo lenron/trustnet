@@ -680,7 +680,9 @@ s		flex-direction: row;
 	<h2>Development Site -- Crypto Functions</h2>
 	<div style="display:flex; flex-direction:row; justify-content: space-between; width: 1010px;">
 		<h3 style="color:black;">OpenSSL Encrypt</h3>
+		<button class="glossy_button" style="" onclick="showTipOpenSSLTitle()">OpenSSL Encrypt Blurb</button>
 	</div>
+
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/openssl_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Encrypt" />
 
@@ -695,6 +697,8 @@ s		flex-direction: row;
 		<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:310px; left:26px; width:183px; height:10px;">
 		<!--<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">--!>
 
+		<button class="glossy_button" style="position:absolute; top:150px; left:500px;" onclick="showTipBinary()">Why binary shows up like this</button>
+		<button class="glossy_button" style="position:absolute; top:180px; left:770px;" onclick="showTipNewline()">Why newline byte needed</button>
 		<!--<input type="image" src="plus.jpg" style="position:absolute; top:200px; left:350px; height:50px; width:50px;" onclick="showTipImportKeyEnc()" onmouseover="showTipImportKeyEnc()">--!>
 		<button class="glossy_button" style="position:absolute; top:250px; left:318px;" onclick="showTipImportKeyEnc()">IMPORT KEY</button>
 
@@ -731,6 +735,9 @@ s		flex-direction: row;
 		<input id="dev_enc_openssl_encrypted_salt_string" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:173px; width:200px; height:10px;">
 		<input id="dev_enc_openssl_encrypted_salt_random" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:400px; width:236px; height:10px;">
 
+		<button class="glossy_button" style="position:absolute; top:615px; left:70px; " onclick="showTipSalted()">Salted Blurb</button>
+		<button class="glossy_button" style="position:absolute; top:630px; left:400px; " onclick="showTipRandSalt()">Random Salt Blurb</button>
+
 		<input id="dev_enc_openssl_encrypted_data_two_salts" class="devsite_inputs" type="text" style="position:absolute; top:676px; left:31px; width:950px;">
 		<input id="dev_enc_openssl_encrypted_data_base64" class="devsite_inputs" type="text" style="position:absolute; top:752px; left:31px; width:950px;">
 
@@ -740,6 +747,7 @@ s		flex-direction: row;
 
 	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
 		<h3 style="color:red;">OpenSSL Decrypt</h3>
+		<button class="glossy_button" style="" onclick="showTipDecTitle()">OpenSSL Decrypt Blurb</button>
 	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
@@ -792,7 +800,10 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<h3 style="color:black;">Obf-1 Encrypt</h3>
+	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
+		<h3 style="color:black;">Obf-1 Encrypt</h3>
+		<button class="glossy_button" style="" onclick="showTipObf1EncTitle()">Obf1 Title Blurb</button>
+	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
 
@@ -817,7 +828,10 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<h3 style="color:red;">Obf-1 Decrypt</h3>
+	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
+		<h3 style="color:red;">Obf-1 Decrypt</h3>
+		<button class="glossy_button" style="" onclick="showTipObf1DecTitle()">Obf1 Title Blurb</button>
+	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
 
@@ -844,7 +858,10 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<h3 style="color:black;">Obf-2 Encrypt</h3>
+	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
+		<h3 style="color:black;">Obf-2 Encrypt</h3>
+		<button class="glossy_button" style="" onclick="showTipObf2EncTitle()">Obf2 Title Blurb</button>
+	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
 
@@ -867,7 +884,10 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<h3 style="color:red;">Obf-2 Decrypt</h3>
+	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
+		<h3 style="color:red;">Obf-2 Decrypt</h3>
+		<button class="glossy_button" style="" onclick="showTipObf2DecTitle()">Obf2 Title Blurb</button>
+	</div>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
 
@@ -921,6 +941,16 @@ FOR REFERENCE:
 	//OpenSSL Encrypt 
 	//OpenSSL Encrypt 
 	//OpenSSL Encrypt 
+	const html_openssl_enc_title= `
+		<p>
+			OpenSSL was chosen for the base encryption because it is widely available from the command line and its featureset includes aes-256-cbc symmetric encryption/decryption which is good enough for the US government as described in its spec document,
+			<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
+			
+			<br><br>
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
 	const html_openssl_enc_importkey = `
 		<p>
 			importKey() is a method for importing key material (e.g. a password) in a secure way that adheres to the SubtleCrypto guidelines set by the World Wide Web Consortium (the top authority/consensus for web design).<br><br>
@@ -947,7 +977,7 @@ FOR REFERENCE:
 		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
 	`;
 
-	const html_openssl_enc_encrypt= `
+	const html_openssl_enc_encrypt = `
 		<p>
 			encrypt() encrypts data using the specified algorithm (AES-CBC in this case) along with parameter datas like an IV.<br><br>
 
@@ -957,6 +987,63 @@ FOR REFERENCE:
 		</p>
 		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
 	`;
+
+	const html_openssl_enc_binary = `
+		<p>
+			The browser converts the binary stored arraybuffers into human readable bytes which is why binary numbers are showing up as 23, 129, 284, etc.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_newline = `
+		<p>
+			In order to mirror exactly the output of the openssl command line encrypt/decrypt functions we need a newline byte that delimits the end of the linux file which is how input is treated from the command line. In other words openssl treats all command line input as a file which in linux always ends with a newline character, so we have to add it here to produce the same output and make sure command line encrypted data can be decrypted by our system and vice versa.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_salted = `
+		<p>
+			OpenSSL command line encryption output includes the string literal prepend “Salted__”.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_randsalt = `
+		<p>
+			It also includes a number 8 bytes long as a randomly generated salt which is used to run the encryption and then inserted after the “Salted__” literal. This number is needed to run the decryption.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	function showTipRandSalt(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_randsalt;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipSalted(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_salted;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipBinary(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_binary;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipNewline(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_newline;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipOpenSSLTitle(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_title;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
 
 	function showTipEncDeriveBits(){
 		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_derivebits;
@@ -1020,6 +1107,19 @@ FOR REFERENCE:
 		<button class="glossy_button" onclick="hideTipDec()">Close</button>
 	`;
 
+	const html_openssl_dec_title = `
+		<p>
+			We chose openssl for the base encryption because it is widely available from the command line and its featureset includes aes-256-cbc symmetric encryption/decryption which is good enough for the US government as described in its spec document, RFC3602.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipDec()">Close</button>
+	`;
+
+	function showTipDecTitle(){
+		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_title
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
+	}
+
 	function showTipDecDeriveBits(){
 		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_derivebits;
 		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
@@ -1054,8 +1154,25 @@ FOR REFERENCE:
 		<p>OBF1 ENCRYPT convert to 1000 chars b58.</p>
 		<img src="./svg_images/get_1000_b58_chars.svg" style="" alt="" />
 		<br>
+		The blocking is a bit tricky converting bytes of size up to 256 to precisely 1000 characters of base58 characters (which have a size of 58). 256 divided by 58 = 4.413793... so we currently employ a ‘guess and check’ with tapering strategy by popping bytes then converting the binary number to base 58 and checking the number of characters it converted to. If we go from 1001 characters to 999, we know we missed 1000 and enable a subroutine that converts the number from 8-bit bytes into 4-bit words which are chunks of size up to 16 giving us the precision to guarantee 1000 base 58 characters of output.
+
+		<br>
 		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
 	`;
+
+	const html_obf1_enc_title = `
+		<p>
+			Our secret sauce is meant as a type of blocking that obfuscates the length of the stored data. As such our system is designed to store all data in blocks of 1000 base 58 characters. This is so that if and when an attacker accesses the stored and obfuscated data, it will be harder to decrypt. There was a time when everyone trusted Google and they deserved that trust and everything was great. That time is over. Now if you’re not expecting data leaks and planning for your ‘secure’ storage to be leaked at some point, are you really trying? We are attempting to help solve the problem of trusting ‘secure’ systems.
+
+
+		</p>
+		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
+	`;
+
+	function showTipObf1EncTitle(){
+		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_title;
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
+	}
 
 	function showTipObf1EncShasum(){
 		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_shasum;
@@ -1087,6 +1204,20 @@ FOR REFERENCE:
 		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
 	`;
 
+	const html_obf1_dec_title = `
+		<p>
+			Our secret sauce is meant as a type of blocking that obfuscates the length of the stored data. As such our system is designed to store all data in blocks of 1000 base 58 characters. This is so that if and when an attacker accesses the stored and obfuscated data, it will be harder to decrypt. There was a time when everyone trusted Google and they deserved that trust and everything was great. That time is over. Now if you’re not expecting data leaks and planning for your ‘secure’ storage to be leaked at some point, are you really trying? We are attempting to help solve the problem of trusting ‘secure’ systems.
+
+
+		</p>
+		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
+	`;
+
+	function showTipObf1DecTitle(){
+		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_title;
+		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
+	}
+
 	function showTipObf1DecShasum(){
 		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_shasum;
 		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
@@ -1117,6 +1248,20 @@ FOR REFERENCE:
 		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
 	`;
 
+	const html_obf2_enc_title = `
+		<p>
+			obf2 title enc
+
+
+		</p>
+		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
+	`;
+
+	function showTipObf2EncTitle(){
+		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_title;
+		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
+	}
+
 	function showTipObf2EncShasum(){
 		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_shasum;
 		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
@@ -1145,6 +1290,20 @@ FOR REFERENCE:
 		<br>
 		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
 	`;
+
+	const html_obf2_dec_title = `
+		<p>
+			obf2 title dec
+
+
+		</p>
+		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
+	`;
+
+	function showTipObf2DecTitle(){
+		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_title;
+		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
+	}
 
 	function showTipObf2DecShasum(){
 		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_shasum;
