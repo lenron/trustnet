@@ -697,11 +697,14 @@ s		flex-direction: row;
 		<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:310px; left:26px; width:183px; height:10px;">
 		<!--<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">--!>
 
-		<!--<a class="glossy_icon" style="position:absolute; top:150px; left:500px;" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a>
-		<a class="glossy_icon" style="position:absolute; top:180px; left:770px;" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a>--!>
+		<!-- Might use a different graphic for this.
+		<a class="glossy_icon" style="position:absolute; top:150px; left:500px;" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a>-->
+
+		<a class="glossy_icon" style="position:absolute; top:165px; left:970px;" href="javascript:void('show tooltip')" onclick="showTipNewline()" >[?]</a>
+
 		<button class="glossy_button" style="position:absolute; top:150px; left:500px;" onclick="showTipBinary()">Why binary shows up like this</button>
-		<button class="glossy_button" style="position:absolute; top:180px; left:770px;" onclick="showTipNewline()">Why newline byte needed</button>
-		<!--<input type="image" src="plus.jpg" style="position:absolute; top:200px; left:350px; height:50px; width:50px;" onclick="showTipImportKeyEnc()" onmouseover="showTipImportKeyEnc()">--!>
+		<!--<button class="glossy_button" style="position:absolute; top:180px; left:770px;" onclick="showTipNewline()">Why newline byte needed</button>-->
+
 		<button class="glossy_button" style="position:absolute; top:250px; left:318px;" onclick="showTipImportKeyEnc()">IMPORT KEY</button>
 
 		<button class="glossy_button" id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:230px; left:106px; width:100px; height:20px; font-size:10px;" onclick="devManualSalt()">Roll Salt</button>
@@ -737,8 +740,11 @@ s		flex-direction: row;
 		<input id="dev_enc_openssl_encrypted_salt_string" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:173px; width:200px; height:10px;">
 		<input id="dev_enc_openssl_encrypted_salt_random" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:400px; width:236px; height:10px;">
 
-		<button class="glossy_button" style="position:absolute; top:615px; left:70px; " onclick="showTipSalted()">Salted Blurb</button>
-		<button class="glossy_button" style="position:absolute; top:630px; left:400px; " onclick="showTipRandSalt()">Random Salt Blurb</button>
+		<a class="glossy_icon" style="position:absolute; top:605px; left:25px;" href="javascript:void('show tooltip')" onclick="showTipSalted()" >[?]</a>
+		<a class="glossy_icon" style="position:absolute; top:580px; left:505px;" href="javascript:void('show tooltip')" onclick="showTipRandSalt()" >[?]</a>
+
+		<!--<button class="glossy_button" style="position:absolute; top:615px; left:70px; " onclick="showTipSalted()">Salted Blurb</button>
+		<button class="glossy_button" style="position:absolute; top:630px; left:400px; " onclick="showTipRandSalt()">Random Salt Blurb</button>-->
 
 		<input id="dev_enc_openssl_encrypted_data_two_salts" class="devsite_inputs" type="text" style="position:absolute; top:676px; left:31px; width:950px;">
 		<input id="dev_enc_openssl_encrypted_data_base64" class="devsite_inputs" type="text" style="position:absolute; top:752px; left:31px; width:950px;">
@@ -747,7 +753,7 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<h3 style="color:red;">OpenSSL Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
+	<h3 style="color:red;">OpenSSL Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipDecTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
 
@@ -799,15 +805,18 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<h3 style="color:black;">Obf-1 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
+	<h3 style="color:black;">Obf-1 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf1EncTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
 
 		<!-- Tooltip Object for Obf1 Encrypt--!>
 		<div id="dev_enc_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for Obf1 Encrypt--!>
-		<button class="glossy_button" style="position:absolute; top:190px; left:320px;" onclick="showTipObf1EncShasum()">SHA SUM</button>
-		<button class="glossy_button" style="position:absolute; top:480px; left:650px;" onclick="showTipObf1EncConvert()">CONVERT</button>
+		<!--<button class="glossy_button" style="position:absolute; top:190px; left:320px;" onclick="showTipObf1EncShasum()">SHA SUM</button>
+		<button class="glossy_button" style="position:absolute; top:480px; left:650px;" onclick="showTipObf1EncConvert()">CONVERT</button>-->
+		<a class="glossy_icon" style="position:absolute; top:195px; left:340px;" href="javascript:void('show tooltip')" onclick="showTipObf1EncShasum()" >[?]</a>
+		<a class="glossy_icon" style="position:absolute; top:180px; left:840px;" href="javascript:void('show tooltip')" onclick="showTipObf1EncZeroPad()" >[?]</a>
+		<a class="glossy_icon" style="position:absolute; top:490px; left:660px;" href="javascript:void('show tooltip')" onclick="showTipObf1EncConvert()" >[?]</a>
 
 		<input id="dev_enc_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:380px;">
 		<input id="dev_enc_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:380px;">
@@ -824,14 +833,16 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<h3 style="color:red;">Obf-1 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
+	<h3 style="color:red;">Obf-1 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf1DecTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
 
 		<!-- Tooltip Object for Obf1 DECRYPT --!>
 		<div id="dev_dec_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for Obf1 DECRYPT --!>
-		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf1DecShasum()">SHA SUM Obf1 decrypt</button>
+		<a class="glossy_icon" style="position:absolute; top:180px; left:320px;" href="javascript:void('show tooltip')" onclick="showTipObf1DecShasum()" >[?]</a>
+
+<!--		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf1DecShasum()">SHA SUM Obf1 decrypt</button>-->
 		<button class="glossy_button" style="position:absolute; top:330px; left:880px;" onclick="showTipObf1DecInverse()">INVERSE</button>
 
 		<input id="dev_dec_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:374px;">
@@ -851,14 +862,17 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<h3 style="color:black;">Obf-2 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
+	<h3 style="color:black;">Obf-2 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf2EncTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
 
 		<!-- Tooltip Object for Obf2 ENCRYPT --!>
 		<div id="dev_enc_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for Obf2 ENCRYPT --!>
-		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2EncShasum()">SHA SUM Obf2 ENCRYPT</button>
+
+		<a class="glossy_icon" style="position:absolute; top:180px; left:400px;" href="javascript:void('show tooltip')" onclick="showTipObf2EncShasum()" >[?]</a>
+
+		<!--<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2EncShasum()">SHA SUM Obf2 ENCRYPT</button>-->
 		<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2EncModulo()">MODULO Obf2 ENCRYPT</button>
 
 		<input id="dev_enc_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
@@ -874,14 +888,17 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<h3 style="color:red;">Obf-2 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
+	<h3 style="color:red;">Obf-2 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf2DecTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
 
 		<!-- Tooltip Object for Obf2 DECRYPT --!>
 		<div id="dev_dec_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
 		<!-- Tooltip Buttons for Obf2 DECRYPT --!>
-		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2DecShasum()">SHA SUM Obf2 DECRYPT</button>
+
+
+		<a class="glossy_icon" style="position:absolute; top:180px; left:400px;" href="javascript:void('show tooltip')" onclick="showTipObf2DecShasum()" >[?]</a>
+		<!--<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2DecShasum()">SHA SUM Obf2 DECRYPT</button>-->
 		<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2DecModulo()">MODULO Obf2 Decrypt</button>
 
 		<input id="dev_dec_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
@@ -1134,6 +1151,16 @@ FOR REFERENCE:
 		<p>OBF1 ENCRYPT SHASUM TOOLTIP</p>
 		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
 		<br>
+		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
+		<br>
+		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
+	`;
+
+	const html_obf1_enc_zero = `
+		<p>OBF1 Why Zero Pad Works</p>
+		<br>
+		We can use zero padding here because of the identity: X⊕0=X
+		<br>
 		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
 	`;
 
@@ -1149,6 +1176,9 @@ FOR REFERENCE:
 
 	const html_obf1_enc_title = `
 		<p>
+			Obf1 utilizes our Shasum function to produce entropy which is then XOR’d into the data.  We then convert the binary data from the XOR into exactly 1000 characters of base58 represented data. This turns out to be non-trivial so we implement a ‘guess-and-check’ style mechanism to ensure outputs of the same length. 
+		<br>
+		<br>
 			Our secret sauce is meant as a type of blocking that obfuscates the length of the stored data. As such our system is designed to store all data in blocks of 1000 base 58 characters. This is so that if and when an attacker accesses the stored and obfuscated data, it will be harder to decrypt. There was a time when everyone trusted Google and they deserved that trust and everything was great. That time is over. Now if you’re not expecting data leaks and planning for your ‘secure’ storage to be leaked at some point, are you really trying? We are attempting to help solve the problem of trusting ‘secure’ systems.
 
 
@@ -1158,6 +1188,11 @@ FOR REFERENCE:
 
 	function showTipObf1EncTitle(){
 		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_title;
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
+	}
+
+	function showTipObf1EncZeroPad(){
+		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_zero;
 		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
 	}
 
@@ -1181,6 +1216,8 @@ FOR REFERENCE:
 		<p>OBF1 DECRYPT SHASUM TOOLTIP</p>
 		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
 		<br>
+		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
+		<br>
 		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
 	`;
 
@@ -1188,11 +1225,17 @@ FOR REFERENCE:
 		<p>OBF1 DECRYPT INVERSE</p>
 		<img src="./svg_images/obf1_inverse.svg" style="" alt="" />
 		<br>
+		When more precision is needed for the Obf1 Encrypt binary bytes (8 bits) are converted to binary words (4 bits). When this is needed a single character is added to the left of the data. So when decrypting we run it first without stripping that leftmost character, then check if it looks like correctly decrypted data. If not we strip that single added character which will be representative of the binary word added in the encrypt step.
+		<br>
 		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
 	`;
 
 	const html_obf1_dec_title = `
 		<p>
+			To decrypt data from Obf1 we precisely recreate the entropy and XOR again. The decrypt works because a number XOR'd with another number twice is the same number.
+
+		<br>
+		<br>
 			Our secret sauce is meant as a type of blocking that obfuscates the length of the stored data. As such our system is designed to store all data in blocks of 1000 base 58 characters. This is so that if and when an attacker accesses the stored and obfuscated data, it will be harder to decrypt. There was a time when everyone trusted Google and they deserved that trust and everything was great. That time is over. Now if you’re not expecting data leaks and planning for your ‘secure’ storage to be leaked at some point, are you really trying? We are attempting to help solve the problem of trusting ‘secure’ systems.
 
 
@@ -1207,7 +1250,7 @@ FOR REFERENCE:
 
 	function showTipObf1DecShasum(){
 		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_shasum;
-		document.geRestaurantstElementById("dev_dec_obf1_tooltip").style.display = "inline";
+		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
 	}
 
 	function showTipObf1DecInverse(){
@@ -1226,19 +1269,23 @@ FOR REFERENCE:
 		<p>obf2 enCRYPT SHASUM TOOLTIP</p>
 		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
 		<br>
+		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
+		<br>
 		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
 	`;
 	const html_obf2_enc_modulo = `
 		<p>obf2 enCRYPT SUM AND MODULO FUNCTION</p>
 		<img src="./svg_images/sum_and_modulo.svg" style="" alt="" />
 		<br>
+			For the second round of obfuscation we sum the index of each base58 character with entropy produced from our shasum function and then modulo the output.
+		<br>
 		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
 	`;
 
 	const html_obf2_enc_title = `
 		<p>
-			obf2 title enc
-
+			For the second round of obfuscation we sum the index of each base58 character with entropy produced from our shasum function and then modulo the output.
+		<br>
 
 		</p>
 		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
@@ -1269,20 +1316,23 @@ FOR REFERENCE:
 		<p>obf2 decrypt SHASUM TOOLTIP</p>
 		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
 		<br>
+		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
+		<br>
 		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
 	`;
 	const html_obf2_dec_modulo = `
 		<p>obf2 decrypt SUM AND MODULO FUNCTION</p>
 		<img src="./svg_images/inverse_sum_and_mod.svg" style="" alt="" />
 		<br>
+		To run the inverse of our sum and mod function we can simply take the difference of the indexes and then check if the answer is negative, adding 58 in that case as we know it got modulo’d during the encryption step.
+		<br>
 		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
 	`;
 
 	const html_obf2_dec_title = `
 		<p>
-			obf2 title dec
-
-
+			To run the inverse of our sum and mod function we can simply take the difference of the indexes and then check if the answer is negative, adding 58 in that case as we know it got modulo’d during the encryption step.
+		<br>
 		</p>
 		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
 	`;
