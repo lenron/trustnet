@@ -46,7 +46,8 @@ s		flex-direction: row;
 		display: none;
 	}
 
-	.header_title {
+	.header_title:hover {
+		cursor: pointer;
 
 	}
 
@@ -181,20 +182,22 @@ s		flex-direction: row;
 		background-image: url('./svg_images/openssl_decrypt_flowchart.drawio.svg');
 	}
 
+	/* Makes the background color blend from orange to #AEE850 */
 	.glossy_button {
-		background: orange;
-		background: -moz-linear-gradient(top,  orange 0%, #aee850 100%);
-		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,orange), color-stop(100%,#aee850));
-		background: -webkit-linear-gradient(top,  orange 0%,#aee850 100%);
-		background: -o-linear-gradient(top,  orange 0%,#aee850 100%);
-		background: -ms-linear-gradient(top,  orange 0%,#aee850 100%);
-		background: linear-gradient(to bottom,  orange 0%,#aee850 100%);
-		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='orange', endColorstr='#aee850',GradientType=0 );
+		background: linear-gradient(orange, #aee850);
 		border: 1px solid #1d6511;
 		color: black;
 		font-size: 12px;
 		height: 30px;
 		cursor: pointer;
+	}
+
+	/* Makes the text blend from orange to #AEE850 */
+	/* background-clip: text creates a 'cut-out' of the background where the text exists, creating text with a linear gradient.*/
+	.glossy_icon {
+		background-image: linear-gradient(orange, #aee850);
+		color: transparent;
+		background-clip: text;
 	}
 
 	/* Set minimum page Width to */
@@ -677,11 +680,8 @@ s		flex-direction: row;
 <!-- Dev Site --!>
 <!-- Dev Site --!>
 
-	<h2>Development Site -- Crypto Functions</h2>
-	<div style="display:flex; flex-direction:row; justify-content: space-between; width: 1010px;">
-		<h3 style="color:black;">OpenSSL Encrypt</h3>
-		<button class="glossy_button" style="" onclick="showTipOpenSSLTitle()">OpenSSL Encrypt Blurb</button>
-	</div>
+	<h2 class="header_title">Development Site -- Crypto Functions</h2>
+	<h3 style="color:black;">OpenSSL Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
 
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/openssl_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Encrypt" />
@@ -697,6 +697,8 @@ s		flex-direction: row;
 		<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:310px; left:26px; width:183px; height:10px;">
 		<!--<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">--!>
 
+		<!--<a class="glossy_icon" style="position:absolute; top:150px; left:500px;" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a>
+		<a class="glossy_icon" style="position:absolute; top:180px; left:770px;" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a>--!>
 		<button class="glossy_button" style="position:absolute; top:150px; left:500px;" onclick="showTipBinary()">Why binary shows up like this</button>
 		<button class="glossy_button" style="position:absolute; top:180px; left:770px;" onclick="showTipNewline()">Why newline byte needed</button>
 		<!--<input type="image" src="plus.jpg" style="position:absolute; top:200px; left:350px; height:50px; width:50px;" onclick="showTipImportKeyEnc()" onmouseover="showTipImportKeyEnc()">--!>
@@ -745,10 +747,7 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
-		<h3 style="color:red;">OpenSSL Decrypt</h3>
-		<button class="glossy_button" style="" onclick="showTipDecTitle()">OpenSSL Decrypt Blurb</button>
-	</div>
+	<h3 style="color:red;">OpenSSL Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
 
@@ -800,10 +799,7 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
-		<h3 style="color:black;">Obf-1 Encrypt</h3>
-		<button class="glossy_button" style="" onclick="showTipObf1EncTitle()">Obf1 Title Blurb</button>
-	</div>
+	<h3 style="color:black;">Obf-1 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
 
@@ -828,10 +824,7 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
-		<h3 style="color:red;">Obf-1 Decrypt</h3>
-		<button class="glossy_button" style="" onclick="showTipObf1DecTitle()">Obf1 Title Blurb</button>
-	</div>
+	<h3 style="color:red;">Obf-1 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
 
@@ -858,10 +851,7 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
-		<h3 style="color:black;">Obf-2 Encrypt</h3>
-		<button class="glossy_button" style="" onclick="showTipObf2EncTitle()">Obf2 Title Blurb</button>
-	</div>
+	<h3 style="color:black;">Obf-2 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
 
@@ -884,10 +874,7 @@ s		flex-direction: row;
 	</div>
 	<br>
 
-	<div style="display:flex; flex-direction:row; justify-content: space-between; width:1010px;">
-		<h3 style="color:red;">Obf-2 Decrypt</h3>
-		<button class="glossy_button" style="" onclick="showTipObf2DecTitle()">Obf2 Title Blurb</button>
-	</div>
+	<h3 style="color:red;">Obf-2 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
 
@@ -1220,7 +1207,7 @@ FOR REFERENCE:
 
 	function showTipObf1DecShasum(){
 		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_shasum;
-		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
+		document.geRestaurantstElementById("dev_dec_obf1_tooltip").style.display = "inline";
 	}
 
 	function showTipObf1DecInverse(){
@@ -1340,7 +1327,7 @@ FOR REFERENCE:
 		document.getElementById("dev_enc_openssl_encrypted_data_base64").value = output_base64;
 		// Propagate encrypt outputs to inverse decrypt function and next encrypt for now.
 		document.getElementById("dev_dec_openssl_decrypt_algorithm").value = digest_algo;
-		document.getElementById("dev_dec_openssl_password_input").value = input_password;
+		Restaurantsdocument.getElementById("dev_dec_openssl_password_input").value = input_password;
 		document.getElementById("dev_dec_openssl_ciphertext_input").value = output_base64;
 		document.getElementById("dev_dec_openssl_derivebits_iterations").value = iterations;
 		if( hash === 'SHA-256' ){
