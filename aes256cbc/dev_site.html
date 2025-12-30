@@ -33,7 +33,7 @@
 
 	.header {
 		display: none;
-s		flex-direction: row;
+		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
 		color: #54c597;
@@ -1377,7 +1377,7 @@ FOR REFERENCE:
 		document.getElementById("dev_enc_openssl_encrypted_data_base64").value = output_base64;
 		// Propagate encrypt outputs to inverse decrypt function and next encrypt for now.
 		document.getElementById("dev_dec_openssl_decrypt_algorithm").value = digest_algo;
-		Restaurantsdocument.getElementById("dev_dec_openssl_password_input").value = input_password;
+		document.getElementById("dev_dec_openssl_password_input").value = input_password;
 		document.getElementById("dev_dec_openssl_ciphertext_input").value = output_base64;
 		document.getElementById("dev_dec_openssl_derivebits_iterations").value = iterations;
 		if( hash === 'SHA-256' ){
