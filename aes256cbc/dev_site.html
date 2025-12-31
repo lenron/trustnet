@@ -681,10 +681,10 @@
 <!-- Dev Site --!>
 	<h2 class="header_title">Development Site -- Crypto Functions</h2>
 
-	<h3>Base58 Functions -- Convert int array or base58 chars</h3>
-		<label>Input</label>
+	<h3>Base58 Functions -- Convert int array or base58 chars into its converted form</h3>
+		<label>Input -- Length=<span id="input_length_label"></span></label>
 		<textarea id="dev_b58_top" class="devsite_inputs" rows="5" style=""></textarea>
-		<label>Output</label>
+		<label>Output -- Length=<span id="output_length_label"></label>
 		<textarea id="dev_b58_bot" class="devsite_inputs" rows="5" style=""></textarea>
 		<button onclick="convertBase58()">Convert Base58</button>
 
@@ -946,11 +946,19 @@
 			console.log("top input: found int string");
 			const numbers = input.split(',').map(Number);
 			console.log(numbers);
-			document.getElementById("dev_b58_bot").value = to_b58(numbers);
+			const output = to_b58(numbers);
+			//document.getElementById("dev_b58_bot").value = to_b58(numbers);
+			document.getElementById("dev_b58_bot").value = output;
+			document.getElementById("input_length_label").innerHTML = numbers.length;
+			document.getElementById("output_length_label").innerHTML = output.length;
 		}else{
 			// convert base58 into ints
 			console.log("top input: found base58 chars");
-			document.getElementById("dev_b58_bot").value = from_b58(input);
+			//document.getElementById("dev_b58_bot").value = from_b58(input);
+			const output = from_b58(input);
+			document.getElementById("dev_b58_bot").value = output;
+			document.getElementById("input_length_label").innerHTML = input.length;
+			document.getElementById("output_length_label").innerHTML = output.length;
 		}
 	}
 
