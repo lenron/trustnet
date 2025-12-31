@@ -679,10 +679,17 @@
 <!-- Dev Site --!>
 <!-- Dev Site --!>
 <!-- Dev Site --!>
-
 	<h2 class="header_title">Development Site -- Crypto Functions</h2>
-	<h3 style="color:black;">OpenSSL Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
 
+	<h3>Base58 Functions -- Convert int array or base58 chars</h3>
+		<label>Input</label>
+		<textarea id="dev_b58_top" class="devsite_inputs" rows="5" style=""></textarea>
+		<label>Output</label>
+		<textarea id="dev_b58_bot" class="devsite_inputs" rows="5" style=""></textarea>
+		<button onclick="convertBase58()">Convert Base58</button>
+
+	<!-- OpenSSL Encrypt -->
+	<h3 style="color:black;">OpenSSL Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
 	<div style="position:relative; border:1px solid; width:1010px;">
 		<img src="./svg_images/openssl_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Encrypt" />
 
@@ -928,6 +935,24 @@
 				hideTipImportKeyEnc();
 		}
 	});   
+
+	function convertBase58(){
+		// determine what kind of input is in top, ints or base58.
+		const input = document.getElementById("dev_b58_top").value;
+		let numbers = new Array();
+		// If input includes any commas, we assume it's an int string.	
+		if( input.includes(',') ){
+			// convert ints into base58
+			console.log("top input: found int string");
+			const numbers = input.split(',').map(Number);
+			console.log(numbers);
+			document.getElementById("dev_b58_bot").value = to_b58(numbers);
+		}else{
+			// convert base58 into ints
+			console.log("top input: found base58 chars");
+			document.getElementById("dev_b58_bot").value = from_b58(input);
+		}
+	}
 
 
 /*
@@ -2668,6 +2693,7 @@ FOR REFERENCE:
 			document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
 		}else{
 			saltstring = document.getElementById("dev_enc_openssl_derivebits_salt").value;
+			// Convert string of ints into an array (numbers).
 			const numbers = saltstring.split(',').map(Number);
 			console.log("numbers salt array length: " + numbers.length);
 			if( numbers.length != 8 ){
