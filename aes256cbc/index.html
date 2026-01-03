@@ -2380,7 +2380,7 @@
 
 		// show input size in bytes
 		let size = new Blob([input]).size;
-		let difference = 700 - size;
+		let difference = 711 - size;
 		// Show running count of data length.
 		let size_string = "Number chars left: " + difference;
 		document.getElementById("data_length_label").innerHTML = size_string;
@@ -2389,7 +2389,7 @@
 		//debug("Input (blob) size: " + size);
 		//debug("byte size: " + size);
 		//if( input.length > 500 ){
-		if( size > 700 ){
+		if( size > 711 ){
 			return 0; // Length Check Failed.
 		}else{
 			return 1; // Length Check Passed.
