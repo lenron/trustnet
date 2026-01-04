@@ -1323,11 +1323,21 @@
 			// Grab upload_flag value for server database flag.
 			// Double Encrypt
 			encrypted_data = await encryptDouble(uploadtext, pass_2, pass_3);
+			// Validate encrypted data as decryptable.
+			const decrypt_test = await decryptDouble(encrypted_data, pass_2, pass_3);
+			if( uploadtext != decrypt_test){
+				throw new Error('Encryption Error! Data failed to decrypt!');
+			}
 			// reset flag once it is used
 			upload_flag = 'false';
 		}else{
 			// Triple Encrypt
 			encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
+			// Validate encrypted data as decryptable.
+			const plaintext_decrypt_test = await decryptStack(encrypted_data, pass_1, pass_2, pass_3);
+			if( plaintext != plaintext_decrypt_test ){
+				throw new Error('Encryption Error! Data failed to decrypt!');
+			}
 		}
 
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
@@ -2311,7 +2321,7 @@
 		const obf2_decrypted = await obf2Decrypt(encrypted, pass3);
 		const obf1_decrypted = await obf1Decrypt(obf2_decrypted, pass2);
 		return obf1_decrypted;
-	}//decryptStack()
+	}//decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
 	async function decryptStack(encrypted, pass1, pass2, pass3){
