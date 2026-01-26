@@ -963,21 +963,14 @@
 	}
 
 
-/*
-FOR REFERENCE:
 
-	function mouseOver(){
-		console.log("MOUSEOVER!!!");
-	}
-	function showTip(){
-		console.log("SHOW ME YO TIP!!!");
-	}
-*/
+	//////////////////////////////////////////////////////////////
+	//		Dev Site Tooltip Content & Functionality			//
+	//////////////////////////////////////////////////////////////
 
-
-	//OpenSSL Encrypt 
-	//OpenSSL Encrypt 
-	//OpenSSL Encrypt 
+	//OpenSSL Encrypt Tooltip Content 
+	//OpenSSL Encrypt Tooltip Content 
+	//OpenSSL Encrypt Tooltip Content 
 	const html_openssl_enc_title= `
 		<p>
 			OpenSSL was chosen for the base encryption because it is widely available from the command line and its featureset includes aes-256-cbc symmetric encryption/decryption which is good enough for the US government as described in its spec document,
@@ -1056,7 +1049,9 @@ FOR REFERENCE:
 		</p>
 		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
 	`;
+	//OpenSSL Encrypt Tooltip Content 
 
+	//OpenSSL Encrypt Tooltip Functions
 	function showTipRandSalt(){
 		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_randsalt;
 		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
@@ -1100,13 +1095,11 @@ FOR REFERENCE:
 	function hideTipEnc(){
 		document.getElementById("dev_enc_openssl_tooltip").style.display = "none";
 	}
-	//OpenSSL Encrypt Page
-	//OpenSSL Encrypt Page
-	//OpenSSL Encrypt Page
+	//OpenSSL Encrypt Tooltip Functions
 
-	//OpenSSL Decrypt 
-	//OpenSSL Decrypt 
-	//OpenSSL Decrypt 
+	//OpenSSL Decrypt Tooltip Content
+	//OpenSSL Decrypt Tooltip Content
+	//OpenSSL Decrypt Tooltip Content
 	const html_openssl_dec_importkey = `
 		<p>
 			importKey() is a method for importing key material (e.g. a password) in a secure way that adheres to the SubtleCrypto guidelines set by the World Wide Web Consortium (the top authority/consensus for web design).<br><br>
@@ -1151,7 +1144,9 @@ FOR REFERENCE:
 		</p>
 		<button class="glossy_button" onclick="hideTipDec()">Close</button>
 	`;
+	//OpenSSL Decrypt Tooltip Content
 
+	//OpenSSL Decrypt Tooltip Functions
 	function showTipDecTitle(){
 		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_title
 		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
@@ -1175,11 +1170,9 @@ FOR REFERENCE:
 	function hideTipDec(){
 		document.getElementById("dev_dec_openssl_tooltip").style.display = "none";
 	}
-	//OpenSSL Decrypt Page
-	//OpenSSL Decrypt Page
-	//OpenSSL Decrypt Page
+	//OpenSSL Decrypt Tooltip Functions
 
-	//Obf1 Encrypt
+	//Obf1 Encrypt Tooltip Content
 	const html_obf1_enc_shasum = `
 		<p>OBF1 ENCRYPT SHASUM TOOLTIP</p>
 		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
@@ -1218,7 +1211,9 @@ FOR REFERENCE:
 		</p>
 		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
 	`;
+	//Obf1 Encrypt Tooltip Content
 
+	//Obf1 Encrypt Tooltip Functions
 	function showTipObf1EncTitle(){
 		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_title;
 		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
@@ -1242,9 +1237,9 @@ FOR REFERENCE:
 	function hideTipObf1Enc(){
 		document.getElementById("dev_enc_obf1_tooltip").style.display = "none";
 	}
-	//Obf1 Encrypt
+	//Obf1 Encrypt Tooltip Functions
 
-	//Obf1 DECRYPT
+	//Obf1 DECRYPT Tooltip Content
 	const html_obf1_dec_shasum = `
 		<p>OBF1 DECRYPT SHASUM TOOLTIP</p>
 		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
@@ -1275,7 +1270,9 @@ FOR REFERENCE:
 		</p>
 		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
 	`;
+	//Obf1 DECRYPT Tooltip Content
 
+	//Obf1 DECRYPT Tooltip Functions
 	function showTipObf1DecTitle(){
 		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_title;
 		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
@@ -1295,9 +1292,9 @@ FOR REFERENCE:
 	function hideTipObf1Dec(){
 		document.getElementById("dev_dec_obf1_tooltip").style.display = "none";
 	}
-	//Obf1 DECRYPT
+	//Obf1 DECRYPT Tooltip Functions
 
-	//Obf2 Encrypt
+	//Obf2 Encrypt Tooltip Content
 	const html_obf2_enc_shasum = `
 		<p>obf2 enCRYPT SHASUM TOOLTIP</p>
 		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
@@ -1323,7 +1320,9 @@ FOR REFERENCE:
 		</p>
 		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
 	`;
+	//Obf2 Encrypt Tooltip Content
 
+	//Obf2 Encrypt Tooltip Functions
 	function showTipObf2EncTitle(){
 		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_title;
 		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
@@ -1342,9 +1341,9 @@ FOR REFERENCE:
 	function hideTipObf2Enc(){
 		document.getElementById("dev_enc_obf2_tooltip").style.display = "none";
 	}
-	//Obf2 Encrypt
+	//Obf2 Encrypt Tooltip Functions
 
-	//Obf2 DECRYPT 
+	//Obf2 DECRYPT Tooltip Content
 	const html_obf2_dec_shasum = `
 		<p>obf2 decrypt SHASUM TOOLTIP</p>
 		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
@@ -1369,7 +1368,9 @@ FOR REFERENCE:
 		</p>
 		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
 	`;
+	//Obf2 DECRYPT Tooltip Content
 
+	//Obf2 DECRYPT Tooltip Functions
 	function showTipObf2DecTitle(){
 		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_title;
 		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
@@ -1388,15 +1389,21 @@ FOR REFERENCE:
 	function hideTipObf2Dec(){
 		document.getElementById("dev_dec_obf2_tooltip").style.display = "none";
 	}
-	//Obf2 DECRYPT
+	//Obf2 DECRYPT Tooltip Functions
 
+
+	//////////////////////////////////////////////////////////////
+	//		Dev Site Hook-into-main-functionality functions		//
+	//////////////////////////////////////////////////////////////
+
+	// Rolls a random salt manually for Dev Site's encrypt OpenSSL.
 	async function devManualSalt(){
 		const salt = window.crypto.getRandomValues(new Uint8Array(8));
 		document.getElementById("dev_enc_openssl_derivebits_salt").value = salt;
 		document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
 	}
 
-	// OpenSSL
+	// Dev Site Hook function for encOpenSSL()
 	async function devEncOpenSSL(){
 		const input_password = document.getElementById("dev_enc_openssl_password_input").value;
 		const input_plaintext = document.getElementById("dev_enc_openssl_plaintext_input").value;
@@ -1424,6 +1431,7 @@ FOR REFERENCE:
 		document.getElementById("dev_enc_obf1_b64_input_data").value = output_base64;
 	}
 
+	// Dev Site Hook function for decOpenSSL()
 	async function devDecOpenSSL(){
 		const input_password = document.getElementById("dev_dec_openssl_password_input").value;
 		const input_plaintext = document.getElementById("dev_dec_openssl_ciphertext_input").value;
@@ -1437,7 +1445,7 @@ FOR REFERENCE:
 		document.getElementById("dev_dec_openssl_decrypted_plaintext").value = decrypted_plaintext;
 	}
 
-	// Obf 1
+	// Dev Site Hook function for obf1Encrypt()
 	async function devEncObf1(){
 		const input_password = document.getElementById("dev_enc_obf1_password_input").value;
 		const input_b64_encoded_data = document.getElementById("dev_enc_obf1_b64_input_data").value;
@@ -1452,6 +1460,7 @@ FOR REFERENCE:
 		document.getElementById("dev_enc_obf2_ciphertext_b58").value = output_1000_b58;
 	}
 
+	// Dev Site Hook function for obf1Decrypt()
 	async function devDecObf1(){
 		const input_password = document.getElementById("dev_dec_obf1_password_input").value;
 		const input_b58_encoded_data = document.getElementById("dev_dec_obf1_b58_ciphertext").value;
@@ -1460,7 +1469,7 @@ FOR REFERENCE:
 		document.getElementById("dev_dec_obf1_data_b64_output").value = output_b64;
 	}
 
-	// Obf 2
+	// Dev Site Hook function for obf1Encrypt()
 	async function devEncObf2(){
 		const input_password = document.getElementById("dev_enc_obf2_password_input").value;
 		const input_b58_ciphertext = document.getElementById("dev_enc_obf2_ciphertext_b58").value;
@@ -1472,6 +1481,7 @@ FOR REFERENCE:
 		document.getElementById("dev_dec_obf2_final_encrypted").value = output_final;
 	}
 
+	// Dev Site Hook function for obf2Decrypt()
 	async function devDecObf2(){
 		const input_password = document.getElementById("dev_dec_obf2_password_input").value;
 		const input_final_encrypted = document.getElementById("dev_dec_obf2_final_encrypted").value;
