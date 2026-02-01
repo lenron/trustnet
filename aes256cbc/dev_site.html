@@ -835,7 +835,7 @@
 		<input id="dev_enc_obf1_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:324px; left:48px; width:808px;">
 
 		<textarea id="dev_enc_obf1_xord_data" class="devsite_inputs" rows="3" style="position:absolute; top:398px; left:20px; width:965px; height:50px;"></textarea>
-		<textarea id="dev_enc_obf1_b58_output" class="devsite_inputs" rows="3" style="position:absolute; top:541px; left:20px; width:965px; height:102px;"></textarea>
+		<textarea id="dev_enc_obf1_b64_output" class="devsite_inputs" rows="3" style="position:absolute; top:541px; left:20px; width:965px; height:102px;"></textarea>
 		<button class="glossy_button"id="dev_enc_obf1_encrypt_button" style="color:black; width:1000px; height:50px; font-size:18px;" onclick="devEncObf1()">Obf-1 ENCRYPT</button>
 	</div>
 	<br>
@@ -855,7 +855,7 @@
 		<input id="dev_dec_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:374px;">
 		<input id="dev_dec_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:374px;">
 
-		<textarea id="dev_dec_obf1_b58_ciphertext" class="devsite_inputs" rows="3" style="position:absolute; top:38px; left:466px; width:526px; height:160px;"></textarea>
+		<textarea id="dev_dec_obf1_b64_ciphertext" class="devsite_inputs" rows="3" style="position:absolute; top:38px; left:466px; width:526px; height:160px;"></textarea>
 
 		<input id="dev_dec_obf1_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:256px; left:48px; width:795px;">
 		<input id="dev_dec_obf1_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:319px; left:48px; width:795px;">
@@ -886,8 +886,8 @@
 		<input id="dev_enc_obf2_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:108px; left:15px; width:374px;">
 		<input id="dev_enc_obf2_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:259px; left:15px; width:730px;">
 
-		<textarea id="dev_enc_obf2_ciphertext_b58" class="devsite_inputs" rows="3" style="position:absolute; top:39px; left:443px; width:537px; height:168px;"></textarea>
-		<textarea id="dev_enc_obf2_password_b58" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
+		<textarea id="dev_enc_obf2_ciphertext_b64" class="devsite_inputs" rows="3" style="position:absolute; top:39px; left:443px; width:537px; height:168px;"></textarea>
+		<textarea id="dev_enc_obf2_password_b64" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
 
 		<textarea id="dev_enc_obf2_final_encrypted" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
 
@@ -913,9 +913,9 @@
 		<input id="dev_dec_obf2_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:259px; left:15px; width:730px;">
 
 		<textarea id="dev_dec_obf2_final_encrypted" class="devsite_inputs" rows="3" style="position:absolute; top:39px; left:443px; width:537px; height:168px;"></textarea>
-		<textarea id="dev_dec_obf2_password_b58" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
+		<textarea id="dev_dec_obf2_password_b64" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
 
-		<textarea id="dev_dec_obf2_ciphertext_b58" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
+		<textarea id="dev_dec_obf2_ciphertext_b64" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
 
 		<button class="glossy_button"id="dev_dec_obf2_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecObf2()">Obf-2 DECRYPT</button>
 	</div>
@@ -1450,22 +1450,22 @@
 		const input_password = document.getElementById("dev_enc_obf1_password_input").value;
 		const input_b64_encoded_data = document.getElementById("dev_enc_obf1_b64_input_data").value;
 
-		const output_1000_b58 = await obf1Encrypt(input_b64_encoded_data, input_password);
-		document.getElementById("dev_enc_obf1_b58_output").value = output_1000_b58;
+		const output_1000_b64 = await obf1Encrypt(input_b64_encoded_data, input_password);
+		document.getElementById("dev_enc_obf1_b64_output").value = output_1000_b64;
 		// Propagate encrypt outputs to decrypt.
 		document.getElementById("dev_dec_obf1_password_input").value = input_password;
-		document.getElementById("dev_dec_obf1_b58_ciphertext").value = output_1000_b58;
+		document.getElementById("dev_dec_obf1_b64_ciphertext").value = output_1000_b64;
 		// Proopagate to next encrypt step.
 		//document.getElementById("dev_enc_obf2_password_input").value = input_password;
-		document.getElementById("dev_enc_obf2_ciphertext_b58").value = output_1000_b58;
+		document.getElementById("dev_enc_obf2_ciphertext_b64").value = output_1000_b64;
 	}
 
 	// Dev Site Hook function for obf1Decrypt()
 	async function devDecObf1(){
 		const input_password = document.getElementById("dev_dec_obf1_password_input").value;
-		const input_b58_encoded_data = document.getElementById("dev_dec_obf1_b58_ciphertext").value;
+		const input_b64_encoded_data = document.getElementById("dev_dec_obf1_b64_ciphertext").value;
 
-		const output_b64 = await obf1Decrypt(input_b58_encoded_data, input_password);
+		const output_b64 = await obf1Decrypt(input_b64_encoded_data, input_password);
 		console.log("output length: " + output_b64.length);
 		document.getElementById("dev_dec_obf1_data_b64_output").value = output_b64;
 	}
@@ -1473,9 +1473,9 @@
 	// Dev Site Hook function for obf1Encrypt()
 	async function devEncObf2(){
 		const input_password = document.getElementById("dev_enc_obf2_password_input").value;
-		const input_b58_ciphertext = document.getElementById("dev_enc_obf2_ciphertext_b58").value;
+		const input_b64_ciphertext = document.getElementById("dev_enc_obf2_ciphertext_b64").value;
 
-		const output_final = await obf2Encrypt(input_b58_ciphertext, input_password);
+		const output_final = await obf2Encrypt(input_b64_ciphertext, input_password);
 		document.getElementById("dev_enc_obf2_final_encrypted").value = output_final;
 		// Propagate encrypt outputs to decrypt.
 		document.getElementById("dev_dec_obf2_password_input").value = input_password;
@@ -1487,8 +1487,8 @@
 		const input_password = document.getElementById("dev_dec_obf2_password_input").value;
 		const input_final_encrypted = document.getElementById("dev_dec_obf2_final_encrypted").value;
 
-		const output_ciphertext_b58 = await obf2Decrypt(input_final_encrypted, input_password);
-		document.getElementById("dev_dec_obf2_ciphertext_b58").value = output_ciphertext_b58;
+		const output_ciphertext_b64 = await obf2Decrypt(input_final_encrypted, input_password);
+		document.getElementById("dev_dec_obf2_ciphertext_b64").value = output_ciphertext_b64;
 	}
 
 
@@ -2914,25 +2914,12 @@
 	// Inputs: plaintext64 is base64, password is plaintext.
 	// Outputs: 1000 characters of base58 string.
 	async function obf1Encrypt(plaintext64, password) {
-		// Data Flow Window
-		//debug("Data Flow obf1Encrypt() -- base64 input: " + plaintext64);
-		// Prepare plaintext side for XOR.
-		// Adds our custom countstring to the data.
+		// Add our custom countstring to the data.
 		let plaintext_binary = addCountstring(plaintext64);
 		document.getElementById("dev_enc_obf1_zero_padded_data").value = plaintext_binary;
-		//debug("Data Flow obf1Encrypt() -- Counstring added: " + plaintext_binary);
-		// XOR plaintext with password and return exactly 1000 base 58 chars.
-		//const result_b58 = await getXOR(plaintext_binary, password);
 
-		const result_b64 = await getXOR64(plaintext_binary, password);
+/*	DO WE WANT A CHAR CHECK HERE STILL???
 
-
-		//debug("Data Flow obf1Encrypt() -- Post getXOR - 1000 chars of base58 - obf1Encrypt() Output: " + result_b58);
-
-		// Check data length and type (specification check 2: 1000 char length, base 58).
-		// If all b58 chars...
-
-/*
 		if( !check_b58chars(result_b58) ){
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
@@ -2941,11 +2928,7 @@
 			throw new Error('Obfuscation step 1 output length INVALID!');
 		}
 */
-		//return result_b58;
-		return result_b64;
-	}//obf1Encrypt()
 
-	async function getXOR64(plaintext_binary, password){
 		// Start at 1000, will immediately be chopped to 780, which guarantees a converstion to more than 1000 b58 chars.
 		const array_length = 750;
 
@@ -2954,11 +2937,6 @@
 		document.getElementById("dev_enc_obf1_password_bytes").value = password_binary;
 		const pass_binary = await getPassHash(password_binary, array_length);
 		document.getElementById("dev_enc_obf1_sha_extended_bytes").value = pass_binary;
-
-		// Data Flow
-		//debug("Password Flow getXOR() -- Re-Hashed Password to be XOR'd: " + pass_binary);
-		//debug("Data Flow getXOR() -- Data to be XOR'd: " + plaintext_binary);
-		
 
 		// Perform the XOR bitwise byte by byte.
 		let xor_result = new Array();
@@ -2971,227 +2949,96 @@
 		document.getElementById("dev_enc_obf1_xord_data").value = result_b64;
 
 		console.log("BASE64 CONVERTED TO LENGTH: " + result_b64.length);
-		//return result_b58;
+
 		return result_b64;
-	}//getXOR64()
-/*
-	// XOR plaintext with password and return exactly 1000 base 58 chars.
-	// Inputs: plintext_binary is a Uint8Array typed array, password is plaintext.
-	// Returns: array of the XOR result.
-	async function getXOR(plaintext_binary, password){
-		// Start at 1000, will immediately be chopped to 780, which guarantees a converstion to more than 1000 b58 chars.
-		const array_length = 1000;
+	}//obf1Encrypt()
 
-		// Prepare password side for XOR.
-		const password_binary = new TextEncoder().encode(password);
-		document.getElementById("dev_enc_obf1_password_bytes").value = password_binary;
-		const pass_binary = await getPassHash(password_binary, array_length);
-		document.getElementById("dev_enc_obf1_sha_extended_bytes").value = pass_binary;
-
-		// Data Flow
-		//debug("Password Flow getXOR() -- Re-Hashed Password to be XOR'd: " + pass_binary);
-		//debug("Data Flow getXOR() -- Data to be XOR'd: " + plaintext_binary);
-		
-
-		// Perform the XOR bitwise byte by byte.
-		let xor_result = new Array();
-		// XOR is a ^ in javascript
-		for (let i = 0; i < array_length; i++) {
-			xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
-		}
-		//debug("Data Flow getXOR() -- XOR Result: " + xor_result);
-		// In order to encode to exactly 1000 characters of base58 data, start by popping byte size chunks,
-		// running the conversion, then checking the length of base58 result.
-		// Try 8-bit Bytes:
-		// Chop unnecessary data, keeping the important slice.
-		let array_slice = xor_result.slice(0, 780);
-		document.getElementById("dev_enc_obf1_xord_data").value = array_slice;
-		let last_byte_popped;
-		let array_slice_hex;
-		// Without actually doing the conversion to base58, output length is unclear.
-		let result_b58 = to_b58(array_slice);
-		// Start Try: 
-		// Pop WHOLE bytes until length is 1000 or less.
-		while( result_b58.length > 1000 ){
-			// Pop an 8-bit Byte. Keep it in case we need its data for 4-bit word precision tries.
-			last_byte_popped = array_slice.pop();
-			// Convert array_slice to base58 string.
-			result_b58 = to_b58(array_slice);
-		}
-
-		// Try Failed: 4-bit Word Precision Needed.
-		// In this case, we missed 1000 byte length: looks something like length=1001 then length=999.
-			// This happens irregularly because of the bit order conversion missmatch between base64 and base58 (I think).
-		if( result_b58.length != 1000 ){
-			// Since we can't get to 1000 bytes by popping 8-bit bytes, increase precision by popping 4-bit words.
-				// The result of the below function in practice appears equivalent to prepending a zero. The inverse function handles this by 
-				// popping a character before trying the decrypt if the beginning of the ciphertext doesn't look like an encrypted countstring. /^\d+:/
-			//debug("1000 char output missed. ADD MORE PRECISION!");
-			// Start by adding back the popped byte we saved.
-			array_slice.push(last_byte_popped);
-			// Convert to word array:
-			// Instead of 8-bit, 256 value bytes use 4-bit, 16 value words.
-			word_array = bytesToWords( array_slice ); // function resides base58.js
-			let tries = 0;
-			// Continue if we made it to length 1000 (success!).
-			while( result_b58.length != 1000){
-				//debug("word_array: " + word_array);
-				// Pop a 4-bit word.
-				last_word_popped = word_array.pop();
-				// Convert word_array to base58 string.
-				result_b58 = to_b58_words(word_array);
-				//debug("b58 length: " + result_b58.length);
-				//debug("result_b58: " + result_b58);
-				tries++;
-				// Not sure how to test this as it may never trigger, however...
-				// We should never miss a whole character of base58 length as long as we pop 4-bit chunks (I think-- pretty sure!).
-				// We have 16 words that are poppable. Not sure if this value is efficient.
-				if( tries > 16 ){
-					throw new Error('MAJOR ERROR: additional precision not sufficient to reach 1000 characters of length. This should never trigger.');
-				}
-			}
-		}
-	
-		//debug("Data LENGTH: " + result_b58.length);
-		return result_b58;
-	}//getXOR()
-*/
 	// obf1Decrypt() is the inverse function of obf1Encrypt().
-	// Inputs: ciphertext58 is a base58 string, password is plaintext
+	// Inputs: ciphertext64 is a base58 string, password is plaintext
 	// Output: decrypted_string is a base64 string
-	async function obf1Decrypt(ciphertext58, password) {
-		//debug("Data Flow obf1Decrypt() -- base58 Ciphertext: " + ciphertext58);
-		// Obfuscate 1 Decrypt core function.
-		let decrypted_string = await xorInverse64(ciphertext58, password);
-		//debug("Data Flow obf1Decrypt() -- xorInverse() First Try Looking for Countstring: " + decrypted_string);
-/*
-		// Data should now be in countstring form.
-		// use regex to see if decrypted_string looks like the countstring. 
-		// remove lead char (hopefully a 0) if not.
-		const regex = /^\d+:/;
-		if( !regex.test(decrypted_string) ){
-			//debug("NO MATCH: try stripping zero");
-			// Try stripping zero (if not a zero this should fail in the same way) from function input and running the obf1 decrypt again.
-			// Strip from the LEFT. This is equivalent to enc1Obf/getXOR's popping because the base58 converter function inverts the order.
-			try_stripped = ciphertext58.substr(1);
-			// Try running the decrypt a second time.
-			decrypted_string = await xorInverse(try_stripped, password);
-			//debug("Data Flow obf1Decrypt() -- xorInverse() Second Try Looking for Countstring: " + decrypted_string);
-			// Make sure this fixed it.
-			if( !regex.test(decrypted_string) ){
-				throw new Error('DECRYPT RETRY FAILED!');
-			}
-		}
-*/
-		// Remove (pop) countstring.
-		//decrypted_string = decrypted_string.split(":").pop();
-		//decrypted_array = decrypted_string.split(":").pop();
-		decrypted_array = decrypted_string.split(":");
-		console.log(decrypted_array);
-		console.log("length from countstring: " + decrypted_array[0]);
-		console.log("data without countstring: " + decrypted_array[1]);
-		console.log(decrypted_array[1]);
-		console.log("computed length: " + decrypted_array[1].length);
+	async function obf1Decrypt(ciphertext64, password) {
 
-		let output = decrypted_array[1].substring(0, decrypted_array[0]);
-		console.log("computed length after substring: " + output.length);
-		//debug("Data Flow obf1Decrypt() -- Countstring Removed - obf1Decrypt() Output " + decrypted_string);
-		//return decrypted_string;
-		//return decrypted_array[1];
+		// Convert base64 string to Uint8Array of bytes.
+		//let decoded_b64_array = base64ToBytes(data);
+		let decoded_b64_array = base64ToBytes(ciphertext64);
+
+		// Devsite window functrion.
+		document.getElementById("dev_dec_obf1_ciphertext_bytes").value = decoded_b64_array;
+
+		// Compute array length.
+		let array_length = decoded_b64_array.length;
+		console.log("array_length: " + array_length);
+		// Compute password for XOR.
+		const password_binary = new TextEncoder().encode(password);
+		document.getElementById("dev_dec_obf1_password_bytes").value = password_binary;
+		let pass_binary = await getPassHash(password_binary, array_length);
+		document.getElementById("dev_dec_obf1_sha_extended_bytes").value = pass_binary;
+
+		// Inverse of XOR is XOR and is communicative.
+		// XOR password and output to get input.
+		let xor_result = new Uint8Array(array_length);
+		for (let i = 0; i < array_length; i++) {
+			// Perform the XOR.
+			xor_result[i] = pass_binary[i] ^ decoded_b64_array[i];
+		}
+
+		// Regular Array needed for shift, pop.
+		let plaintextbytes = Array.from(xor_result);
+		document.getElementById("dev_dec_obf1_xor_inversed_data").value = plaintextbytes;
+
+		// Decode to show user in dev site.
+		data_uint8 = Uint8Array.from(plaintextbytes);
+		let with_countstring = new TextDecoder().decode(data_uint8);
+		document.getElementById("dev_dec_obf1_data_with_countstring").value = with_countstring;
+		console.log("plaintextbytes length: " + plaintextbytes.length);
+
+		// Needs to be an array for push() to work.
+		let count_array = new Array;
+		let shifted_byte = plaintextbytes.shift();
+		// Need this value to compute how many zeros to pop.
+		array_length -= 1;
+		console.log("shifted byte = " + shifted_byte);
+		count_array.push(shifted_byte);
+		// Start at 2 bytes, check last chomped, do until find colon char byte number (58).
+		while( plaintextbytes[0] != 58 ){
+			shifted_byte = plaintextbytes.shift();
+			array_length -= 1;
+			count_array.push(shifted_byte);
+		}
+		// Shift off colon byte. It's done its job.
+		shifted_byte = plaintextbytes.shift();
+		array_length -= 1;
+
+		// Convert bytes to a number.
+		count_array = Uint8Array.from(count_array);
+		const string_length = new TextDecoder().decode(count_array);
+		console.log("countstring extracted length value: " + string_length);
+
+		console.log("plaintextbytes length: " + plaintextbytes.length);
+		const number_zeros_to_pop = array_length - string_length;
+		// Pop off zero bytes.
+		for ( i = 0; i < number_zeros_to_pop; i++) {
+			plaintextbytes.pop();
+			//console.log("plaintextbytes while popping: " + plaintextbytes);
+		}
+		console.log("plaintextbytes length: " + plaintextbytes.length);
+	
+		// Array needs to be Uint8Array for Decode to work.	
+		// Should now be stripped of zeros and countstring leaving data.
+		plaintextbytes = Uint8Array.from(plaintextbytes);
+		// Decode precisely stripped array.
+		let output = new TextDecoder().decode(plaintextbytes);
+		console.log("output length: " + output.length);
+
 		return output;
 	}//obf1Decrypt
 
-	async function xorInverse64(data, password){
-		//debug("Data Flow xorInverse() -- base58 Input Data: " + data);
-		// Convert to Uint8Array from base 58.
-
-	//	let decoded_b58_arr = from_b58(data);
-		let decoded_b58_arr = base64ToBytes(data);
-
-		document.getElementById("dev_dec_obf1_ciphertext_bytes").value = decoded_b58_arr;
-		//debug("Data Flow xorInverse() -- Binary Input Data: " + decoded_b58_arr);
-		// Compute array length.
-		let array_length = decoded_b58_arr.length;
-		// Compute password for XOR.
-		const password_binary = new TextEncoder().encode(password);
-		document.getElementById("dev_dec_obf1_password_bytes").value = password_binary;
-		let pass_binary = await getPassHash(password_binary, array_length);
-		document.getElementById("dev_dec_obf1_sha_extended_bytes").value = pass_binary;
-		//debug("Password Flow xorInverse() -- Hashed Password: " + pass_binary);
-		// Inverse of XOR is XOR and is communicative.
-		// XOR password and output to get input.
-		let xor_result = new Uint8Array(array_length);
-		for (let i = 0; i < array_length; i++) {
-			// Perform the XOR.
-			xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
-		}
-		//debug("Data Flow xorInverse() -- XOR Password and Data: " + xor_result);
-		let plaintextbytes = Array.from(xor_result);
-		document.getElementById("dev_dec_obf1_xor_inversed_data").value = plaintextbytes;
-		// Strip off tailing zeros from the RIGHT.
-/*
-		while(plaintextbytes[plaintextbytes.length - 1] == 0){
-			plaintextbytes.pop();
-		}
-*/
-		plaintextbytes = Uint8Array.from(plaintextbytes);
-		//debug("Data Flow xorInverse() -- Strip off Tailing Zeros: " + plaintextbytes);
-		// Convert utf-8 to string
-		let decrypted_string = new TextDecoder().decode(plaintextbytes);
-		document.getElementById("dev_dec_obf1_data_with_countstring").value = decrypted_string;
-		//debug("Data Flow xorInverse() -- Decrypted String: " + decrypted_string);
-		return decrypted_string;
-	}//xorInverse64()
-/*
-	// Runs the cryptographic core functions of obf1Decrypt, which will run twice if the encrypt required 4-bit word precision.
-	// Input same data, password as parent function obf1Decrypt.
-	// Output data which includes the countstring in string form.
-	async function xorInverse(data, password){
-		//debug("Data Flow xorInverse() -- base58 Input Data: " + data);
-		// Convert to Uint8Array from base 58.
-		let decoded_b58_arr = from_b58(data);
-		document.getElementById("dev_dec_obf1_ciphertext_bytes").value = decoded_b58_arr;
-		//debug("Data Flow xorInverse() -- Binary Input Data: " + decoded_b58_arr);
-		// Compute array length.
-		let array_length = decoded_b58_arr.length;
-		// Compute password for XOR.
-		const password_binary = new TextEncoder().encode(password);
-		document.getElementById("dev_dec_obf1_password_bytes").value = password_binary;
-		let pass_binary = await getPassHash(password_binary, array_length);
-		document.getElementById("dev_dec_obf1_sha_extended_bytes").value = pass_binary;
-		//debug("Password Flow xorInverse() -- Hashed Password: " + pass_binary);
-		// Inverse of XOR is XOR and is communicative.
-		// XOR password and output to get input.
-		let xor_result = new Uint8Array(array_length);
-		for (let i = 0; i < array_length; i++) {
-			// Perform the XOR.
-			xor_result[i] = pass_binary[i] ^ decoded_b58_arr[i];
-		}
-		//debug("Data Flow xorInverse() -- XOR Password and Data: " + xor_result);
-		let plaintextbytes = Array.from(xor_result);
-		document.getElementById("dev_dec_obf1_xor_inversed_data").value = plaintextbytes;
-		// Strip off tailing zeros from the RIGHT.
-		while(plaintextbytes[plaintextbytes.length - 1] == 0){
-			plaintextbytes.pop();
-		}
-		plaintextbytes = Uint8Array.from(plaintextbytes);
-		//debug("Data Flow xorInverse() -- Strip off Tailing Zeros: " + plaintextbytes);
-		// Convert utf-8 to string
-		let decrypted_string = new TextDecoder().decode(plaintextbytes);
-		document.getElementById("dev_dec_obf1_data_with_countstring").value = decrypted_string;
-		//debug("Data Flow xorInverse() -- Decrypted String: " + decrypted_string);
-		return decrypted_string;
-	}
-*/
 	// Encrypting function that adds each index pair of the input_data and password,
 	// then takes the modulo of that result to build an ecrypted string of 1000 base58 characters.
 	// Inputs: input_data is 1000 characters of base58 string, password is plaintext
 	// Output: 1000 chars of base58 string
 	async function obf2Encrypt(input_data, password){
-
-		// Check input data for non-b58 chars.
-		// This was in initial spec but maybe insn't required now that the input will only be from obf1 output.
-/*
+/*	ARE WE STILL CHECKING CHAR TYPES??
 		if( !check_b58chars(input_data) ){
 			console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
 			// Abort final step encode.
@@ -3212,41 +3059,41 @@
 		// Convert password hash byte array to base58 string.
 		// Over 4000 chars long at this point.
 		//const pass_b58 = to_b58(pass_hash);
-		const pass_b58 = bytesToBase64(pass_hash);
-		document.getElementById("dev_enc_obf2_password_b58").value = pass_b58;
+		const pass_b64 = bytesToBase64(pass_hash);
+		document.getElementById("dev_enc_obf2_password_b64").value = pass_b64;
 		//debug("Password Flow obf2Encrypt() -- Password Hash base58: " + pass_b58);
 		//debug("Data Flow obf2Encrypt() -- Input Data: " + input_data);
 
 		// Convert each operand b58 string to an array of corresponding indices.
 		// Create 2 arrays of length 1000.
-		let input_b58_num_arr = new Array(input_length);
-		let pass_b58_num_arr = new Array(input_length);
+		let input_b64_num_arr = new Array(input_length);
+		let pass_b64_num_arr = new Array(input_length);
 		for (let i = 0; i < input_length; i++) {								// input_length should be 1000
 			// Convert each b58 character to its numerical index and store in an array. 
-			input_b58_num_arr[i] = base64map.indexOf(input_data.charAt(i));		// 1000 chars long
-			pass_b58_num_arr[i] = base64map.indexOf(pass_b58.charAt(i));		// there is more data in pass_b58 but we don't use it.
+			input_b64_num_arr[i] = base64map.indexOf(input_data.charAt(i));		// 1000 chars long
+			pass_b64_num_arr[i] = base64map.indexOf(pass_b64.charAt(i));		// there is more data in pass_b64 but we don't use it.
 		}
 		//debug("Password Flow obf2Encrypt() -- Password - Index Array: " + pass_b58_num_arr);
 		//debug("Data Flow obf2Encrypt() -- Data - Index Array: " + input_b58_num_arr);
 
 		// Add each index pair and store in new array.
-		let sum_b58_num_arr = new Array(input_length);
+		let sum_b64_num_arr = new Array(input_length);
 		for (let i = 0; i < input_length; i++) {
-			sum_b58_num_arr[i] = input_b58_num_arr[i] + pass_b58_num_arr[i];
+			sum_b64_num_arr[i] = input_b64_num_arr[i] + pass_b64_num_arr[i];
 		}
 		//debug("Data Flow obf2Encrypt() -- Summed Index Array: " + sum_b58_num_arr);
 
 		// Take the 58 modulo of each index.
 		for (let i = 0; i < input_length; i++) {
 			//sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
-			sum_b58_num_arr[i] = sum_b58_num_arr[i] % 64;
+			sum_b64_num_arr[i] = sum_b64_num_arr[i] % 64;
 		}
 		//debug("Data Flow obf2Encrypt() -- Modulo 58'd Index Array: " + sum_b58_num_arr);
 
 		// Convert each processed index to b58 characters.
 		let final_encrypted_string = '';
 		for (let i = 0; i < input_length; i++) {
-			final_encrypted_string += base64map.charAt(sum_b58_num_arr[i]);
+			final_encrypted_string += base64map.charAt(sum_b64_num_arr[i]);
 		}
 		//debug("Data Flow obf2Encrypt() -- Return Index Array to base58 - obf2Encrypt() Output: " + final_encrypted_string);
 
@@ -3272,25 +3119,25 @@
 		// Convert password hash byte array to base58 string.
 		// Over 4000 chars long at this point.
 		//const pass_b58 = to_b58(pass_hash);
-		const pass_b58 = bytesToBase64(pass_hash);
-		document.getElementById("dev_dec_obf2_password_b58").value = pass_b58;
+		const pass_b64 = bytesToBase64(pass_hash);
+		document.getElementById("dev_dec_obf2_password_b64").value = pass_b64;
 		//debug("Password Flow obf2Decrypt() -- Password - base58: " + pass_b58);
 		//debug("Data Flow obf2Decrypt() -- Input Data to be Decrypted: " + final_encrypted);
 
 		// Convert each operand b58 string to an array of corresponding indices.
 		// Create 2 arrays of length 1000.
-		let final_encrypted_b58_num_arr = new Array(final_encrypted_length);
-		let pass_b58_num_arr = new Array(final_encrypted_length);
+		let final_encrypted_b64_num_arr = new Array(final_encrypted_length);
+		let pass_b64_num_arr = new Array(final_encrypted_length);
 		for (let i = 0; i < final_encrypted_length; i++) {
 			// Convert each b58 character to its numerical index. 
-			final_encrypted_b58_num_arr[i] = base64map.indexOf(final_encrypted.charAt(i));
-			pass_b58_num_arr[i] = base64map.indexOf(pass_b58.charAt(i));
+			final_encrypted_b64_num_arr[i] = base64map.indexOf(final_encrypted.charAt(i));
+			pass_b64_num_arr[i] = base64map.indexOf(pass_b64.charAt(i));
 		}
 		//debug("Password Flow obf2Decrypt() -- Password - Index Array: " + pass_b58_num_arr);
 		//debug("Data Flow obf2Decrypt() -- Data - Index Array: " + final_encrypted_b58_num_arr);
 
 		// Run the inverse of the sum-and-58-modulo encrypt function.
-		let in_b58_num_arr = new Array(final_encrypted_length);
+		let in_b64_num_arr = new Array(final_encrypted_length);
 		for (let i = 0; i < final_encrypted_length; i++) {
 
 			// If the difference is negative, we know the input got modulo'd and needs that 58 back to produce the inverse data.
@@ -3298,11 +3145,11 @@
 				//final_encrypted_b58_num_arr[i] += 58;
 			//}
 			// Now we can decrypt by taking the difference of each index pair.
-			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
+			in_b64_num_arr[i] = final_encrypted_b64_num_arr[i] - pass_b64_num_arr[i];
 
-			if( in_b58_num_arr[i] < 0 ){
+			if( in_b64_num_arr[i] < 0 ){
 				//in_b58_num_arr[i] += 58;
-				in_b58_num_arr[i] += 64;
+				in_b64_num_arr[i] += 64;
 			}
 /*
 			// If the difference is negative, we know the input got modulo'd and needs that 58 back to produce the inverse data.
@@ -3318,7 +3165,7 @@
 		// Convert the resulting numerical values to b58 chars.
 		let final_decrypted_string = '';
 		for (let i = 0; i < final_encrypted_length; i++) {
-			final_decrypted_string += base64map.charAt(in_b58_num_arr[i]);
+			final_decrypted_string += base64map.charAt(in_b64_num_arr[i]);
 		}
 		//debug("Data Flow obf2Decrypt() -- Decrypted String - obf2Decrypt() Output: " + in_b58_num_arr);
 
