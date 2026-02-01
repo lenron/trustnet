@@ -32,7 +32,7 @@
 	}
 
 	.header {
-		display: none;
+		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
@@ -43,7 +43,7 @@
 	}
 
 	.header_content {
-		display: none;
+		display: flex;
 	}
 
 	.header_title:hover {
@@ -59,13 +59,13 @@
 		width: 100%;
 		background-color: #272727;
 		flex: 1 auto;
-		display: none;
+		display: flex;
 		/*align-self: center;*/
 	}
 
 	.content_html {
 		width: 100%;
-		display: none;
+		display: flex;
 		/*align-items: baseline;*/
 		justify-content: center;
 	}
@@ -75,7 +75,7 @@
 		width: 700px;
 		margin: 10px;
 		align-self: center;
-		display: none;
+		display: flex;
 		flex-direction: column;
 		justify-content: center; 
 		color: #54c597;
@@ -272,6 +272,8 @@
 
 </style>
 <body>
+<button id="toggle_site_button" onclick="toggleSite()">Show Main Site</button>
+<div id="main_site" style="display:none">
 
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
@@ -289,10 +291,10 @@
 			</div>
 		</div>
 	</div>
-	<div id="offline_status_div" style="display:none; justify-content:space-between;">
+	<div id="offline_status_div" style="display:flex; justify-content:space-between;">
 		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
 	</div>
-	<div id="full_offline_dbase_warning_div" style="display:none; justify-content:space-between;">
+	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
 		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS NOW FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
 	</div>
 	<div class="center_html" id="center_html">
@@ -301,7 +303,7 @@
 			<!--<TMPL_VAR NAME=htmlblock>--!>
 
 <!--  home  --!>
-			<div class="gen home" id="home" style="align-self: center; display: none; flex-direction: column; justify-content: center; color: #54c597">
+			<div class="gen home" id="home" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content: center;">
 					<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="securityReset();showPage('store1')">STORE SECRET DATA</button>
@@ -653,7 +655,7 @@
 
 
 <!-- Footer Buttons --!>
-	<div style="display:none; flex-direction:column;">
+	<div style="display:flex; flex-direction:column;">
 		<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseThread()">CREATE NEW OFFLINE DBASE</button>
 		<div style="display:flex">
 			<button id="toggle_debug_button" style="flex-grow:1" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
@@ -667,6 +669,7 @@
 	<p id="offline_dbase_pointer" style="display:none"></p>
 	<!-- Offline Database flag that we need to do a burst store when we come back online --!>
 	<p id="offline_dbase_update_flag" style="display:none"></p>
+</div>
 
 <!-- Dev Site --!>
 <!-- Dev Site --!>
@@ -679,14 +682,8 @@
 <!-- Dev Site --!>
 <!-- Dev Site --!>
 <!-- Dev Site --!>
+<div class="" id="dev_site" style="display:inline">
 	<h2 class="header_title">Development Site -- Crypto Functions</h2>
-
-	<h3>Base58 Functions -- Convert int array or base58 chars into its converted form</h3>
-		<label>Input -- Length=<span id="input_length_label"></span></label>
-		<textarea id="dev_b58_top" class="devsite_inputs" rows="5" style=""></textarea>
-		<label>Output -- Length=<span id="output_length_label"></label>
-		<textarea id="dev_b58_bot" class="devsite_inputs" rows="5" style=""></textarea>
-		<button onclick="convertBase58()">Convert Base58</button>
 
 	<!-- OpenSSL Encrypt -->
 	<h3 style="color:black;">OpenSSL Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
@@ -921,6 +918,15 @@
 	</div>
 	<br>
 
+	<h3>Base64 Functions -- Convert int array or base64 chars into its converted form</h3>
+	<div style="display:flex; flex-direction:column; ">
+			<label>Input -- Length=<span id="input_length_label"></span></label>
+			<textarea id="dev_b64_top" class="devsite_inputs" rows="5" style=""></textarea>
+			<label>Output -- Length=<span id="output_length_label"></label>
+			<textarea id="dev_b64_bot" class="devsite_inputs" rows="5" style=""></textarea>
+		<button onclick="convertBase64()">Convert Base64</button>
+	</div>
+</div>
 </body>
 <script>
 
@@ -936,27 +942,42 @@
 		}
 	});   
 
-	function convertBase58(){
-		// determine what kind of input is in top, ints or base58.
-		const input = document.getElementById("dev_b58_top").value;
+	let site = "dev_site";
+	function toggleSite(){
+		if( site === "dev_site" ){
+			// Switch to main_site
+			document.getElementById("dev_site").style.display = "none";
+			document.getElementById("main_site").style.display = "inline";
+			site = "main_site";
+			document.getElementById("toggle_site_button").innerHTML = "Show Dev Site";
+		}else{
+			// Switch to dev_site
+			document.getElementById("dev_site").style.display = "inline";
+			document.getElementById("main_site").style.display = "none";
+			site = "dev_site";
+			document.getElementById("toggle_site_button").innerHTML = "Show Main Site";
+		}
+	}
+
+	function convertBase64(){
+		// determine what kind of input is in top, ints or base64.
+		const input = document.getElementById("dev_b64_top").value;
 		let numbers = new Array();
 		// If input includes any commas, we assume it's an int string.	
 		if( input.includes(',') ){
-			// convert ints into base58
+			// convert ints into base64
 			console.log("top input: found int string");
 			const numbers = input.split(',').map(Number);
 			console.log(numbers);
-			const output = to_b58(numbers);
-			//document.getElementById("dev_b58_bot").value = to_b58(numbers);
-			document.getElementById("dev_b58_bot").value = output;
+			const output = bytesToBase64(numbers);
+			document.getElementById("dev_b64_bot").value = output;
 			document.getElementById("input_length_label").innerHTML = numbers.length;
 			document.getElementById("output_length_label").innerHTML = output.length;
 		}else{
-			// convert base58 into ints
-			console.log("top input: found base58 chars");
-			//document.getElementById("dev_b58_bot").value = from_b58(input);
-			const output = from_b58(input);
-			document.getElementById("dev_b58_bot").value = output;
+			// convert base64 into ints
+			console.log("top input: found base64 chars");
+			const output = base64ToBytes(input);
+			document.getElementById("dev_b64_bot").value = output;
 			document.getElementById("input_length_label").innerHTML = input.length;
 			document.getElementById("output_length_label").innerHTML = output.length;
 		}
@@ -1501,8 +1522,7 @@
 	// Global flags. 
 	let upload_flag = 'false';
 	let download_flag = 'false';
-	// Base 58 character map.
-	const base58map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+	// Base 64 character map.
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 	// Automatically run this function when page loads.
@@ -1940,17 +1960,17 @@
 		return new_fingerprint;
 	}
 
-	// Get 1000 b58 chars for a random data.
+	// Get 1000 b64 chars for a random data.
 	function getRandData(){
-		// We're going to fill this string with random base58 chars.
+		// We're going to fill this string with random base64 chars.
 		let new_data = "";
-		// Generate 1000 random b58 chars.
+		// Generate 1000 random b64 chars.
 		for(let i=0; i < 1000; i++){
-			const random_b58_int = randomInt(0,57);
-			//console.log("random b58 value: " + random_b58_int);
-			const random_b58_char = base58map.charAt(random_b58_int);
-			//console.log("random b58 char: " + random_b58_char);
-			new_data += random_b58_char;
+			const random_b64_int = randomInt(0,63);
+			//console.log("random b64 value: " + random_b64_int);
+			const random_b64_char = base64map.charAt(random_b64_int);
+			//console.log("random b64 char: " + random_b64_char);
+			new_data += random_b64_char;
 		}
 		//console.log("completed random data: " + new_data);
 		return new_data;
@@ -1967,10 +1987,9 @@
 		}
 	}
 
-	// Check if a data looks valid.
+	// Make sure input is exactly 1000 chars of base64 data.
 	function checkDataIsValid(data){
-		// 1-9A-HJ-NP-Za-km-z (false if any non-b58 chars) or if not 1000 long.
-		const regex = /^[1-9A-HJ-NP-Za-km-z]{1000}$/;
+		const regex = /^[a-zA-Z0-9+/]{1000}$/;
 		if( regex.test(data) ){
 			return 1;
 		}else{
@@ -2534,7 +2553,7 @@
 
 	// Endpoint exestore will attempt to store.
 	// input encrypted data at the input fingerprint location.
-	// Inputs: fingerprint is hex, data is base58.
+	// Inputs: fingerprint is hex, data is base64.
 	// Output: POST message to server script which will attempt to Store.
 	async function serverStore(fingerprint, data){
 		let SERVER_URL = getServerOrigin();
@@ -2678,7 +2697,7 @@
 	// Our implementation of OpenSSL's encrypt function.
 	// Inputs: Plaintext.
 	// Output: OpenSSL encrypted base64 string.
-	async function encOpenSSL(plaintext, pass, iter, digest_hash, digest_algorithm) {
+	async function encOpenSSL(plaintext, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
 		// Data Flow Window
 		//debug("Data Flow encOpenSSL() -- Plaintext data input:\n" + plaintext);
 		//debug("Password Flow encOpenSSL() -- Plaintext password input:\n" + pass);
@@ -2910,9 +2929,9 @@
 	}//getKeyMaterial()
 
 	// Encrypting function that prepends a countstring, then runs an XOR on the byte arrrays of the input data and password,
-	// and finally converts the result to a specific length output of 1000 base 58 character string.
+	// and finally converts the result to a specific length output of 1000 base 64 character string.
 	// Inputs: plaintext64 is base64, password is plaintext.
-	// Outputs: 1000 characters of base58 string.
+	// Outputs: 1000 characters of base64 string.
 	async function obf1Encrypt(plaintext64, password) {
 		// Add our custom countstring to the data.
 		let plaintext_binary = addCountstring(plaintext64);
@@ -2928,8 +2947,7 @@
 			throw new Error('Obfuscation step 1 output length INVALID!');
 		}
 */
-
-		// Start at 1000, will immediately be chopped to 780, which guarantees a converstion to more than 1000 b58 chars.
+		// With conversion to base64, 750 bytes convert to 1000 base64 chars exactly.
 		const array_length = 750;
 
 		// Prepare password side for XOR.
@@ -2954,7 +2972,7 @@
 	}//obf1Encrypt()
 
 	// obf1Decrypt() is the inverse function of obf1Encrypt().
-	// Inputs: ciphertext64 is a base58 string, password is plaintext
+	// Inputs: ciphertext64 is a base64 string, password is plaintext
 	// Output: decrypted_string is a base64 string
 	async function obf1Decrypt(ciphertext64, password) {
 
@@ -2966,7 +2984,8 @@
 		document.getElementById("dev_dec_obf1_ciphertext_bytes").value = decoded_b64_array;
 
 		// Compute array length.
-		let array_length = decoded_b64_array.length;
+		//let array_length = decoded_b64_array.length;
+		let array_length = 750;
 		console.log("array_length: " + array_length);
 		// Compute password for XOR.
 		const password_binary = new TextEncoder().encode(password);
@@ -3034,9 +3053,9 @@
 	}//obf1Decrypt
 
 	// Encrypting function that adds each index pair of the input_data and password,
-	// then takes the modulo of that result to build an ecrypted string of 1000 base58 characters.
-	// Inputs: input_data is 1000 characters of base58 string, password is plaintext
-	// Output: 1000 chars of base58 string
+	// then takes the modulo of that result to build an ecrypted string of 1000 base64 characters.
+	// Inputs: input_data is 1000 characters of base64 string, password is plaintext
+	// Output: 1000 chars of base64 string
 	async function obf2Encrypt(input_data, password){
 /*	ARE WE STILL CHECKING CHAR TYPES??
 		if( !check_b58chars(input_data) ){
@@ -3049,125 +3068,87 @@
 		const input_length = input_data.length;
 
 		// Hash, rehash, append password function.
-		// This results in 1000 bytes of length which might (will?) convert to over 4000 b58 chars
 		const password_binary = new TextEncoder().encode(password);
 		document.getElementById("dev_enc_obf2_password_bytes").value = password_binary;
 		const pass_hash = await getPassHash(password_binary, input_length);
 		document.getElementById("dev_enc_obf2_sha_extended_bytes").value = pass_hash;
-		//debug("Password Flow obf2Encrypt() -- Password Hash Binary: " + pass_hash);
 
-		// Convert password hash byte array to base58 string.
-		// Over 4000 chars long at this point.
-		//const pass_b58 = to_b58(pass_hash);
 		const pass_b64 = bytesToBase64(pass_hash);
 		document.getElementById("dev_enc_obf2_password_b64").value = pass_b64;
-		//debug("Password Flow obf2Encrypt() -- Password Hash base58: " + pass_b58);
-		//debug("Data Flow obf2Encrypt() -- Input Data: " + input_data);
 
-		// Convert each operand b58 string to an array of corresponding indices.
 		// Create 2 arrays of length 1000.
 		let input_b64_num_arr = new Array(input_length);
 		let pass_b64_num_arr = new Array(input_length);
 		for (let i = 0; i < input_length; i++) {								// input_length should be 1000
-			// Convert each b58 character to its numerical index and store in an array. 
+			// Convert each b64 character to its numerical index and store in an array. 
 			input_b64_num_arr[i] = base64map.indexOf(input_data.charAt(i));		// 1000 chars long
 			pass_b64_num_arr[i] = base64map.indexOf(pass_b64.charAt(i));		// there is more data in pass_b64 but we don't use it.
 		}
-		//debug("Password Flow obf2Encrypt() -- Password - Index Array: " + pass_b58_num_arr);
-		//debug("Data Flow obf2Encrypt() -- Data - Index Array: " + input_b58_num_arr);
 
 		// Add each index pair and store in new array.
 		let sum_b64_num_arr = new Array(input_length);
 		for (let i = 0; i < input_length; i++) {
 			sum_b64_num_arr[i] = input_b64_num_arr[i] + pass_b64_num_arr[i];
 		}
-		//debug("Data Flow obf2Encrypt() -- Summed Index Array: " + sum_b58_num_arr);
 
-		// Take the 58 modulo of each index.
+		// Take the 64 modulo of each index.
 		for (let i = 0; i < input_length; i++) {
-			//sum_b58_num_arr[i] = sum_b58_num_arr[i] % 58;
 			sum_b64_num_arr[i] = sum_b64_num_arr[i] % 64;
 		}
-		//debug("Data Flow obf2Encrypt() -- Modulo 58'd Index Array: " + sum_b58_num_arr);
 
-		// Convert each processed index to b58 characters.
+		// Convert each processed index to b64 characters.
 		let final_encrypted_string = '';
 		for (let i = 0; i < input_length; i++) {
 			final_encrypted_string += base64map.charAt(sum_b64_num_arr[i]);
 		}
-		//debug("Data Flow obf2Encrypt() -- Return Index Array to base58 - obf2Encrypt() Output: " + final_encrypted_string);
 
 		return final_encrypted_string;
 	}//obf2Encrypt()
 
 	// Decrypting function that takes the inverse of obf2Encrypt().
-	// Inputs: final_encrypted is 1000 characters of base58 string, password is plaintext
-	// Output: final_decrypted_string is 1000 chars of base58 string
+	// Inputs: final_encrypted is 1000 characters of base64 string, password is plaintext
+	// Output: final_decrypted_string is 1000 chars of base64 string
 	async function obf2Decrypt(final_encrypted, password){
 
 		// Get size of input data. Should be 1000.
 		const final_encrypted_length = final_encrypted.length;
 
 		// Hash, rehash, append password function.
-		// This results in 1000 bytes of length which might (will?) convert to over 4000 b58 chars
 		const password_binary = new TextEncoder().encode(password);
 		document.getElementById("dev_dec_obf2_password_bytes").value = password_binary;
 		const pass_hash = await getPassHash(password_binary, final_encrypted_length);
 		document.getElementById("dev_dec_obf2_sha_extended_bytes").value = pass_hash;
-		//debug("Password Flow obf2Decrypt() -- Password Hash: " + pass_hash);
 
-		// Convert password hash byte array to base58 string.
-		// Over 4000 chars long at this point.
-		//const pass_b58 = to_b58(pass_hash);
+		// Convert password hash byte array to base64 string.
 		const pass_b64 = bytesToBase64(pass_hash);
 		document.getElementById("dev_dec_obf2_password_b64").value = pass_b64;
-		//debug("Password Flow obf2Decrypt() -- Password - base58: " + pass_b58);
-		//debug("Data Flow obf2Decrypt() -- Input Data to be Decrypted: " + final_encrypted);
 
-		// Convert each operand b58 string to an array of corresponding indices.
+		// Convert each operand b64 string to an array of corresponding indices.
 		// Create 2 arrays of length 1000.
 		let final_encrypted_b64_num_arr = new Array(final_encrypted_length);
 		let pass_b64_num_arr = new Array(final_encrypted_length);
 		for (let i = 0; i < final_encrypted_length; i++) {
-			// Convert each b58 character to its numerical index. 
+			// Convert each b64 character to its numerical index. 
 			final_encrypted_b64_num_arr[i] = base64map.indexOf(final_encrypted.charAt(i));
 			pass_b64_num_arr[i] = base64map.indexOf(pass_b64.charAt(i));
 		}
-		//debug("Password Flow obf2Decrypt() -- Password - Index Array: " + pass_b58_num_arr);
-		//debug("Data Flow obf2Decrypt() -- Data - Index Array: " + final_encrypted_b58_num_arr);
 
-		// Run the inverse of the sum-and-58-modulo encrypt function.
+		// Run the inverse of the sum-and-64-modulo encrypt function.
 		let in_b64_num_arr = new Array(final_encrypted_length);
 		for (let i = 0; i < final_encrypted_length; i++) {
-
-			// If the difference is negative, we know the input got modulo'd and needs that 58 back to produce the inverse data.
-			//if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
-				//final_encrypted_b58_num_arr[i] += 58;
-			//}
+			// If the difference is negative, we know the input got modulo'd and needs that 64 back to produce the inverse data.
 			// Now we can decrypt by taking the difference of each index pair.
 			in_b64_num_arr[i] = final_encrypted_b64_num_arr[i] - pass_b64_num_arr[i];
-
 			if( in_b64_num_arr[i] < 0 ){
-				//in_b58_num_arr[i] += 58;
 				in_b64_num_arr[i] += 64;
 			}
-/*
-			// If the difference is negative, we know the input got modulo'd and needs that 58 back to produce the inverse data.
-			if( final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i] < 0 ){
-				final_encrypted_b58_num_arr[i] += 58;
-			}
-			// Now we can decrypt by taking the difference of each index pair.
-			in_b58_num_arr[i] = final_encrypted_b58_num_arr[i] - pass_b58_num_arr[i];
-*/
 		}
-		//debug("Data Flow obf2Decrypt() -- Decrypted Index Array: " + in_b58_num_arr);
 
-		// Convert the resulting numerical values to b58 chars.
+		// Convert the resulting numerical values to b64 chars.
 		let final_decrypted_string = '';
 		for (let i = 0; i < final_encrypted_length; i++) {
 			final_decrypted_string += base64map.charAt(in_b64_num_arr[i]);
 		}
-		//debug("Data Flow obf2Decrypt() -- Decrypted String - obf2Decrypt() Output: " + in_b58_num_arr);
 
 		return final_decrypted_string;
 	}//obf2Decrypt()
@@ -3430,7 +3411,7 @@
 	let debug_flag = "true";
 	// Need to set the //debug() function on page load.
 	// Debug mode gets turned off with every page load. This is good for security so leave it.
-	setDebug(true);
+	setDebug(false);
 	// Use a toggle button for usage.
 	async function toggleDebug(){
 		if( debug_flag === "false"){
@@ -3493,175 +3474,6 @@
 		}
 	}	
 
-	//Uint8Array raw byte input) 
-	function to_b58( B ){
-		let A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-		let d = [],   //the array for storing the stream of base58 digits
-			s = "",   //the result string variable that will be returned
-			i,        //the iterator variable for the byte input
-			j,        //the iterator variable for the base58 digit array (d)
-			c,        //the carry amount variable that is used to overflow from the current base58 digit to the next base58 digit
-			n;        //a temporary placeholder variable for the current base58 digit
-		for(i in B) { //loop through each byte in the input stream
-			j = 0,                           //reset the base58 digit iterator
-			c = B[i];                        //set the initial carry amount equal to the current byte amount
-			s += c || s.length ^ i ? "" : 1; //prepend the result string with a "1" (0 in base58) if the byte stream is zero and non-zero bytes haven't been seen yet (to ensure correct decode length)
-			while(j in d || c) {             //start looping through the digits until there are no more digits and no carry amount
-				n = d[j];                    //set the placeholder for the current base58 digit
-				n = n ? n * 256 + c : c;     //shift the current base58 one byte and add the carry amount (or just add the carry amount if this is a new digit)
-				c = n / 58 | 0;              //find the new carry amount (floored integer of current digit divided by 58)
-				d[j] = n % 58;               //reset the current base58 digit to the remainder (the carry amount will pass on the overflow)
-				j++                          //iterate to the next base58 digit
-			}
-		}
-		while(j--)        //since the base58 digits are backwards, loop through them in reverse order
-			s += A[d[j]]; //lookup the character associated with each base58 digit
-		return s          //return the final base58 string
-	}
-
-	//Base58 encoded string input
-	function from_b58( S ){
-		let A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-		let d = [],   //the array for storing the stream of decoded bytes
-			b = [],   //the result byte array that will be returned
-			i,        //the iterator variable for the base58 string
-			j,        //the iterator variable for the byte array (d)
-			c,        //the carry amount variable that is used to overflow from the current byte to the next byte
-			n;        //a temporary placeholder variable for the current byte
-		for(i in S) { //loop through each base58 character in the input string
-			j = 0,                             //reset the byte iterator
-			c = A.indexOf( S[i] );             //set the initial carry amount equal to the current base58 digit
-			if(c < 0)                          //see if the base58 digit lookup is invalid (-1)
-				return undefined;              //if invalid base58 digit, bail out and return undefined
-			c || b.length ^ i ? i : b.push(0); //prepend the result array with a zero if the base58 digit is zero and non-zero characters haven't been seen yet (to ensure correct decode length)
-			while(j in d || c) {               //start looping through the bytes until there are no more bytes and no carry amount
-				n = d[j];                      //set the placeholder for the current byte
-				n = n ? n * 58 + c : c;        //shift the current byte 58 units and add the carry amount (or just add the carry amount if this is a new byte)
-				c = n >> 8;                    //find the new carry amount (1-byte shift of current byte value)
-				d[j] = n % 256;                //reset the current byte to the remainder (the carry amount will pass on the overflow)
-				j++                            //iterate to the next byte
-			}
-		}
-		while(j--)               //since the byte array is backwards, loop through it in reverse order
-			b.push( d[j] );      //append each byte to the result
-		return new Uint8Array(b) //return the final byte array in Uint8Array format
-	}
-
-	//Uint8Array raw byte input
-	function to_b58_words( B ){
-		let A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-		let d = [],   //the array for storing the stream of base58 digits
-			s = "",   //the result string variable that will be returned
-			i,        //the iterator variable for the byte input
-			j,        //the iterator variable for the base58 digit array (d)
-			c,        //the carry amount variable that is used to overflow from the current base58 digit to the next base58 digit
-			n;        //a temporary placeholder variable for the current base58 digit
-		for(i in B) { //loop through each byte in the input stream
-			j = 0,                           //reset the base58 digit iterator
-			c = B[i];                        //set the initial carry amount equal to the current byte amount
-			s += c || s.length ^ i ? "" : 1; //prepend the result string with a "1" (0 in base58) if the byte stream is zero and non-zero bytes haven't been seen yet (to ensure correct decode length)
-			while(j in d || c) {             //start looping through the digits until there are no more digits and no carry amount
-				n = d[j];                    //set the placeholder for the current base58 digit
-				n = n ? n * 16 + c : c;     //shift the current base58 one byte and add the carry amount (or just add the carry amount if this is a new digit)
-				c = n / 58 | 0;              //find the new carry amount (floored integer of current digit divided by 58)
-				d[j] = n % 58;               //reset the current base58 digit to the remainder (the carry amount will pass on the overflow)
-				j++                          //iterate to the next base58 digit
-			}
-		}
-		while(j--)        //since the base58 digits are backwards, loop through them in reverse order
-			s += A[d[j]]; //lookup the character associated with each base58 digit
-		return s          //return the final base58 string
-	}
-
-	//Base58 encoded string input
-	function from_b58_words( S ){
-		let A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-		let d = [],   //the array for storing the stream of decoded bytes
-			b = [],   //the result byte array that will be returned
-			i,        //the iterator variable for the base58 string
-			j,        //the iterator variable for the byte array (d)
-			c,        //the carry amount variable that is used to overflow from the current byte to the next byte
-			n;        //a temporary placeholder variable for the current byte
-		for(i in S) { //loop through each base58 character in the input string
-			j = 0,                             //reset the byte iterator
-			c = A.indexOf( S[i] );             //set the initial carry amount equal to the current base58 digit
-			if(c < 0)                          //see if the base58 digit lookup is invalid (-1)
-				return undefined;              //if invalid base58 digit, bail out and return undefined
-			c || b.length ^ i ? i : b.push(0); //prepend the result array with a zero if the base58 digit is zero and non-zero characters haven't been seen yet (to ensure correct decode length)
-			while(j in d || c) {               //start looping through the bytes until there are no more bytes and no carry amount
-				n = d[j];                      //set the placeholder for the current byte
-				n = n ? n * 58 + c : c;        //shift the current byte 58 units and add the carry amount (or just add the carry amount if this is a new byte)
-				c = n >> 4;                    //find the new carry amount (1-byte shift of current byte value)
-				d[j] = n % 16;                //reset the current byte to the remainder (the carry amount will pass on the overflow)
-				j++                            //iterate to the next byte
-			}
-		}
-		while(j--)               //since the byte array is backwards, loop through it in reverse order
-			b.push( d[j] );      //append each byte to the result
-		//return new Uint8Array(b) //return the final byte array in Uint8Array format
-		return new Array(b) //return the final byte array in Uint8Array format
-	}
-
-	function wordsToBytes( words ){
-		bytes = new Array();
-		let bite;
-		let upper;
-		for(let i = 1; i < words.length; i+=2){
-			// add lower bite.
-			bite = words[i];
-			// add upper 
-			upper = words[i-1];
-			if( upper >> 3 ){
-				upper = upper - 8;
-				bite = bite + 128;
-			}
-			if( upper >> 2 ){
-				upper = upper - 4;
-				bite = bite + 64;
-			}
-			if( upper >> 1 ){
-				upper = upper - 2;
-				bite = bite + 32;
-			}
-			if( upper ){
-				bite = bite + 16;
-			}
-			bytes.push( bite );
-		}
-		return bytes;
-	}
-
-	function bytesToWords( bytes ){
-		words = new Array();
-		let upper;
-		let lower;
-		let bite;
-
-		for(i in bytes) {
-			bite = bytes[i];
-			upper = 0;
-			lower = 0;
-			if( bite >> 7 ){ 
-				upper += 8;
-				bite = bite - 128;
-			}
-			if( bite >> 6 ){ 
-				upper += 4;
-				bite = bite - 64;
-			}
-			if( bite >> 5 ){ 
-				upper += 2;
-				bite = bite - 32;
-			}
-			if( bite >> 4 ){ 
-				upper += 1;
-				bite = bite - 16;
-			}
-			words.push(upper);
-			words.push(bite);
-		}
-		return words;
-	}
 
 </script>
 
