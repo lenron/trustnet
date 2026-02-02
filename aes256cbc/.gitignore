@@ -4,4 +4,5 @@ ssh.txt
 *.swp
 *.swo
 online_check_log.txt
+passlock_log.txt
 
