@@ -53,8 +53,7 @@ my $db_name = 'chatriwe_obf';
 	#}
 
 	# Try checking for existence first because mariadb versions work differently.
-	#my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	my $dbh = DBI->connect("dbi:MariaDB:$db_name;host=42.42.42.10", $db_username, $db_pw);
+	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	my $response = $dbh->do("INSERT INTO $db_table (browser_id, passlock) VALUES (?, ?)", undef, $browser_id, $passlock);
 	print $fh "response after INSERT: $response\n";
 

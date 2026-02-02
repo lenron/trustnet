@@ -41,8 +41,7 @@ my $db_name = 'chatriwe_obf';
 
 	# Get passlock at browser_id, return.
 	my $passlock = '';
-	#my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
-	my $dbh = DBI->connect("dbi:MariaDB:$db_name;host=42.42.42.10", $db_username, $db_pw);
+	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	my $query = "SELECT passlock FROM $db_table WHERE browser_id = ?";
 	my $sth = $dbh->prepare($query);
 	$sth->execute($browser_id);
