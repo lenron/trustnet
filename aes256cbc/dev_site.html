@@ -48,7 +48,6 @@
 
 	.header_title:hover {
 		cursor: pointer;
-
 	}
 
 	.header_label {
@@ -2411,6 +2410,24 @@
 		}
 	}//deepDelete()
 
+	// Global browser_id variable to be used for accessing passlock, 
+	// the random password we're using to encrypt data as user moves through interface.
+	let browser_id_g;
+
+	async function genPasslock(){
+		// Generate and set browser_id;
+		browser_id_g = self.crypto.randomUUID();
+		// Gen new passlock;
+		const passlock = self.crypto.randomUUID();
+		// Send to server.
+		await serverSetPasslock(browser_id_g, passlock);
+	}
+
+	async function getPasslock(){
+		const passlock = await serverGetPasslock(browser_id_g);
+		return passlock;
+	}
+
 	//////////////////////////////////////////////////////////////
 	//			Server Communication Functions				    //
 	//////////////////////////////////////////////////////////////
@@ -2588,6 +2605,69 @@
 		}
 		return;
 	}//serverStore()
+
+	async function serverSetPasslock(browser_id, passlock){
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exesetpasslock;';
+		
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/plain',
+			},
+			body: JSON.stringify({
+				browser_id: browser_id,
+				passlock: passlock,
+			}),
+		})
+		.catch((error) => {
+			console.log("Fetch Error on serverSetPasslock : " + error.message);
+			if( error.message == "Failed to fetch" ){
+				console.log("CAUGHT THE DISCONNECTED ERROR IN SetPasslock!");
+			}
+		});
+		if( response ){
+			if( response.ok ){
+				console.log("Response from serverSetPasslock() fetch() call = OK!");
+				return response.json();
+			} else {
+				console.log("HTTP error. Status: " + response.status);
+				return response.json();
+			}
+		}
+		return;
+	}//serverSetPasslock()
+
+	async function serverGetPasslock(browser_id){
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exegetpasslock;';
+		
+		const response = await fetch(SERVER_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/plain',
+			},
+			body: JSON.stringify({
+				browser_id: browser_id,
+			}),
+		})
+		.catch((error) => {
+			console.log("Fetch Error on serverGetPasslock : " + error.message);
+			if( error.message == "Failed to fetch" ){
+				console.log("CAUGHT THE DISCONNECTED ERROR IN GetPasslock!");
+			}
+		});
+		if( response ){
+			if( response.ok ){
+				console.log("Response from serverGetPasslock() fetch() call = OK!");
+				return response.json();
+			} else {
+				console.log("HTTP error. Status: " + response.status);
+				return response.json();
+			}
+		}
+		return;
+	}//serverGetPasslock()
 
 	// Create a json string containing every record in the offline dbase from 0 to pointer.
 	function convertOfflineDBaseToJSONString(){
