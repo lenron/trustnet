@@ -636,9 +636,9 @@
 				<div style="display:flex; flex-direction:column;">
 					<label id="">ENTER CODEWORD:</label>
 					<input autocomplete="off" type="password"  value="" id="gather_codeword" style="">
-					<label id="">ENTER PASSWORD2:</label>
+					<label id="">ENTER PASSWORD 2:</label>
 					<input autocomplete="off" type="password"  value="" id="gather_password2" style="">
-					<label id="">ENTER PASSWORD3:</label>
+					<label id="">ENTER PASSWORD 3:</label>
 					<input autocomplete="off" type="password"  value="" id="gather_password3" style="">
 				</div>
 				<div style="display:flex; flex-direction:row;">
@@ -647,6 +647,44 @@
 					<button id="new_offline_dbase_completed_button" style="flex-grow:1; display:none;" onclick="doneNewOfflineDBase()">DONE</button>
 				</div>
 				<h3 id="status_label" style="align-self:center; display:none; color:red;">placeholder</h3>
+			</div>
+
+			<!---------------------------REITERATION STEP -----------------------!>
+			<div id="reiteration_div" class="gen" style="display:flex; ">
+				<h2 id="">This is the REITERATION Step</h2>
+				<h3 id="">Eloquent text explaining how this works.</h3>
+				<div style="display:flex; flex-direction:column;">
+					<label id="">CODEWORD:</label>
+					<div style="display:flex; ">
+						<input id="reiteration_codeword" autocomplete="off" type="password" value="" style="">
+						<button id="show_reiteration_codeword" style="" onclick="showPassword('codeword')">SHOW</button>
+					</div>
+					<label id="">PASSWORD 1 (maybe this appears only if you've chosen browser?):</label>
+					<div style="display:flex; ">
+						<input id="reiteration_pass1" autocomplete="off" type="password" value="" style="">
+						<button id="show_reiteration_pass1" style="" onclick="showPassword('pass1')">SHOW</button>
+					</div>
+					<label id="">PASSWORD 2:</label>
+					<div style="display:flex; ">
+						<input id="reiteration_pass2" autocomplete="off" type="password" value="" style="">
+						<button id="show_reiteration_pass2" style="" onclick="showPassword('pass2')">SHOW</button>
+					</div>
+					<label id="">PASSWORD 3:</label>
+					<div style="display:flex; ">
+						<input id="reiteration_pass3" autocomplete="off" type="password" value="" style="">
+						<button id="show_reiteration_pass3" style="" onclick="showPassword('pass3')">SHOW</button>
+					</div>
+					<label id="">DATA (also only show with browser choice?):</label>
+					<div style="display:flex; ">
+						<textarea id="reiteration_data" type="password" rows="5" cols="50"></textarea>
+						<button id="show_reiteration_data" style="" onclick="showPassword('data')">SHOW</button>
+					</div>
+				</div>
+				<div style="display:flex; flex-direction:row;">
+					<button id="reiteration_commit" style="flex-grow:1; " onclick="finalCommit()">COMMIT DATA TO SERVER</button>
+					<button id="reiteration_cancel" style="flex-grow:1; " onclick="cancelFinalCommit()">CANCEL</button>
+				</div>
+				<h3 id="status_label" style="align-self:center; display:inline; color:red;">Errors, important information can go here.</h3>
 			</div>
 
 		</div>		<!-- content_html --!>
@@ -2410,23 +2448,63 @@
 		}
 	}//deepDelete()
 
+
+
+	//////////////////////////////////////////////////////////////
+	//			Passlock Functions							    //
+	//////////////////////////////////////////////////////////////
+
 	// Global browser_id variable to be used for accessing passlock, 
 	// the random password we're using to encrypt data as user moves through interface.
-	let browser_id_g;
+	let browser_id_global;
+	// Set timeout somehow later.
 
-	async function genPasslock(){
+	// Generate a browser_id, passlock and save them to server as a key-value pair.
+	async function generatePasslock(){
+
+		// First maybe check if a browser id exists.
+		// Also maybe handle timeout functionality.
+
 		// Generate and set browser_id;
-		browser_id_g = self.crypto.randomUUID();
+		browser_id_global = self.crypto.randomUUID();
 		// Gen new passlock;
 		const passlock = self.crypto.randomUUID();
 		// Send to server.
-		await serverSetPasslock(browser_id_g, passlock);
-	}
-
-	async function getPasslock(){
-		const passlock = await serverGetPasslock(browser_id_g);
+		await serverSetPasslock(browser_id_global, passlock);
 		return passlock;
 	}
+
+	// Retrieve passlock from server.
+	async function getPasslock(){
+		// Maybe if passlock hasn'timed out or whatever then query server for it?
+		const passlock = await serverGetPasslock(browser_id_global);
+		return passlock;
+	}
+
+	// Use previously generated passlock to encrypt input.
+	// Returns encrypted password.
+	async function passlockEncrypt( cleartext_password ){
+		// Just use our already vetted OpenSSL implementation? 
+		const passlock = await getPasslock();
+		// I think await is needed here because need a variable before returning?
+		const ciphertext_password = await encOpenSSL(cleartext_password, passlock);
+		return ciphertext_password;
+	}
+
+	// Use previously generated passlock to decrypt input.
+	// Returns decrypted password.
+	async function passlockDecrypt( ciphertext_password ){
+		const passlock = await getPasslock();
+		const cleartext_password = await decOpenSSL(ciphertext_password, passlock);
+		return cleartext_password;
+	}
+
+	// Decrypt password stored in target object.
+	// 
+	async function showPassword( object_holding_password_to_show ){
+
+	}
+
 
 	//////////////////////////////////////////////////////////////
 	//			Server Communication Functions				    //
