@@ -2856,27 +2856,18 @@
 	// Inputs: Plaintext.
 	// Output: OpenSSL encrypted base64 string.
 	async function encOpenSSL(plaintext, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
-		// Data Flow Window
-		//debug("Data Flow encOpenSSL() -- Plaintext data input:\n" + plaintext);
-		//debug("Password Flow encOpenSSL() -- Plaintext password input:\n" + pass);
 		// Prepare plaintext for encryption.
 		// Encode plaintext in utf8 and store in Uint8Array inputbytes.
 		const inputbytes = new TextEncoder().encode( plaintext );
-		//debug("Data Flow encOpenSSL() -- Plaintext, in binary form: " + inputbytes);
-		//const inputbytes_hex = buf2hex(inputbytes);
 		document.getElementById("dev_enc_openssl_plaintext_bytes").value = inputbytes;
-		// Make the plaintext look like a file by adding a single newline
-		// char to the end of the string.
+
+		// Make the plaintext look like a file by adding a single newline char to the end of the string.
 		const single_newline = new Uint8Array(1);
 		// utf8 newline code is the value 10(decimal).
 		single_newline[0] = 10;
 		// Merge the two Uint8Arrays.
-		const plaintextbytes_buf = concatBuffer(inputbytes, single_newline);
-		const with_newline = new Uint8Array(plaintextbytes_buf);
-		document.getElementById("dev_enc_openssl_plaintext_with_newline").value = with_newline;
-		// plaintext is now in a form that is ready to give to the encryption function.
-		const plaintextbytes = new Uint8Array(plaintextbytes_buf);
-		//debug("Data Flow encOpenSSL() -- Plaintext, with single newline: " + plaintextbytes);
+		const plaintextbytes = concatBuffer(inputbytes, single_newline);
+		document.getElementById("dev_enc_openssl_plaintext_with_newline").value = plaintextbytes;
 
 		// Prepare inputs for digest.
 		//const iter = 10000;
@@ -2965,8 +2956,7 @@
 		const two_salts = concatBuffer(saltbytes, salt);
 		// Merge salts with encoded ciphertext.
 		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
-		let encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
-		encrypted_output_buf = new Uint8Array(encrypted_output_buf);
+		const encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
 		//debug("Data Flow encOpenSSL() -- Encrypted Data with 2 added Salts:\n" + encrypted_output_buf);
 		document.getElementById("dev_enc_openssl_encrypted_data_two_salts").value = encrypted_output_buf;
 		let out64 = bytesToBase64(encrypted_output_buf);
@@ -3114,6 +3104,10 @@
 		document.getElementById("dev_enc_obf1_password_bytes").value = password_binary;
 		const pass_binary = await getPassHash(password_binary, array_length);
 		document.getElementById("dev_enc_obf1_sha_extended_bytes").value = pass_binary;
+console.log("pass_binary: ");
+console.log(pass_binary);
+console.log("plaintext_binary: ");
+console.log(plaintext_binary);
 
 		// Perform the XOR bitwise byte by byte.
 		let xor_result = new Array();
@@ -3136,14 +3130,12 @@
 	async function obf1Decrypt(ciphertext64, password) {
 
 		// Convert base64 string to Uint8Array of bytes.
-		//let decoded_b64_array = base64ToBytes(data);
 		let decoded_b64_array = base64ToBytes(ciphertext64);
 
 		// Devsite window functrion.
 		document.getElementById("dev_dec_obf1_ciphertext_bytes").value = decoded_b64_array;
 
 		// Compute array length.
-		//let array_length = decoded_b64_array.length;
 		let array_length = 750;
 		console.log("array_length: " + array_length);
 		// Compute password for XOR.
@@ -3370,8 +3362,7 @@
 		// Concatenate: fingerprint = cw_hash + p2_hash + p3_hash
 		const cw_and_p2_hash = concatBuffer(cw_hash, p2_hash)
 		const concatenated_hashes = concatBuffer(cw_and_p2_hash, p3_hash)
-		const log_concat = new Uint8Array(concatenated_hashes);
-		//debug("computeFingerprint() -- Concatenated Hashes:\n" + log_concat); 
+
 		// SHA-256 hash the result.
 		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
 		const fingerprint = new Uint8Array(fp_hash);
@@ -3428,6 +3419,8 @@
 		//debug("Data Flow addCountstring() -- Countstring added to base64 data: " + countstring);
 		// Convert to binary (Uint8Array).
 		const countstring_binary = new TextEncoder().encode(countstring);
+console.log("countstring_binary:");
+console.log(countstring_binary);
 		// Copy to size 1000 array for XOR.
 		let big_arr = new Uint8Array(1000);
 		// Really looks like: binarydataxxxxxxxxxx00000000000000000000000...
@@ -3448,18 +3441,15 @@
 
 		// Take initial SHA256.
 		let sha_cumulative = await crypto.subtle.digest('SHA-256', password_binary);
-		//let sha_cumulative = initial_sha;
 		let	sha_result;
 
 		// Loop until we have more than the input length number of bytes of data.
 		do{
 			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
 			// Append SHA256 of Hash(n-1)
-			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
-			sha_cumulative = new Uint8Array(sha_cumulative);
-			////debug("sha_cumulative: " + sha_cumulative);
+			sha_cumulative = concatBuffer(sha_cumulative, sha_result); //ArrayBuffer
+			//sha_cumulative = new Uint8Array(sha_cumulative);	//uint8Array
 		} while( sha_cumulative.length < length);
-		////debug("sha_cumulative: " + sha_cumulative);
 
 		// Truncate array to size <length>
 		sha_cumulative = sha_cumulative.slice(0, length);
@@ -3470,13 +3460,22 @@
 	// Concatenates ArrayBuffers.
 	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
 	// Output: return = buffer1 concatenated with buffer2 in order buffer1, then buffer2.
+	// There doesn't appear to be a native array merge for typed arrays like Uint8Array (their length is fixed).
 	function concatBuffer(buffer1, buffer2) {
-	  let tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
-	  tmp.set(new Uint8Array(buffer1), 0);
-	  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
-	  return tmp.buffer;
+		// Create new uint8array with size of buffer1 length + buffer 2 length.
+		let tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+		// Set left part of the array to buffer 1.
+		tmp.set(new Uint8Array(buffer1), 0);
+		// Set right part of the array to buffer 2.
+		tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+		// Return only the underlying ArrayBuffer)
+		//return tmp.buffer;
+		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
+		return tmp;
 	}//concatBuffer()
 
+	// Code for function found here:
+	// https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa
 	// MDN funcction Usage:
 	// bytesToBase64(new TextEncoder().encode("a Ā 𐀀 文 🦄")); // "YSDEgCDwkICAIOaWhyDwn6aE"
 	// new TextDecoder().decode(base64ToBytes("YSDEgCDwkICAIOaWhyDwn6aE")); // "a Ā 𐀀 文 🦄"
