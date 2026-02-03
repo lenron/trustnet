@@ -3128,16 +3128,13 @@ console.log(plaintext_binary);
 	// Inputs: ciphertext64 is a base64 string, password is plaintext
 	// Output: decrypted_string is a base64 string
 	async function obf1Decrypt(ciphertext64, password) {
-
 		// Convert base64 string to Uint8Array of bytes.
 		let decoded_b64_array = base64ToBytes(ciphertext64);
-
 		// Devsite window functrion.
 		document.getElementById("dev_dec_obf1_ciphertext_bytes").value = decoded_b64_array;
 
-		// Compute array length.
+		// Constant array length. 750 is the total bytes that will fit into 1000 base64 chars.
 		let array_length = 750;
-		console.log("array_length: " + array_length);
 		// Compute password for XOR.
 		const password_binary = new TextEncoder().encode(password);
 		document.getElementById("dev_dec_obf1_password_bytes").value = password_binary;
@@ -3146,60 +3143,63 @@ console.log(plaintext_binary);
 
 		// Inverse of XOR is XOR and is communicative.
 		// XOR password and output to get input.
-		let xor_result = new Uint8Array(array_length);
-		for (let i = 0; i < array_length; i++) {
-			// Perform the XOR.
-			xor_result[i] = pass_binary[i] ^ decoded_b64_array[i];
-		}
-
 		// Regular Array needed for shift, pop.
-		let plaintextbytes = Array.from(xor_result);
-		document.getElementById("dev_dec_obf1_xor_inversed_data").value = plaintextbytes;
+		let xor_result = new Array();
+		// XOR is typically the carrot char: ^ 
+		for (let i = 0; i < array_length; i++) {
+			xor_result.push(pass_binary[i] ^ decoded_b64_array[i]);
+		}
+		document.getElementById("dev_dec_obf1_xor_inversed_data").value = xor_result;
+		console.log("xor_result length: " + xor_result.length);
 
 		// Decode to show user in dev site.
-		data_uint8 = Uint8Array.from(plaintextbytes);
-		let with_countstring = new TextDecoder().decode(data_uint8);
+		// Decoder works on uint8array's.
+		data_uint8 = Uint8Array.from(xor_result);
+		// Converts bytes to javascript String:
+		// https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
+		const with_countstring = new TextDecoder().decode(data_uint8);
 		document.getElementById("dev_dec_obf1_data_with_countstring").value = with_countstring;
-		console.log("plaintextbytes length: " + plaintextbytes.length);
 
-		// Needs to be an array for push() to work.
-		let count_array = new Array;
-		let shifted_byte = plaintextbytes.shift();
-		// Need this value to compute how many zeros to pop.
-		array_length -= 1;
+		// The number of digits for the countstring will be either 1, 2, or 3 as the data length is limited to a number less than 1000 chars.
+		// First shift off 1 byte from the beginning of the array, which will be a number byte.
+		// Then push that shifted byte onto a new array to be converted into a number later.
+		//
+		// shift(), pop() reduce the size of target array by 1.
+		let shifted_byte = xor_result.shift();
 		console.log("shifted byte = " + shifted_byte);
-		count_array.push(shifted_byte);
-		// Start at 2 bytes, check last chomped, do until find colon char byte number (58).
-		while( plaintextbytes[0] != 58 ){
-			shifted_byte = plaintextbytes.shift();
-			array_length -= 1;
-			count_array.push(shifted_byte);
+		// Need explicit instantiation for push to work on new variable.
+		let length_array = new Array;
+		length_array.push(shifted_byte);
+		// We've shifted off 1 byte, so we won't enter the while loop if there's 1 length digit.
+		// Shift bytes from countstring decrypted array to length_array until we hit the colon byte.
+		while( xor_result[0] != 58 ){
+			shifted_byte = xor_result.shift();
+			length_array.push(shifted_byte);
 		}
 		// Shift off colon byte. It's done its job.
-		shifted_byte = plaintextbytes.shift();
-		array_length -= 1;
+		shifted_byte = xor_result.shift();
 
 		// Convert bytes to a number.
-		count_array = Uint8Array.from(count_array);
-		const string_length = new TextDecoder().decode(count_array);
-		console.log("countstring extracted length value: " + string_length);
+		length_array = Uint8Array.from(length_array);
+		const data_length = new TextDecoder().decode(length_array);
+		console.log("countstring extracted length value: " + data_length);
+		console.log("xor_result length: " + xor_result.length);
 
-		console.log("plaintextbytes length: " + plaintextbytes.length);
-		const number_zeros_to_pop = array_length - string_length;
+		// The number of zeros to pop is the total length of the array (after stripping length bytes and colon) - the length of the data.
+		const number_zeros_to_pop = xor_result.length - data_length;
 		// Pop off zero bytes.
 		for ( i = 0; i < number_zeros_to_pop; i++) {
-			plaintextbytes.pop();
-			//console.log("plaintextbytes while popping: " + plaintextbytes);
+			xor_result.pop();
 		}
-		console.log("plaintextbytes length: " + plaintextbytes.length);
+		console.log("xor_result length: " + xor_result.length);
 	
 		// Array needs to be Uint8Array for Decode to work.	
-		// Should now be stripped of zeros and countstring leaving data.
-		plaintextbytes = Uint8Array.from(plaintextbytes);
+		// Should now be stripped of zeros and countstring, leaving data.
+		const plaintextbytes = Uint8Array.from(xor_result);
 		// Decode precisely stripped array.
 		let output = new TextDecoder().decode(plaintextbytes);
-		console.log("output length: " + output.length);
 
+		console.log("output length: " + output.length);
 		return output;
 	}//obf1Decrypt
 
@@ -3391,7 +3391,6 @@ console.log(plaintext_binary);
 	// Input: input is a string.
 	// Output: Returns false if the input length (in bytes) is over 700.
 	function checkInputLength(input){
-
 		// show input size in bytes
 		let size = new Blob([input]).size;
 		let difference = 526 - size;
@@ -3399,33 +3398,27 @@ console.log(plaintext_binary);
 		let size_string = "Byte length remaining: " + difference;
 		document.getElementById("data_length_label").innerHTML = size_string;
 		
-		if( size > 700 ){
+		if( size > 526 ){
 			return 0; // Length Check Failed.
 		}else{
 			return 1; // Length Check Passed.
 		}
 	}//checkInputLength()
 
-	// Prepends a string equal to the number of characters in data to the front of data.
-	// Input: string of base 64 data.
-	// Output: same string with an integer then ':' character at the front.
+	// Prepends a string equal to the length of the input base64 string to the front of that string in readable format.
+	// Input: varying length string of base64 data.
+	// Output: string with number then colon then input data: 10:<data of length 10>
 	function addCountstring(data) {
 		// Count chars.
 		const num_chars = data.length;
-		//debug("countstring number of chars: " + num_chars);
-		// Form 'countstring'.
+		// Form 'countstring'
 		let countstring = num_chars + ':' + data;
 		document.getElementById("dev_enc_obf1_b64_with_countstring").value = countstring;
-		//debug("Data Flow addCountstring() -- Countstring added to base64 data: " + countstring);
 		// Convert to binary (Uint8Array).
 		const countstring_binary = new TextEncoder().encode(countstring);
-console.log("countstring_binary:");
-console.log(countstring_binary);
-		// Copy to size 1000 array for XOR.
-		let big_arr = new Uint8Array(1000);
-		// Really looks like: binarydataxxxxxxxxxx00000000000000000000000...
-		// Looks like: I:dataxxxxxx00000000000000....
-		// where I is an integer equal to the length of input data.
+		// Create uint8array of length 750 as this will be used for obf1 XOR.
+		let big_arr = new Uint8Array(750);
+		// Copy countstring_binary into big_arr matching index 0 to index 0, 1 to 1, etc.
 		big_arr.set(countstring_binary);
 		return big_arr;
 	}//addCountstring()
@@ -3434,26 +3427,17 @@ console.log(countstring_binary);
 	// Inputs: pass is plaintext, length is an integer 
 	// Output: binary byte array (Uint8Array).
 	async function getPassHash(password_binary, length) {
-		// Convert to binary (Uint8Array).
-		//const password_binary = new TextEncoder().encode(pass);
-		//debug("Password Flow getPassHash() -- Password plaintext: " + pass);
-		//debug("Password Flow getPassHash() -- Password binary: " + password_binary);
-
 		// Take initial SHA256.
 		let sha_cumulative = await crypto.subtle.digest('SHA-256', password_binary);
 		let	sha_result;
-
 		// Loop until we have more than the input length number of bytes of data.
 		do{
 			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
 			// Append SHA256 of Hash(n-1)
-			sha_cumulative = concatBuffer(sha_cumulative, sha_result); //ArrayBuffer
-			//sha_cumulative = new Uint8Array(sha_cumulative);	//uint8Array
+			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
 		} while( sha_cumulative.length < length);
-
 		// Truncate array to size <length>
 		sha_cumulative = sha_cumulative.slice(0, length);
-
 		return sha_cumulative;
 	}//getPassHash()
 
@@ -3468,8 +3452,6 @@ console.log(countstring_binary);
 		tmp.set(new Uint8Array(buffer1), 0);
 		// Set right part of the array to buffer 2.
 		tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
-		// Return only the underlying ArrayBuffer)
-		//return tmp.buffer;
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
 		return tmp;
 	}//concatBuffer()
