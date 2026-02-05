@@ -272,13 +272,13 @@
 </style>
 <body>
 <button id="toggle_site_button" onclick="toggleSite()">Show Main Site</button>
-<div id="main_site" style="display:none">
+<div id="main_site" style="display:none;">
 
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
-				<a id="titletext" style="font-size: 30px; text-decoration: underline;" >SECRETWORD</a>
-				<!--<a id="titletext" style="font-size: 30px" href="/obf">SECRETWORD</a>--!>
+				<a id="titletext" style="font-size:30px; text-decoration:underline;" >SECRETWORD</a>
+				<!--<a id="titletext" style="font-size:30px" href="/obf">SECRETWORD</a>--!>
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
@@ -296,15 +296,15 @@
 	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
 		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS NOW FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
 	</div>
-	<div class="center_html" id="center_html">
+	<div class="center_html" id="center_html" style="height:100%">
 		<div class="content_html" id="content_html">
 
 			<!--<TMPL_VAR NAME=htmlblock>--!>
 
 <!--  home  --!>
-			<div class="gen home" id="home" style="align-self: center; display: flex; flex-direction: column; justify-content: center; color: #54c597">
+			<div class="gen home" id="home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
-				<div class="home_buttons" id="" style="display:flex; justify-content: center;">
+				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="securityReset();showPage('store1')">STORE SECRET DATA</button>
 					<button class="obf_button" id='go_load_thread' style="flex-grow:1" onclick="securityReset();showPage('load1')">ACCESS SECRET DATA</button>
 				</div>
@@ -313,9 +313,9 @@
 
 <!--  store  --!>
 			<div class="gen store one" id="store1" style="display:none">
-				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE DATA</label>
-					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODE WORD TO HELP YOU REMEMBER YOUR SECRET DATA</h2>
 				<input type="password" autocomplete="off" autofocus id="store_codeword" style="">
@@ -353,7 +353,7 @@
 				<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
 				<br>
 				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
-				<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
+				<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
 					<label>Encrypt:</label>
 					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 					<br>
@@ -367,24 +367,24 @@
 			</div>
 
 			<div class="gen store two" id="store2" style="display:none">
-				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE DATA</label>
-					<label id="data_length_label" style="color: black" ></label>
+					<label id="data_length_label" style="color:black" ></label>
 				</div>
-				<textarea class="browser_input" value="" id="store_data" rows="8" cols="45" oninput="checkTextInputLength()" placeholder="ENTER YOUR SECRET DATA"></textarea>
+				<textarea class="browser_input" value="" id="store_data" rows="8" cols="45" oninput="checkTextInputLength('store_data')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store_choose')">BACK</button>
-					<button class="" id='store_text_input_continue' style="flex-grow:1" onclick="showPage('store3')">ENCRYPT DATA</button>
-					<div id='store_text_input_warning' style="flex-grow:1;display:none;">
+					<button class="" id='text_input_continue' style="flex-grow:1" onclick="showPage('store3')">ENCRYPT DATA</button>
+					<div id='text_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
 				</div>
 			</div>
 
 			<div class="gen store three" id="store3" style="display:none">
-				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE DATA</label>
-					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label>&#10004; SECRET DATA SAVED</label>
 				<h2>ENTER SECRET WORD 1</h2>
@@ -396,9 +396,9 @@
 			</div>
 
 			<div class="gen store four" id="store4" style="display:none">
-				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE DATA</label>
-					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label>&#10004; SECRET DATA SAVED</label>
 				<label>&#10004; SECRET WORD 1 SAVED</label>
@@ -411,9 +411,9 @@
 			</div>
 
 			<div class="gen store five" id="store5" style="display:none">
-				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE DATA</label>
-					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label>&#10004; SECRET DATA SAVED</label>
 				<label>&#10004; SECRET WORD 1 SAVED</label>
@@ -467,9 +467,9 @@
 
 <!--  load  --!>
 			<div class="gen load one" id="load1" style="display:none;">
-				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS DATA</label>
-					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODE WORD</h2>
 				<input autocomplete="off" type="password" autofocus  value="" id="load_codeword" style="">
@@ -492,18 +492,18 @@
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
 						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="loadDownload()">
-							<span style="color:#ff00ff;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">COMMAND LINE</span>
+							<span style="color:#ff00ff;text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">COMMAND LINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">File Output</span>
 						</button>
-						<label style="align-self:center; color:#ff00ff;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">More Secure</label>
+						<label style="align-self:center; color:#ff00ff;text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">More Secure</label>
 					</div>
 				</div>
 			</div>
 
 			<div class="gen load two" id="load2" style="display:none">
-				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS DATA</label>
-					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<h2>ENTER SECRET WORD 1</h2>
@@ -515,9 +515,9 @@
 			</div>
 
 			<div class="gen load three" id="load3" style="display:none">
-				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS DATA</label>
-					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
@@ -530,9 +530,9 @@
 			</div>
 
 			<div class="gen load four" id="load4" style="display:none">
-				<div style="display: flex; flex-direction: row; justify-content: space-between;">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS DATA</label>
-					<label class="pass_length_warn" style="color:red; display: none;">Password too short!</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label>&#10004; CODE WORD ENTERED</label> 
 				<label>&#10004; SECRET WORD 1 ENTERED</label> 
@@ -571,7 +571,7 @@
 				<br>
 				<div class="overlay_container" style="position:relative">
 					<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
-					<div style='display: flex; flex-direction: column; border-style: inset; width: fit-content; padding: 5px;'>
+					<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
 						<label>Encrypt:</label>
 						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 						<br>
@@ -649,49 +649,126 @@
 				<h3 id="status_label" style="align-self:center; display:none; color:red;">placeholder</h3>
 			</div>
 
+<!------------------------------------ Passlock Steps --------------------------------------------------------------------------!>
+
+			<!---------------------------Pass 1-----------------------!>
+			<div class="gen passlock" id="passlock1" style="display:flex">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="passlock_pass1" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock1')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock1','passlock2')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Pass 2-----------------------!>
+			<div class="gen passlock" id="passlock2" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="passlock_pass2" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock1')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock2','passlock3')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Pass 3-----------------------!>
+			<div class="gen passlock" id="passlock3" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>PASS 3</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 3</h2>
+				<input autocomplete="off" type="password" value="" id="passlock_pass3" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock2')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock3','passlock_cw')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Codeword-----------------------!>
+			<div class="gen passlock" id="passlock_cw" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>CODEWORD</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER CODEWORD</h2>
+				<input autocomplete="off" type="password" value="" id="passlock_codeword" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock3')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock_cw','passlock_reiteration')">CONTINUE</button>
+				</div>
+			</div>
+
 			<!---------------------------REITERATION STEP -----------------------!>
-			<div id="reiteration_div" class="gen" style="display:flex; ">
+			<div class="gen passlock" id="passlock_reiteration" style="display:none;">
 				<h2 id="">This is the REITERATION Step</h2>
 				<h3 id="">Eloquent text explaining how this works.</h3>
 				<div style="display:flex; flex-direction:column;">
-					<label id="">CODEWORD:</label>
-					<div style="display:flex; ">
-						<input id="reiteration_codeword" autocomplete="off" type="password" value="" style="">
-						<button id="show_reiteration_codeword" style="" onclick="showPassword('codeword')">SHOW</button>
-					</div>
 					<label id="">PASSWORD 1 (maybe this appears only if you've chosen browser?):</label>
-					<div style="display:flex; ">
+					<div style="display:flex;">
 						<input id="reiteration_pass1" autocomplete="off" type="password" value="" style="">
 						<button id="show_reiteration_pass1" style="" onclick="showPassword('pass1')">SHOW</button>
 					</div>
 					<label id="">PASSWORD 2:</label>
-					<div style="display:flex; ">
+					<div style="display:flex;">
 						<input id="reiteration_pass2" autocomplete="off" type="password" value="" style="">
 						<button id="show_reiteration_pass2" style="" onclick="showPassword('pass2')">SHOW</button>
 					</div>
 					<label id="">PASSWORD 3:</label>
-					<div style="display:flex; ">
+					<div style="display:flex;">
 						<input id="reiteration_pass3" autocomplete="off" type="password" value="" style="">
 						<button id="show_reiteration_pass3" style="" onclick="showPassword('pass3')">SHOW</button>
 					</div>
-					<label id="">DATA (also only show with browser choice?):</label>
-					<div style="display:flex; ">
-						<textarea id="reiteration_data" type="password" rows="5" cols="50"></textarea>
-						<button id="show_reiteration_data" style="" onclick="showPassword('data')">SHOW</button>
+					<label id="">CODEWORD:</label>
+					<div style="display:flex;">
+						<input id="reiteration_codeword" autocomplete="off" type="password" value="" style="">
+						<button id="show_reiteration_codeword" style="" onclick="showPassword('codeword')">SHOW</button>
 					</div>
 				</div>
 				<div style="display:flex; flex-direction:row;">
-					<button id="reiteration_commit" style="flex-grow:1; " onclick="finalCommit()">COMMIT DATA TO SERVER</button>
-					<button id="reiteration_cancel" style="flex-grow:1; " onclick="cancelFinalCommit()">CANCEL</button>
+					<button id="reiteration_cancel" style="flex-grow:1; " onclick="showPage('passlock_cw')">BACK</button>
+					<button id="reiteration_commit" style="flex-grow:1; " onclick="showPage('passlock_data')">READY TO STORE DATA</button>
 				</div>
 				<h3 id="status_label" style="align-self:center; display:inline; color:red;">Errors, important information can go here.</h3>
 			</div>
+
+			<!---------------------------Data-----------------------!>
+			<div class="gen passlock" id="passlock_data" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>STORE DATA</label>
+					<label id="data_length_label" style="color:black"></label>
+				</div>
+				<textarea class="browser_input" value="" id="passlock_data" rows="8" cols="45" oninput="checkTextInputLength('passlock_data')" placeholder="ENTER YOUR SECRET DATA"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('passlock_reiteration')">BACK</button>
+					<button class="" id='text_input_continue' style="flex-grow:1" onclick="showPage('passlock_data')">ENCRYPT DATA AND COMMIT TO SERVER</button>
+					<div id='text_input_warning' style="flex-grow:1;display:none;">
+						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
+					</div>
+				</div>
+			</div>
+
+
+<!------------------------------------ Passlock Steps --------------------------------------------------------------------------!>
 
 		</div>		<!-- content_html --!>
 	</div>			<!-- center_html --!>
 
 
-<!-- Footer Buttons --!>
+<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
 		<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseThread()">CREATE NEW OFFLINE DBASE</button>
 		<div style="display:flex">
@@ -699,7 +776,7 @@
 			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
 		</div>
 	</div>
-<!-- Footer Buttons --!>
+<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 
 	<!-- Offline Database Data --!>
 	<p id="offline_dbase" style="display:none"></p>
@@ -967,7 +1044,7 @@
 </body>
 <script>
 
-		//console.log("radiovalue: " + document.querySelector('input[type=radio][name=algo]:checked').value );
+		//console.log("radiovalue:" + document.querySelector('input[type=radio][name=algo]:checked').value );
 
 	// Dev Site Functions
 
@@ -1845,18 +1922,19 @@
 	}
 
 	// Called on change of text area, checks length of that text area and shows warning if input data too long.
-	function checkTextInputLength(){
-		let input = document.getElementById("store_data").value;
+	function checkTextInputLength(input_id){
+		//let input = document.getElementById("store_data").value;
+		let input = document.getElementById(input_id).value;
 		if( checkInputLength(input) ){
 			// Length OK, turn off warning
-			document.getElementById("store_text_input_warning").style.display = "none";
+			document.getElementById("text_input_warning").style.display = "none";
 			// display button
-			document.getElementById("store_text_input_continue").style.display = "inline";
+			document.getElementById("text_input_continue").style.display = "inline";
 		}else{
 			// remove button
-			document.getElementById("store_text_input_continue").style.display = "none";
+			document.getElementById("text_input_continue").style.display = "none";
 			// Length NOT OK, turn ON warning
-			document.getElementById("store_text_input_warning").style.display = "inline";
+			document.getElementById("text_input_warning").style.display = "inline";
 		}
 	}
 /*
@@ -2026,7 +2104,7 @@
 
 	// Make sure input is exactly 1000 chars of base64 data.
 	function checkDataIsValid(data){
-		const regex = /^[a-zA-Z0-9+/]{1000}$/;
+		const regex = /^[a-zA-Z0-9\+\/]{1000}$/;
 		if( regex.test(data) ){
 			return 1;
 		}else{
@@ -2469,6 +2547,9 @@
 		browser_id_global = self.crypto.randomUUID();
 		// Gen new passlock;
 		const passlock = self.crypto.randomUUID();
+console.log("browser_id: " + browser_id_global);
+console.log("passlock : " + passlock);
+
 		// Send to server.
 		await serverSetPasslock(browser_id_global, passlock);
 		return passlock;
@@ -3086,16 +3167,10 @@
 		let plaintext_binary = addCountstring(plaintext64);
 		document.getElementById("dev_enc_obf1_zero_padded_data").value = plaintext_binary;
 
-/*	DO WE WANT A CHAR CHECK HERE STILL???
-
-		if( !check_b58chars(result_b58) ){
+		if( !checkBase64Chars(plaintext64) ){
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
 
-		if( !result_b58.length == 1000 ){ 
-			throw new Error('Obfuscation step 1 output length INVALID!');
-		}
-*/
 		// With conversion to base64, 750 bytes convert to 1000 base64 chars exactly.
 		const array_length = 750;
 
@@ -3104,10 +3179,6 @@
 		document.getElementById("dev_enc_obf1_password_bytes").value = password_binary;
 		const pass_binary = await getPassHash(password_binary, array_length);
 		document.getElementById("dev_enc_obf1_sha_extended_bytes").value = pass_binary;
-console.log("pass_binary: ");
-console.log(pass_binary);
-console.log("plaintext_binary: ");
-console.log(plaintext_binary);
 
 		// Perform the XOR bitwise byte by byte.
 		let xor_result = new Array();
@@ -3118,9 +3189,6 @@ console.log(plaintext_binary);
 
 		let result_b64 = bytesToBase64(xor_result);
 		document.getElementById("dev_enc_obf1_xord_data").value = result_b64;
-
-		console.log("BASE64 CONVERTED TO LENGTH: " + result_b64.length);
-
 		return result_b64;
 	}//obf1Encrypt()
 
@@ -3173,33 +3241,27 @@ console.log(plaintext_binary);
 		// We've shifted off 1 byte, so we won't enter the while loop if there's 1 length digit.
 		// Shift bytes from countstring decrypted array to length_array until we hit the colon byte.
 		while( xor_result[0] != 58 ){
+			//console.log("xor_result while looping : " + xor_result);
 			shifted_byte = xor_result.shift();
 			length_array.push(shifted_byte);
 		}
 		// Shift off colon byte. It's done its job.
-		shifted_byte = xor_result.shift();
+		//shifted_byte = xor_result.shift();
+		xor_result.shift();
 
 		// Convert bytes to a number.
 		length_array = Uint8Array.from(length_array);
 		const data_length = new TextDecoder().decode(length_array);
 		console.log("countstring extracted length value: " + data_length);
-		console.log("xor_result length: " + xor_result.length);
 
-		// The number of zeros to pop is the total length of the array (after stripping length bytes and colon) - the length of the data.
-		const number_zeros_to_pop = xor_result.length - data_length;
-		// Pop off zero bytes.
-		for ( i = 0; i < number_zeros_to_pop; i++) {
-			xor_result.pop();
-		}
-		console.log("xor_result length: " + xor_result.length);
+		// Remove zeros by slicing off everything after the data bytes end.
+		xor_result = xor_result.slice( 0, data_length );
 	
 		// Array needs to be Uint8Array for Decode to work.	
 		// Should now be stripped of zeros and countstring, leaving data.
 		const plaintextbytes = Uint8Array.from(xor_result);
 		// Decode precisely stripped array.
 		let output = new TextDecoder().decode(plaintextbytes);
-
-		console.log("output length: " + output.length);
 		return output;
 	}//obf1Decrypt
 
@@ -3208,13 +3270,11 @@ console.log(plaintext_binary);
 	// Inputs: input_data is 1000 characters of base64 string, password is plaintext
 	// Output: 1000 chars of base64 string
 	async function obf2Encrypt(input_data, password){
-/*	ARE WE STILL CHECKING CHAR TYPES??
-		if( !check_b58chars(input_data) ){
-			console.log("Non-base 58 chars found in the Final Step input! \n\n Second check; WARNING! This should never trigger!!!");
-			// Abort final step encode.
-			return;
+
+		if( !checkBase64Chars(input_data) ){
+			throw new Error('Obfuscation step 2 INVALID characters found!');
 		}
-*/
+
 		// Get size of input data. Should be 1000.
 		const input_length = input_data.length;
 
@@ -3224,7 +3284,7 @@ console.log(plaintext_binary);
 		const pass_hash = await getPassHash(password_binary, input_length);
 		document.getElementById("dev_enc_obf2_sha_extended_bytes").value = pass_hash;
 
-		const pass_b64 = bytesToBase64(pass_hash);
+		pass_b64 = bytesToBase64(pass_hash);
 		document.getElementById("dev_enc_obf2_password_b64").value = pass_b64;
 
 		// Create 2 arrays of length 1000.
@@ -3375,10 +3435,9 @@ console.log(plaintext_binary);
 
 	// Input: input is a string.
 	// Output: Returns false if non-base58 characters are detected.
-	function check_b58chars(input){
-		// From the first char(^) to the last($), match zero or more(*) of 
-		// 1-9A-HJ-NP-Za-km-z (false if any non-b58 chars).
-		const regex = /^[1-9A-HJ-NP-Za-km-z]*$/;
+	function checkBase64Chars(input){
+		// From the first char(^) to the last($), match exactly 1000 base64 chars.
+		const regex = /^[a-zA-Z0-9\+\/]*$/;
 		if( regex.test(input) ){
 			// Return true/valid: non-b58 chars were NOT found.
 			return 1;
@@ -3386,7 +3445,7 @@ console.log(plaintext_binary);
 			// Return false/invalid: non-b58 chars were found.
 			return 0;
 		}
-	}//check_b58chars()
+	}//checkBase64Chars()
 
 	// Input: input is a string.
 	// Output: Returns false if the input length (in bytes) is over 700.
