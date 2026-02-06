@@ -662,9 +662,7 @@
 				<input autocomplete="off" type="password" value="" id="passlock_pass1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock1')">BACK</button>
-					<!----<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock1','passlock2')">CONTINUE</button>---!>
 					<button class="" id='' style="flex-grow:1;" onclick="initiatePasslock('passlock_pass1');showPage('passlock2');">CONTINUE</button>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="generatePasslock();passlockAdd('passlock_pass1');showPage('passlock2');">CONTINUE</button>--!>
 				</div>
 			</div>
 
@@ -2644,8 +2642,9 @@
 		// Gen new passlock;
 		const passlock = self.crypto.randomUUID();
 		// Send to server.
-		const returned = await serverSetPasslock(browser_id_global, passlock);
-		console.log(returned);
+		// returned is a json object containing data: 1 = success. 0 = fail.
+		//const returned = await serverSetPasslock(browser_id_global, passlock);
+		await serverSetPasslock(browser_id_global, passlock);
 		console.log("new browser_id: " + browser_id_global);
 		console.log("new passlock: " + passlock);
 		// Set timeout timer.
@@ -2988,7 +2987,15 @@
 		if( response ){
 			if( response.ok ){
 				console.log("Response from serverSetPasslock() fetch() call = OK!");
-				return response.json();
+				const response_obj = await response.json();
+				// checkResponseObject();
+				console.log(response_obj);
+				if( response_obj.response != 1 ){ // there appears to be a problem.
+					throw Error("serverSetPasslock database store error!");
+				}else{
+					console.log("set_passlock successfully stored to database.");
+					return;
+				}
 			} else {
 				console.log("HTTP error. Status: " + response.status);
 				return response.json();
