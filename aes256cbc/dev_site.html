@@ -662,7 +662,9 @@
 				<input autocomplete="off" type="password" value="" id="passlock_pass1" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock1')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock1','passlock2')">CONTINUE</button>
+					<!----<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock1','passlock2')">CONTINUE</button>---!>
+					<button class="" id='' style="flex-grow:1;" onclick="initiatePasslock('passlock_pass1');showPage('passlock2');">CONTINUE</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="generatePasslock();passlockAdd('passlock_pass1');showPage('passlock2');">CONTINUE</button>--!>
 				</div>
 			</div>
 
@@ -677,7 +679,8 @@
 				<input autocomplete="off" type="password" value="" id="passlock_pass2" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock1')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock2','passlock3')">CONTINUE</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock2','passlock3')">CONTINUE</button>--!>
+					<button class="" id='' style="flex-grow:1;" onclick="passlockAdd('passlock_pass2');showPage('passlock3');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -692,7 +695,7 @@
 				<input autocomplete="off" type="password" value="" id="passlock_pass3" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock2')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock3','passlock_cw')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="passlockAdd('passlock_pass3');showPage('passlock_cw');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -707,7 +710,88 @@
 				<input autocomplete="off" type="password" value="" id="passlock_codeword" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock3')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock_cw','passlock_reiteration')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="passlockAdd('passlock_codeword');showPage('check_passlock1')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 1-----------------------!>
+			<div class="gen passlock" id="check_passlock1" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>CHECK PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="check_pass1" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock_cw')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(0, 'check_pass1', 'check_passlock1', 'check_passlock2')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 2-----------------------!>
+			<div class="gen passlock" id="check_passlock2" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>CHECK PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="check_pass2" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('check_passlock1')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(1, 'check_pass2', 'check_passlock2', 'check_passlock3')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 3-----------------------!>
+			<div class="gen passlock" id="check_passlock3" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>CHECK PASS 3</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 3</h2>
+				<input autocomplete="off" type="password" value="" id="check_pass3" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('check_passlock2')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'check_pass3', 'check_passlock3', 'check_cw')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Codeword-----------------------!>
+			<div class="gen passlock" id="check_cw" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>CHECK CODEWORD</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER CODEWORD</h2>
+				<input autocomplete="off" type="password" value="" id="check_codeword" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('check_passlock3')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Data-----------------------!>
+			<div class="gen passlock" id="passlock_data" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>STORE DATA</label>
+					<label id="data_length_label" style="color:black"></label>
+				</div>
+				<textarea class="browser_input" id="passlock_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('passlock_data')" placeholder="ENTER YOUR SECRET DATA"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('check_cw')">BACK</button>
+					<button class="" id='text_input_continue' style="flex-grow:1" onclick="commitDataToServer('passlock_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
+					<div id='text_input_warning' style="flex-grow:1;display:none;">
+						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
+					</div>
 				</div>
 			</div>
 
@@ -739,29 +823,10 @@
 				</div>
 				<div style="display:flex; flex-direction:row;">
 					<button id="reiteration_cancel" style="flex-grow:1; " onclick="showPage('passlock_cw')">BACK</button>
-					<button id="reiteration_commit" style="flex-grow:1; " onclick="showPage('passlock_data')">READY TO STORE DATA</button>
+					<button id="reiteration_commit" style="flex-grow:1; " onclick="showPage('')">READY TO STORE DATA</button>
 				</div>
 				<h3 id="status_label" style="align-self:center; display:inline; color:red;">Errors, important information can go here.</h3>
 			</div>
-
-			<!---------------------------Data-----------------------!>
-			<div class="gen passlock" id="passlock_data" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
-					<label>STORE DATA</label>
-					<label id="data_length_label" style="color:black"></label>
-				</div>
-				<textarea class="browser_input" value="" id="passlock_data" rows="8" cols="45" oninput="checkTextInputLength('passlock_data')" placeholder="ENTER YOUR SECRET DATA"></textarea>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('passlock_reiteration')">BACK</button>
-					<button class="" id='text_input_continue' style="flex-grow:1" onclick="showPage('passlock_data')">ENCRYPT DATA AND COMMIT TO SERVER</button>
-					<div id='text_input_warning' style="flex-grow:1;display:none;">
-						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
-					</div>
-				</div>
-			</div>
-
-
 <!------------------------------------ Passlock Steps --------------------------------------------------------------------------!>
 
 		</div>		<!-- content_html --!>
@@ -1675,6 +1740,8 @@
 	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of an html generated pane.
 	function showPage(target){
+		// Hide pass check warnings (passlock thread).
+		hidePassWarnings();
 		// Hide all password warnings.
 		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
 		for (let i = 0; i < pass_warn_elements.length; i++) {
@@ -2104,7 +2171,7 @@
 
 	// Make sure input is exactly 1000 chars of base64 data.
 	function checkDataIsValid(data){
-		const regex = /^[a-zA-Z0-9\+\/]{1000}$/;
+		const regex = /^[a-zA-Z0-9\+\/\=]{1000}$/;
 		if( regex.test(data) ){
 			return 1;
 		}else{
@@ -2298,31 +2365,29 @@
 	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
 	// Inputs: Plaintext held in inputs hidden from the user until all data is ready for the server query.
 	// Output: Functionality.
+/*
 	async function deepStore(){
 		// Get save data from user.
 		const plaintext = document.getElementById("store_data").value;
-		const uploadtext = document.getElementById("upload_data").value;
 		// Get code/passwords from user.
 		const codeword = document.getElementById("store_codeword").value;
 		const pass_1 = document.getElementById("store_pass_1").value;
 		const pass_2 = document.getElementById("store_pass_2").value;
 		const pass_3 = document.getElementById("store_pass_3").value;
-		//debug("Attempting Server STORE - deepStore()"); 
-		//debug("Server Handling - deepStore() -- Browser Entered Plaintext Data:\n" + plaintext); 
-		//debug("Server Handling - deepStore() -- Uploaded Encrypted Data:\n" + uploadtext); 
-		//debug("Server Handling - deepStore() -- Codeword: " + codeword); 
-		//debug("Server Handling - deepStore() -- Password 1: " + pass_1); 
-		//debug("Server Handling - deepStore() -- Password 2: " + pass_2); 
-		//debug("Server Handling - deepStore() -- Password 3: " + pass_3); 
+	*/
+	async function deepStore( plaintext, cleartextSet ){
+		const uploadtext = document.getElementById("upload_data").value;
+		const pass_1 = cleartextSet[0];
+		const pass_2 = cleartextSet[1];
+		const pass_3 = cleartextSet[2];
+		const codeword = cleartextSet[3];
 
-		// First check lengths as user moves through interface then maybe:
-		// Final check:
-		//		Make sure data isn't blank, and mandate that all 3 pw's are used in addition to the cw.
-		//if( plaintext === '' || codeword === '' || pass_1 === '' || pass_2 === '' || pass_3 === '' ){
-		//if( plaintext.length === '' || codeword.length < 8 || pass_1.length < 8 || pass_2.length < 8 || pass_3.length < 8 ){
-			//throw new Error('Empty fields found! Ending.');
-		//}
-	
+		console.log("cleartext: " + plaintext);
+		console.log("pass1: " + pass_1);
+		console.log("pass2: " + pass_2);
+		console.log("pass3: " + pass_3);
+		console.log("codeword: " + codeword);
+		
 		let encrypted_data;
 		// Use flag set by storeUpload() to determine which enc stack to use.
 		if( upload_flag == 'true' ){
@@ -2528,6 +2593,46 @@
 
 
 
+/*
+	async function initiatePasslock(userPassInputId){
+		//Store user's password in javascript and delete it from html.
+		const userPass = extractUserPass(userPassInputId);
+		
+		// Reset global variables.	
+		resetPasslock();
+		// Generate passlock key value pair.
+		const passlock = await generatePasslock();
+		const encrypted_password = await passlockEncrypt(userPass, passlock);
+		passlocked_passwords.push( encrypted_password );
+	}
+
+	async function continuePasslock(userPassInputId){
+		const userPass = extractUserPass(userPassInputId);
+		
+		const passlock = getPasslock();
+		const encrypted_password = await passlockEncrypt(userPass, passlock);
+		passlocked_passwords.push( encrypted_password );
+		console.log("passlock password array:");
+		console.log("test inline" + passlocked_passwords);
+		console.log(passlocked_passwords);
+	}
+*/
+
+	function showPassWarnings(){
+		// Show all password warnings.
+		pass_check_elements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < pass_check_elements.length; i++) {
+			pass_check_elements[i].style.display = "inline";
+		}
+	}
+
+	function hidePassWarnings(){
+		// Show all password warnings.
+		pass_check_elements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < pass_check_elements.length; i++) {
+			pass_check_elements[i].style.display = "none";
+		}
+	}
 	//////////////////////////////////////////////////////////////
 	//			Passlock Functions							    //
 	//////////////////////////////////////////////////////////////
@@ -2535,49 +2640,151 @@
 	// Global browser_id variable to be used for accessing passlock, 
 	// the random password we're using to encrypt data as user moves through interface.
 	let browser_id_global;
-	// Set timeout somehow later.
+	let passlocked_passwords; //Array to hold passlocked passwords.
+	//Reset passlock global variables
+	function resetPasslock(){
+		browser_id_global = null;
+		passlocked_passwords = new Array;
+		console.log("passlock reset.");
+	}
+
+	//Function that extracts user password from html and deletes it from the html source.
+	function extractUserPass(userPassInputId){
+		const userPass = document.getElementById(userPassInputId).value;
+		document.getElementById(userPassInputId).value = ""; //delete password from html
+		return userPass;
+	}
+
+	function weTimedOut(){
+		console.log("weTimedOut() ran successfully.");
+		// Delete client held data. Should be able to just check for null to see if we're timed out.
+		//resetPasslock();
+		// Tell server to delete passlock record.
+		//serverDeletePasslock();
+	}
 
 	// Generate a browser_id, passlock and save them to server as a key-value pair.
 	async function generatePasslock(){
-
-		// First maybe check if a browser id exists.
-		// Also maybe handle timeout functionality.
-
+		// Reset global variables.	
+		resetPasslock();
 		// Generate and set browser_id;
 		browser_id_global = self.crypto.randomUUID();
 		// Gen new passlock;
 		const passlock = self.crypto.randomUUID();
-console.log("browser_id: " + browser_id_global);
-console.log("passlock : " + passlock);
-
 		// Send to server.
-		await serverSetPasslock(browser_id_global, passlock);
+		const returned = await serverSetPasslock(browser_id_global, passlock);
+		console.log(returned);
+		console.log("new browser_id: " + browser_id_global);
+		console.log("new passlock: " + passlock);
+		// Set timeout timer.
+		setTimeout(() => {
+			console.log("Timeout timer expired!");
+			weTimedOut();
+		}, 1000); // One Second.
 		return passlock;
 	}
 
-	// Retrieve passlock from server.
+	// Can be removed if generatePasslock();passlockAdd() is used instead
+	// That means we do 1 more server call. Because O() notation complexity I think 1 call in 8 is taught to mean nothing in context.
+	// ==> By saving 1 server call in many, we use an additional function.
+	//	Also we use crypto data in a different way, giving more changes for errors.
+	//	Also we're now managing 3 functionss that do 2 things in different ways that isn't immediately clear instead of 2 functions that do specific things.
+	//
+	// I guess we need to use it tho as about half the time the server didn't have the passlock in time for the retreival.
+	async function initiatePasslock(userPassInputId){
+		//Store user's password in javascript and delete it from html.
+		const userPass = extractUserPass(userPassInputId);
+		// Generate passlock key value pair.
+		const passlock = await generatePasslock();
+		const encryptedPassword = await encOpenSSL(userPass, passlock);
+		passlocked_passwords.push( encryptedPassword );
+	}
+
+	// Add encrypted user password to passlock array.
+	async function passlockAdd(userPassInputId){
+		// Can add length check here
+		const userPass = extractUserPass(userPassInputId);
+		const encryptedPassword = await passlockEncrypt(userPass);
+		passlocked_passwords.push( encryptedPassword );
+	}
+
+	// Checks existing encrypted pass at index vs reiteration step encrypted value.
+	async function checkPasslock(index, userPassInputId, thisPageId, nextPageId){
+		const userPass = extractUserPass(userPassInputId);
+		const encryptedPassword = await passlockEncrypt(userPass);
+		if( passlocked_passwords[index] === encryptedPassword){
+			// Password re-iterated successfully, continue to next page.
+			showPage(nextPageId);
+		}else{
+			showPassWarnings();
+			// Re-iterated password doesn't match original.
+			throw Error("Passwords are different!");
+			// Failed to re-iterate, Stay on this page.
+		}
+	}
+
+	// Return passlock for encrypt/decrypt functions if not timed out.
 	async function getPasslock(){
-		// Maybe if passlock hasn'timed out or whatever then query server for it?
-		const passlock = await serverGetPasslock(browser_id_global);
-		return passlock;
+		// Check for timeout
+		if( browser_id_global === null ){
+			throw Error("Passlock is timed out!");
+		}
+		// Return passlock json object if not timed out.
+		const passlockJsonObject = await serverGetPasslock(browser_id_global);
+		console.log("browser id: " + browser_id_global);
+		console.log(passlockJsonObject);
+		// Return data from json object.
+		return passlockJsonObject.passlock;
 	}
 
 	// Use previously generated passlock to encrypt input.
 	// Returns encrypted password.
-	async function passlockEncrypt( cleartext_password ){
-		// Just use our already vetted OpenSSL implementation? 
+	// Should check for timeout and return error if so.
+	async function passlockEncrypt(cleartextPassword){
 		const passlock = await getPasslock();
 		// I think await is needed here because need a variable before returning?
-		const ciphertext_password = await encOpenSSL(cleartext_password, passlock);
-		return ciphertext_password;
+		const encryptedPassword = await encOpenSSL(cleartextPassword, passlock);
+		console.log("retrieved passlock: " + passlock);
+		console.log("cleartextPassword: " + cleartextPassword);
+		console.log("encryptedPassword: " + encryptedPassword);
+		return encryptedPassword;
 	}
 
 	// Use previously generated passlock to decrypt input.
 	// Returns decrypted password.
-	async function passlockDecrypt( ciphertext_password ){
+	//
+	// Unused function.
+	async function passlockDecrypt(encryptedPassword){
 		const passlock = await getPasslock();
-		const cleartext_password = await decOpenSSL(ciphertext_password, passlock);
-		return cleartext_password;
+		const cleartextPassword = await decOpenSSL(encryptedPassword, passlock);
+		return cleartextPassword;
+	}
+
+	// Decrypt passlocked password set and return cleartext set.
+	async function passlockDecryptSet(){
+		const passlock = await getPasslock();
+		let cleartextPassword;
+		let cleartextSet = new Array;
+		for(let i=0; i < 4; i++ ){
+			cleartextPassword = await decOpenSSL(passlocked_passwords[0], passlock);
+			cleartextSet.push(cleartextPassword);
+		}
+		console.log("retrieved passlock: " + passlock);
+		console.log("cleartext Password Set: " + cleartextSet);
+		console.log("encrypted Password Set: " + passlocked_passwords);
+		return cleartextSet;
+	}
+
+	async function commitDataToServer(cleartextDataInputId){
+		// Get user data, clear from html.
+		const cleartextData = extractUserPass(cleartextDataInputId);
+		console.log("cleartext data: " + cleartextData);
+		// Get decrypted passwords
+		let cleartextSet = await passlockDecryptSet();
+console.log(cleartextSet);
+		// Store to server.
+		const outcome = await deepStore(cleartextData, cleartextSet);
+		console.log("deepStore outcome: " + outcome);
 	}
 
 	// Decrypt password stored in target object.
@@ -2585,7 +2792,6 @@ console.log("passlock : " + passlock);
 	async function showPassword( object_holding_password_to_show ){
 
 	}
-
 
 	//////////////////////////////////////////////////////////////
 	//			Server Communication Functions				    //
@@ -2797,7 +3003,8 @@ console.log("passlock : " + passlock);
 		return;
 	}//serverSetPasslock()
 
-	async function serverGetPasslock(browser_id){
+	async function serverGetPasslock(){
+		const browser_id = browser_id_global;
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exegetpasslock;';
 		
@@ -2964,7 +3171,6 @@ console.log("passlock : " + passlock);
 			saltstring = document.getElementById("dev_enc_openssl_derivebits_salt").value;
 			// Convert string of ints into an array (numbers).
 			const numbers = saltstring.split(',').map(Number);
-			console.log("numbers salt array length: " + numbers.length);
 			if( numbers.length != 8 ){
 				alert("Invalid Random Salt!\n\nManually inputted salt must be exactly 8 bytes in comma separated number form.");
 				throw new Error("Manually inputted salt must be exactly 8 bytes.");
@@ -3371,7 +3577,7 @@ console.log("passlock : " + passlock);
 		// Obfuscation Step 2 Encrypt
 		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, pass3);
 		return obf_s2_encrypted;
-	}//encryptStack()
+	}//encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
 	async function encryptStack(plaintext, pass1, pass2, pass3){
@@ -3437,7 +3643,7 @@ console.log("passlock : " + passlock);
 	// Output: Returns false if non-base58 characters are detected.
 	function checkBase64Chars(input){
 		// From the first char(^) to the last($), match exactly 1000 base64 chars.
-		const regex = /^[a-zA-Z0-9\+\/]*$/;
+		const regex = /^[a-zA-Z0-9\+\/\=]*$/;
 		if( regex.test(input) ){
 			// Return true/valid: non-b58 chars were NOT found.
 			return 1;
