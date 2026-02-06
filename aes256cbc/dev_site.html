@@ -1842,14 +1842,12 @@
 	// These standalone functions are required to set upload_flag in javascript.
 	// User choose text input, set flag to false.
 	function storeDefault(){
-		//debug("Threadwalker Flow -- set upload_flag: false");
 		upload_flag = 'false';
 		showPage('store2');
 	}
 
 	// User choose upload, set flag to true.
 	function storeUpload(){
-		//debug("Threadwalker Flow -- set upload_flag: true");
 		upload_flag = 'true';
 		showPage('store_upload');
 	}
@@ -1885,14 +1883,12 @@
 
 	// User choose text output, set flag to false.
 	function loadDefault(){
-		//debug("Threadwalker Flow -- set download_flag: false");
 		download_flag = 'false';
 		showPage('load2');
 	}
 
 	// User choose file output, set flag to true.
 	function loadDownload(){
-		//debug("Threadwalker Flow -- set download_flag: true");
 		download_flag = 'true';
 		showPage('load3');
 	}
@@ -1952,19 +1948,9 @@
 
 		reader.onload = function(e){
 			let buffer = e.target.result;
-//console.log("init buffer size: " + buffer.length);
-//console.log("init buffer: " + buffer);
 			const buffer_uint8a = new Uint8Array(buffer);
-//console.log("new buffer size: " + buffer_uint8a.length);
-//console.log("new buffer: " + buffer_uint8a);
 			let filedata = bytesToBase64(buffer_uint8a);
-			//let filedata = bytesToBase64(buffer_uint8a);
-//console.log("filedata size (calculated bytes): " + filedata.length );
-//console.log("filedata: " + filedata);
-			//debug("Data Flow catchUpload() -- uploaded file content:");
-			//debug(filedata);
 			// Input Data Length Check
-			//if( checkInputLength(filedata) ){
 			if( checkInputLength(buffer) ){
 				// Data Length within parameters
 				document.getElementById("upload_data").value = filedata;
@@ -2375,6 +2361,7 @@
 		const pass_2 = document.getElementById("store_pass_2").value;
 		const pass_3 = document.getElementById("store_pass_3").value;
 	*/
+/*
 	async function deepStore( plaintext, cleartextSet ){
 		const uploadtext = document.getElementById("upload_data").value;
 		const pass_1 = cleartextSet[0];
@@ -2406,7 +2393,9 @@
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
 		}
+*/
 
+	async function deepStore( fp_hex, encrypted_data){
 		let offline_dbase_store_outcome;
 		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
 			offline_dbase_store_outcome = await handleOfflineDBaseStore(fp_hex, encrypted_data);
@@ -2420,7 +2409,6 @@
 		const server_response = await serverStore(fp_hex, encrypted_data);
 		if( server_response != null){
 			sr_store_result = server_response.response;
-			//debug("Server Handling - deepStore() -- Response from STORE: " + "~" + sr_store_result + "~");
 			// Store returned 0 (fail).
 			if( Number(sr_store_result) != 1){
 				throw new Error('STORE ERROR!');
@@ -2433,7 +2421,6 @@
 		// return of 0 means fingerprint form check fails
 		// return of empty means fingerprint returned nothing
 		const sr_load = await serverLoad(fp_hex);
-		//debug("Server Handling - deepStore() -- Response from LOAD (store final check): " + "~" + sr_load.data + "~");
 
 		// Report Results
 		if(sr_load != null){ // Looks like we have to use this nested loop for null check or code will break.
@@ -2461,11 +2448,6 @@
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
 
-		//debug("Attempting Server LOAD - deepLoad()"); 
-		//debug("Server Handling - deepLoad() -- Codeword: " + codeword); 
-		//debug("Server Handling - deepLoad() -- Password 1: " + pass_1); 
-		//debug("Server Handling - deepLoad() -- Password 2: " + pass_2); 
-		//debug("Server Handling - deepLoad() -- Password 3: " + pass_3); 
 
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
 		// fingerprint length check
@@ -2484,7 +2466,6 @@
 		console.log("Querying server...");
 
 		// Load from server
-		//debug("Server Handling - deepLoad() -- Attempting Load with fingerprint: " + fp_hex);
 		const sr_load = await serverLoad(fp_hex);
 		if(sr_load == null){
 			showPage('failed_to_access');
@@ -2542,15 +2523,8 @@
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
 		const pass_3 = document.getElementById("load_pass_3").value;
-		//debug("Attempting Server DELETE - deepDelete()"); 
-		//debug("Server Handling - deepDelete() -- Codeword: " + codeword); 
-		//debug("Server Handling - deepDelete() -- Password 1: " + pass_1); 
-		//debug("Server Handling - deepDelete() -- Password 2: " + pass_2); 
-		//debug("Server Handling - deepDelete() -- Password 3: " + pass_3); 
 
 		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
-		////debug("fingerprint hex: " + fp_hex);
-		////debug("fingerprint length: " + fp_hex.length);
 		// fingerprint length check
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
@@ -2559,7 +2533,6 @@
 		let offline_dbase_delete_success = '';
 		// If there's an offline dbase, also try to delete it there.
 		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
-			////debug("deepDelete() -- Attempting Offline Database Delete with fingerprint: " + fp_hex);
 			console.log("deepDelete() -- Attempting Offline Database Delete with fingerprint: " + fp_hex);
 			const outcome = await deleteSingleRecordOfflineDBase(fp_hex);
 			if( outcome != "success" ){
@@ -2571,7 +2544,6 @@
 		}
 
 		// Load from server
-		//debug("Server Handling - deepDelete() -- Attempting Delete with fingerprint: " + fp_hex);
 		const sr_delete = await serverDelete(fp_hex);
 		//return sr_delete.response;
 		if( sr_delete != null){
@@ -2781,16 +2753,41 @@
 		console.log("cleartext data: " + cleartextData);
 		// Get decrypted passwords
 		let cleartextSet = await passlockDecryptSet();
-console.log(cleartextSet);
+		console.log(cleartextSet);
+
+		const pass_1 = cleartextSet[0];
+		const pass_2 = cleartextSet[1];
+		const pass_3 = cleartextSet[2];
+		const codeword = cleartextSet[3];
+
+		console.log("cleartext: " + cleartextData);
+		console.log("pass1: " + pass_1);
+		console.log("pass2: " + pass_2);
+		console.log("pass3: " + pass_3);
+		console.log("codeword: " + codeword);
+		
+		let encryptedData;
+		// Use flag set by storeUpload() to determine which enc stack to use.
+		if( upload_flag == 'true' ){
+			// Grab upload_flag value for server database flag.
+			// Double Encrypt
+			encryptedData = await encryptDouble(uploadtext, pass_2, pass_3);
+			// reset flag once it is used
+			upload_flag = 'false';
+		}else{
+			// Triple Encrypt
+			encryptedData = await encryptStack(cleartextData, pass_1, pass_2, pass_3);
+		}
+
+		const fingerprint = await computeFingerprint(codeword, pass_2, pass_3);
+		// fingerprint length check
+		if( fingerprint.length != 64 ){
+			throw new Error('Fingerprint length INVALID!');
+		}
+		
 		// Store to server.
-		const outcome = await deepStore(cleartextData, cleartextSet);
+		const outcome = await deepStore(fingerprint, encryptedData);
 		console.log("deepStore outcome: " + outcome);
-	}
-
-	// Decrypt password stored in target object.
-	// 
-	async function showPassword( object_holding_password_to_show ){
-
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -2905,7 +2902,6 @@ console.log(cleartextSet);
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exeload';
 		
-		//debug("serverLoad() -- Attempting Server Load with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -2941,8 +2937,6 @@ console.log(cleartextSet);
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exestore;';
 		
-		////debug("Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\nUpload Flag: " + upload_flag_db + "\n");
-		//debug("ser100%verStore() -- Attempting Server Store.\nFingerprint: " + fingerprint + "\nData: " + data + "\n");
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -3072,7 +3066,6 @@ console.log(cleartextSet);
 
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exeburststore;';
-		////debug("Attempting Server BURST Store of the Offline Database.");
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -3108,7 +3101,6 @@ console.log(cleartextSet);
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exedelete;';
 		
-		//debug("serverDelete() -- Attempting Server Delete with\nFingerprint: " + fingerprint); 
 		const response = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -3198,14 +3190,11 @@ console.log(cleartextSet);
 			384,
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
-		//debug("Password Flow encOpenSSL() -- PBKDF2 Derived Bits - 384 bits:\n" + derivedKeyBuffer);
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
 		const keybytes = derivedKeyBuffer.slice(0, 32);
-		//debug("Password Flow encOpenSSL() -- PBKDF2 Derived Bits - Lower 256 - Key:\n" + keybytes);
 		const ivbytes = derivedKeyBuffer.slice(32);
-		//debug("Password Flow encOpenSSL() -- PBKDF2 Derived Bits - Upper 128 - Initialization Vector (IV):\n" + ivbytes);
 
 		document.getElementById("dev_enc_openssl_encrypt_iv").value = ivbytes;
 		document.getElementById("dev_enc_openssl_encrypt_key").value = keybytes;
@@ -3223,18 +3212,12 @@ console.log(cleartextSet);
 			false, 
 			['encrypt']
 		);
-		//debug("Data Flow encOpenSSL() -- AES-CBC 256 Encryption Inputs:");
-		//debug("Data Flow encOpenSSL() -- AES-CBC 256 Input - Key:");
-		//debug(key);
-		//debug("Data Flow encOpenSSL() -- AES-CBC 256 Input - IV:\n" + ivbytes);
-		//debug("Data Flow encOpenSSL() -- AES-CBC 256 Input - Binary Data:\n" + plaintextbytes);
 		// Main Function Digest
 		// MDN syntax: encrypt(algorithm, key, data)
 		//const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: digest_algorithm, iv: ivbytes }, key, plaintextbytes);
 		// Data Flow Window
 		const log_encrypted_result = new Uint8Array(encrypted_result);
-		//debug("Data Flow encOpenSSL() -- AES-CBC 256 Encrypted Output Data:\n" + log_encrypted_result);
 		document.getElementById("dev_enc_openssl_encrypted_data").value = log_encrypted_result;
 		// Combine (OpenSSL hardcoded) constant salt, random salt, and encrypted result as array buffers, then convert to base64.
 		const const_salt = "Salted__";	// OpenSSL hardcoded.
@@ -3244,10 +3227,8 @@ console.log(cleartextSet);
 		// Merge salts with encoded ciphertext.
 		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
 		const encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
-		//debug("Data Flow encOpenSSL() -- Encrypted Data with 2 added Salts:\n" + encrypted_output_buf);
 		document.getElementById("dev_enc_openssl_encrypted_data_two_salts").value = encrypted_output_buf;
 		let out64 = bytesToBase64(encrypted_output_buf);
-		//debug("Data Flow encOpenSSL() -- Encrypted Data in base64 - encOpenSSL() Output:\n" + out64);
 		return out64;
 	}//encOpenSSL()
 
@@ -3256,11 +3237,9 @@ console.log(cleartextSet);
 	// Output: decrypted plaintext.
 	//async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash=, digest_algorithm) {
 	async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
-		//debug("Data Flow decOpenSSL() -- Ciphertext Input - base64:\n" + ciphertext64);
 		// Convert input base 64 to binary.
 		const ciphertextbytes = base64ToBytes(ciphertext64);
 		document.getElementById("dev_dec_openssl_ciphertext_bytes").value = ciphertextbytes;
-		//debug("Data Flow decOpenSSL() -- Ciphertext - Binary:\n" + ciphertextbytes);
 		// ciphertext is now in a form that is ready to give to the encryption function.
 
 		// Prepare inputs for digest.
@@ -3270,14 +3249,12 @@ console.log(cleartextSet);
 		const salta = ciphertextbytes.slice(8,16);
 		document.getElementById("dev_dec_openssl_derivebits_salt").value = salta;
 		const salt = new Uint8Array(salta);
-		//debug("Data Flow decOpenSSL() -- Ciphertext - Extracted Salt (bytes 8-15):\n" + salt);
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
 		// be used to create the cryptoKey object needed for the main digest.
 		const encoded_pass = new TextEncoder().encode(pass);
 		document.getElementById("dev_dec_openssl_password_bytes").value = encoded_pass;
 		const keyMaterial = await getKeyMaterial(encoded_pass);
-		//debug("Password Flow decOpenSSL() -- Plaintext password input:\n" + pass);
 		const derived_bits = await window.crypto.subtle.deriveBits(
 			{
 				name: "PBKDF2",
@@ -3301,12 +3278,6 @@ console.log(cleartextSet);
 		const cipherbytesphrase = ciphertextbytes.slice(16);
 		document.getElementById("dev_dec_openssl_ciphertext_extracted_bytes").value = cipherbytesphrase;
 
-		// Data Window Logging
-		//debug("Password Flow decOpenSSL() -- PBKDF2 Derived Bits - 384 bits:\n" + derivedKeyBuffer);
-		////debug(derivedKeyBuffer);
-		//debug("Password Flow decOpenSSL() -- PBKDF2 Derived Bits - Lower 256 - Key:\n" + keybytes);
-		//debug("Password Flow decOpenSSL() -- PBKDF2 Derived Bits - Upper 128 - Initialization Vector (IV):\n" + ivbytes);
-
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -3322,25 +3293,14 @@ console.log(cleartextSet);
 			['decrypt']
 		);
 
-		// Data Window Logging
-		//debug("Data Flow decOpenSSL() -- AES-CBC 256 Decryption Inputs:");
-		//debug("Data Flow decOpenSSL() -- AES-CBC 256 Decrypt - Key:");
-		//debug(key);
-		//debug("Data Flow decOpenSSL() -- AES-CBC 256 Decrypt - IV:\n" + ivbytes);
-		//debug("Data Flow decOpenSSL() -- AES-CBC 256 Decrypt - Binary Data:\n" + cipherbytesphrase);
-		// Main Function Call
 		// MDN syntax: decrypt(algorithm, key, data)
-		//const decrypted_result = await window.crypto.subtle.decrypt({ name: "AES-CBC", iv: ivbytes }, key, cipherbytesphrase);
 		const decrypted_result = await window.crypto.subtle.decrypt({ name: digest_algorithm, iv: ivbytes }, key, cipherbytesphrase);
 		const log_decrypted_result = new Uint8Array(decrypted_result);
 		document.getElementById("dev_dec_openssl_decrypted_bytes").value = log_decrypted_result;
-		//debug("Data Flow decOpenSSL() -- Decrypted Binary Data:\n" + log_decrypted_result);
 		// Convert bytes to string.
 		let decrypted_string = new TextDecoder().decode( decrypted_result );
 		// Pop single newline added in enc (openssl emulation).
 		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
-		//debug("Data Flow decOpenSSL() -- Decrypted String - decOpenSSL() Output:");
-		//debug(decrypted_string);
 		return decrypted_string;
 	}//decOpenSSL()
 
@@ -3348,14 +3308,9 @@ console.log(cleartextSet);
 	// Input: Plaintext password.
 	// Output: Subtlecrypto usable Key Object.
 	function getKeyMaterial(encoded_pass) {
-		//const enc = new TextEncoder();
-		//const encoded_pass = new TextEncoder().encode( password );
-		//debug("Password Flow getKeyMaterial() -- Encoded Password: " + encoded_pass);
-		//document.getElementById("dev_enc_openssl_password_bytes").value = encoded_pass;
 		// importKey(format, keyData, algorithm, extractable, keyUsages)
 		return window.crypto.subtle.importKey(
 			"raw",
-			//enc.encode(password),	// plaintext -> binary
 			encoded_pass,	// plaintext -> binary
 			"PBKDF2",
 			//algo,
@@ -3611,17 +3566,11 @@ console.log(cleartextSet);
 	async function computeFingerprint(codeword, pass_2, pass_3){
 		// Convert to lowercase.
 		const cw_lower = codeword.toLowerCase();
-		//debug("computeFingerprint() -- Lowercase Codeword: " + cw_lower); 
-		//debug("computeFingerprint() -- Password 2: " + pass_2); 
-		//debug("computeFingerprint() -- Password 3: " + pass_3); 
 		// Take SHA-256 hash of codeword, pass 2, pass 3.
 		const enc = new TextEncoder();
 		const cw_buf = enc.encode(cw_lower);
 		const p2_buf = enc.encode(pass_2);
 		const p3_buf = enc.encode(pass_3);
-		//debug("computeFingerprint() -- Binary Codeword: " + cw_buf); 
-		//debug("computeFingerprint() -- Binary Password 2: " + p2_buf); 
-		//debug("computeFingerprint() -- Binary Password 3: " + p3_buf); 
 		const cw_hash = await crypto.subtle.digest('SHA-256', cw_buf);
 		const p2_hash = await crypto.subtle.digest('SHA-256', p2_buf);
 		const p3_hash = await crypto.subtle.digest('SHA-256', p3_buf);
@@ -3632,10 +3581,7 @@ console.log(cleartextSet);
 		// SHA-256 hash the result.
 		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
 		const fingerprint = new Uint8Array(fp_hash);
-		//debug("computeFingerprint() -- Binary Fingerprint:\n" + fingerprint); 
-		////debug("Computed Fingerprint: " + fingerprint);
 		const fp_hex = buf2hex(fingerprint);
-		//debug("computeFingerprint() -- base64 Fingerprint: " + fp_hex); 
 		return fp_hex;
 	}//computeFingerprint
 
