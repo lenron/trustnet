@@ -21,7 +21,7 @@ my $json = JSON->new;
 	my $t = localtime;
 	my $time = $t->strftime();
 	# If log exists, we know q->param caught data.
-	my $filename = './online_check_log.txt';
+	my $filename = './logs/online_check_log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "\n\nONLINE CHECK\n";

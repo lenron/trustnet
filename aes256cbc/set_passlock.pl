@@ -26,7 +26,7 @@ my $db_name = 'chatriwe_obf';
 	my $t = localtime;
 	my $time = $t->strftime();
 	# If log exists, we know q->param caught some data.
-	my $filename = './passlock_log.txt';
+	my $filename = './logs/passlock_log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "\n\nSET\n";
