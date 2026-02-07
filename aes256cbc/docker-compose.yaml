@@ -20,7 +20,7 @@ services:
       - dbase
     networks:
       - proxy
-	# Needed to hook into edge router Traefik.
+    # Needed to hook into edge router Traefik.
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
