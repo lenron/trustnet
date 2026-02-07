@@ -23,3 +23,5 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 # Run docker compose file docker-compose.yaml. This fill will download images and run the httpd (apache) and MariaDB containers in the background.
 sudo docker compose up -d
 
+# Make logs work by giving ownership of logs directory to apache
+sudo chown -R www-data ./logs

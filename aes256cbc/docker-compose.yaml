@@ -2,6 +2,7 @@ services:
   obf:
     image: mkrlenron/lenron-obf:0.1
     restart: always
+    # Turn these off if using Traefik.
     ports:
       - "80:80"
     volumes:
@@ -11,11 +12,31 @@ services:
       - type: bind
         source: ./obf
         target: /usr/local/apache2/htdocs/obf
+      # This is the socket connection between apache and mariadb
       - type: bind
         source: /tmp/mysqld
         target: /run/mysqld
     depends_on:
       - dbase
+    networks:
+      - proxy
+	# Needed to hook into edge router Traefik.
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.obf.entrypoints=http"
+      - "traefik.http.routers.obf.rule=Host(`obf.mkrsvr.org`)"
+      - "traefik.http.middlewares.obf-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.obf.middlewares=obf-https-redirect"
+      - "traefik.http.routers.obf-secure.entrypoints=https"
+      - "traefik.http.routers.obf-secure.rule=Host(`obf.mkrsvr.org`)"
+      - "traefik.http.routers.obf-secure.tls=true"
+      - "traefik.http.routers.obf-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.obf-secure.tls.domains[0].main=mkrsvr.org"
+      - "traefik.http.routers.obf-secure.tls.domains[0].sans=*.mkrsvr.org"
+      - "traefik.http.routers.obf-secure.service=obf"
+      - "traefik.http.services.obf.loadbalancer.server.port=80"
 
   dbase:
     image: mariadb:12.0.2
@@ -25,11 +46,20 @@ services:
       MARIADB_USER: chatriwe_admin
       MARIADB_PASSWORD: Vuu_fQY1#qH,
       MARIADB_DATABASE: chatriwe_obf
-      #MARIADB_TCP_PORT: 3306
+      #MARIADB_TCP_PORT: 3306 # On by default I think.
     volumes:
+      # Create SQL tables. Won't run if there is an existing mariadb_data volume.
       - ./obf.sql:/docker-entrypoint-initdb.d/obf.sql
       - mariadb_data:/var/lib/mysql
+      # This is the socket connection between apache and mariadb
       - /tmp/mysqld:/var/run/mysqld
+    networks:
+      - proxy
 
 volumes:
   mariadb_data:
+
+networks:
+  proxy:
+    # Turn this on if proxy network already created and existing.
+    #external: true
