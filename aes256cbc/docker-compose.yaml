@@ -3,8 +3,9 @@ services:
     image: mkrlenron/lenron-obf:0.1
     restart: always
     # Turn these off if using Traefik.
-    ports:
-      - "80:80"
+	# Turn these on if accessing through localhost.
+    #ports:
+      #- "80:80"
     volumes:
       - type: bind
         source: .
@@ -53,6 +54,8 @@ services:
       - mariadb_data:/var/lib/mysql
       # This is the socket connection between apache and mariadb
       - /tmp/mysqld:/var/run/mysqld
+      # Enable event_scheduler and set other configuration.
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
     networks:
       - proxy
 
@@ -62,4 +65,4 @@ volumes:
 networks:
   proxy:
     # Turn this on if proxy network already created and existing.
-    #external: true
+    external: true
