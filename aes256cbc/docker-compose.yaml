@@ -3,7 +3,7 @@ services:
     image: mkrlenron/lenron-obf:0.1
     restart: always
     # Turn these off if using Traefik.
-	# Turn these on if accessing through localhost.
+    # Turn these on if accessing through localhost.
     #ports:
       #- "80:80"
     volumes:
