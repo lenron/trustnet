@@ -2631,6 +2631,10 @@
 		//resetPasslock();
 		// Tell server to delete passlock record.
 		//serverDeletePasslock();
+
+		// First make sure passlock deleted from server
+		// i
+		// Then delete from client.
 	}
 
 	// Generate a browser_id, passlock and save them to server as a key-value pair.
@@ -2643,7 +2647,11 @@
 		const passlock = self.crypto.randomUUID();
 		// Send to server.
 		// returned is a json object containing data: 1 = success. 0 = fail.
-		//const returned = await serverSetPasslock(browser_id_global, passlock);
+		// 
+		// "There was a problem communicating with the server."
+		// What do we do when we're not sure if the passlock got saved to the server?
+		// 
+		//const did_passlock_save_to_server_successfully = await serverSetPasslock(browser_id_global, passlock);
 		await serverSetPasslock(browser_id_global, passlock);
 		console.log("new browser_id: " + browser_id_global);
 		console.log("new passlock: " + passlock);
@@ -2670,6 +2678,10 @@
 		const encryptedPassword = await encOpenSSL(userPass, passlock);
 		passlocked_passwords.push( encryptedPassword );
 	}
+
+// Might make sense to remove initiatePasslock.
+// Have an if that checks for empty passlocked_passwords set.
+
 
 	// Add encrypted user password to passlock array.
 	async function passlockAdd(userPassInputId){
@@ -2793,21 +2805,6 @@
 	//			Server Communication Functions				    //
 	//////////////////////////////////////////////////////////////
 
-	// Check if we're online or not and inform user.
-	async function updateOnlineStatus(){
-		document.getElementById("offline_label").innerHTML = "ONLINE STATUS PENDING...";
-		// Check if we're online
-		const online_status = await checkOnline();
-
-		console.log("Updating Online Status...");
-		if( online_status === "online" ){
-			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
-			await checkForPendingStoreAndExecute();
-		}else{
-			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
-		}
-	}
-
 	// Whenever burst store succeeds, clear the update flag so it doesn't get auto-updated when coming back online.
 	function unsetUpdateFlag(){
 		console.log("Clearing pending Burst Store update flag.");
@@ -2822,7 +2819,7 @@
 
 	// Check for pending offline dbase store and try to execute it.
 	async function checkForPendingStoreAndExecute(){
-		console.log("Checking for pending Burst Store...");
+		//console.log("Checking for pending Burst Store...");
 		const update_flag = document.getElementById("offline_dbase_update_flag").innerHTML;
 		if( update_flag !== ""){
 			console.log("Pending Burst Store found! Execute it.");
@@ -2847,24 +2844,19 @@
 		}
 	}
 
-	// We need to set the origin differently depending if we're a standalone file or not.
-	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
-	// Returns the SERVER_URL to be used for server communication functions.
-	function getServerOrigin(){
-		// Check origin.
-		console.log("window.location.origin = " + window.location.origin);
-		const url_origin = window.location.origin;
-		let server_origin = '';
-		// If we're standalone, set address to chat.dance instead of a relative path.
-		const regex = /^file/;
-		if( regex.test(url_origin) ){
-			console.log("We're a standalone file!");
-			server_origin = 'https://chat.dance/obf/';
+	// Check if we're online or not and inform user.
+	async function updateOnlineStatus(){
+		document.getElementById("offline_label").innerHTML = "ONLINE STATUS PENDING...";
+		// Check if we're online
+		const online_status = await checkOnline();
+
+		//console.log("Updating Online Status...");
+		if( online_status === "online" ){
+			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
+			await checkForPendingStoreAndExecute();
 		}else{
-			console.log("We're NOT a standalone file!");
-			server_origin = '/obf/';
+			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
 		}
-		return server_origin;
 	}
 
 	// Check if we're online 
@@ -2872,8 +2864,8 @@
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exeonlinecheck';
 		
-		console.log("Checking Online...");
-		const response = await fetch(SERVER_URL, {
+		//console.log("Checking Online...");
+		const fetchResponseObject = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/plain',
@@ -2885,12 +2877,33 @@
 			console.log("response FAILED");
 			return "offline";
 		});
-		if( response.ok ){
-			console.log("Response from checkOnline() fetch() call = OK!");
+		if( fetchResponseObject.ok ){
+			//console.log("Response from checkOnline() fetch() call = OK!");
 			return "online";
 		} else {
-			console.log("HTTP error. Status: " + response.status);
+			console.log("HTTP error. Status: " + fetchResponseObject.status);
+			return "offline";
 		}
+	}
+
+	// We need to set the origin differently depending if we're a standalone file or not.
+	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
+	// Returns the SERVER_URL to be used for server communication functions.
+	function getServerOrigin(){
+		// Check origin.
+		//console.log("window.location.origin = " + window.location.origin);
+		const url_origin = window.location.origin;
+		let server_origin = '';
+		// If we're standalone, set address to chat.dance instead of a relative path.
+		const regex = /^file/;
+		if( regex.test(url_origin) ){
+			//console.log("We're a standalone file!");
+			server_origin = 'https://chat.dance/obf/';
+		}else{
+			//console.log("We're NOT a standalone file!");
+			server_origin = '/obf/';
+		}
+		return server_origin;
 	}
 
 	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
@@ -2901,7 +2914,7 @@
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exeload';
 		
-		const response = await fetch(SERVER_URL, {
+		const fetchResponseObject = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/plain',
@@ -2916,13 +2929,13 @@
 				console.log("WE'VE SUCCESSFULLY CAUGHT THE DISCONNECTED ERROR!~");
 			}
 		});
-		if( response ){
-			if( response.ok ){
+		if( fetchResponseObject ){
+			if( fetchResponseObject.ok ){
 				console.log("Response from serverLoad() fetch() call = OK!");
-				return response.json();
+				return fetchResponseObject.json();
 			} else {
-				console.log("HTTP error. Status: " + response.status);
-				return response.json();
+				console.log("HTTP error. Status: " + fetchResponseObject.status);
+				return fetchResponseObject.json();
 			}
 		}
 		return;
@@ -2936,7 +2949,7 @@
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exestore;';
 		
-		const response = await fetch(SERVER_URL, {
+		const fetchResponseObject = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/plain',
@@ -2952,23 +2965,24 @@
 				console.log("CAUGHT THE DISCONNECTED ERROR IN STORE!~");
 			}
 		});
-		if( response ){
-			if( response.ok ){
+		if( fetchResponseObject ){
+			if( fetchResponseObject.ok ){
 				console.log("Response from serverStore() fetch() call = OK!");
-				return response.json();
+				return fetchResponseObject.json();
 			} else {
-				console.log("HTTP error. Status: " + response.status);
-				return response.json();
+				console.log("HTTP error. Status: " + fetchResponseObject.status);
+				return fetchResponseObject.json();
 			}
 		}
 		return;
 	}//serverStore()
-
+/*
+	// It's this functions job to handle recourse
 	async function serverSetPasslock(browser_id, passlock){
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exesetpasslock;';
 		
-		const response = await fetch(SERVER_URL, {
+		const fetchResponseObject = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/plain',
@@ -2984,32 +2998,77 @@
 				console.log("CAUGHT THE DISCONNECTED ERROR IN SetPasslock!");
 			}
 		});
-		if( response ){
-			if( response.ok ){
-				console.log("Response from serverSetPasslock() fetch() call = OK!");
-				const response_obj = await response.json();
+		if( fetchResponseObject ){	// We've received a response object from fetch()
+			if( fetchResponseObject.ok ){	// Response object is reporting OK!
+				//console.log("Response from serverSetPasslock() fetch() call = OK!");
+				const response_obj = await fetchResponseObject.json();
 				// checkResponseObject();
 				console.log(response_obj);
 				if( response_obj.response != 1 ){ // there appears to be a problem.
-					throw Error("serverSetPasslock database store error!");
+					throw Error("serverSetPasslock() database store error!");
 				}else{
-					console.log("set_passlock successfully stored to database.");
+					console.log("New passlock successfully stored to database.");
 					return;
 				}
 			} else {
-				console.log("HTTP error. Status: " + response.status);
-				return response.json();
+				console.log("HTTP error. Status: " + fetchResponseObject.status);
+				return fetchResponseObject.json();
 			}
 		}
 		return;
 	}//serverSetPasslock()
+*/
+
+	async function serverSetPasslock(browser_id, passlock) {
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exesetpasslock;';
+
+		try {
+			//const response = await fetch(url);
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({
+					browser_id: browser_id,
+					passlock: passlock,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) {
+				console.log("HTTP error. Status: " + fetchResponseObject.status);
+				return fetchResponseObject.json();
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
+			}
+			console.log("Response from serverGetPasslock() fetch() call = OK!");
+
+			const response_obj = await fetchResponseObject.json();
+			// checkResponseObject();
+			console.log(response_obj);
+			if( response_obj.response != 1 ){ // there appears to be a problem.
+				throw Error("serverSetPasslock() database store error!");
+			}else{
+				console.log("New passlock successfully stored to database.");
+				return;
+			}
+		// …
+		} catch (error) {
+			console.log("Fetch Error on serverGetPasslock : " + error.message);
+			if( error.message == "Failed to fetch" ){
+				console.log("CAUGHT THE DISCONNECTED ERROR IN GetPasslock!");
+			}
+			console.error(error.message);
+		}
+	}//serverSetPasslock()
+
 
 	async function serverGetPasslock(){
 		const browser_id = browser_id_global;
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exegetpasslock;';
 		
-		const response = await fetch(SERVER_URL, {
+		const fetchResponseObject = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/plain',
@@ -3024,13 +3083,13 @@
 				console.log("CAUGHT THE DISCONNECTED ERROR IN GetPasslock!");
 			}
 		});
-		if( response ){
-			if( response.ok ){
+		if( fetchResponseObject ){
+			if( fetchResponseObject.ok ){
 				console.log("Response from serverGetPasslock() fetch() call = OK!");
-				return response.json();
+				return fetchResponseObject.json();
 			} else {
-				console.log("HTTP error. Status: " + response.status);
-				return response.json();
+				console.log("HTTP error. Status: " + fetchResponseObject.status);
+				return fetchResponseObject.json();
 			}
 		}
 		return;
@@ -3073,7 +3132,7 @@
 
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exeburststore;';
-		const response = await fetch(SERVER_URL, {
+		const fetchResponseObject = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/plain',
@@ -3088,13 +3147,13 @@
 				setUpdateFlag();
 			}
 		});
-		if( response ){
-			if( response.ok ){
+		if( fetchResponseObject ){
+			if( fetchResponseObject.ok ){
 				console.log("Response from sendOfflineDBaseToServer() fetch() call = OK!");
-				return response.json();
+				return fetchResponseObject.json();
 			} else {
-				console.log("HTTP error. Status: " + response.status);
-				return response.json();
+				console.log("HTTP error. Status: " + fetchResponseObject.status);
+				return fetchResponseObject.json();
 			}
 		}
 		return;
@@ -3108,7 +3167,7 @@
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exedelete;';
 		
-		const response = await fetch(SERVER_URL, {
+		const fetchResponseObject = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/plain',
@@ -3123,13 +3182,13 @@
 				console.log("CAUGHT THE DISCONNECTED ERROR IN DELETE.");
 			}
 		});
-		if( response ){
-			if( response.ok ){
+		if( fetchResponseObject ){
+			if( fetchResponseObject.ok ){
 				console.log("Response from serverDelete() fetch() call = OK!");
-				return response.json();
+				return fetchResponseObject.json();
 			} else {
-				console.log("HTTP error. Status: " + response.status);
-				return response.json();
+				console.log("HTTP error. Status: " + fetchResponseObject.status);
+				return fetchResponseObject.json();
 			}
 		}
 		return;

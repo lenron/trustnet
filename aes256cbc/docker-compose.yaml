@@ -49,17 +49,19 @@ services:
       MARIADB_DATABASE: chatriwe_obf
       #MARIADB_TCP_PORT: 3306 # On by default I think.
     volumes:
-      # Create SQL tables. Won't run if there is an existing mariadb_data volume.
+      # .sql script that runs at container creation: creates SQL tables, events, etc.
+      # Won't run if there is an existing mariadb_data volume.
       - ./obf.sql:/docker-entrypoint-initdb.d/obf.sql
-      - mariadb_data:/var/lib/mysql
-      # This is the socket connection between apache and mariadb
-      - /tmp/mysqld:/var/run/mysqld
       # Enable event_scheduler and set other configuration.
       - ./my.cnf:/etc/mysql/conf.d/my.cnf
+      # Persist this volume which contains the database data.
+      - mariadb_data:/var/lib/mysql
+      # This is the socket connection between apache and mariadb.
+      - /tmp/mysqld:/var/run/mysqld
     networks:
       - proxy
 
-volumes:
+volumes: # This volume which contains the database data will persist.
   mariadb_data:
 
 networks:
