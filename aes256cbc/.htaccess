@@ -27,6 +27,7 @@ RewriteRule ^exeburststore burst_store.pl
 RewriteRule ^exeonlinecheck online_check.pl
 RewriteRule ^exesetpasslock set_passlock.pl
 RewriteRule ^exegetpasslock get_passlock.pl
+RewriteRule ^exedeletepasslock delete_passlock.pl
 
 # Redirects for Offline Database
 #RewriteRule ^exe_offline_set set_offline_dbase.pl
