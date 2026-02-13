@@ -69,8 +69,8 @@
 		justify-content: center;
 	}
 
-	/* generated conetent */
-	.gen {
+	/* Single (pages) shown to user as they (flow) through site. */
+	.flow_pages {
 		width: 700px;
 		margin: 10px;
 		align-self: center;
@@ -121,8 +121,8 @@
 		color: black;
 	}
 
-	/* Change the textareas inside divs with 'gen' class to the following: */
-	.gen textarea {
+	/* Change the textareas inside divs with 'flow_pages' class to the following: */
+	.flow_pages textarea {
 		width: 95%;
 		height: 150px;
 		background-color: #272727;
@@ -305,13 +305,15 @@
 			<div class="gen home" id="home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='go_store_thread' style="flex-grow:1" onclick="securityReset();showPage('store1')">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_thread' style="flex-grow:1" onclick="securityReset();showPage('load1')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_store_flow' style="flex-grow:1" onclick="securityReset();showPage('store1')">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="securityReset();showPage('load1')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 <!--  home  --!>
 
 <!--  store  --!>
+
+<!--
 			<div class="gen store one" id="store1" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE DATA</label>
@@ -429,7 +431,6 @@
 			<div class="gen store six" id="store6" style="display:none">
 				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<!--<button class="" id='learnmore' style="flex-grow:1;" onclick="location.href='/obf/how';">LEARN MORE</button>--!>
 					<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>
 					<button class="" id='accessdata' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 				</div>
@@ -461,8 +462,8 @@
 				</div>
 			</div>
 
-	<!-- Catch Upload Data --!>
 	<input autocomplete="off" type="password" value="" id="upload_data" style="display:none;">
+--!>
 <!--  store  --!>
 
 <!--  load  --!>
@@ -630,7 +631,7 @@
 <!--  delete --!>
 
 						<!------ Create New Offline DBase  ---!>
-			<div id="create_new_offline_dbase_div" class="gen" style="display:none; ">
+			<div id="create_new_offline_dbase_div" class="flow_pages" style="display:none; ">
 				<h2 id="create_offline_dbase_label_h2">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
 				<h3 id="create_offline_dbase_label_h3">Please enter the following passwords to Access the data you wish to be stored in the offline database.</h3>
 				<div style="display:flex; flex-direction:column;">
@@ -649,152 +650,179 @@
 				<h3 id="status_label" style="align-self:center; display:none; color:red;">placeholder</h3>
 			</div>
 
-<!------------------------------------ Passlock Steps --------------------------------------------------------------------------!>
+<!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
+<!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
+<!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
 
-			<!---------------------------Pass 1-----------------------!>
-			<div class="gen passlock" id="passlock1" style="display:flex">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
-					<label>PASS 1</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="passlock_pass1" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock1')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="initiatePasslock('passlock_pass1');showPage('passlock2');">CONTINUE</button>
-				</div>
-			</div>
-
-			<!---------------------------Pass 2-----------------------!>
-			<div class="gen passlock" id="passlock2" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
-					<label>PASS 2</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="passlock_pass2" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock1')">BACK</button>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPassLength('passlock2','passlock3')">CONTINUE</button>--!>
-					<button class="" id='' style="flex-grow:1;" onclick="passlockAdd('passlock_pass2');showPage('passlock3');">CONTINUE</button>
-				</div>
-			</div>
-
-			<!---------------------------Pass 3-----------------------!>
-			<div class="gen passlock" id="passlock3" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
-					<label>PASS 3</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER SECRET WORD 3</h2>
-				<input autocomplete="off" type="password" value="" id="passlock_pass3" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock2')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="passlockAdd('passlock_pass3');showPage('passlock_cw');">CONTINUE</button>
+			<!--------------------------  HOME  ----------------------------!>
+			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#54c597">
+				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
+				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='go_store_flow' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="showPage('')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 
 			<!---------------------------Codeword-----------------------!>
-			<div class="gen passlock" id="passlock_cw" style="display:none">
+			<div class="flow_pages passlock" id="store_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>STORE FLOW</label>
 					<label>CODEWORD</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="passlock_codeword" style="">
+				<input autocomplete="off" type="password" value="" id="store_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock3')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="passlockAdd('passlock_codeword');showPage('check_passlock1')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
+					<!--  initiateStore is an async function. here we don't wait for it to finish before moving on to the next page which is great.  --!>
+					<!--  Might need to wait for an error?  --!>
+					<button class="" id='' style="flex-grow:1;" onclick="initiateStore('store_codeword_input');showPage('store_pass1')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 1-----------------------!>
-			<div class="gen passlock" id="check_passlock1" style="display:none">
+			<!---------------------------Pass 1-----------------------!>
+			<div class="flow_pages passlock" id="store_pass1" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
-					<label>CHECK PASS 1</label>
+					<label>STORE FLOW</label>
+					<label>PASS 1</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
-				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
-				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="check_pass1" style="">
+				<h2>ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="store_pass1_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('passlock_cw')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(0, 'check_pass1', 'check_passlock1', 'check_passlock2')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass1_input');showPage('store_pass2');">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 2-----------------------!>
-			<div class="gen passlock" id="check_passlock2" style="display:none">
+			<!---------------------------Pass 2-----------------------!>
+			<div class="flow_pages passlock" id="store_pass2" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
-					<label>CHECK PASS 2</label>
+					<label>STORE FLOW</label>
+					<label>PASS 2</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
-				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
-				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="check_pass2" style="">
+				<h2>ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="store_pass2_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('check_passlock1')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(1, 'check_pass2', 'check_passlock2', 'check_passlock3')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass1')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass2_input');showPage('store_pass3');">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 3-----------------------!>
-			<div class="gen passlock" id="check_passlock3" style="display:none">
+			<!---------------------------Choose CMD Line or Browser-----------------------!>
+
+
+
+
+
+
+			<!---------------------------Pass 3-----------------------!>
+			<div class="flow_pages passlock" id="store_pass3" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
-					<label>CHECK PASS 3</label>
+					<label>STORE FLOW</label>
+					<label>PASS 3</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
-				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
-				<h2>RE-ENTER SECRET WORD 3</h2>
-				<input autocomplete="off" type="password" value="" id="check_pass3" style="">
+				<h2>ENTER SECRET WORD 3</h2>
+				<input autocomplete="off" type="password" value="" id="store_pass3_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('check_passlock2')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'check_pass3', 'check_passlock3', 'check_cw')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass2')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass3_input');showPage('store_codeword_check');">CONTINUE</button>
 				</div>
 			</div>
 
 			<!---------------------------Check Codeword-----------------------!>
-			<div class="gen passlock" id="check_cw" style="display:none">
+			<div class="flow_pages passlock" id="store_codeword_check" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>STORE FLOW</label>
 					<label>CHECK CODEWORD</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="check_codeword" style="">
+				<input autocomplete="off" type="password" value="" id="store_codeword_check_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('check_passlock3')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass3')">BACK</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
+																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(0, 'store_codeword_check_input', 'store_codeword_check', 'store_pass1_check')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 1-----------------------!>
+			<div class="flow_pages passlock" id="store_pass1_check" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="store_pass1_check_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_check')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(1, 'store_pass1_check_input', 'store_pass1_check', 'store_pass2_check')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 2-----------------------!>
+			<div class="flow_pages passlock" id="store_pass2_check" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="store_pass2_check_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass1_check')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'store_pass2_check_input', 'store_pass2_check', 'store_pass3_check')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 3-----------------------!>
+			<div class="flow_pages passlock" id="store_pass3_check" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 3</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 3</h2>
+				<input autocomplete="off" type="password" value="" id="store_pass3_check_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass2_check')">BACK</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'check_pass3', 'check_passlock3', 'check_cw')">CONTINUE</button>--!>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'store_pass3_check_input', 'store_pass3_check', 'store_data')">CONTINUE</button>
 				</div>
 			</div>
 
 			<!---------------------------Data-----------------------!>
-			<div class="gen passlock" id="passlock_data" style="display:none">
+			<div class="flow_pages passlock" id="store_data" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>PASSLOCK PROTOTYPE THREAD</label>
+					<label>STORE FLOW</label>
 					<label>STORE DATA</label>
 					<label id="data_length_label" style="color:black"></label>
 				</div>
-				<textarea class="browser_input" id="passlock_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('passlock_data')" placeholder="ENTER YOUR SECRET DATA"></textarea>
+				<textarea class="browser_input" id="store_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('store_data')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('check_cw')">BACK</button>
-					<button class="" id='text_input_continue' style="flex-grow:1" onclick="storeDataToServer('passlock_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_pass3_check')">BACK</button>
+					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptEncryptAndStore('store_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
 					<div id='text_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
 				</div>
 			</div>
 
+<!-------------------------------------- New Site Flow ------------------------------------------!>
+<!-------------------------------------- New Site Flow ------------------------------------------!>
+<!-------------------------------------- New Site Flow ------------------------------------------!>
+
+
 			<!---------------------------REITERATION STEP -----------------------!>
-			<div class="gen passlock" id="passlock_reiteration" style="display:none;">
+			<div class="flow_pages passlock" id="passlock_reiteration" style="display:none;">
 				<h2 id="">This is the REITERATION Step</h2>
 				<h3 id="">Eloquent text explaining how this works.</h3>
 				<div style="display:flex; flex-direction:column;">
@@ -833,7 +861,7 @@
 
 <!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
-		<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseThread()">CREATE NEW OFFLINE DBASE</button>
+		<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseFlow()">CREATE NEW OFFLINE DBASE</button>
 		<div style="display:flex">
 			<button id="toggle_debug_button" style="flex-grow:1" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
 			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
@@ -1732,13 +1760,13 @@
 */
 
 	//////////////////////////////////////////////////////////////
-	//		UI & Threadwalker Handler Functions					//
+	//		UI & flowwalker Handler Functions					//
 	//////////////////////////////////////////////////////////////
 
 	// Hide all other pages, then show target page. 
-	// Input: Target is the element ID of an html generated pane.
+	// Input: Target is the element ID of a page for flowing the user through site.
 	function showPage(target){
-		// Hide pass check warnings (passlock thread).
+		// Hide pass check warnings (passlock flow).
 		hidePassWarnings();
 		// Hide all password warnings.
 		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
@@ -1746,12 +1774,12 @@
 			pass_warn_elements[i].style.display = "none";
 		}
 
-		let generated_html_pages;
-		// Fill generated_html_pages array with set of objects (divs in this case) that are tagged as generated html.
-		generated_html_pages = document.getElementsByClassName('gen');
-		// hide all generated_html_pages
-		for (let i = 0; i < generated_html_pages.length; i++) {
-			generated_html_pages[i].style.display = "none";
+		let flow_page_divs;
+		// Fill flow_page_divs array with set of objects (hopefully divs in this case) that contain the flow_pages class.
+		flow_page_divs = document.getElementsByClassName('flow_pages');
+		// hide all flow_page_divs
+		for (let i = 0; i < flow_page_divs.length; i++) {
+			flow_page_divs[i].style.display = "none";
 		}
 		// show target 
 		document.getElementById(target).style.display = "flex";
@@ -1773,7 +1801,7 @@
 
 	// Used to check password length as user flows through interface.
 	// Inputs: current_div is the div presently shown to the user.
-	// 		   next_div is the id of the next page in the thread which will be accessed if the password length is validated.
+	// 		   next_div is the id of the next page in the flow which will be accessed if the password length is validated.
 	// Output: Warns user and doesn't pass if length outside constraints.
 	function checkPassLength(current_div, next_div){
 		// Get all inputs in the active user-shown div (should only be 1).
@@ -1859,7 +1887,7 @@
 		}
 	}
 
-	// Store thread walk finisher.
+	// Store flow walk finisher.
 	// async needed to handle crypto functionality
 	async function storeExecute(){
 		// Main Function Call
@@ -1900,7 +1928,7 @@
 		}
 	}
 
-	// Load thread walk finisher.
+	// Load flow walk finisher.
 	function loadExecute(){
 		// Main Function Call
 		deepLoad();
@@ -1917,7 +1945,7 @@
 		document.getElementById(tar).style.display = "none";
 	}
 
-	// Delete thread walk finisher.
+	// Delete flow walk finisher.
 	async function deleteExecute(){
 		// Main Function Call
 		const outcome = await deepDelete();
@@ -2047,7 +2075,7 @@
 	//////////////////////////////////////////////////////////////
 
 	// Gather passwords to access existing records and gather them into a new offline dbase.
-	function createNewOfflineDBaseThread(){
+	function createNewOfflineDBaseFlow(){
 		createNewOfflineDBase();
 		// activate some html
 		showPage("create_new_offline_dbase_div");
@@ -2089,7 +2117,7 @@
 	async function accessDataForOfflineDBaseCreation(){
 		// Don't need password 1 which is used for command line encryption or its browser backup.
 		const codeword = document.getElementById("gather_codeword").value;
-		const pass_2 = document.getElementById("gather_password2").value;
+		const obf1_pass = document.getElementById("gather_password2").value;
 		const pass_3 = document.getElementById("gather_password3").value;
 		document.getElementById("gather_codeword").value = "";
 		document.getElementById("gather_password2").value = "";
@@ -2097,7 +2125,7 @@
 		// Re-focus on first input field.
 		document.getElementById("gather_codeword").focus();
 
-		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
+		const fp_hex = await computeFingerprint(codeword, obf1_pass, pass_3);
 		// Fingerprint length check.
 		if( fp_hex.length != 64 ){
 			throw new Error('Fingerprint length INVALID!');
@@ -2433,7 +2461,7 @@
 			throw new Error('Fingerprint length INVALID!');
 		}
 */
-
+/*
 	async function deepStore( fp_hex, encrypted_data){
 		let offline_dbase_store_outcome;
 		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
@@ -2475,7 +2503,7 @@
 			return 0;
 		}
 	}//deepStore()
-
+*/
 	// Main Access Function Handler
 	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
 	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
@@ -2557,7 +2585,7 @@
 	// Output: functionality.
 	async function deepDelete(){
 		// Get code/passwords from user.
-		// For Delete, we will now be in the Access thread and should be able to use already entered values.
+		// For Delete, we will now be in the Access flow and should be able to use already entered values.
 		const codeword = document.getElementById("load_codeword").value;
 		const pass_1 = document.getElementById("load_pass_1").value;
 		const pass_2 = document.getElementById("load_pass_2").value;
@@ -2627,11 +2655,13 @@
 	// the random password we're using to encrypt data as user moves through interface.
 	let browserId;
 	let uploadedFile;
-	let passlockedPasswords; //Array to hold passlocked passwords.
+	// Could map 'codeword' 'pass1' to index numbers?
+	// - only need to change in 1 place.
+	let passlockedData; //Array to hold passlocked passwords.
 	//Reset passlock global variables
 	function resetPasslock(){
 		browserId = null;
-		passlockedPasswords = new Array;
+		passlockedData = new Array;
 		console.log("passlock reset.");
 	}
 
@@ -2677,39 +2707,39 @@
 		return passlock;
 	}
 
-	// Can be removed if generatePasslock();passlockAdd() is used instead
+	// Can be removed if generatePasslock();passlockAddStore() is used instead
 	// That means we do 1 more server call. Because O() notation complexity I think 1 call in 8 is taught to mean nothing in context.
 	// ==> By saving 1 server call in many, we use an additional function.
 	//	Also we use crypto data in a different way, giving more changes for errors.
 	//	Also we're now managing 3 functionss that do 2 things in different ways that isn't immediately clear instead of 2 functions that do specific things.
 	//
 	// I guess we need to use it tho as about half the time the server didn't have the passlock in time for the retreival.
-	async function initiatePasslock(userPassInputId){
+	async function initiateStore(userPassInputId){
 		//Store user's password in javascript and delete it from html.
 		const userPass = extractUserCleartext(userPassInputId);
 		// Generate passlock key value pair.
 		const passlock = await generatePasslock();
 		const encryptedPassword = await encOpenSSL(userPass, passlock);
-		passlockedPasswords.push( encryptedPassword );
+		passlockedData.push( encryptedPassword );
 	}
 
-// Might make sense to remove initiatePasslock.
-// Have an if that checks for empty passlockedPasswords set.
 
 
 	// Add encrypted user password to passlock array.
-	async function passlockAdd(userPassInputId){
+	async function passlockAddStore(userPassInputId){
 		// Can add length check here
 		const userPass = extractUserCleartext(userPassInputId);
 		const encryptedPassword = await passlockEncrypt(userPass);
-		passlockedPasswords.push( encryptedPassword );
+		passlockedData.push( encryptedPassword );
+		console.log("passlockedData: ");
+		console.log(passlockedData);
 	}
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
 	async function checkPasslock(index, userPassInputId, thisPageId, nextPageId){
 		const userPass = extractUserCleartext(userPassInputId);
 		const encryptedPassword = await passlockEncrypt(userPass);
-		if( passlockedPasswords[index] === encryptedPassword){
+		if( passlockedData[index] === encryptedPassword){
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
@@ -2764,96 +2794,128 @@
 		const passlock = await getPasslock();
 		let cleartextPassword;
 		let cleartextSet = new Array;
-		for(let i=0; i < 4; i++ ){
-			cleartextPassword = await decOpenSSL(passlockedPasswords[0], passlock);
+		// Length should be 4 (CMD Line) or 5 (Browser).
+		for(let i=0; i < passlockedData.length; i++ ){
+			cleartextPassword = await decOpenSSL(passlockedData[i], passlock);
 			cleartextSet.push(cleartextPassword);
 		}
 		console.log("retrieved passlock: " + passlock);
-		console.log("cleartext Password Set: " + cleartextSet);
-		console.log("encrypted Password Set: " + passlockedPasswords);
+		console.log("encrypted Password Set: ");
+		console.log(passlockedData);
+		console.log("cleartext Password Set: ");
+		console.log(cleartextSet);
 		return cleartextSet;
+		// Leaving function effectively deletes passlock.
 	}
 
 	// Next.
 	//
-	// Current plan is to use this for both CMD and Browser choices in the Store Thread
+	// Current plan is to use this for both CMD and Browser choices in the Store flow
 	//async function decryptDataForAccess(){
 	//}
 
 
 
 	async function attemptEncryptAndStore(cleartextDataInputId){
+		// Looks like a better idea to put functions needing 'await' in 1 function if it lives in HTML.
+		// First encrypt data with passlock to keep cleartext data in the same place.
+		await passlockAddStore(cleartextDataInputId);
+		// Now can assume we have fully loaded passlockedArray.
+
+		
 		// Keep cleartext isolated to ONE function.
 		// Return 2 element Array.
 		//  data = [0]
 		//  fingerprint - [1]
-		let encryptedDataAndFingerprint = await encryptDataAndFingerprint(cleartextDataInputId);
+		let encryptedDataAndFingerprint = await encryptDataAndFingerprint();
 		// Store encrypted data at fingerprint location. 
 		storeDataToServer(encryptedDataAndFingerprint[0], encryptedDataAndFingerprint[1]);
 
 		// Handle errors. What is the set of different use shown responses/pages?
+		// - Success
+		// - Offline
+		// - Some other error?
 
 	}
 
-	// Current plan is to use this for both CMD and Browser choices in the Store Thread
+	// Current plan is to use this for both CMD and Browser choices in the Store flow
 	async function encryptDataAndFingerprint(cleartextDataInputId){
 
-		// Get Cleartext Data
-		const cleartextData = extractUserCleartext(cleartextDataInputId);
-		//console.log("cleartext data: " + cleartextData);
-		// Get Cleartext Passwords
+		// Figure out where the conditional should go.
+
+		// Get Cleartext Passwords and Data.
 		let cleartextSet = await passlockDecryptSet();
 		//console.log(cleartextSet);
-		// Get Encrypted Data using Cleartext Data
-	}
 
-	async function storeDataToServer(cleartextDataInputId){
+		// Get Encrypted Data, fingerprint using Cleartext Data.
+		//						 computeFingerprint(codeword, obf1Pass, obf2Pass);
+		const fingerprint = await computeFingerprint(cleartextSet[0], cleartextSet[1], cleartextSet[2]);
+		//							encryptStack(obf1Pass, obf2Pass, openssl_pass, cleartextData)
+		const encryptedData = await encryptStack(cleartextSet[1], cleartextSet[2], cleartextSet[3], cleartextSet[4]);
+		let encryptedArray = new Array;
+		encryptedArray.push(fingerprint);
+		encryptedArray.push(encryptedData);
+		console.log("Fingerprint and Encrypted Data from encryptDataAndFingerprint: ");
+		console.log(encryptedArray[0]);
+		console.log(encryptedArray[1]);
+		return encryptedArray;
+	}
 /*
-		// Get user data, clear from html.
-		const cleartextData = extractUserCleartext(cleartextDataInputId);
-		console.log("cleartext data: " + cleartextData);
-		// Get decrypted passwords
-		let cleartextSet = await passlockDecryptSet();
-		console.log(cleartextSet);
+Rewrite here later maybe.
 
-		const pass_1 = cleartextSet[0];
-		const pass_2 = cleartextSet[1];
-		const pass_3 = cleartextSet[2];
-		const codeword = cleartextSet[3];
+	async function storeDataToServer(fingerprint, encryptedData){
+		// Handle Offline Database 
 
-		console.log("cleartext: " + cleartextData);
-		console.log("pass1: " + pass_1);
-		console.log("pass2: " + pass_2);
-		console.log("pass3: " + pass_3);
-		console.log("codeword: " + codeword);
-*/
-		
+		// Attempt Store.
 
-// New "upload_flag" is the existance of passlockedPasswords[3]
+		// Make sure encrypted data matches Load of fingerprint after return from Store.
 
-		let encryptedData;
-		// Use flag set by storeUpload() to determine which enc stack to use.
-		if( upload_flag == 'true' ){
-			// Grab upload_flag value for server database flag.
-			// Double Encrypt
-			encryptedData = await encryptDouble(uploadtext, pass_2, pass_3);
-			// reset flag once it is used
-			upload_flag = 'false';
-		}else{
-			// Triple Encrypt
-			encryptedData = await encryptStack(cleartextData, pass_1, pass_2, pass_3);
-		}
 
-		const fingerprint = await computeFingerprint(codeword, pass_2, pass_3);
-		// fingerprint length check
-		if( fingerprint.length != 64 ){
-			throw new Error('Fingerprint length INVALID!');
-		}
-		
-		// Store to server.
-		const outcome = await deepStore(fingerprint, encryptedData);
-		console.log("deepStore outcome: " + outcome);
 	}
+*/
+
+	async function storeDataToServer(fp_hex, encrypted_data){
+		let offline_dbase_store_outcome;
+		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
+			offline_dbase_store_outcome = await handleOfflineDBaseStore(fp_hex, encrypted_data);
+			// Return from deepStore() unless the offline dbase is full, in which case store that single normally by not returning from deepStore.
+			if( offline_dbase_store_outcome != "full" ){
+				return offline_dbase_store_outcome;
+			}
+		}
+
+		// Attempt to store a record to the server.
+		const server_response = await serverStore(fp_hex, encrypted_data);
+		if( server_response != null){
+			sr_store_result = server_response.response;
+			// Store returned 0 (fail).
+			if( Number(sr_store_result) != 1){
+				throw new Error('STORE ERROR!');
+			}
+		}else{
+			return;
+		}
+
+		// Check Load
+		// return of 0 means fingerprint form check fails
+		// return of empty means fingerprint returned nothing
+		const sr_load = await serverLoad(fp_hex);
+
+		// Report Results
+		if(sr_load != null){ // Looks like we have to use this nested loop for null check or code will break.
+			if(encrypted_data  === sr_load.data && offline_dbase_store_outcome === "full"){
+				return "fullsuccess";
+			}else if(encrypted_data  === sr_load.data){
+				return 1;
+			}else{
+				return 0;
+				// Maybe delete the record if it fails to load correctly?
+			}
+		}else{
+			return 0;
+		}
+	}//storeDataToServer()
+
 
 	//////////////////////////////////////////////////////////////
 	//			Server Communication Functions				    //
@@ -3664,14 +3726,18 @@
 	}//encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
-	async function encryptStack(plaintext, pass1, pass2, pass3){
+	//async function encryptStack(plaintext, pass1, pass2, pass3){
+	async function encryptStack(obf1Pass, obf2Pass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
-		const openssl_encrypted = await encOpenSSL(plaintext, pass1);
+		//const openssl_encrypted = await encOpenSSL(plaintext, pass1);
+		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
 		// Obfuscation Step 1 Encrypt
-		const obf_s1_encrypted = await obf1Encrypt(openssl_encrypted, pass2);
+		//const obf_s1_encrypted = await obf1Encrypt(openssl_encrypted, pass2);
+		const obf1Encrypted = await obf1Encrypt(opensslEncrypted, obf1Pass);
 		// Obfuscation Step 2 Encrypt
-		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, pass3);
-		return obf_s2_encrypted;
+		//const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, pass3);
+		const obf2Encrypted = await obf2Encrypt(obf1Encrypted, obf2Pass);
+		return obf2Encrypted;
 	}//encryptStack()
 
 	// Decrypt stack used in the case user chooses Command Line.
@@ -3692,26 +3758,26 @@
 	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
 	// Inputs: plaintext.
 	// Output: hexadecimal.
-	async function computeFingerprint(codeword, pass_2, pass_3){
+	async function computeFingerprint(codeword, obf1Pass, obf2Pass){
 		// Convert to lowercase.
-		const cw_lower = codeword.toLowerCase();
-		// Take SHA-256 hash of codeword, pass 2, pass 3.
+		const codewordLower = codeword.toLowerCase();
+		// Take SHA-256 hash of codeword, obf1_pass, obf2_pass
 		const enc = new TextEncoder();
-		const cw_buf = enc.encode(cw_lower);
-		const p2_buf = enc.encode(pass_2);
-		const p3_buf = enc.encode(pass_3);
-		const cw_hash = await crypto.subtle.digest('SHA-256', cw_buf);
-		const p2_hash = await crypto.subtle.digest('SHA-256', p2_buf);
-		const p3_hash = await crypto.subtle.digest('SHA-256', p3_buf);
-		// Concatenate: fingerprint = cw_hash + p2_hash + p3_hash
-		const cw_and_p2_hash = concatBuffer(cw_hash, p2_hash)
-		const concatenated_hashes = concatBuffer(cw_and_p2_hash, p3_hash)
+		const codewordBuf = enc.encode(codewordLower);
+		const obf1PassBuff = enc.encode(obf1Pass);
+		const obf2PassBuff = enc.encode(obf2Pass);
+		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
+		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1PassBuff);
+		const obf2pHash = await crypto.subtle.digest('SHA-256', obf2PassBuff);
+		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
+		const codeword_and_obf1pHash = concatBuffer(codewordHash, obf1pHash)
+		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
 
 		// SHA-256 hash the result.
-		const fp_hash = await crypto.subtle.digest('SHA-256', concatenated_hashes);
-		const fingerprint = new Uint8Array(fp_hash);
-		const fp_hex = buf2hex(fingerprint);
-		return fp_hex;
+		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
+		const fingerprint = new Uint8Array(fingerprintHash);
+		const fingerprintHex = buf2hex(fingerprint);
+		return fingerprintHex;
 	}//computeFingerprint
 
 	// Input: input is a string.
