@@ -302,6 +302,7 @@
 			<!--<TMPL_VAR NAME=htmlblock>--!>
 
 <!--  home  --!>
+<!--
 			<div class="gen home" id="home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
@@ -309,6 +310,7 @@
 					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="securityReset();showPage('load1')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
+--!>
 <!--  home  --!>
 
 <!--  store  --!>
@@ -630,26 +632,6 @@
 			</div>
 <!--  delete --!>
 
-						<!------ Create New Offline DBase  ---!>
-			<div id="create_new_offline_dbase_div" class="flow_pages" style="display:none; ">
-				<h2 id="create_offline_dbase_label_h2">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
-				<h3 id="create_offline_dbase_label_h3">Please enter the following passwords to Access the data you wish to be stored in the offline database.</h3>
-				<div style="display:flex; flex-direction:column;">
-					<label id="">ENTER CODEWORD:</label>
-					<input autocomplete="off" type="password"  value="" id="gather_codeword" style="">
-					<label id="">ENTER PASSWORD 2:</label>
-					<input autocomplete="off" type="password"  value="" id="gather_password2" style="">
-					<label id="">ENTER PASSWORD 3:</label>
-					<input autocomplete="off" type="password"  value="" id="gather_password3" style="">
-				</div>
-				<div style="display:flex; flex-direction:row;">
-					<button id="new_offline_dbase_access_data_button" style="flex-grow:1; " onclick="accessDataForOfflineDBaseCreation()">SUBMIT PASSWORDS</button>
-					<button id="new_offline_dbase_cancel_button" style="flex-grow:1; " onclick="cancelNewOfflineDBase()">CANCEL</button>
-					<button id="new_offline_dbase_completed_button" style="flex-grow:1; display:none;" onclick="doneNewOfflineDBase()">DONE</button>
-				</div>
-				<h3 id="status_label" style="align-self:center; display:none; color:red;">placeholder</h3>
-			</div>
-
 <!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
 <!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
 <!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
@@ -691,7 +673,7 @@
 				<input autocomplete="off" type="password" value="" id="store_pass1_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass1_input');showPage('store_pass2');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass1_input', OBF1PASS_INDEX);showPage('store_pass2');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -706,17 +688,109 @@
 				<input autocomplete="off" type="password" value="" id="store_pass2_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass1')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass2_input');showPage('store_pass3');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass2_input', OBF2PASS_INDEX);showPage('store_choose');">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Choose CMD Line or Browser-----------------------!>
+			<!---------------------------Choose: CMD Line or Browser-----------------------!>
+			<div class="flow_pages" id="store_choose" style="display:none">
+				<label>STORE DATA</label>
+				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_pass2')">BACK</button>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('store_pass3')">
+							<span style="">BROWSER</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
+						</button>
+					</div>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('store_codeword_cmd')">
+							<span class="coolpink" style="">COMMAND LINE</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
+						</button>
+						<label class="coolpink" style="align-self:center;">More Secure</label>
+					</div>
+				</div>
+			</div>
+
+			<!---------------------------CMD Line-----------------------!>
+			<!---------------------------Check Codeword-----------------------!>
+			<div class="flow_pages passlock" id="store_codeword_cmd" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>STORE FLOW</label>
+					<label>CHECK CODEWORD</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER CODEWORD</h2>
+				<input autocomplete="off" type="password" value="" id="store_codeword_cmd_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
+																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(CODEWORD_INDEX, 'store_codeword_cmd_input', 'store_codeword_cmd', 'store_pass1_cmd')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 1-----------------------!>
+			<div class="flow_pages passlock" id="store_pass1_cmd" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="store_pass1_cmd_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_cmd')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OBF1PASS_INDEX, 'store_pass1_cmd_input', 'store_pass1_cmd', 'store_pass2_cmd')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 2-----------------------!>
+			<div class="flow_pages passlock" id="store_pass2_cmd" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="store_pass2_cmd_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass1_cmd')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OBF2PASS_INDEX, 'store_pass2_cmd_input', 'store_pass2_cmd', 'store_upload')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Upload-----------------------!>
+			<div class="flow_pages" id="store_upload" style="display:none">
+				<label>STORE DATA</label>
+				<h2>UPLOAD FILE</h3>
+				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 526 byte limit</h2>
+				<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
+				<br>
+				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
+				<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
+					<label>Encrypt:</label>
+					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+					<br>
+					<label>Decrypt:</label>
+					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+				</div>
+				<div class="button_pair" id="" style="display:flex;">
+					<!-- when hitting back here go back to CMD Line or Browser? --!>
+					<!--<button class="" id='' style="width:250px;" onclick="showPage('store_choose')">BACK</button>--!>
+					<button class="" id='' style="width:250px;" onclick="showPage('store_pass2_cmd')">BACK</button>
+					<button class="" id='store_upload_commit_button' style="flex-grow:1;display:none;" onclick="attemptEncryptAndStore('upload')">COMMIT DATA TO SERVER</button>
+				</div>
+			</div>
+			<!---------------------------END Store CMD Line Flow-----------------------!>
 
 
-
-
-
-
+			<!---------------------------Browser-----------------------!>
 			<!---------------------------Pass 3-----------------------!>
 			<div class="flow_pages passlock" id="store_pass3" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
@@ -727,8 +801,8 @@
 				<h2>ENTER SECRET WORD 3</h2>
 				<input autocomplete="off" type="password" value="" id="store_pass3_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass2')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass3_input');showPage('store_codeword_check');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass3_input', OPENSSL_INDEX);showPage('store_codeword_check');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -746,7 +820,7 @@
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass3')">BACK</button>
 					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
 																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(0, 'store_codeword_check_input', 'store_codeword_check', 'store_pass1_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(CODEWORD_INDEX, 'store_codeword_check_input', 'store_codeword_check', 'store_pass1_check')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -762,7 +836,7 @@
 				<input autocomplete="off" type="password" value="" id="store_pass1_check_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_check')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(1, 'store_pass1_check_input', 'store_pass1_check', 'store_pass2_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OBF1PASS_INDEX, 'store_pass1_check_input', 'store_pass1_check', 'store_pass2_check')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -778,7 +852,7 @@
 				<input autocomplete="off" type="password" value="" id="store_pass2_check_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass1_check')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'store_pass2_check_input', 'store_pass2_check', 'store_pass3_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OBF2PASS_INDEX, 'store_pass2_check_input', 'store_pass2_check', 'store_pass3_check')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -795,7 +869,7 @@
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass2_check')">BACK</button>
 					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'check_pass3', 'check_passlock3', 'check_cw')">CONTINUE</button>--!>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'store_pass3_check_input', 'store_pass3_check', 'store_data')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OPENSSL_INDEX, 'store_pass3_check_input', 'store_pass3_check', 'store_data')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -815,6 +889,7 @@
 					</div>
 				</div>
 			</div>
+			<!---------------------------END Store BROWSER Flow-----------------------!>
 
 <!-------------------------------------- New Site Flow ------------------------------------------!>
 <!-------------------------------------- New Site Flow ------------------------------------------!>
@@ -854,6 +929,26 @@
 				<h3 id="status_label" style="align-self:center; display:inline; color:red;">Errors, important information can go here.</h3>
 			</div>
 <!------------------------------------ Passlock Steps --------------------------------------------------------------------------!>
+
+						<!------ Create New Offline DBase  ---!>
+			<div id="create_new_offline_dbase_div" class="flow_pages" style="display:none; ">
+				<h2 id="create_offline_dbase_label_h2">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
+				<h3 id="create_offline_dbase_label_h3">Please enter the following passwords to Access the data you wish to be stored in the offline database.</h3>
+				<div style="display:flex; flex-direction:column;">
+					<label id="">ENTER CODEWORD:</label>
+					<input autocomplete="off" type="password"  value="" id="gather_codeword" style="">
+					<label id="">ENTER PASSWORD 2:</label>
+					<input autocomplete="off" type="password"  value="" id="gather_password2" style="">
+					<label id="">ENTER PASSWORD 3:</label>
+					<input autocomplete="off" type="password"  value="" id="gather_password3" style="">
+				</div>
+				<div style="display:flex; flex-direction:row;">
+					<button id="new_offline_dbase_access_data_button" style="flex-grow:1; " onclick="accessDataForOfflineDBaseCreation()">SUBMIT PASSWORDS</button>
+					<button id="new_offline_dbase_cancel_button" style="flex-grow:1; " onclick="cancelNewOfflineDBase()">CANCEL</button>
+					<button id="new_offline_dbase_completed_button" style="flex-grow:1; display:none;" onclick="doneNewOfflineDBase()">DONE</button>
+				</div>
+				<h3 id="status_label" style="align-self:center; display:none; color:red;">placeholder</h3>
+			</div>
 
 		</div>		<!-- content_html --!>
 	</div>			<!-- center_html --!>
@@ -1972,24 +2067,29 @@
 		const reader = new FileReader();
 		reader.readAsArrayBuffer(file);
 
-		reader.onload = function(e){
+		reader.onload = async function(e){
 			let buffer = e.target.result;
 			const buffer_uint8a = new Uint8Array(buffer);
 			let filedata = bytesToBase64(buffer_uint8a);
 			// Input Data Length Check
 			if( checkInputLength(buffer) ){
-
+console.log("filedata: " + filedata);
 				// Set base64 encoded filedata to global uploadFile variable.
-				uploadedFile = filedata.
+				//uploadedFile = filedata.
+				//passlockedData.push(filedata);
+				//const encryptedPassword = await passlockEncrypt(filedata);
+				// Most secure/fast right?
+				passlockedData[DATA_INDEX] = await passlockEncrypt(filedata);
+				//passlockedData[DATA_INDEX] = filedata;
 
 
 				// Data Length within parameters
 				//document.getElementById("upload_data").value = filedata;
-				document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "none");
+				//document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "none");
 				// skip data and pass1 input screens
-				document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
+				//document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
 				// for back functionality, we need a button to continue
-				document.getElementById("store_upload_continue").style.display = "inline";
+				document.getElementById("store_upload_commit_button").style.display = "inline";
 				document.getElementById("store_upload_input").style.border = "";
 				// add red warning text
 				document.getElementById("store_upload_warning").style.display = "none";
@@ -2654,14 +2754,16 @@
 	// Global browser_id variable to be used for accessing passlock, 
 	// the random password we're using to encrypt data as user moves through interface.
 	let browserId;
-	let uploadedFile;
-	// Could map 'codeword' 'pass1' to index numbers?
-	// - only need to change in 1 place.
-	let passlockedData; //Array to hold passlocked passwords.
+	const CODEWORD_INDEX = 0;
+	const OBF1PASS_INDEX = 1;
+	const OBF2PASS_INDEX = 2;
+	const OPENSSL_INDEX = 3;
+	const DATA_INDEX = 4;
+	let passlockedData = new Array(5); //Array to hold passlocked passwords.
 	//Reset passlock global variables
 	function resetPasslock(){
 		browserId = null;
-		passlockedData = new Array;
+		passlockedData = new Array(5);
 		console.log("passlock reset.");
 	}
 
@@ -2720,18 +2822,19 @@
 		// Generate passlock key value pair.
 		const passlock = await generatePasslock();
 		const encryptedPassword = await encOpenSSL(userPass, passlock);
-		passlockedData.push( encryptedPassword );
+		// initiate functions known to set codeword to index 0 of global passlock array.
+		passlockedData[CODEWORD_INDEX] = encryptedPassword;
 	}
 
 
-
 	// Add encrypted user password to passlock array.
-	async function passlockAddStore(userPassInputId){
+	async function passlockAddStore(userPassInputId, passlockIndex){
 		// Can add length check here
 		const userPass = extractUserCleartext(userPassInputId);
 		const encryptedPassword = await passlockEncrypt(userPass);
-		passlockedData.push( encryptedPassword );
-		console.log("passlockedData: ");
+		//passlockedData.push( encryptedPassword );
+		passlockedData[passlockIndex] = encryptedPassword;
+		console.log("passlockedData Array: ");
 		console.log(passlockedData);
 	}
 
@@ -2792,12 +2895,24 @@
 	// Decrypt passlocked password set and return cleartext set.
 	async function passlockDecryptSet(){
 		const passlock = await getPasslock();
-		let cleartextPassword;
-		let cleartextSet = new Array;
-		// Length should be 4 (CMD Line) or 5 (Browser).
-		for(let i=0; i < passlockedData.length; i++ ){
-			cleartextPassword = await decOpenSSL(passlockedData[i], passlock);
-			cleartextSet.push(cleartextPassword);
+		//let cleartextPassword;
+		let cleartextSet = new Array(5);
+		//for(let i=0; i < passlockedData.length; i++ ){
+		// Currently set up for 5 explicitly assigned slots for the passlockedData array.
+console.log(passlockedData);
+console.log("passlock: " + passlock);
+		for(let i=0; i < 5; i++ ){
+			if( passlockedData[i] != undefined ){
+			//if( passlockedData[i] != ''){
+			//if( passlockedData[i] ){ // I'm guessing undefined will read false.
+console.log("passlockedData: " + passlockedData[i] + " index: " + i);
+				cleartextSet[i] = await decOpenSSL(passlockedData[i], passlock);
+console.log("decrypted: " + cleartextSet[i]);
+console.log(cleartextSet);
+			
+			}
+			//cleartextPassword = await decOpenSSL(passlockedData[i], passlock);
+			//cleartextSet.push(cleartextPassword);
 		}
 		console.log("retrieved passlock: " + passlock);
 		console.log("encrypted Password Set: ");
@@ -2817,11 +2932,20 @@
 
 
 	async function attemptEncryptAndStore(cleartextDataInputId){
-		// Looks like a better idea to put functions needing 'await' in 1 function if it lives in HTML.
-		// First encrypt data with passlock to keep cleartext data in the same place.
-		await passlockAddStore(cleartextDataInputId);
-		// Now can assume we have fully loaded passlockedArray.
-
+		// OPENSSL_INDEX should be the primitive type/value undefined if and only if in CMD Line Flow.
+		// !! Don't think will work if user goes into Browser Flow then comes back without reset!
+		//if( passlockedData(OPENSSL_INDEX) !== undefined ){
+		//
+		// I don't like this because we're using a flag in a variable meant to hold HTML ID, but maybe it's ok because there's only 2 options with how this function currently used?
+		//   - Could change the name of the variable. 
+		// 
+		// I think attemptEncryptAndStore could be passed from upload Flow with no input? so this could be empty instead?
+		if( cleartextDataInputId !== 'upload' ){
+			// Looks like a better idea to put functions needing 'await' in 1 function if it lives in HTML.
+			// First encrypt data with passlock to keep cleartext data in the same place.
+			await passlockAddStore(cleartextDataInputId, DATA_INDEX);
+			// Now can assume we have fully loaded passlockedArray.
+		}
 		
 		// Keep cleartext isolated to ONE function.
 		// Return 2 element Array.
@@ -2839,7 +2963,7 @@
 	}
 
 	// Current plan is to use this for both CMD and Browser choices in the Store flow
-	async function encryptDataAndFingerprint(cleartextDataInputId){
+	async function encryptDataAndFingerprint(){
 
 		// Figure out where the conditional should go.
 
@@ -2849,9 +2973,24 @@
 
 		// Get Encrypted Data, fingerprint using Cleartext Data.
 		//						 computeFingerprint(codeword, obf1Pass, obf2Pass);
-		const fingerprint = await computeFingerprint(cleartextSet[0], cleartextSet[1], cleartextSet[2]);
-		//							encryptStack(obf1Pass, obf2Pass, openssl_pass, cleartextData)
-		const encryptedData = await encryptStack(cleartextSet[1], cleartextSet[2], cleartextSet[3], cleartextSet[4]);
+		//const fingerprint = await computeFingerprint(cleartextSet[0], cleartextSet[1], cleartextSet[2]);
+		const fingerprint = await computeFingerprint(cleartextSet[CODEWORD_INDEX], cleartextSet[OBF1PASS_INDEX], cleartextSet[OBF2PASS_INDEX]);
+
+		let encryptedData;
+		// No OpenSSL means encryptUpload
+		if( passlockedData[OPENSSL_INDEX] === undefined ){
+			// 
+			// encryptDouble(obf1Pass, obf2Pass, fileData){
+			//
+			// Note: no OPENSSL_INDEX used. 
+			encryptedData = await encryptDouble(cleartextSet[OBF1PASS_INDEX], cleartextSet[OBF2PASS_INDEX], cleartextSet[DATA_INDEX]);
+		}else{
+			//							encryptStack(obf1Pass, obf2Pass, openssl_pass, cleartextData)
+			//const encryptedData = await encryptStack(cleartextSet[1], cleartextSet[2], cleartextSet[3], cleartextSet[4]);
+			encryptedData = await encryptStack(cleartextSet[OBF1PASS_INDEX], cleartextSet[OBF2PASS_INDEX], cleartextSet[OPENSSL_INDEX], cleartextSet[DATA_INDEX]);
+		}
+
+		// Not sure if it makes sense to use assigned indexes here.
 		let encryptedArray = new Array;
 		encryptedArray.push(fingerprint);
 		encryptedArray.push(encryptedData);
@@ -3717,12 +3856,13 @@ Rewrite here later maybe.
 	}//obf2Decrypt()
 
 	// Encrypt stack used in the case user chooses command line.
-	async function encryptDouble(file_ingest_input, pass2, pass3){
+	//async function encryptDouble(file_ingest_input, pass2, pass3){
+	async function encryptDouble(obf1Pass, obf2Pass, fileData){
 		// Obfuscation Step 1 Encrypt
-		const obf_s1_encrypted = await obf1Encrypt(file_ingest_input, pass2);
+		const obf1Encrypted = await obf1Encrypt(fileData, obf1Pass);
 		// Obfuscation Step 2 Encrypt
-		const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, pass3);
-		return obf_s2_encrypted;
+		const obf2Encrypted = await obf2Encrypt(obf1Encrypted, obf2Pass);
+		return obf2Encrypted;
 	}//encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
@@ -3795,7 +3935,7 @@ Rewrite here later maybe.
 	}//checkBase64Chars()
 
 	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over 700.
+	// Output: Returns false if the input length (in bytes) is over 526.
 	function checkInputLength(input){
 		// show input size in bytes
 		let size = new Blob([input]).size;
