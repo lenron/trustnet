@@ -2754,6 +2754,10 @@ console.log("filedata: " + filedata);
 	// Global browser_id variable to be used for accessing passlock, 
 	// the random password we're using to encrypt data as user moves through interface.
 	let browserId;
+	// Assigning constants to passlockData indices is kind-of like setting a memory location.
+	//   - Allows changing of the constant in one place if that ever needs to happen.
+	//   - More clear what's going on when OBF1PASS_INDEX is used rather than: 1
+	//   - Using CAPS_UNDERSCORE here to indicate constant number (common convention).
 	const CODEWORD_INDEX = 0;
 	const OBF1PASS_INDEX = 1;
 	const OBF2PASS_INDEX = 2;
@@ -2826,8 +2830,7 @@ console.log("filedata: " + filedata);
 		passlockedData[CODEWORD_INDEX] = encryptedPassword;
 	}
 
-
-	// Add encrypted user password to passlock array.
+	// Add encrypted user password or data to passlock array.
 	async function passlockAddStore(userPassInputId, passlockIndex){
 		// Can add length check here
 		const userPass = extractUserCleartext(userPassInputId);
@@ -2895,24 +2898,17 @@ console.log("filedata: " + filedata);
 	// Decrypt passlocked password set and return cleartext set.
 	async function passlockDecryptSet(){
 		const passlock = await getPasslock();
-		//let cleartextPassword;
 		let cleartextSet = new Array(5);
-		//for(let i=0; i < passlockedData.length; i++ ){
 		// Currently set up for 5 explicitly assigned slots for the passlockedData array.
-console.log(passlockedData);
-console.log("passlock: " + passlock);
+		console.log(passlockedData);
+		console.log("passlock: " + passlock);
 		for(let i=0; i < 5; i++ ){
-			if( passlockedData[i] != undefined ){
-			//if( passlockedData[i] != ''){
-			//if( passlockedData[i] ){ // I'm guessing undefined will read false.
-console.log("passlockedData: " + passlockedData[i] + " index: " + i);
+			if( passlockedData[i] !== undefined ){ // Skip OPENSSL_INDEX if we're in upload flow.
+				console.log("passlockedData: " + passlockedData[i] + " index: " + i);
 				cleartextSet[i] = await decOpenSSL(passlockedData[i], passlock);
-console.log("decrypted: " + cleartextSet[i]);
-console.log(cleartextSet);
-			
+				console.log("decrypted: " + cleartextSet[i]);
+				console.log(cleartextSet);
 			}
-			//cleartextPassword = await decOpenSSL(passlockedData[i], passlock);
-			//cleartextSet.push(cleartextPassword);
 		}
 		console.log("retrieved passlock: " + passlock);
 		console.log("encrypted Password Set: ");
@@ -2965,28 +2961,22 @@ console.log(cleartextSet);
 	// Current plan is to use this for both CMD and Browser choices in the Store flow
 	async function encryptDataAndFingerprint(){
 
-		// Figure out where the conditional should go.
-
 		// Get Cleartext Passwords and Data.
 		let cleartextSet = await passlockDecryptSet();
 		//console.log(cleartextSet);
 
 		// Get Encrypted Data, fingerprint using Cleartext Data.
 		//						 computeFingerprint(codeword, obf1Pass, obf2Pass);
-		//const fingerprint = await computeFingerprint(cleartextSet[0], cleartextSet[1], cleartextSet[2]);
 		const fingerprint = await computeFingerprint(cleartextSet[CODEWORD_INDEX], cleartextSet[OBF1PASS_INDEX], cleartextSet[OBF2PASS_INDEX]);
 
 		let encryptedData;
-		// No OpenSSL means encryptUpload
+		// No OpenSSL means encryptDouble
 		if( passlockedData[OPENSSL_INDEX] === undefined ){
-			// 
-			// encryptDouble(obf1Pass, obf2Pass, fileData){
-			//
 			// Note: no OPENSSL_INDEX used. 
+			//					 encryptDouble(obf1Pass, obf2Pass, fileData){
 			encryptedData = await encryptDouble(cleartextSet[OBF1PASS_INDEX], cleartextSet[OBF2PASS_INDEX], cleartextSet[DATA_INDEX]);
 		}else{
 			//							encryptStack(obf1Pass, obf2Pass, openssl_pass, cleartextData)
-			//const encryptedData = await encryptStack(cleartextSet[1], cleartextSet[2], cleartextSet[3], cleartextSet[4]);
 			encryptedData = await encryptStack(cleartextSet[OBF1PASS_INDEX], cleartextSet[OBF2PASS_INDEX], cleartextSet[OPENSSL_INDEX], cleartextSet[DATA_INDEX]);
 		}
 
@@ -3013,6 +3003,7 @@ Rewrite here later maybe.
 	}
 */
 
+	// Legacy code probably needs full rewrite.
 	async function storeDataToServer(fp_hex, encrypted_data){
 		let offline_dbase_store_outcome;
 		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
