@@ -465,10 +465,6 @@
 			</div>
 
 	<input autocomplete="off" type="password" value="" id="upload_data" style="display:none;">
---!>
-<!--  store  --!>
-
-<!--  load  --!>
 			<div class="gen load one" id="load1" style="display:none;">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS DATA</label>
@@ -603,9 +599,6 @@
 					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 				</div>
 			</div>
-<!--  load  --!>
-
-<!--  delete --!>
 			<div class="gen delete five" id="delete5" style="display:none">
 				<label>&#10004; SUCCESS</label>
 				<div class="button_pair" id="" style="display:flex;">
@@ -630,8 +623,7 @@
 					<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>
 				</div>
 			</div>
-<!--  delete --!>
-
+--!>
 <!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
 <!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
 <!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
@@ -639,6 +631,16 @@
 			<!--------------------------  HOME  ----------------------------!>
 			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
+				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='go_store_flow' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="showPage('')">ACCESS SECRET DATA</button>
+				</div>
+			</div>
+
+			<!--------------------------  TIMED OUT HOME  ----------------------------!>
+			<div class="flow_pages home" id="timed_out_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
+				<h3 style="color:red;">TIMED OUT!</h3>
+				<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button" id='go_store_flow' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="showPage('')">ACCESS SECRET DATA</button>
@@ -658,37 +660,37 @@
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
 					<!--  initiateStore is an async function. here we don't wait for it to finish before moving on to the next page which is great.  --!>
 					<!--  Might need to wait for an error?  --!>
-					<button class="" id='' style="flex-grow:1;" onclick="initiateStore('store_codeword_input');showPage('store_pass1')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');showPage('store_obf1pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Pass 1-----------------------!>
-			<div class="flow_pages passlock" id="store_pass1" style="display:none">
+			<!--------------------------- obf1pass -----------------------!>
+			<div class="flow_pages passlock" id="store_obf1pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>PASS 1</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_pass1_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf1pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass1_input', OBF1PASS_INDEX);showPage('store_pass2');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('store_obf1pass_input');showPage('store_obf2pass');">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Pass 2-----------------------!>
-			<div class="flow_pages passlock" id="store_pass2" style="display:none">
+			<!--------------------------- obf2pass -----------------------!>
+			<div class="flow_pages passlock" id="store_obf2pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>PASS 2</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="store_pass2_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf2pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass1')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass2_input', OBF2PASS_INDEX);showPage('store_choose');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('store_obf2pass_input');showPage('store_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -697,9 +699,9 @@
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('store_pass2')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_obf2pass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('store_pass3')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('store_opensslpass')">
 							<span style="">BROWSER</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
 						</button>
@@ -724,17 +726,17 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="store_codeword_cmd_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_codeword_cmdinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
 					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
 																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(CODEWORD_INDEX, 'store_codeword_cmd_input', 'store_codeword_cmd', 'store_pass1_cmd')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdinput', 'store_obf1pass_cmd')">CONTINUE</button>
 				</div>
 			</div>
 
 			<!---------------------------Check Pass 1-----------------------!>
-			<div class="flow_pages passlock" id="store_pass1_cmd" style="display:none">
+			<div class="flow_pages passlock" id="store_obf1pass_cmd" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
@@ -742,15 +744,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_pass1_cmd_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf1pass_cmdinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_cmd')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OBF1PASS_INDEX, 'store_pass1_cmd_input', 'store_pass1_cmd', 'store_pass2_cmd')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_cmdinput', 'store_obf2pass_cmd')">CONTINUE</button>
 				</div>
 			</div>
 
 			<!---------------------------Check Pass 2-----------------------!>
-			<div class="flow_pages passlock" id="store_pass2_cmd" style="display:none">
+			<div class="flow_pages passlock" id="store_obf2pass_cmd" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 2</label>
@@ -758,10 +760,10 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="store_pass2_cmd_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf2pass_cmdinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass1_cmd')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OBF2PASS_INDEX, 'store_pass2_cmd_input', 'store_pass2_cmd', 'store_upload')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_cmd')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_cmdinput', 'store_upload')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -783,8 +785,8 @@
 				<div class="button_pair" id="" style="display:flex;">
 					<!-- when hitting back here go back to CMD Line or Browser? --!>
 					<!--<button class="" id='' style="width:250px;" onclick="showPage('store_choose')">BACK</button>--!>
-					<button class="" id='' style="width:250px;" onclick="showPage('store_pass2_cmd')">BACK</button>
-					<button class="" id='store_upload_commit_button' style="flex-grow:1;display:none;" onclick="attemptEncryptAndStore('upload')">COMMIT DATA TO SERVER</button>
+					<button class="" id='' style="width:250px;" onclick="showPage('store_obf2pass_cmd')">BACK</button>
+					<button class="" id='store_upload_commit_button' style="flex-grow:1;display:none;" onclick="attemptCMDStore()">COMMIT DATA TO SERVER</button>
 				</div>
 			</div>
 			<!---------------------------END Store CMD Line Flow-----------------------!>
@@ -792,17 +794,17 @@
 
 			<!---------------------------Browser-----------------------!>
 			<!---------------------------Pass 3-----------------------!>
-			<div class="flow_pages passlock" id="store_pass3" style="display:none">
+			<div class="flow_pages passlock" id="store_opensslpass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>PASS 3</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 3</h2>
-				<input autocomplete="off" type="password" value="" id="store_pass3_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="passlockAddStore('store_pass3_input', OPENSSL_INDEX);showPage('store_codeword_check');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('store_opensslpass_input');showPage('store_codeword_check');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -815,17 +817,17 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="store_codeword_check_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_codeword_checkinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass3')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_opensslpass')">BACK</button>
 					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
 																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(CODEWORD_INDEX, 'store_codeword_check_input', 'store_codeword_check', 'store_pass1_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_checkinput', 'store_obf1pass_check')">CONTINUE</button>
 				</div>
 			</div>
 
 			<!---------------------------Check Pass 1-----------------------!>
-			<div class="flow_pages passlock" id="store_pass1_check" style="display:none">
+			<div class="flow_pages passlock" id="store_obf1pass_check" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
@@ -833,15 +835,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_pass1_check_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf1pass_checkinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_check')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OBF1PASS_INDEX, 'store_pass1_check_input', 'store_pass1_check', 'store_pass2_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_checkinput', 'store_obf2pass_check')">CONTINUE</button>
 				</div>
 			</div>
 
 			<!---------------------------Check Pass 2-----------------------!>
-			<div class="flow_pages passlock" id="store_pass2_check" style="display:none">
+			<div class="flow_pages passlock" id="store_obf2pass_check" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 2</label>
@@ -849,15 +851,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="store_pass2_check_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf2pass_checkinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass1_check')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OBF2PASS_INDEX, 'store_pass2_check_input', 'store_pass2_check', 'store_pass3_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_check')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_checkinput', 'store_opensslpass_check')">CONTINUE</button>
 				</div>
 			</div>
 
 			<!---------------------------Check Pass 3-----------------------!>
-			<div class="flow_pages passlock" id="store_pass3_check" style="display:none">
+			<div class="flow_pages passlock" id="store_opensslpass_check" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 3</label>
@@ -865,11 +867,11 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 3</h2>
-				<input autocomplete="off" type="password" value="" id="store_pass3_check_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_opensslpass_checkinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_pass2_check')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf2pass_check')">BACK</button>
 					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'check_pass3', 'check_passlock3', 'check_cw')">CONTINUE</button>--!>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(OPENSSL_INDEX, 'store_pass3_check_input', 'store_pass3_check', 'store_data')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_opensslpass_checkinput', 'store_data')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -882,8 +884,8 @@
 				</div>
 				<textarea class="browser_input" id="store_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('store_data')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('store_pass3_check')">BACK</button>
-					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptEncryptAndStore('store_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_opensslpass_check')">BACK</button>
+					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStore('store_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
 					<div id='text_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
@@ -2071,24 +2073,12 @@
 			let buffer = e.target.result;
 			const buffer_uint8a = new Uint8Array(buffer);
 			let filedata = bytesToBase64(buffer_uint8a);
+			//console.log("filedata: " + filedata);
 			// Input Data Length Check
 			if( checkInputLength(buffer) ){
-console.log("filedata: " + filedata);
-				// Set base64 encoded filedata to global uploadFile variable.
-				//uploadedFile = filedata.
-				//passlockedData.push(filedata);
-				//const encryptedPassword = await passlockEncrypt(filedata);
-				// Most secure/fast right?
-				passlockedData[DATA_INDEX] = await passlockEncrypt(filedata);
-				//passlockedData[DATA_INDEX] = filedata;
+				passlockedData['data'] = await passlockEncrypt(filedata);
 
-
-				// Data Length within parameters
-				//document.getElementById("upload_data").value = filedata;
-				//document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "none");
-				// skip data and pass1 input screens
-				//document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
-				// for back functionality, we need a button to continue
+				// Show button.
 				document.getElementById("store_upload_commit_button").style.display = "inline";
 				document.getElementById("store_upload_input").style.border = "";
 				// add red warning text
@@ -2750,102 +2740,93 @@ console.log("filedata: " + filedata);
 	//////////////////////////////////////////////////////////////
 	//			Passlock Functions							    //
 	//////////////////////////////////////////////////////////////
-
 	// Global browser_id variable to be used for accessing passlock, 
-	// the random password we're using to encrypt data as user moves through interface.
 	let browserId;
-	// Assigning constants to passlockData indices is kind-of like setting a memory location.
-	//   - Allows changing of the constant in one place if that ever needs to happen.
-	//   - More clear what's going on when OBF1PASS_INDEX is used rather than: 1
-	//   - Using CAPS_UNDERSCORE here to indicate constant number (common convention).
-	const CODEWORD_INDEX = 0;
-	const OBF1PASS_INDEX = 1;
-	const OBF2PASS_INDEX = 2;
-	const OPENSSL_INDEX = 3;
-	const DATA_INDEX = 4;
-	let passlockedData = new Array(5); //Array to hold passlocked passwords.
+	// Create Object for passlocked passwords and data.
+	let passlockedData = {};
 	//Reset passlock global variables
 	function resetPasslock(){
 		browserId = null;
-		passlockedData = new Array(5);
-		console.log("passlock reset.");
-	}
-
-	//Function that extracts user password from html and deletes it from the html source.
-	function extractUserCleartext(userPassInputId){
-		const userPass = document.getElementById(userPassInputId).value;
-		document.getElementById(userPassInputId).value = ""; //delete password from html
-		return userPass;
+		passlockedData = {};
+		console.log("Passlock has been reset.");
 	}
 
 	function weTimedOut(){
-		console.log("weTimedOut() ran successfully.");
-		// Delete client held data. MariaDB EVENT handles deleting server held passlock after 5 min.
-		//resetPasslock();
+		resetPasslock();
+		// Home with timeout explaination.
+		showPage('timed_out_home');
+		// Later add "ADD MORE TIME" overlay?
 	}
 
-	// Generate a browser_id, passlock and save them to server as a key-value pair.
+	// Generate a browser_id, passlock and save to server as a key-value pair.
 	async function generatePasslock(){
-		// Reset global variables.	
+		// Reset browserId and encrypted user data, passwords.
 		resetPasslock();
-		// Generate and set browser_id;
+		// Generate new browserId (global variable).
 		browserId = self.crypto.randomUUID();
-		// Gen new passlock;
+		// Generate new passlock (not global).
 		const passlock = self.crypto.randomUUID();
-		// Send to server.
-		// returned is a json object containing data: 1 = success. 0 = fail.
-		// 
-		// "There was a problem communicating with the server."
-		// What do we do when we're not sure if the passlock got saved to the server?
-		// 
-		//const did_passlock_save_to_server_successfully = await serverSetPasslock(browserId, passlock);
-		await serverSetPasslock(browserId, passlock);
-		console.log("new browser_id: " + browserId);
-		console.log("new passlock: " + passlock);
+		// If handling error inside function, don't need 'await' here?
+		serverSetPasslock(browserId, passlock);
+		return passlock;
+	}
+
+	// Return passlock for encrypt/decrypt functions if not timed out.
+	// Only works on getting existing passlock that hasn't timed out.
+	async function getPasslock(){
+		// Check for timeout.
+		if( browserId === null ){
+			showPage("timed_out_home");
+			throw Error("Passlock is timed out!");
+		}
+		// Needs to be not a json object. Need to update serverGetPasslock too.
+		//
+		// Return passlock json object if not timed out.
+		const passlockJsonObject = await serverGetPasslock(browserId);
+		//console.log("browser id: " + browserId);
+		//console.log(passlockJsonObject);
+		// Return data from json object.
+		return passlockJsonObject.passlock;
+	}
+
+	// Resets any old data.
+	// Generates a new passlock for encrypting user cleartext passwords and data.
+	// Sets 5 minute timer for security.
+	// Saves first user data which will always be the codeword.
+	async function initPasslockFlow(inputId){
 		// Set timeout timer.
 		setTimeout(() => {
 			console.log("Timeout timer expired!");
 			weTimedOut();
-		//}, 1000); // One Second.
-		}, 2000); // Two Second.
-		//}, 60000); // One Minute.
-		//}, 300000); // Five Minutes.
-		return passlock;
-	}
-
-	// Can be removed if generatePasslock();passlockAddStore() is used instead
-	// That means we do 1 more server call. Because O() notation complexity I think 1 call in 8 is taught to mean nothing in context.
-	// ==> By saving 1 server call in many, we use an additional function.
-	//	Also we use crypto data in a different way, giving more changes for errors.
-	//	Also we're now managing 3 functionss that do 2 things in different ways that isn't immediately clear instead of 2 functions that do specific things.
-	//
-	// I guess we need to use it tho as about half the time the server didn't have the passlock in time for the retreival.
-	async function initiateStore(userPassInputId){
-		//Store user's password in javascript and delete it from html.
-		const userPass = extractUserCleartext(userPassInputId);
-		// Generate passlock key value pair.
+		}, 300000); // Five Minutes.
+		// Reset old data and generate new passlock, browserId.
 		const passlock = await generatePasslock();
-		const encryptedPassword = await encOpenSSL(userPass, passlock);
-		// initiate functions known to set codeword to index 0 of global passlock array.
-		passlockedData[CODEWORD_INDEX] = encryptedPassword;
+		console.log("new browser_id: " + browserId);
+		console.log("new passlock: " + passlock);
+		// Data will be stored at keyword's 'location'.
+		const cleartextData = extractCleartextData(inputId);
+		// Extract keyword. could be: codeword, obf1pass, obf12pass, opensslpass
+		const keyword = extractKeyword(inputId);
+		//passlockedData{keyword} = await encOpenSSL(cleartextData, passlock);
+		passlockedData[keyword] = await encOpenSSL(cleartextData, passlock);
 	}
 
-	// Add encrypted user password or data to passlock array.
-	async function passlockAddStore(userPassInputId, passlockIndex){
-		// Can add length check here
-		const userPass = extractUserCleartext(userPassInputId);
-		const encryptedPassword = await passlockEncrypt(userPass);
-		//passlockedData.push( encryptedPassword );
-		passlockedData[passlockIndex] = encryptedPassword;
-		console.log("passlockedData Array: ");
-		console.log(passlockedData);
+	// Extract, encrypt, and store data at inputId to global passlockedData Object.
+	async function extractInputData(inputId){
+		const keyword = extractKeyword(inputId);
+		const cleartextData = extractCleartextData(inputId);
+		passlockedData[keyword] = await passlockEncrypt(cleartextData);
 	}
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
-	async function checkPasslock(index, userPassInputId, thisPageId, nextPageId){
-		const userPass = extractUserCleartext(userPassInputId);
-		const encryptedPassword = await passlockEncrypt(userPass);
-		if( passlockedData[index] === encryptedPassword){
+	async function checkPasslock(inputId, nextPageId){
+		const keyword = extractKeyword(inputId);
+		const cleartextPass = extractCleartextData(inputId);
+		const encryptedPassword = await passlockEncrypt(cleartextPass);
+		//console.log("Checking passlock...");
+		//console.log("keyword: " + keyword);
+		//console.log("passlockedData[keyword]: " + passlockedData[keyword]);
+		if( passlockedData[keyword] === encryptedPassword){
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
@@ -2856,152 +2837,83 @@ console.log("filedata: " + filedata);
 		}
 	}
 
-	// Return passlock for encrypt/decrypt functions if not timed out.
-	async function getPasslock(){
-		// Check for timeout
-		if( browserId === null ){
-			throw Error("Passlock is timed out!");
+	//Function that extracts user password from html and deletes it from the html source.
+	function extractCleartextData(inputId){
+		const cleartextData = document.getElementById(inputId).value;
+		document.getElementById(inputId).value = ""; //delete password from html
+		return cleartextData;
+	}
 
-			// Probably change this to informing user they timed out and diverting back to home page.
-		}
-		// Return passlock json object if not timed out.
-		const passlockJsonObject = await serverGetPasslock(browserId);
-		console.log("browser id: " + browserId);
-		console.log(passlockJsonObject);
-		// Return data from json object.
-		return passlockJsonObject.passlock;
+	// Use regex to extract keyword from input ID.
+	function extractKeyword(inputId){
+		const regex = /^\w+_(\w+)_\w+$/g;
+		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll#better_access_to_capturing_groups_than_string.prototype.match
+		// This syntax needed to decode js string iterator which is how you best capture groups I guess.
+		const matchedArray = [...inputId.matchAll(regex)];
+		// Spread syntax (...)
+		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+		console.log("PASSLOCK OBJECT: ");
+		console.log(passlockedData);
+		//console.log("extracted keyword: " + matchedArray[0][1]);
+		return matchedArray[0][1];
 	}
 
 	// Use previously generated passlock to encrypt input.
-	// Returns encrypted password.
-	// Should check for timeout and return error if so.
 	async function passlockEncrypt(cleartextPassword){
 		const passlock = await getPasslock();
-		// I think await is needed here because need a variable before returning?
 		const encryptedPassword = await encOpenSSL(cleartextPassword, passlock);
-		console.log("retrieved passlock: " + passlock);
-		console.log("cleartextPassword: " + cleartextPassword);
-		console.log("encryptedPassword: " + encryptedPassword);
+		//console.log("retrieved passlock: " + passlock);
+		//console.log("cleartextPassword: " + cleartextPassword);
+		//console.log("encryptedPassword: " + encryptedPassword);
 		return encryptedPassword;
-	}
-
-	// Use previously generated passlock to decrypt input.
-	// Returns decrypted password.
-	//
-	// Unused function.
-	async function passlockDecrypt(encryptedPassword){
-		const passlock = await getPasslock();
-		const cleartextPassword = await decOpenSSL(encryptedPassword, passlock);
-		return cleartextPassword;
 	}
 
 	// Decrypt passlocked password set and return cleartext set.
 	async function passlockDecryptSet(){
 		const passlock = await getPasslock();
-		let cleartextSet = new Array(5);
-		// Currently set up for 5 explicitly assigned slots for the passlockedData array.
-		console.log(passlockedData);
-		console.log("passlock: " + passlock);
-		for(let i=0; i < 5; i++ ){
-			if( passlockedData[i] !== undefined ){ // Skip OPENSSL_INDEX if we're in upload flow.
-				console.log("passlockedData: " + passlockedData[i] + " index: " + i);
-				cleartextSet[i] = await decOpenSSL(passlockedData[i], passlock);
-				console.log("decrypted: " + cleartextSet[i]);
-				console.log(cleartextSet);
-			}
+		let cleartextSet = {};
+		for(const keyword in passlockedData){
+			cleartextSet[keyword] = await decOpenSSL(passlockedData[keyword], passlock);
 		}
-		console.log("retrieved passlock: " + passlock);
-		console.log("encrypted Password Set: ");
-		console.log(passlockedData);
-		console.log("cleartext Password Set: ");
+		console.log("Cleartext Set: ");
 		console.log(cleartextSet);
 		return cleartextSet;
-		// Leaving function effectively deletes passlock.
 	}
 
-	// Next.
-	//
-	// Current plan is to use this for both CMD and Browser choices in the Store flow
-	//async function decryptDataForAccess(){
-	//}
-
-
-
-	async function attemptEncryptAndStore(cleartextDataInputId){
-		// OPENSSL_INDEX should be the primitive type/value undefined if and only if in CMD Line Flow.
-		// !! Don't think will work if user goes into Browser Flow then comes back without reset!
-		//if( passlockedData(OPENSSL_INDEX) !== undefined ){
-		//
-		// I don't like this because we're using a flag in a variable meant to hold HTML ID, but maybe it's ok because there's only 2 options with how this function currently used?
-		//   - Could change the name of the variable. 
-		// 
-		// I think attemptEncryptAndStore could be passed from upload Flow with no input? so this could be empty instead?
-		if( cleartextDataInputId !== 'upload' ){
-			// Looks like a better idea to put functions needing 'await' in 1 function if it lives in HTML.
-			// First encrypt data with passlock to keep cleartext data in the same place.
-			await passlockAddStore(cleartextDataInputId, DATA_INDEX);
-			// Now can assume we have fully loaded passlockedArray.
-		}
-		
-		// Keep cleartext isolated to ONE function.
-		// Return 2 element Array.
-		//  data = [0]
-		//  fingerprint - [1]
-		let encryptedDataAndFingerprint = await encryptDataAndFingerprint();
-		// Store encrypted data at fingerprint location. 
-		storeDataToServer(encryptedDataAndFingerprint[0], encryptedDataAndFingerprint[1]);
-
-		// Handle errors. What is the set of different use shown responses/pages?
-		// - Success
-		// - Offline
-		// - Some other error?
-
+	async function attemptBrowserStore(inputId){
+		// Encrypt and save OpenSSL password to passlockedData object.
+		await extractInputData(inputId);
+		let fingerprintAndData = await getFpAndDataForBrowserStore();
+		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 	}
 
-	// Current plan is to use this for both CMD and Browser choices in the Store flow
-	async function encryptDataAndFingerprint(){
-
-		// Get Cleartext Passwords and Data.
+	async function getFpAndDataForBrowserStore(){
+		// Get cleartext passwords for encryption.
 		let cleartextSet = await passlockDecryptSet();
-		//console.log(cleartextSet);
-
-		// Get Encrypted Data, fingerprint using Cleartext Data.
-		//						 computeFingerprint(codeword, obf1Pass, obf2Pass);
-		const fingerprint = await computeFingerprint(cleartextSet[CODEWORD_INDEX], cleartextSet[OBF1PASS_INDEX], cleartextSet[OBF2PASS_INDEX]);
-
-		let encryptedData;
-		// No OpenSSL means encryptDouble
-		if( passlockedData[OPENSSL_INDEX] === undefined ){
-			// Note: no OPENSSL_INDEX used. 
-			//					 encryptDouble(obf1Pass, obf2Pass, fileData){
-			encryptedData = await encryptDouble(cleartextSet[OBF1PASS_INDEX], cleartextSet[OBF2PASS_INDEX], cleartextSet[DATA_INDEX]);
-		}else{
-			//							encryptStack(obf1Pass, obf2Pass, openssl_pass, cleartextData)
-			encryptedData = await encryptStack(cleartextSet[OBF1PASS_INDEX], cleartextSet[OBF2PASS_INDEX], cleartextSet[OPENSSL_INDEX], cleartextSet[DATA_INDEX]);
-		}
-
-		// Not sure if it makes sense to use assigned indexes here.
-		let encryptedArray = new Array;
-		encryptedArray.push(fingerprint);
-		encryptedArray.push(encryptedData);
-		console.log("Fingerprint and Encrypted Data from encryptDataAndFingerprint: ");
-		console.log(encryptedArray[0]);
-		console.log(encryptedArray[1]);
-		return encryptedArray;
+		let fingerprintAndData = {};
+		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1pass'], cleartextSet['obf2pass']);
+		fingerprintAndData['data'] = await encryptStack(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['opensslpass'], cleartextSet['data']);
+		return fingerprintAndData;
 	}
-/*
-Rewrite here later maybe.
 
-	async function storeDataToServer(fingerprint, encryptedData){
-		// Handle Offline Database 
-
-		// Attempt Store.
-
-		// Make sure encrypted data matches Load of fingerprint after return from Store.
-
-
+	async function attemptCMDStore(inputId){
+		let fingerprintAndData = await getFpAndDataForCMDStore();
+		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
+		// showPage('pending_or_completed') ???
 	}
-*/
+
+	async function getFpAndDataForCMDStore(){
+		// Get cleartext passwords for encryption.
+		let cleartextSet = await passlockDecryptSet();
+		let fingerprintAndData = {};
+		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1pass'], cleartextSet['obf2pass']);
+		fingerprintAndData['data'] = await encryptDouble(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['data']);
+		return fingerprintAndData;
+	}
+
+
+
+
 
 	// Legacy code probably needs full rewrite.
 	async function storeDataToServer(fp_hex, encrypted_data){
@@ -3317,7 +3229,7 @@ Rewrite here later maybe.
 		}
 	}//serverSetPasslock()
 
-
+	// needs update.
 	async function serverGetPasslock(){
 		const browser_id = browserId;
 		let SERVER_URL = getServerOrigin();
