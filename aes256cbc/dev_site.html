@@ -772,6 +772,7 @@
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
 				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 526 byte limit</h2>
+				<label id="uploaddata_length_label" style="color:black"></label>
 				<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
 				<br>
 				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
@@ -880,9 +881,9 @@
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>STORE DATA</label>
-					<label id="data_length_label" style="color:black"></label>
+					<label id="browserdata_length_label" style="color:black"></label>
 				</div>
-				<textarea class="browser_input" id="store_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('store_data')" placeholder="ENTER YOUR SECRET DATA"></textarea>
+				<textarea class="browser_input" id="store_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('store_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store_opensslpass_check')">BACK</button>
 					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStore('store_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
@@ -2075,9 +2076,9 @@
 			let filedata = bytesToBase64(buffer_uint8a);
 			//console.log("filedata: " + filedata);
 			// Input Data Length Check
-			if( checkInputLength(buffer) ){
+			//if( checkInputLength(buffer) ){
+			if( checkInputLengthUpload(buffer) ){
 				passlockedData['data'] = await passlockEncrypt(filedata);
-
 				// Show button.
 				document.getElementById("store_upload_commit_button").style.display = "inline";
 				document.getElementById("store_upload_input").style.border = "";
@@ -2086,7 +2087,7 @@
 			}else{
 				// Data Length too long! Show Warning.
 				// hide continue button
-				document.getElementById("store_upload_continue").style.display = "none";
+				document.getElementById("store_upload_commit_button").style.display = "none";
 				// make border red
 				document.getElementById("store_upload_input").style.border = "thick solid red";
 				// add red warning text
@@ -2141,10 +2142,10 @@
 			// display button
 			document.getElementById("text_input_continue").style.display = "inline";
 		}else{
-			// remove button
-			document.getElementById("text_input_continue").style.display = "none";
 			// Length NOT OK, turn ON warning
 			document.getElementById("text_input_warning").style.display = "inline";
+			// remove button
+			document.getElementById("text_input_continue").style.display = "none";
 		}
 	}
 /*
@@ -2758,6 +2759,25 @@
 		// Later add "ADD MORE TIME" overlay?
 	}
 
+	// Return passlock for encrypt/decrypt functions if not timed out.
+	// Only works on getting existing passlock that hasn't timed out.
+	async function getPasslock(){
+		// Check for timeout.
+		if( browserId === null ){
+			showPage("timed_out_home");
+			// Nothing is supposed to call this function while brrowserId unset. 
+			throw Error("Passlock is timed out!");
+		}
+		// Needs to be not a json object. Need to update serverGetPasslock too.
+		//
+		// Return passlock json object if not timed out.
+		const passlockJsonObject = await serverGetPasslock(browserId);
+		//console.log("browser id: " + browserId);
+		//console.log(passlockJsonObject);
+		// Return data from json object.
+		return passlockJsonObject.passlock;
+	}
+
 	// Generate a browser_id, passlock and save to server as a key-value pair.
 	async function generatePasslock(){
 		// Reset browserId and encrypted user data, passwords.
@@ -2769,24 +2789,6 @@
 		// If handling error inside function, don't need 'await' here?
 		serverSetPasslock(browserId, passlock);
 		return passlock;
-	}
-
-	// Return passlock for encrypt/decrypt functions if not timed out.
-	// Only works on getting existing passlock that hasn't timed out.
-	async function getPasslock(){
-		// Check for timeout.
-		if( browserId === null ){
-			showPage("timed_out_home");
-			throw Error("Passlock is timed out!");
-		}
-		// Needs to be not a json object. Need to update serverGetPasslock too.
-		//
-		// Return passlock json object if not timed out.
-		const passlockJsonObject = await serverGetPasslock(browserId);
-		//console.log("browser id: " + browserId);
-		//console.log(passlockJsonObject);
-		// Return data from json object.
-		return passlockJsonObject.passlock;
 	}
 
 	// Resets any old data.
@@ -2801,20 +2803,40 @@
 		}, 300000); // Five Minutes.
 		// Reset old data and generate new passlock, browserId.
 		const passlock = await generatePasslock();
-		console.log("new browser_id: " + browserId);
-		console.log("new passlock: " + passlock);
+		//console.log("new browser_id: " + browserId);
+		//console.log("new passlock: " + passlock);
+
 		// Data will be stored at keyword's 'location'.
-		const cleartextData = extractCleartextData(inputId);
-		// Extract keyword. could be: codeword, obf1pass, obf12pass, opensslpass
+		// Extract keyword using regex. could be: codeword, obf1pass, obf12pass, opensslpass
 		const keyword = extractKeyword(inputId);
-		//passlockedData{keyword} = await encOpenSSL(cleartextData, passlock);
+		// Extracts either user password or data from DOM object's  value.
+		const cleartextData = extractCleartextData(inputId);
+		// OpenSSL encrypt user data and store in global Object. 
 		passlockedData[keyword] = await encOpenSSL(cleartextData, passlock);
+	}
+
+	// Use regex to extract keyword from input ID.
+	function extractKeyword(inputId){
+		const regex = /^\w+_(?<keyword>\w+)_\w+$/;
+		const match = regex.exec(inputId);
+		//console.log("PASSLOCK OBJECT: ");
+		//console.log(passlockedData);
+		//console.log("Regex matched: " + match.groups.keyword);
+		return match.groups.keyword;
+	}
+
+	//Function that extracts user password from html and deletes it from the html source.
+	function extractCleartextData(inputId){
+		const cleartextData = document.getElementById(inputId).value;
+		document.getElementById(inputId).value = ""; //delete password from html
+		return cleartextData;
 	}
 
 	// Extract, encrypt, and store data at inputId to global passlockedData Object.
 	async function extractInputData(inputId){
 		const keyword = extractKeyword(inputId);
 		const cleartextData = extractCleartextData(inputId);
+		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
 		passlockedData[keyword] = await passlockEncrypt(cleartextData);
 	}
 
@@ -2826,7 +2848,7 @@
 		//console.log("Checking passlock...");
 		//console.log("keyword: " + keyword);
 		//console.log("passlockedData[keyword]: " + passlockedData[keyword]);
-		if( passlockedData[keyword] === encryptedPassword){
+		if(passlockedData[keyword] === encryptedPassword){
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
@@ -2835,27 +2857,6 @@
 			throw Error("Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
 		}
-	}
-
-	//Function that extracts user password from html and deletes it from the html source.
-	function extractCleartextData(inputId){
-		const cleartextData = document.getElementById(inputId).value;
-		document.getElementById(inputId).value = ""; //delete password from html
-		return cleartextData;
-	}
-
-	// Use regex to extract keyword from input ID.
-	function extractKeyword(inputId){
-		const regex = /^\w+_(\w+)_\w+$/g;
-		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll#better_access_to_capturing_groups_than_string.prototype.match
-		// This syntax needed to decode js string iterator which is how you best capture groups I guess.
-		const matchedArray = [...inputId.matchAll(regex)];
-		// Spread syntax (...)
-		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
-		console.log("PASSLOCK OBJECT: ");
-		console.log(passlockedData);
-		//console.log("extracted keyword: " + matchedArray[0][1]);
-		return matchedArray[0][1];
 	}
 
 	// Use previously generated passlock to encrypt input.
@@ -2880,39 +2881,37 @@
 		return cleartextSet;
 	}
 
+	async function getFpAndDataForStore(){
+		// Get cleartext passwords for encryption.
+		const cleartextSet = await passlockDecryptSet();
+		const fingerprintAndData = {};
+		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1pass'], cleartextSet['obf2pass']);
+		//Check for existence of 'key' in js Object.
+		if('opensslpass' in passlockedData){
+			//console.log("we found opensslpass in passlockedData");
+			fingerprintAndData['data'] = await encryptStack(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['opensslpass'], cleartextSet['data']);
+		}else{
+			fingerprintAndData['data'] = await encryptDouble(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['data']);
+		}
+		return fingerprintAndData;
+	}
+
 	async function attemptBrowserStore(inputId){
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
-		let fingerprintAndData = await getFpAndDataForBrowserStore();
+		//let fingerprintAndData = await getFpAndDataForStore();
+		const fingerprintAndData = await getFpAndDataForStore();
+		const storeOutcome = await storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
+		// Show user outcome of store, pass or fail.
+		// showPage('pending_or_completed')
+	}
+
+	async function attemptCMDStore(){
+		const fingerprintAndData = await getFpAndDataForStore();
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
+		// Show user outcome of store, pass or fail.
+		// showPage('pending_or_completed')
 	}
-
-	async function getFpAndDataForBrowserStore(){
-		// Get cleartext passwords for encryption.
-		let cleartextSet = await passlockDecryptSet();
-		let fingerprintAndData = {};
-		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1pass'], cleartextSet['obf2pass']);
-		fingerprintAndData['data'] = await encryptStack(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['opensslpass'], cleartextSet['data']);
-		return fingerprintAndData;
-	}
-
-	async function attemptCMDStore(inputId){
-		let fingerprintAndData = await getFpAndDataForCMDStore();
-		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
-		// showPage('pending_or_completed') ???
-	}
-
-	async function getFpAndDataForCMDStore(){
-		// Get cleartext passwords for encryption.
-		let cleartextSet = await passlockDecryptSet();
-		let fingerprintAndData = {};
-		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1pass'], cleartextSet['obf2pass']);
-		fingerprintAndData['data'] = await encryptDouble(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['data']);
-		return fingerprintAndData;
-	}
-
-
-
 
 
 	// Legacy code probably needs full rewrite.
@@ -3759,7 +3758,6 @@
 	}//obf2Decrypt()
 
 	// Encrypt stack used in the case user chooses command line.
-	//async function encryptDouble(file_ingest_input, pass2, pass3){
 	async function encryptDouble(obf1Pass, obf2Pass, fileData){
 		// Obfuscation Step 1 Encrypt
 		const obf1Encrypted = await obf1Encrypt(fileData, obf1Pass);
@@ -3769,16 +3767,12 @@
 	}//encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
-	//async function encryptStack(plaintext, pass1, pass2, pass3){
 	async function encryptStack(obf1Pass, obf2Pass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
-		//const openssl_encrypted = await encOpenSSL(plaintext, pass1);
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
 		// Obfuscation Step 1 Encrypt
-		//const obf_s1_encrypted = await obf1Encrypt(openssl_encrypted, pass2);
 		const obf1Encrypted = await obf1Encrypt(opensslEncrypted, obf1Pass);
 		// Obfuscation Step 2 Encrypt
-		//const obf_s2_encrypted = await obf2Encrypt(obf_s1_encrypted, pass3);
 		const obf2Encrypted = await obf2Encrypt(obf1Encrypted, obf2Pass);
 		return obf2Encrypted;
 	}//encryptStack()
@@ -3845,9 +3839,26 @@
 		let difference = 526 - size;
 		// Show running count of data length.
 		let size_string = "Byte length remaining: " + difference;
-		document.getElementById("data_length_label").innerHTML = size_string;
-		
-		if( size > 526 ){
+		//console.log("size_string: " + size_string);
+		document.getElementById("browserdata_length_label").innerHTML = size_string;
+		if(size > 526){
+			return 0; // Length Check Failed.
+		}else{
+			return 1; // Length Check Passed.
+		}
+	}//checkInputLength()
+
+	// Input: input is a string.
+	// Output: Returns false if the input length (in bytes) is over 526.
+	function checkInputLengthUpload(input){
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		let difference = 544 - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		//console.log("size_string: " + size_string);
+		document.getElementById("uploaddata_length_label").innerHTML = size_string;
+		if(size > 544){
 			return 0; // Length Check Failed.
 		}else{
 			return 1; // Length Check Passed.
