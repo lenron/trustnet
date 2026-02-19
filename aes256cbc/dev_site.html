@@ -2913,7 +2913,9 @@
 		// showPage('pending_or_completed')
 	}
 
-
+	// Unwind this giant conditional. 
+	// Return either pass or fail to show outcome of store, pass or fail to user.
+	//
 	// Legacy code probably needs full rewrite.
 	async function storeDataToServer(fp_hex, encrypted_data){
 		let offline_dbase_store_outcome;
