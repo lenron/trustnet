@@ -4,8 +4,8 @@ services:
     restart: always
     # Turn these off if using Traefik.
     # Turn these on if accessing through localhost.
-    #ports:
-      #- "80:80"
+    ports:
+      - "80:80"
     volumes:
       - type: bind
         source: .
@@ -67,4 +67,4 @@ volumes: # This volume which contains the database data will persist.
 networks:
   proxy:
     # Turn this on if proxy network already created and existing.
-    external: true
+    #external: true
