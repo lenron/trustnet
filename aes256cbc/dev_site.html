@@ -633,7 +633,7 @@
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button" id='go_store_flow' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="showPage('')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 
@@ -643,10 +643,103 @@
 				<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button" id='go_store_flow' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="showPage('')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
+				</div>
+			</div>
+<!----------------------------Access--------------------------------------------------------------!>
+<!----------------------------Access--------------------------------------------------------------!>
+
+			<div class="flow_pages passlock" id="access_codeword" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>ACCESS FLOW</label>
+					<label>CODEWORD</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER CODEWORD</h2>
+				<input autocomplete="off" type="password" value="" id="access_codeword_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
+					<!--  initiateStore is an async function. here we don't wait for it to finish before moving on to the next page which is great.  --!>
+					<!--  Might need to wait for an error?  --!>
+					<button class="" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');showPage('access_obf1pass')">CONTINUE</button>
 				</div>
 			</div>
 
+			<!--------------------------- obf1pass -----------------------!>
+			<div class="flow_pages passlock" id="access_obf1pass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>ACCESS FLOW</label>
+					<label>PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="access_obf1pass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_codeword')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('access_obf1pass_input');showPage('access_obf2pass');">CONTINUE</button>
+				</div>
+			</div>
+
+			<!--------------------------- obf2pass -----------------------!>
+			<div class="flow_pages passlock" id="access_obf2pass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>ACCESS FLOW</label>
+					<label>PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="access_obf2pass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_obf1pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('access_obf2pass_input');showPage('access_choose');">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Choose: CMD Line or Browser-----------------------!>
+			<div class="flow_pages" id="access_choose" style="display:none">
+				<label>ACCESS DATA</label>
+				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('access_obf2pass')">BACK</button>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('access_opensslpass')">
+							<span style="">BROWSER</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
+						</button>
+					</div>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<!--<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('store_codeword_cmd')">--!>
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="attemptCMDAccess()">
+							<span class="coolpink" style="">COMMAND LINE</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
+						</button>
+						<label class="coolpink" style="align-self:center;">More Secure</label>
+					</div>
+				</div>
+			</div>
+
+			<!---------------------------Pass 3-----------------------!>
+			<div class="flow_pages passlock" id="access_opensslpass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>ACCESS FLOW</label>
+					<label>PASS 3</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 3</h2>
+				<input autocomplete="off" type="password" value="" id="access_opensslpass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_choose')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="attemptBrowserAccess('access_opensslpass_input');">ACCESS DATA</button>
+				</div>
+			</div>
+
+
+			<!---------------------------Outcome-----------------------!>
+			<!---------------------------Show cleartext or send file to user for download-----------------------!>
+
+
+<!----------------------------Access--------------------------------------------------------------!>
+<!----------------------------Access--------------------------------------------------------------!>
 			<!---------------------------Codeword-----------------------!>
 			<div class="flow_pages passlock" id="store_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
@@ -2899,7 +2992,6 @@
 	async function attemptBrowserStore(inputId){
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
-		//let fingerprintAndData = await getFpAndDataForStore();
 		const fingerprintAndData = await getFpAndDataForStore();
 		const storeOutcome = await storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		// Show user outcome of store, pass or fail.
@@ -2913,9 +3005,39 @@
 		// showPage('pending_or_completed')
 	}
 
-	// Unwind this giant conditional. 
+	// 
+	async function getFpForAccess(){
+		// Get cleartext passwords for encryption.
+		const cleartextSet = await passlockDecryptSet();
+		const fingerprint = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1pass'], cleartextSet['obf2pass']);
+		console.log("passlockedData:");
+		console.log(passlockedData);
+		console.log("cleartextSet:");
+		console.log(cleartextSet);
+		return fingerprint;
+	}
+
+	async function attemptBrowserAccess(inputId){
+		// Encrypt and save OpenSSL password to passlockedData object.
+		await extractInputData(inputId);
+		const fingerprint = await getFpForAccess();
+		console.log("Browser Access. fingerprint: " + fingerprint);
+
+		// Try to access data from server.
+		// If successful, either DELETE or SHOW USER
+	}
+
+	async function attemptCMDAccess(){
+		const fingerprint = await getFpForAccess();
+		console.log("CMD Access. fingerprint: " + fingerprint);
+
+		// Try to access data from server.
+		// If successful, either DELETE or DOWNLOAD FILE.
+	}
+
+
+
 	// Return either pass or fail to show outcome of store, pass or fail to user.
-	//
 	// Legacy code probably needs full rewrite.
 	async function storeDataToServer(fp_hex, encrypted_data){
 		let offline_dbase_store_outcome;
