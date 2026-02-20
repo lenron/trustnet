@@ -30,6 +30,19 @@ if ($q->param){
 	my $ip = $ENV{REMOTE_ADDR};
 	#my $ip = "1.1.1.1";
 
+
+	# Get current time for log.
+	my $t = localtime;
+	my $time = $t->strftime();
+	# If log exists, we know q->param caught data.
+	my $filename = './logs/log.txt';
+	# Append to existing file if it exists, create new otherwise.
+	open(my $fh, '>>', $filename); # or die;
+	print $fh "LOAD\n";
+	print $fh "$time\n";
+	print $fh "$ip\n";
+	print $fh "fingerprint: $fingerprint\n";
+
 	# Return fail if data isn't in the proper form.
 	# Match exactly 64 hex chars, (i)gnoring case.
 	if( !($fingerprint =~ /^[0-9a-f]{64}$/i) ){
@@ -49,22 +62,11 @@ if ($q->param){
 		$data = $row->{data};
 	}
 
-	# Get current time for log.
-	my $t = localtime;
-	my $time = $t->strftime();
-	# If log exists, we know q->param caught data.
-	my $filename = './log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $fh, '>>', $filename); # or die;
-	print $fh "LOAD\n";
-	print $fh "$time\n";
-	print $fh "$ip\n";
-	print $fh "fingerprint: $fingerprint\n";
 	print $fh "data: $data\n";
 
 	# 
 	print $q->header();
-	#print qq{{"response":"$data"}};
+	# Form custom JSON Object
 	print qq{{"data":"$data"}};
 }
 
