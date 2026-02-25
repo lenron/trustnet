@@ -3086,8 +3086,10 @@
 			// serverLoad returns either undefined or encrypted data in string form.
 			encryptedData = await serverLoad(fingerprint);
 		}
-		if(encryptedData === undefined || encryptedData === 'miss'){ // there appears to be a problem.
+		//if(encryptedData === undefined || encryptedData === 'miss' || encryptedData === 'failed to load'){ // there appears to be a problem.
+		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
+			resetPasslock();
 		}else{
 			showPage('access_file');
 			decryptAndDownloadFile(encryptedData);
@@ -3113,27 +3115,33 @@
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprint = await getFpForAccess();
-		// First attempt loading from offline dbase.
+		// First attempt loading from offline dbase. Can return 'miss'.
 		let encryptedData = attemptLoadOfflineDBase(fingerprint);
 		// Try loading from server next.
 		if(encryptedData === 'miss'){
+			// Can return 'failed to load'.
 			encryptedData = await serverLoad(fingerprint);
 		}
-
-
-
+		//console.log("encrypteData: " + encryptedData);
 		// Report outcome of Access attempt.
-		if(encryptedData === undefined || encryptedData === 'miss'){ // there appears to be a problem.
+		// This is a spec check lower in encrypt methods, why not use it here?
+		// ==? Don't try to decrypt if doesns't look like decryptable data.
+		//if(encryptedData.length !== 1000){ // || encryptedData not base 64 chars?>
+		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 		}else{
 			showPage('access_cleartext');
-			try{
-				await decryptAndShowCleartext(encryptedData);
-			}catch(error){
-				console.log("Openssl password 3 entered incorrectly?!");
-				console.log(error);
-			}
+			await decryptAndShowCleartext(encryptedData);
 		}
+/*
+		// Report outcome of Access attempt.
+		if(encryptedData === undefined || encryptedData === 'miss' || encryptedData === 'failed to load'){ // there appears to be a problem.
+			showPage('failed_to_access');
+		}else{
+			showPage('access_cleartext');
+			await decryptAndShowCleartext(encryptedData);
+		}
+*/
 	}
 
 	async function decryptAndShowCleartext(encryptedData){
@@ -3313,7 +3321,15 @@
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Load responseObj.data: " + responseObj.data);
-			//if( responseObj.response != 1 ){ // there appears to be a problem.
+			if( responseObj.data.length === 1000 || checkBase64Chars(responseObj.data)){ // Data looks good.
+				console.log("serverLoad: Successfully loaded encrypted data.");
+				return responseObj.data;
+			}else{
+				//throw Error("serverLoad: Load length NOT 1000 chars! Something went wrong!?");
+				console.log("serverLoad: Failed to load encrypted data.");
+				return "failed to load";
+			}
+/*
 			if( responseObj.data.length != 1000 ){ // there appears to be a problem.
 				throw Error("serverLoad: Load length NOT 1000 chars! Something went wrong!?");
 				return "failed to load";
@@ -3321,6 +3337,7 @@
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.data;
 			}
+*/
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
 		} catch (error) { // Catch rejected promise.
 			console.error(error.message);
