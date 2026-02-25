@@ -143,7 +143,6 @@
 		position:absolute;
 		width:100%;
 		height:215%;
-		display:none;
 		background-color:gray;
 		padding:8px;
 		margin-left:0;
@@ -750,18 +749,18 @@
 						<label>Decrypt:</label>
 						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
 					</div>
-					<div class="deletecheck" id="overlay_download" style="">
+					<div class="deletecheck" id="overlay_delete_cmd" style="display:none">
 						<h2>Are you sure you want to delete this data?</h2> 
 						<div class="button_pair" id="" style="display:flex">
-							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('')">KEEP DATA</button>
-							<button class="" id='' style="flex-grow:1" onclick="deleteExecute()">DELETE DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('overlay_delete_cmd')">KEEP DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="attemptDelete()">DELETE DATA</button>
 						</div>
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='go_store' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
 					<button class="" id='go_load' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_download')">DELETE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
 
@@ -772,13 +771,13 @@
 				<div class="overlay_container" style="position:relative">
 					<!--<textarea value="" id="output_display" rows="8" cols="50"></textarea>--!>
 					<textarea value="" id="access_cleartext_outputdisplay" rows="8" cols="50"></textarea>
-					<div id="overlay_text" class="deletecheck" style="">
+					<div class="deletecheck" id="overlay_delete_browser" style="">
 						<h2>Are you sure you want to delete this data?</h2> 
 						<div class="button_pair" id="" style="display:flex">
 							<!--<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('overlay_text')">KEEP DATA</button>--!>
 							<!--<button class="" id='' style="flex-grow:1;" onclick="deleteExecute()">DELETE DATA</button>--!>
-							<button class="" id='' style="flex-grow:1" onclick="">KEEP DATA</button>
-							<button class="" id='' style="flex-grow:1" onclick="">DELETE DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('overlay_delete_browser')">KEEP DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="attemptDelete()">DELETE DATA</button>
 						</div>
 					</div>
 				</div>
@@ -788,7 +787,7 @@
 					<!--<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_text')">DELETE DATA</button>--!>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1" onclick="">DELETE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
 				</div>
 			</div>
 
@@ -2049,15 +2048,17 @@
 		// Hide pass check warnings (passlock flow).
 		hidePassWarnings();
 		// Reset delete overlay
-		deleteCheckHide('overlay_text');
-		deleteCheckHide('overlay_download');
+		deleteCheckHide('overlay_delete_cmd');
+		deleteCheckHide('overlay_delete_browser');
 	}
 	// Show Overlay
 	function deleteCheckShow(targetId){
+		//console.log("deleteCheck SHOW hit. targetId: " + targetId);
 		document.getElementById(targetId).style.display = "flex";
 	}
 	// Hide Overlay
 	function deleteCheckHide(targetId){
+		//console.log("deleteCheck HIDE hit. targetId: " + targetId);
 		document.getElementById(targetId).style.display = "none";
 	}
 
@@ -2896,18 +2897,25 @@
 		//console.log("resetPasslock called! Passlock has been reset.");
 		// Always clear passlocked data for security.
 		passlockedData = {};
+		// Always clear timout?
+		//clearTimeout(timeoutId);
+		//timeoutId = '';
 		// Don't cause error by sending null into serverDeletePasslock.
 		if(browserId === null){
 			return;
 		}
 		// Ask server to delete passlock.
 		const passlockDeleteOutcome = await serverDeletePasslock(browserId);
+		// Not sure if we need conditional here. Or return anything.
+		// We always want to clear the timeout.
+		// If there's a failure, we can probably rely on MariaDB cleanup job.
+		// What do we do if it fails? Anything?
 		if(passlockDeleteOutcome === "success"){
-			// Since we've verified passlock is deleted from server, clear timeout timer/function.
-			//console.log("Clearing passlock timeout! timeoutId: " + timeoutId);
+			browserId = null;
+			// Only clear timeout on success? meaning it will fire again? Trying to delete the passlock one more time?
+			// Seems like a good idea?
 			clearTimeout(timeoutId);
 			timeoutId = '';
-			browserId = null;
 		}
 	}
 
@@ -2920,21 +2928,18 @@
 			// Nothing is supposed to call this function while brrowserId unset. 
 			throw Error("Passlock is timed out!");
 		}
-		// Needs to be not a json object. Need to update serverGetPasslock too.
-		//
-		// Return passlock json object if not timed out.
-		const passlockJsonObject = await serverGetPasslock(browserId);
-		//console.log("browser id: " + browserId);
-		//console.log(passlockJsonObject);
-		// Return data from json object.
-		return passlockJsonObject.passlock;
+
+		const passlock = await serverGetPasslock(browserId);
+		if(passlock.length !== 36 || !checkUUIDChars(passlock)){ // Data doesn't look like a passlock.
+			//showPage("unable_to_retrieve_passlock");
+			throw Error("Unable to retrieve passlock!");
+		}else{
+			return passlock;
+		}
 	}
 
 	// Generate a browser_id, passlock and save to server as a key-value pair.
 	async function generatePasslock(){
-		//console.log("Starting passlock: generatePasslock called.");
-		// Reset browserId and encrypted user data, passwords.
-		//resetPasslock();
 		// Generate new browserId (global variable).
 		browserId = self.crypto.randomUUID();
 		// Generate new passlock (not global).
@@ -2977,9 +2982,6 @@
 	function extractKeyword(inputId){
 		const regex = /^\w+_(?<keyword>\w+)_\w+$/;
 		const match = regex.exec(inputId);
-		//console.log("PASSLOCK OBJECT: ");
-		//console.log(passlockedData);
-		//console.log("Regex matched: " + match.groups.keyword);
 		return match.groups.keyword;
 	}
 
@@ -3003,9 +3005,6 @@
 		const keyword = extractKeyword(inputId);
 		const cleartextPass = extractCleartextData(inputId);
 		const encryptedPassword = await passlockEncrypt(cleartextPass);
-		//console.log("Checking passlock...");
-		//console.log("keyword: " + keyword);
-		//console.log("passlockedData[keyword]: " + passlockedData[keyword]);
 		if(passlockedData[keyword] === encryptedPassword){
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
@@ -3021,9 +3020,6 @@
 	async function passlockEncrypt(cleartextPassword){
 		const passlock = await getPasslock();
 		const encryptedPassword = await encOpenSSL(cleartextPassword, passlock);
-		//console.log("retrieved passlock: " + passlock);
-		//console.log("cleartextPassword: " + cleartextPassword);
-		//console.log("encryptedPassword: " + encryptedPassword);
 		return encryptedPassword;
 	}
 
@@ -3122,26 +3118,15 @@
 			// Can return 'failed to load'.
 			encryptedData = await serverLoad(fingerprint);
 		}
-		//console.log("encrypteData: " + encryptedData);
 		// Report outcome of Access attempt.
 		// This is a spec check lower in encrypt methods, why not use it here?
-		// ==? Don't try to decrypt if doesns't look like decryptable data.
-		//if(encryptedData.length !== 1000){ // || encryptedData not base 64 chars?>
+		// ==> Don't try to decrypt if doesns't look like decryptable data.
 		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 		}else{
 			showPage('access_cleartext');
 			await decryptAndShowCleartext(encryptedData);
 		}
-/*
-		// Report outcome of Access attempt.
-		if(encryptedData === undefined || encryptedData === 'miss' || encryptedData === 'failed to load'){ // there appears to be a problem.
-			showPage('failed_to_access');
-		}else{
-			showPage('access_cleartext');
-			await decryptAndShowCleartext(encryptedData);
-		}
-*/
 	}
 
 	async function decryptAndShowCleartext(encryptedData){
@@ -3321,7 +3306,7 @@
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Load responseObj.data: " + responseObj.data);
-			if( responseObj.data.length === 1000 || checkBase64Chars(responseObj.data)){ // Data looks good.
+			if( responseObj.data.length === 1000 && checkBase64Chars(responseObj.data)){ // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.data;
 			}else{
@@ -3329,15 +3314,6 @@
 				console.log("serverLoad: Failed to load encrypted data.");
 				return "failed to load";
 			}
-/*
-			if( responseObj.data.length != 1000 ){ // there appears to be a problem.
-				throw Error("serverLoad: Load length NOT 1000 chars! Something went wrong!?");
-				return "failed to load";
-			}else{
-				console.log("serverLoad: Successfully loaded encrypted data.");
-				return responseObj.data;
-			}
-*/
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
 		} catch (error) { // Catch rejected promise.
 			console.error(error.message);
@@ -3454,9 +3430,7 @@
 			// Now that we've cleared the error check, we can proceed with processing the response.
 			// Make a copy of the json extraction.
 			const response_obj = await fetchResponseObject.json();
-
 			//checkResponseObject(response_obj, "Message specific to serverSetPasslock");
-
 			console.log("set passlock response: ");
 			console.log(response_obj);
 			// Handle database query outcome.
@@ -3473,36 +3447,44 @@
 	}//serverSetPasslock()
 
 	// needs update.
-	async function serverGetPasslock(){
-		const browser_id = browserId;
+	async function serverGetPasslock(browserId){
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exegetpasslock;';
-		
-		const fetchResponseObject = await fetch(SERVER_URL, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'text/plain',
-			},
-			body: JSON.stringify({
-				browser_id: browser_id,
-			}),
-		})
-		.catch((error) => {
-			console.log("Fetch Error on serverGetPasslock : " + error.message);
-			if( error.message == "Failed to fetch" ){
-				console.log("CAUGHT THE DISCONNECTED ERROR IN GetPasslock!");
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					browser_id: browserId,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
 			}
-		});
-		if( fetchResponseObject ){
-			if( fetchResponseObject.ok ){
-				//console.log("Response from serverGetPasslock() fetch() call = OK!");
-				return fetchResponseObject.json();
-			} else {
-				console.log("HTTP error. Status: " + fetchResponseObject.status);
-				return fetchResponseObject.json();
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			//console.log(responseObj);
+			//console.log("responseObj.passlock: " + responseObj.passlock);
+			//console.log("responseObj.passlock.length: " + responseObj.passlock.length);
+			if( responseObj.passlock.length === 36 && checkUUIDChars(responseObj.passlock)){ // Data looks good.
+				//console.log("serverGetPasslock: Successfully retrieved existing passlock.");
+				return responseObj.passlock;
+			}else{
+				throw Error("serverGetPasslock: Failed to load passlock.");
+				//console.log("serverGetPasslock: Failed to load passlock.");
+				return "failed to get passlock";
 			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
 		}
-		return;
 	}//serverGetPasslock()
 
 	// Create a json string containing every record in the offline dbase from 0 to pointer.
@@ -3804,7 +3786,7 @@
 		let plaintext_binary = addCountstring(plaintext64);
 		document.getElementById("dev_enc_obf1_zero_padded_data").value = plaintext_binary;
 
-		if( !checkBase64Chars(plaintext64) ){
+		if(!checkBase64Chars(plaintext64)){
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
 
@@ -3908,7 +3890,7 @@
 	// Output: 1000 chars of base64 string
 	async function obf2Encrypt(input_data, password){
 
-		if( !checkBase64Chars(input_data) ){
+		if(!checkBase64Chars(input_data)){
 			throw new Error('Obfuscation step 2 INVALID characters found!');
 		}
 
@@ -4061,16 +4043,26 @@
 		return fingerprintHex;
 	}//computeFingerprint
 
+	// Check uuid chars which are used for passlock and browserID.
+	function checkUUIDChars(input){
+		const regex = /^[a-f0-9\-]*$/;
+		if( regex.test(input) ){
+			return 1;
+		}else{
+			return 0;
+		}
+	}//checkUUIDChars()
+
 	// Input: input is a string.
 	// Output: Returns false if non-base58 characters are detected.
 	function checkBase64Chars(input){
 		// From the first char(^) to the last($), match exactly 1000 base64 chars.
 		const regex = /^[a-zA-Z0-9\+\/\=]*$/;
 		if( regex.test(input) ){
-			// Return true/valid: non-b58 chars were NOT found.
+			// Return true/valid
 			return 1;
 		}else{
-			// Return false/invalid: non-b58 chars were found.
+			// Return false/invalid
 			return 0;
 		}
 	}//checkBase64Chars()
