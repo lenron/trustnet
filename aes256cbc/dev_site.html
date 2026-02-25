@@ -750,17 +750,17 @@
 						<label>Decrypt:</label>
 						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
 					</div>
-					<div id="overlay_download" class="deletecheck" style="">
+					<div class="deletecheck" id="overlay_download" style="">
 						<h2>Are you sure you want to delete this data?</h2> 
-						<div class="button_pair" id="" style="display:flex;">
+						<div class="button_pair" id="" style="display:flex">
 							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('')">KEEP DATA</button>
-							<button class="" id='' style="flex-grow:1;" onclick="deleteExecute()">DELETE DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="deleteExecute()">DELETE DATA</button>
 						</div>
 					</div>
 				</div>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='go_store' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>
-					<button class="" id='go_load' style="flex-grow:1;" onclick="showPage('access_codeword')">ACCESS DATA</button>
+				<div class="button_pair" id="" style="display:flex">
+					<button class="" id='go_store' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_download')">DELETE DATA</button>
 				</div>
 			</div>
@@ -774,20 +774,20 @@
 					<textarea value="" id="access_cleartext_outputdisplay" rows="8" cols="50"></textarea>
 					<div id="overlay_text" class="deletecheck" style="">
 						<h2>Are you sure you want to delete this data?</h2> 
-						<div class="button_pair" id="" style="display:flex;">
+						<div class="button_pair" id="" style="display:flex">
 							<!--<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('overlay_text')">KEEP DATA</button>--!>
 							<!--<button class="" id='' style="flex-grow:1;" onclick="deleteExecute()">DELETE DATA</button>--!>
 							<button class="" id='' style="flex-grow:1" onclick="">KEEP DATA</button>
-							<button class="" id='' style="flex-grow:1;" onclick="">DELETE DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="">DELETE DATA</button>
 						</div>
 					</div>
 				</div>
-				<div class="button_pair" id="" style="display:flex;">
+				<div class="button_pair" id="" style="display:flex">
 					<!--<button class="" id='go_store' style="flex-grow:1;" onclick="securityReset();showPage('store1')">STORE DATA</button>--!>
 					<!--<button class="" id='go_load' style="flex-grow:1;" onclick="securityReset();showPage('load1')">ACCESS DATA</button>--!>
 					<!--<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_text')">DELETE DATA</button>--!>
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_codeword')">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="">DELETE DATA</button>
 				</div>
 			</div>
@@ -795,9 +795,9 @@
 			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
 			<div class="flow_pages failed_to_access" id="failed_to_access" style="display:none">
 				<label>&#10005; FAILED TO ACCESS</label>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_codeword')">ACCESS DATA</button>
+				<div class="button_pair" id="" style="display:flex">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
 				</div>
 			</div>
 <!----------------------------END Access--------------------------------------------------------------!>
@@ -2037,16 +2037,51 @@
 		// faq();
 	}
 */
-
 	//////////////////////////////////////////////////////////////
 	//		UI & flowwalker Handler Functions					//
 	//////////////////////////////////////////////////////////////
 
+	function securityReset(){
+		// Delete cleartext outdisplay which is shown at the end of the Browser Access Flow.
+		document.getElementById("access_cleartext_outputdisplay").value = '';
+		// Check if we're online and inform user if we are or not.
+		updateOnlineStatus();
+		// Hide pass check warnings (passlock flow).
+		hidePassWarnings();
+		// Reset delete overlay
+		deleteCheckHide('overlay_text');
+		deleteCheckHide('overlay_download');
+	}
+	// Show Overlay
+	function deleteCheckShow(targetId){
+		document.getElementById(targetId).style.display = "flex";
+	}
+	// Hide Overlay
+	function deleteCheckHide(targetId){
+		document.getElementById(targetId).style.display = "none";
+	}
+
+	function showPassWarnings(){
+		// Show all password warnings.
+		pass_check_elements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < pass_check_elements.length; i++) {
+			pass_check_elements[i].style.display = "inline";
+		}
+	}
+
+	function hidePassWarnings(){
+		// Show all password warnings.
+		pass_check_elements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < pass_check_elements.length; i++) {
+			pass_check_elements[i].style.display = "none";
+		}
+	}
+
 	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of a page for flowing the user through site.
 	function showPage(target){
-		// Hide pass check warnings (passlock flow).
-		hidePassWarnings();
+		// Security Reset.
+		securityReset();
 		// Hide all password warnings.
 		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
 		for (let i = 0; i < pass_warn_elements.length; i++) {
@@ -2076,6 +2111,39 @@
 			 textareas_array[0].focus();
 		 }
 */
+	}
+
+	// Catch File Ingest
+	// listener is placed inline of the html
+	async function catchUpload(event){
+		const file = event.target.files[0];
+		const reader = new FileReader();
+		reader.readAsArrayBuffer(file);
+
+		reader.onload = async function(e){
+			let buffer = e.target.result;
+			const buffer_uint8a = new Uint8Array(buffer);
+			let filedata = bytesToBase64(buffer_uint8a);
+			//console.log("filedata: " + filedata);
+			// Input Data Length Check
+			//if( checkInputLength(buffer) ){
+			if( checkInputLengthUpload(buffer) ){
+				passlockedData['data'] = await passlockEncrypt(filedata);
+				// Show button.
+				document.getElementById("store_upload_commit_button").style.display = "inline";
+				document.getElementById("store_upload_input").style.border = "";
+				// add red warning text
+				document.getElementById("store_upload_warning").style.display = "none";
+			}else{
+				// Data Length too long! Show Warning.
+				// hide continue button
+				document.getElementById("store_upload_commit_button").style.display = "none";
+				// make border red
+				document.getElementById("store_upload_input").style.border = "thick solid red";
+				// add red warning text
+				document.getElementById("store_upload_warning").style.display = "inline";
+			}
+		}
 	}
 
 	// Used to check password length as user flows through interface.
@@ -2113,6 +2181,7 @@
 		}
 	} //checkPassLength()
 
+/*
 	// Clears all fields that could contain sensitive data.
 	// Resets delete overlay
 	function securityReset(){
@@ -2143,7 +2212,7 @@
 		// Clear full offline database warning. Don't think we need this because why would you ever want it off?
 		//document.getElementById("full_offline_dbase_warning").style.display = "none";
 	}
-
+*/
 	// These standalone functions are required to set upload_flag in javascript.
 	// User choose text input, set flag to false.
 	function storeDefault(){
@@ -2214,16 +2283,6 @@
 		//showPage('load5');
 	}
 
-	// Show Overlay
-	function deleteCheckShow(tar){
-		document.getElementById(tar).style.display = "flex";
-	}
-
-	// Hide Overlay
-	function deleteCheckHide(tar){
-		document.getElementById(tar).style.display = "none";
-	}
-
 	// Delete flow walk finisher.
 	async function deleteExecute(){
 		// Main Function Call
@@ -2244,75 +2303,6 @@
 		securityReset();
 	}
 
-	// Catch File Ingest
-	// listener is placed inline of the html
-	async function catchUpload(event){
-		const file = event.target.files[0];
-		const reader = new FileReader();
-		reader.readAsArrayBuffer(file);
-
-		reader.onload = async function(e){
-			let buffer = e.target.result;
-			const buffer_uint8a = new Uint8Array(buffer);
-			let filedata = bytesToBase64(buffer_uint8a);
-			//console.log("filedata: " + filedata);
-			// Input Data Length Check
-			//if( checkInputLength(buffer) ){
-			if( checkInputLengthUpload(buffer) ){
-				passlockedData['data'] = await passlockEncrypt(filedata);
-				// Show button.
-				document.getElementById("store_upload_commit_button").style.display = "inline";
-				document.getElementById("store_upload_input").style.border = "";
-				// add red warning text
-				document.getElementById("store_upload_warning").style.display = "none";
-			}else{
-				// Data Length too long! Show Warning.
-				// hide continue button
-				document.getElementById("store_upload_commit_button").style.display = "none";
-				// make border red
-				document.getElementById("store_upload_input").style.border = "thick solid red";
-				// add red warning text
-				document.getElementById("store_upload_warning").style.display = "inline";
-			}
-		}
-	}
-
-/*
-	// Catch File Ingest
-	// listener is placed inline of the html
-	async function catchUpload(event){
-		const file = event.target.files[0];
-		const reader = new FileReader();
-		reader.readAsArrayBuffer(file);
-
-		reader.onload = function(e){
-			let buffer = e.target.result;
-			const buffer_uint8a = new Uint8Array(buffer);
-			let filedata = bytesToBase64(buffer_uint8a);
-			// Input Data Length Check
-			if( checkInputLength(buffer) ){
-				// Data Length within parameters
-				document.getElementById("upload_data").value = filedata;
-				document.querySelectorAll(".store.upload").forEach(a=>a.style.display = "none");
-				// skip data and pass1 input screens
-				document.querySelectorAll(".store.four").forEach(a=>a.style.display = "flex");
-				// for back functionality, we need a button to continue
-				document.getElementById("store_upload_continue").style.display = "inline";
-				document.getElementById("store_upload_input").style.border = "";
-				// add red warning text
-				document.getElementById("store_upload_warning").style.display = "none";
-			}else{
-				// Data Length too long! Show Warning.
-				// hide continue button
-				document.getElementById("store_upload_continue").style.display = "none";
-				// make border red
-				document.getElementById("store_upload_input").style.border = "thick solid red";
-				// add red warning text
-				document.getElementById("store_upload_warning").style.display = "inline";
-			}
-		}
-	}
-*/
 	// Called on change of text area, checks length of that text area and shows warning if input data too long.
 	function checkTextInputLength(input_id){
 		//let input = document.getElementById("store_data").value;
@@ -2329,18 +2319,6 @@
 			document.getElementById("text_input_continue").style.display = "none";
 		}
 	}
-/*
-	// Automatically run this function when page loads.
-	window.onload = async function() {
-		// Initial server online check.
-		await updateOnlineStatus();
-
-		// hide create button if already exists.
-		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
-			document.getElementById("create_dbase_button").style.display = "none";
-		}
-	}
-*/
 
 	//////////////////////////////////////////////////////////////
 	//				Offline Database Functions					//
@@ -2904,43 +2882,33 @@
 		}
 	}//deepDelete()
 
-
-
-	function showPassWarnings(){
-		// Show all password warnings.
-		pass_check_elements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < pass_check_elements.length; i++) {
-			pass_check_elements[i].style.display = "inline";
-		}
-	}
-
-	function hidePassWarnings(){
-		// Show all password warnings.
-		pass_check_elements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < pass_check_elements.length; i++) {
-			pass_check_elements[i].style.display = "none";
-		}
-	}
 	//////////////////////////////////////////////////////////////
 	//			Passlock Functions							    //
 	//////////////////////////////////////////////////////////////
 	// Global browser_id variable to be used for accessing passlock, 
-	let browserId;
+	let browserId = null;
 	// Keep track of running timeout.
 	let timeoutId;
 	// Create Object for passlocked passwords and data.
 	let passlockedData = {};
-	//Reset passlock global variables
-	function resetPasslock(){
-		//const passlockDeleteOutcome = await serverDeletePasslock();
-		//if(passlockDeleteOutcome === "success"){
-			console.log("Resetting passlock timeout! timeoutId: " + timeoutId);
+	// Reset passlock global variables
+	async function resetPasslock(){
+		//console.log("resetPasslock called! Passlock has been reset.");
+		// Always clear passlocked data for security.
+		passlockedData = {};
+		// Don't cause error by sending null into serverDeletePasslock.
+		if(browserId === null){
+			return;
+		}
+		// Ask server to delete passlock.
+		const passlockDeleteOutcome = await serverDeletePasslock(browserId);
+		if(passlockDeleteOutcome === "success"){
+			// Since we've verified passlock is deleted from server, clear timeout timer/function.
+			//console.log("Clearing passlock timeout! timeoutId: " + timeoutId);
 			clearTimeout(timeoutId);
 			timeoutId = '';
-		//}
-		browserId = null;
-		passlockedData = {};
-		console.log("resetPasslock called! Passlock has been reset.");
+			browserId = null;
+		}
 	}
 
 	// Return passlock for encrypt/decrypt functions if not timed out.
@@ -2982,7 +2950,7 @@
 	// Saves first user data which will always be the codeword.
 	async function initPasslockFlow(inputId){
 		// Reset browserId and encrypted user data, passwords.
-		resetPasslock();
+		await resetPasslock();
 		// Set timeout timer.
 		timeoutId = setTimeout(() => {
 			showPage('timed_out_home');
@@ -3138,7 +3106,7 @@
 			a.download = 'yourfile.enc';
 			a.click();
 		// Delete passlock for secruity.
-		resetPasslock();
+		await resetPasslock();
 	}
 
 	async function attemptBrowserAccess(inputId){
@@ -3151,12 +3119,20 @@
 		if(encryptedData === 'miss'){
 			encryptedData = await serverLoad(fingerprint);
 		}
+
+
+
 		// Report outcome of Access attempt.
 		if(encryptedData === undefined || encryptedData === 'miss'){ // there appears to be a problem.
 			showPage('failed_to_access');
 		}else{
 			showPage('access_cleartext');
-			decryptAndShowCleartext(encryptedData);
+			try{
+				await decryptAndShowCleartext(encryptedData);
+			}catch(error){
+				console.log("Openssl password 3 entered incorrectly?!");
+				console.log(error);
+			}
 		}
 	}
 
@@ -3166,7 +3142,7 @@
 		// Reveal cleartext to user.
 		document.getElementById("access_cleartext_outputdisplay").value = decryptedData;
 		// Delete passlock for secruity.
-		resetPasslock();
+		await resetPasslock();
 	}
 
 
@@ -3200,7 +3176,7 @@
 			// Doesn't look like server stored data properly, report fail.
 			showPage('store_fail');
 		}
-		resetPasslock();
+		await resetPasslock();
 	}//storeDataToServer()
 
 
@@ -3387,17 +3363,16 @@
 				return "success";
 			}
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
+		// 500 Internal Server Errors will be caught here too.
+		}catch(error){ // Catch rejected promise.
 			console.error(error.message);
 		}
 	}//serverStore()
 
 	// Runs after Store or Access call completes as a security measure to ensure user passlocks exist only as long as necessary.
-	async function serverDeletePasslock(browser_id) {
-	//async function serverDeletePasslock() {
-		//const browser_id = browserId;
+	async function serverDeletePasslock(passedBrowserId) {
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exedeletepasslock;';
+		SERVER_URL += 'exepasslockdelete;';
 
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
@@ -3407,7 +3382,7 @@
 					'Content-Type': 'text/plain',
 				},
 				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					browser_id: browser_id,
+					browser_id: passedBrowserId,
 				}),
 			});
 
@@ -3415,27 +3390,28 @@
 				// Response Status is the numerical code like 404, 500, etc.
 				throw new Error(`Response status: ${fetchResponseObject.status}`);
 			}
-
 			// Now that we've cleared the error check, we can proceed with processing the response.
 			// Make a copy of the json extraction.
-			const response_obj = await fetchResponseObject.json();
+			const responseObj = await fetchResponseObject.json();
 			// checkResponseObject(response_obj);
-			console.log(response_obj);
+			console.log("delete passlock response: ");
+			console.log(responseObj);
 			// Handle database query outcome.
-			if( response_obj.response != 1 ){ // there appears to be a problem.
-				console.log("Error Deleting. browser_id: " + browserId);
-				throw Error("serverDeletePasslock() database error!");
+			//console.log("Store responseObj.response: " + responseObj.response);
+			//if( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
+			if(responseObj.response !== "passlock successfully deleted"){ // there appears to be a problem.
+				//console.log("Error Deleting. browser_id: " + browserId);
+				throw Error("serverDeletePasslock() Failed to delete passlock!");
+				return "error";
 			}else{
 				console.log("Passlock successfully deleted from database.");
-				return;
+				return "success";
 			}
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
 		} catch (error) { // Catch rejected promise.
 			console.error(error.message);
 		}
 	}//serverDeletePasslock()
-
-
 
 	async function serverSetPasslock(browser_id, passlock) {
 		let SERVER_URL = getServerOrigin();
@@ -3458,13 +3434,13 @@
 				// Response Status is the numerical code like 404, 500, etc.
 				throw new Error(`Response status: ${fetchResponseObject.status}`);
 			}
-
 			// Now that we've cleared the error check, we can proceed with processing the response.
 			// Make a copy of the json extraction.
 			const response_obj = await fetchResponseObject.json();
 
 			//checkResponseObject(response_obj, "Message specific to serverSetPasslock");
 
+			console.log("set passlock response: ");
 			console.log(response_obj);
 			// Handle database query outcome.
 			if( response_obj.response != 1 ){ // there appears to be a problem.
@@ -3473,15 +3449,8 @@
 				console.log("New passlock successfully stored to database.");
 				return;
 			}
-			// 
-			// If can't save passlock to server try again ONCE before switching to offline mode.
-			//
-
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
 		} catch (error) { // Catch rejected promise.
-
-			// Switch to Offline Mode here?
-
 			console.error(error.message);
 		}
 	}//serverSetPasslock()

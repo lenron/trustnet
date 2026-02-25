@@ -19,7 +19,7 @@ my $db_username = 'chatriwe_admin';
 my $db_pw = 'Vuu_fQY1#qH,';
 my $db_name = 'chatriwe_obf';
 
-#if ($q->param){
+if ($q->param){
 #my $test = '{"browser_id":"f6285edb-c048-45c7-9a74-9ddc4c7440be"}';
 
 	# Get current time for log.
@@ -32,17 +32,16 @@ my $db_name = 'chatriwe_obf';
 	print $fh "\n\nDELETE\n";
 	print $fh "$time\n";
 
-	my $postdata = $q->param('POSTDATA');
-	print $fh "POSTDATA: $postdata\n";
+	#my $postdata = $q->param('POSTDATA');
+	#print $fh "POSTDATA: $postdata\n";
 	# Decode to hash ref to extract browser_id and passlock
 	my $hash_ref = $json->decode(scalar $q->param('POSTDATA'));
 	#my $hash_ref = $json->decode($test);
 
 	# Extract values from json-like object (whatever it is).
 	my $browser_id = $hash_ref->{browser_id};
-
 	print $fh "browser_id: $browser_id\n";
-exit(0);
+
 	# Try checking for existence first because mariadb versions work differently.
 	#my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	#my $response = $dbh->do("INSERT INTO $db_table (browser_id, passlock) VALUES (?, ?)", undef, $browser_id, $passlock);
@@ -54,8 +53,13 @@ exit(0);
 	#$dbh->disconnect();
 
 	print $q->header();
-	print qq{{"response":"$response"}};
-#}
+	#if( $response eq "0E0"){
+	if($response == 1){
+		print qq{{"response":"passlock successfully deleted"}};
+	}else{
+		print qq{{"response":"failed to delete"}};
+	}
+}
 
 
 	#my $input = scalar $q->param('POSTDATA');

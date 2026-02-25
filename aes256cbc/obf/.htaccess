@@ -1,6 +1,7 @@
 RewriteEngine On
  RewriteBase /
  # Redirect calls from /obf/exestore to /obf/store.pl
+# These RewriteRules use regex in what appears to be a greedy way. ^exedelete was catching and sending to delete.pl while ^exedeletepasslock, delete_passlock.pl was the intended redirect.
  RewriteRule ^exestore store.pl
  RewriteRule ^exeload load.pl
  RewriteRule ^exedelete delete.pl
@@ -8,4 +9,4 @@ RewriteEngine On
  RewriteRule ^exeonlinecheck online_check.pl
  RewriteRule ^exesetpasslock set_passlock.pl
  RewriteRule ^exegetpasslock get_passlock.pl
- RewriteRule ^exedeletepasslock delete_passlock.pl
+ RewriteRule ^exepasslockdelete delete_passlock.pl

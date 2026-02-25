@@ -19,7 +19,9 @@ RewriteBase /
 #RewriteRule ^delete obfuscate.pl?id=delete
 #RewriteRule ^faq obfuscate.pl?id=faq
 #RewriteRule ^how obfuscate.pl?id=how
-# Redirect calls from /obf/exestore to /obf/store.pl
+
+# Redirect calls from e.g. /obf/exestore to /obf/store.pl
+# These RewriteRules use regex in what appears to be a greedy way. ^exedelete was catching and sending to delete.pl while ^exedeletepasslock, delete_passlock.pl was the intended redirect.
 RewriteRule ^exestore store.pl
 RewriteRule ^exeload load.pl
 RewriteRule ^exedelete delete.pl
@@ -27,7 +29,7 @@ RewriteRule ^exeburststore burst_store.pl
 RewriteRule ^exeonlinecheck online_check.pl
 RewriteRule ^exesetpasslock set_passlock.pl
 RewriteRule ^exegetpasslock get_passlock.pl
-RewriteRule ^exedeletepasslock delete_passlock.pl
+RewriteRule ^exepasslockdelete delete_passlock.pl
 
 # Redirects for Offline Database
 #RewriteRule ^exe_offline_set set_offline_dbase.pl
