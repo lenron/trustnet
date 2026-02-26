@@ -271,7 +271,7 @@
 </style>
 <body>
 <button id="toggle_site_button" onclick="toggleSite()">Show Main Site</button>
-<div id="main_site" style="display:none;">
+<div id="main_site" style="display:inline;">
 
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
@@ -661,7 +661,7 @@
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
 					<!--  initiateStore is an async function. here we don't wait for it to finish before moving on to the next page which is great.  --!>
 					<!--  Might need to wait for an error?  --!>
-					<button class="" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');showPage('access_obf1pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');showPage('access_obf1pass')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -676,7 +676,7 @@
 				<input autocomplete="off" type="password" value="" id="access_obf1pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_codeword')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('access_obf1pass_input');showPage('access_obf2pass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_obf1pass_input');showPage('access_obf2pass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -691,7 +691,7 @@
 				<input autocomplete="off" type="password" value="" id="access_obf2pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_obf1pass')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('access_obf2pass_input');showPage('access_choose');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_obf2pass_input');showPage('access_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -729,7 +729,7 @@
 				<input autocomplete="off" type="password" value="" id="access_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_choose')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="attemptBrowserAccess('access_opensslpass_input');">ACCESS DATA</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptBrowserAccess('access_opensslpass_input');">ACCESS DATA</button>
 				</div>
 			</div>
 
@@ -737,7 +737,7 @@
 			<!---------------------------Outcome-----------------------!>
 			<!---------------------------Send file to user for download-----------------------!>
 			<div class="flow_pages passlock" id="access_file" style="display:none">
-				<label>&#10004; SUCCESS</label>
+				<h2>&#10004; SUCCESS</h2>
 				<label>File should automatically download.</label>
 				<br>
 				<div class="overlay_container" style="position:relative">
@@ -766,7 +766,7 @@
 
 			<!---------------------------Show Cleartext-----------------------!>
 			<div class="flow_pages passlock" id="access_cleartext" style="display:none">
-				<label>&#10004; SUCCESS</label>
+				<h2>&#10004; SUCCESS</h2>
 				<label>result:</label>
 				<div class="overlay_container" style="position:relative">
 					<!--<textarea value="" id="output_display" rows="8" cols="50"></textarea>--!>
@@ -792,11 +792,32 @@
 			</div>
 
 			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
-			<div class="flow_pages failed_to_access" id="failed_to_access" style="display:none">
-				<label>&#10005; FAILED TO ACCESS</label>
+			<div class="flow_pages" id="failed_to_access" style="display:none">
+				<h2>&#10060; FAILED TO ACCESS</h2>
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
+				</div>
+			</div>
+
+			<!------------------Fingerprint Holder for Delete------------------------------!>
+			<input id="fingerprint_holder" autocomplete="off" value="" style="display:none">
+
+			<!----------------------------Successfully Deleted Data--------------------------------------------------------------!>
+			<div class="flow_pages" id="delete_success" style="display:none">
+				<h2>&#10004; SUCCESSFULLY DELETED DATA</h2>
+				<div class="button_pair" id="" style="display:flex">
+					<button class="" id='go_store' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
+				</div>
+			</div>
+
+			<!----------------------------Failed to Delete--------------------------------------------------------------!>
+			<div class="flow_pages" id="delete_failed" style="display:none">
+				<h2>&#10060; FAILED TO DELETE</h2>
+				<div class="button_pair" id="" style="display:flex">
+					<button class="" id='go_store' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
+					<button class="" id='go_load' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
 				</div>
 			</div>
 <!----------------------------END Access--------------------------------------------------------------!>
@@ -818,7 +839,7 @@
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
 					<!--  initiateStore is an async function. here we don't wait for it to finish before moving on to the next page which is great.  --!>
 					<!--  Might need to wait for an error?  --!>
-					<button class="" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');showPage('store_obf1pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');showPage('store_obf1pass')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -833,7 +854,7 @@
 				<input autocomplete="off" type="password" value="" id="store_obf1pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('store_obf1pass_input');showPage('store_obf2pass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_obf1pass_input');showPage('store_obf2pass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -848,7 +869,7 @@
 				<input autocomplete="off" type="password" value="" id="store_obf2pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('store_obf2pass_input');showPage('store_choose');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_obf2pass_input');showPage('store_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -889,7 +910,7 @@
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
 					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
 																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdinput', 'store_obf1pass_cmd')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdinput', 'store_obf1pass_cmd')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -905,7 +926,7 @@
 				<input autocomplete="off" type="password" value="" id="store_obf1pass_cmdinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_cmd')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_cmdinput', 'store_obf2pass_cmd')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_cmdinput', 'store_obf2pass_cmd')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -921,7 +942,7 @@
 				<input autocomplete="off" type="password" value="" id="store_obf2pass_cmdinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_cmd')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_cmdinput', 'store_upload')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_cmdinput', 'store_upload')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -930,6 +951,7 @@
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
 				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 526 byte limit</h2>
+				<h2 id="store_upload_readytocommit" style="color:orange; display:none">READY TO COMMIT</h2>
 				<label id="uploaddata_length_label" style="color:black"></label>
 				<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
 				<br>
@@ -945,7 +967,7 @@
 					<!-- when hitting back here go back to CMD Line or Browser? --!>
 					<!--<button class="" id='' style="width:250px;" onclick="showPage('store_choose')">BACK</button>--!>
 					<button class="" id='' style="width:250px;" onclick="showPage('store_obf2pass_cmd')">BACK</button>
-					<button class="" id='store_upload_commit_button' style="flex-grow:1;display:none;" onclick="attemptCMDStore()">COMMIT DATA TO SERVER</button>
+					<button class="" id='store_upload_commit_button' style="flex-grow:1;display:none;color:orange" onclick="attemptCMDStore()">COMMIT DATA TO SERVER</button>
 				</div>
 			</div>
 			<!---------------------------END Store CMD Line Flow-----------------------!>
@@ -963,7 +985,7 @@
 				<input autocomplete="off" type="password" value="" id="store_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="extractInputData('store_opensslpass_input');showPage('store_codeword_check');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_opensslpass_input');showPage('store_codeword_check');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -981,7 +1003,7 @@
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_opensslpass')">BACK</button>
 					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
 																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_checkinput', 'store_obf1pass_check')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_checkinput', 'store_obf1pass_check')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -997,7 +1019,7 @@
 				<input autocomplete="off" type="password" value="" id="store_obf1pass_checkinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_check')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_checkinput', 'store_obf2pass_check')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_checkinput', 'store_obf2pass_check')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -1013,7 +1035,7 @@
 				<input autocomplete="off" type="password" value="" id="store_obf2pass_checkinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_check')">BACK</button>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_checkinput', 'store_opensslpass_check')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_checkinput', 'store_opensslpass_check')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -1030,7 +1052,7 @@
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf2pass_check')">BACK</button>
 					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'check_pass3', 'check_passlock3', 'check_cw')">CONTINUE</button>--!>
-					<button class="" id='' style="flex-grow:1;" onclick="checkPasslock('store_opensslpass_checkinput', 'store_data')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_opensslpass_checkinput', 'store_data')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -1062,14 +1084,13 @@
 			</div>
 
 			<!---------------------------Store Fail-----------------------!>
-			<div class="flow_pages" id="store_fail" style="display:none">
+			<div class="flow_pages" id="store_failed" style="display:none">
 				<h2>&#10060; FAILED TO STORE</h2>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
 				</div>
 			</div>
-
 
 <!----------------------------END STORE--------------------------------------------------------------!>
 <!----------------------------END STORE--------------------------------------------------------------!>
@@ -1165,7 +1186,7 @@
 <!-- Dev Site --!>
 <!-- Dev Site --!>
 <!-- Dev Site --!>
-<div class="" id="dev_site" style="display:inline">
+<div class="" id="dev_site" style="display:none">
 	<h2 class="header_title">Development Site -- Crypto Functions</h2>
 
 	<!-- OpenSSL Encrypt -->
@@ -1411,21 +1432,29 @@
 	</div>
 </div>
 </body>
+<!----------------------------------JAVASCRIPT-------------------------------------!>
+<!----------------------------------JAVASCRIPT-------------------------------------!>
+<!----------------------------------JAVASCRIPT-------------------------------------!>
 <script>
-
-		//console.log("radiovalue:" + document.querySelector('input[type=radio][name=algo]:checked').value );
-
-	// Dev Site Functions
-
-	// Close tooltips on ESC
+	// Catch Enter.
 	window.addEventListener("keydown", function(event) {
-		if (event.key === "Escape") {
-			// Perform actions when Escape is pressed
-				hideTipImportKeyEnc();
+		if (event.key === "Enter") {
+			activateEnter();
 		}
-	});   
+	});
 
-	let site = "dev_site";
+	function activateEnter(){
+		console.log("Enter keydown caught.");
+		// All buttons activatable by enter will be given the class: activatable_by_enter
+		let enterList = document.getElementById(currentPage).getElementsByClassName('activatable_by_enter');
+		if( enterList.length > 0 ){
+			// Should only have 1 element if we set up activatable_by_enter class correctly.
+			enterList[0].click();
+		}
+	}
+
+	// Start on main site.
+	let site = "main_site";
 	function toggleSite(){
 		if( site === "dev_site" ){
 			// Switch to main_site
@@ -2041,8 +2070,19 @@
 	//////////////////////////////////////////////////////////////
 
 	function securityReset(){
+		// Hide running byte total.
+		document.getElementById("browserdata_length_label").innerHTML = '';
+		document.getElementById("uploaddata_length_label").innerHTML = '';
+		// Clear Store Upload file input.
+		document.getElementById('store_upload_input').value = null;
+		// Hide Store Upload commit button
+		document.getElementById("store_upload_commit_button").style.display = "none";
+		// Hide READY TO COMMIT message.
+		document.getElementById("store_upload_readytocommit").style.display = "none";
 		// Delete cleartext outdisplay which is shown at the end of the Browser Access Flow.
 		document.getElementById("access_cleartext_outputdisplay").value = '';
+		// Clear fingerprint held for delete.
+		document.getElementById("fingerprint_holder").value = '';
 		// Check if we're online and inform user if we are or not.
 		updateOnlineStatus();
 		// Hide pass check warnings (passlock flow).
@@ -2078,11 +2118,15 @@
 		}
 	}
 
+	// Keep track of the page we're on.
+	let currentPage;
 	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of a page for flowing the user through site.
 	function showPage(target){
 		// Security Reset.
 		securityReset();
+		// Set global variable. Currently used for only Enter keydown catch.
+		currentPage = target;
 		// Hide all password warnings.
 		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
 		for (let i = 0; i < pass_warn_elements.length; i++) {
@@ -2133,6 +2177,8 @@
 				// Show button.
 				document.getElementById("store_upload_commit_button").style.display = "inline";
 				document.getElementById("store_upload_input").style.border = "";
+				// Tell user we are READY TO COMMIT. 
+				document.getElementById("store_upload_readytocommit").style.display = "inline";
 				// add red warning text
 				document.getElementById("store_upload_warning").style.display = "none";
 			}else{
@@ -2145,6 +2191,9 @@
 				document.getElementById("store_upload_warning").style.display = "inline";
 			}
 		}
+		console.log("File input contents: " + document.getElementById('store_upload_input').value);
+		document.getElementById('store_upload_input').value = null;
+		console.log("File input contents: " + document.getElementById('store_upload_input').value);
 	}
 
 	// Used to check password length as user flows through interface.
@@ -2628,7 +2677,7 @@
 			return "success";
 		}else{
 			// We didn't find it! return fail.
-			return "fail";
+			return "failed";
 		}
 	}
 
@@ -2830,7 +2879,6 @@
 			document.getElementById("output_display").value = decrypted;
 		}
 	}
-*/
 
 	// Main Delete Function Handler
 	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
@@ -2883,6 +2931,7 @@
 		}
 	}//deepDelete()
 
+*/
 	//////////////////////////////////////////////////////////////
 	//			Passlock Functions							    //
 	//////////////////////////////////////////////////////////////
@@ -2898,24 +2947,13 @@
 		// Always clear passlocked data for security.
 		passlockedData = {};
 		// Always clear timout?
-		//clearTimeout(timeoutId);
-		//timeoutId = '';
+		clearTimeout(timeoutId);
+		timeoutId = '';
 		// Don't cause error by sending null into serverDeletePasslock.
-		if(browserId === null){
-			return;
-		}
-		// Ask server to delete passlock.
-		const passlockDeleteOutcome = await serverDeletePasslock(browserId);
-		// Not sure if we need conditional here. Or return anything.
-		// We always want to clear the timeout.
-		// If there's a failure, we can probably rely on MariaDB cleanup job.
-		// What do we do if it fails? Anything?
-		if(passlockDeleteOutcome === "success"){
+		if(browserId !== null){
+			// Ask server to delete passlock.
+			await serverDeletePasslock(browserId);
 			browserId = null;
-			// Only clear timeout on success? meaning it will fire again? Trying to delete the passlock one more time?
-			// Seems like a good idea?
-			clearTimeout(timeoutId);
-			timeoutId = '';
 		}
 	}
 
@@ -2934,6 +2972,7 @@
 			//showPage("unable_to_retrieve_passlock");
 			throw Error("Unable to retrieve passlock!");
 		}else{
+			// Looks good.
 			return passlock;
 		}
 	}
@@ -3060,8 +3099,6 @@
 		await extractInputData(inputId);
 		const fingerprintAndData = await getFpAndDataForStore();
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
-		// Hide running byte total on Browser cleartext entry page.
-		document.getElementById("browserdata_length_label").innerHTML = '';
 	}
 
 	async function getFpForAccess(){
@@ -3088,17 +3125,26 @@
 			resetPasslock();
 		}else{
 			showPage('access_file');
+			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
+			holdFpForDelete(fingerprint);
 			decryptAndDownloadFile(encryptedData);
 		}
 	}
 
 	async function decryptAndDownloadFile(encryptedData){
+		// Get set of decrypted user passwords.
 		const cleartextSet = await passlockDecryptSet();
 		const decryptedData  = await decryptDouble(cleartextSet['obf1pass'], cleartextSet['obf2pass'], encryptedData);
 
+			// bytes is Uint8Array
 			const bytes = base64ToBytes(decryptedData);
+console.log("bytes: ");
+console.log(bytes);
+console.log([bytes]);
 			// Produce file for user to decrypt.
 			let blob = new Blob([bytes]);
+console.log("blob:");
+console.log(blob);
 			let a = document.createElement('a');
 			a.href = window.URL.createObjectURL(blob);
 			a.download = 'yourfile.enc';
@@ -3119,14 +3165,28 @@
 			encryptedData = await serverLoad(fingerprint);
 		}
 		// Report outcome of Access attempt.
-		// This is a spec check lower in encrypt methods, why not use it here?
-		// ==> Don't try to decrypt if doesns't look like decryptable data.
 		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
+			resetPasslock();
 		}else{
 			showPage('access_cleartext');
+			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
+			holdFpForDelete(fingerprint);
 			await decryptAndShowCleartext(encryptedData);
 		}
+	}
+
+	function getStoredFp(){
+		const fingerprint = document.getElementById("fingerprint_holder").value;
+		// Clear fingerprint held for delete. Always do this?
+		document.getElementById("fingerprint_holder").value = '';
+		return fingerprint;
+	}
+
+	function holdFpForDelete(fingerprint){
+		// Set fingerprint holder to fingerprint.
+		document.getElementById("fingerprint_holder").value = fingerprint;
+		console.log("fingerprint now held in HTML: " + document.getElementById("fingerprint_holder").value);
 	}
 
 	async function decryptAndShowCleartext(encryptedData){
@@ -3138,6 +3198,40 @@
 		await resetPasslock();
 	}
 
+
+	// Main Delete Function Handler
+	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
+	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
+	// Output: functionality.
+	async function attemptDelete(){
+
+// Rework Offline Dbase later.
+/*
+		let offline_dbase_delete_success = '';
+		// If there's an offline dbase, also try to delete it there.
+		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
+			console.log("deepDelete() -- Attempting Offline Database Delete with fingerprint: " + fp_hex);
+			const outcome = await deleteSingleRecordOfflineDBase(fp_hex);
+			if( outcome != "success" ){
+					console.log("failed offline dbase");
+				return "failed offline dbase";
+			}else{
+				offline_dbase_delete_success = '1';
+			}
+		}
+*/
+		// Load from server
+		const fingerprint = getStoredFp();
+		const deleteResponse = await serverDelete(fingerprint);
+		// Report delete outcome.
+		if(deleteResponse === "success"){
+			// Server successfully stored data, report success.
+			showPage('delete_success');
+		}else{
+			// Doesn't look like server stored data properly, report fail.
+			showPage('delete_failed');
+		}
+	}//attemptDelete()
 
 	// Return either pass or fail to show outcome of store, pass or fail to user.
 	// Legacy code probably needs full rewrite.
@@ -3167,7 +3261,7 @@
 			showPage('store_success');
 		}else{
 			// Doesn't look like server stored data properly, report fail.
-			showPage('store_fail');
+			showPage('store_failed');
 		}
 		await resetPasslock();
 	}//storeDataToServer()
@@ -3473,7 +3567,7 @@
 			//console.log(responseObj);
 			//console.log("responseObj.passlock: " + responseObj.passlock);
 			//console.log("responseObj.passlock.length: " + responseObj.passlock.length);
-			if( responseObj.passlock.length === 36 && checkUUIDChars(responseObj.passlock)){ // Data looks good.
+			if(responseObj.passlock.length === 36 && checkUUIDChars(responseObj.passlock)){ // Data looks good.
 				//console.log("serverGetPasslock: Successfully retrieved existing passlock.");
 				return responseObj.passlock;
 			}else{
@@ -3555,35 +3649,42 @@
 	// Input: fingerprint is hexadecimal.
 	// Output: POST message to server script that will attempt to Delete.
 	async function serverDelete(fingerprint){
-		//const SERVER_URL = '/obf/exedelete';
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exedelete;';
 		
-		const fetchResponseObject = await fetch(SERVER_URL, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'text/plain',
-			},
-			body: JSON.stringify({
-				fingerprint: fingerprint,
-			}),
-		})
-		.catch((error) => {
-			console.log("Fetch Error on DELETE: " + error.message);
-			if( error.message == "Failed to fetch" ){
-				console.log("CAUGHT THE DISCONNECTED ERROR IN DELETE.");
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					fingerprint: fingerprint,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
 			}
-		});
-		if( fetchResponseObject ){
-			if( fetchResponseObject.ok ){
-				console.log("Response from serverDelete() fetch() call = OK!");
-				return fetchResponseObject.json();
-			} else {
-				console.log("HTTP error. Status: " + fetchResponseObject.status);
-				return fetchResponseObject.json();
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			//console.log(responseObj);
+			//console.log("Store responseObj.response: " + responseObj.response);
+			if( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
+				throw Error("serverDelete Error! Data not deleted!");
+				return "error";
+			}else{
+				console.log("serverDelete: Successfully deleted data.");
+				return "success";
 			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		// 500 Internal Server Errors will be caught here too.
+		}catch(error){ // Catch rejected promise.
+			console.error(error.message);
 		}
-		return;
 	}//serverDelete()
 
 
