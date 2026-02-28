@@ -695,14 +695,14 @@
 				</div>
 			</div>
 
-			<!---------------------------Choose: CMD Line or Browser-----------------------!>
+			<!---------------------------BRANCH: CMD Line or Browser-----------------------!>
 			<div class="flow_pages" id="access_choose" style="display:none">
 				<label>ACCESS DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('access_obf2pass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('access_opensslpass')">
+						<button class="activatable_by_enter" id='access_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('access_opensslpass')">
 							<span style="">BROWSER</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
 						</button>
@@ -873,14 +873,14 @@
 				</div>
 			</div>
 
-			<!---------------------------Choose: CMD Line or Browser-----------------------!>
+			<!---------------------------BRANCH: CMD Line or Browser-----------------------!>
 			<div class="flow_pages" id="store_choose" style="display:none">
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('store_obf2pass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('store_opensslpass')">
+						<button class="activatable_by_enter" id='store_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('store_opensslpass')">
 							<span style="">BROWSER</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
 						</button>
@@ -1437,26 +1437,30 @@
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <script>
 	// Catch Enter.
-	window.addEventListener("keydown", function(event) {
-		if (event.key === "Enter") {
-			activateEnter();
+	window.addEventListener("keydown", function(event){
+		if(event.key === "Enter"){
+			// If focused element is an input, enter clicks the button with activatable_by_enter.
+			if(document.activeElement.tagName == "INPUT"){
+				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
+				if(buttonObj !== null){
+					buttonObj.click();
+				}else{
+					console.log("We hit a null page: " + currentPage);
+				}
+				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
+				// Prevent strange behavior where "the default action is performed on the newly focused element".
+				event.preventDefault();
+				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
+			}else{
+				// Focused element isn't an Input, do nothng I guess?
+			}
 		}
 	});
-
-	function activateEnter(){
-		console.log("Enter keydown caught.");
-		// All buttons activatable by enter will be given the class: activatable_by_enter
-		let enterList = document.getElementById(currentPage).getElementsByClassName('activatable_by_enter');
-		if( enterList.length > 0 ){
-			// Should only have 1 element if we set up activatable_by_enter class correctly.
-			enterList[0].click();
-		}
-	}
 
 	// Start on main site.
 	let site = "main_site";
 	function toggleSite(){
-		if( site === "dev_site" ){
+		if(site === "dev_site"){
 			// Switch to main_site
 			document.getElementById("dev_site").style.display = "none";
 			document.getElementById("main_site").style.display = "inline";
@@ -2118,8 +2122,8 @@
 		}
 	}
 
-	// Keep track of the page we're on.
-	let currentPage;
+	// Keep track of the page we're on. Start on home page.
+	let currentPage = 'home';
 	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of a page for flowing the user through site.
 	function showPage(target){
@@ -2144,11 +2148,17 @@
 		document.getElementById(target).style.display = "flex";
 		// focus input or textbox
 		let inputs_array = document.getElementById(target).getElementsByTagName('input');
-		let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
+		//let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
 		// There is only 1 input or 1 textarea per div in our setup.
 		// If we found more than zero inputs in the array, focus the first and only one.
 		if( inputs_array.length > 0 ){
 			inputs_array[0].focus();
+		}else{
+			// If there's no input, focus the button with 'activatable_by_enter' class.
+			const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
+			if(buttonObj !== null){
+				document.getElementById(buttonObj.id).focus();
+			}
 		}
 /*
 		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
