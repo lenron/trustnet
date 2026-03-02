@@ -1436,27 +1436,6 @@
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <script>
-	// Catch Enter.
-	window.addEventListener("keydown", function(event){
-		if(event.key === "Enter"){
-			// If focused element is an input, enter clicks the button with activatable_by_enter.
-			if(document.activeElement.tagName == "INPUT"){
-				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-				if(buttonObj !== null){
-					buttonObj.click();
-				}else{
-					console.log("We hit a null page: " + currentPage);
-				}
-				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
-				// Prevent strange behavior where "the default action is performed on the newly focused element".
-				event.preventDefault();
-				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
-			}else{
-				// Focused element isn't an Input, do nothng I guess?
-			}
-		}
-	});
-
 	// Start on main site.
 	let site = "main_site";
 	function toggleSite(){
@@ -2122,6 +2101,27 @@
 		}
 	}
 
+	// Catch Enter.
+	window.addEventListener("keydown", function(event){
+		if(event.key === "Enter"){
+			// If focused element is an input, enter clicks the button with activatable_by_enter.
+			if(document.activeElement.tagName == "INPUT"){
+				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
+				if(buttonObj !== null){
+					buttonObj.click();
+				}else{
+					console.log("We hit a null page: " + currentPage);
+				}
+				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
+				// Prevent strange behavior where "the default action is performed on the newly focused element".
+				event.preventDefault();
+				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
+			}else{
+				// Focused element isn't an Input, do nothng I guess?
+			}
+		}
+	});
+
 	// Keep track of the page we're on. Start on home page.
 	let currentPage = 'home';
 	// Hide all other pages, then show target page. 
@@ -2148,11 +2148,14 @@
 		document.getElementById(target).style.display = "flex";
 		// focus input or textbox
 		let inputs_array = document.getElementById(target).getElementsByTagName('input');
-		//let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
+		let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
 		// There is only 1 input or 1 textarea per div in our setup.
 		// If we found more than zero inputs in the array, focus the first and only one.
 		if( inputs_array.length > 0 ){
 			inputs_array[0].focus();
+		}else if( textareas_array.length > 0 ){
+		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
+			 textareas_array[0].focus();
 		}else{
 			// If there's no input, focus the button with 'activatable_by_enter' class.
 			const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
@@ -2160,12 +2163,6 @@
 				document.getElementById(buttonObj.id).focus();
 			}
 		}
-/*
-		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
-		 else if( textareas_array.length > 0 ){
-			 textareas_array[0].focus();
-		 }
-*/
 	}
 
 	// Catch File Ingest
