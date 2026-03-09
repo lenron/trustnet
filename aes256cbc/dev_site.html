@@ -298,16 +298,496 @@
 	<div class="center_html" id="center_html" style="height:100%">
 		<div class="content_html" id="content_html">
 
-<!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
-<!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
-<!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
+			<!-------------------------- OFFLINE HOME  ----------------------------!>
+			<div class="flow_pages home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
+				<h2 style="color:red">OFFLINE HOME</h2>
+				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="showPage('offlinestore_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="showPage('offlineaccess_codeword')">ACCESS SECRET DATA</button>
+				</div>
+			</div>
 
+<!----------------------------Access--------------------------------------------------------------!>
+<!----------------------------offlineaccess--------------------------------------------------------------!>
+
+			<div class="flow_pages passlock" id="offlineaccess_codeword" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+				<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>ACCESS FLOW</label>
+					<label>CODEWORD</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER CODEWORD</h2>
+				<input autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input');showPage('offlineaccess_obf1pass')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!--------------------------- obf1pass -----------------------!>
+			<div class="flow_pages passlock" id="offlineaccess_obf1pass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>ACCESS FLOW</label>
+					<label>PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="offlineaccess_obf1pass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineaccess_codeword')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf1pass_input');showPage('offlineaccess_obf2pass');">CONTINUE</button>
+				</div>
+			</div>
+
+			<!--------------------------- obf2pass -----------------------!>
+			<div class="flow_pages passlock" id="offlineaccess_obf2pass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>ACCESS FLOW</label>
+					<label>PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="offlineaccess_obf2pass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineaccess_obf1pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf2pass_input');showPage('offlineaccess_choose');">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------BRANCH: CMD Line or Browser-----------------------!>
+			<div class="flow_pages" id="offlineaccess_choose" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<label>ACCESS DATA</label>
+				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('offlineaccess_obf2pass')">BACK</button>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="activatable_by_enter" id='offlineaccess_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('offlineaccess_opensslpass')">
+							<span style="">BROWSER</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
+						</button>
+					</div>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<!--<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('store_codeword_cmd')">--!>
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="attemptCMDAccessOffline()">
+							<span class="coolpink" style="">COMMAND LINE</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
+						</button>
+						<label class="coolpink" style="align-self:center;">More Secure</label>
+					</div>
+				</div>
+			</div>
+
+			<!---------------------------Pass 3-----------------------!>
+			<div class="flow_pages passlock" id="offlineaccess_opensslpass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>ACCESS FLOW</label>
+					<label>PASS 3</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 3</h2>
+				<input autocomplete="off" type="password" value="" id="offlineaccess_opensslpass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineaccess_choose')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptBrowserAccessOffline('offlineaccess_opensslpass_input');">ACCESS DATA</button>
+				</div>
+			</div>
+
+
+			<!---------------------------Outcome-----------------------!>
+			<!---------------------------Send file to user for download-----------------------!>
+			<div class="flow_pages passlock" id="offlineaccess_file" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<h2>&#10004; SUCCESS</h2>
+				<label>File should automatically download.</label>
+				<br>
+				<div class="overlay_container" style="position:relative">
+					<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
+					<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
+						<label>Encrypt:</label>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+						<br>
+						<label>Decrypt:</label>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+					</div>
+					<div class="deletecheck" id="offlineoverlay_delete_cmd" style="display:none">
+						<h2>Are you sure you want to delete this data?</h2> 
+						<div class="button_pair" id="" style="display:flex">
+							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('offlineoverlay_delete_cmd')">KEEP DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="attemptDelete()">DELETE DATA</button>
+						</div>
+					</div>
+				</div>
+				<div class="button_pair" id="" style="display:flex">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_codeword')">STORE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('offlineaccess_codeword')">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('offlineoverlay_delete_cmd')">DELETE DATA</button>
+				</div>
+			</div>
+
+			<!---------------------------Show Cleartext-----------------------!>
+			<div class="flow_pages passlock" id="offlineaccess_cleartext" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<h2>&#10004; SUCCESS</h2>
+				<label>result:</label>
+				<div class="overlay_container" style="position:relative; ">
+					<textarea disabled value="" id="offlineaccess_data_outputdisplay" style="color:gray; " rows="8" cols="50"></textarea>
+					<div class="deletecheck" id="offlineoverlay_delete_browser" style="display:none">
+						<h2>Are you sure you want to delete this data?</h2> 
+						<div class="button_pair" id="" style="display:flex">
+							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('offlineoverlay_delete_browser')">KEEP DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="attemptDelete()">DELETE DATA</button>
+						</div>
+					</div>
+				</div>
+				<div class="button_pair" id="" style="display:flex">
+					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>--!>
+					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
+					<button class="" id='save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStoreOffline('offlineaccess_data_outputdisplay')">SAVE DATA</button>
+					<button class="" id='editdata_button' style="flex-grow:1" onclick="editData('offlineaccess_data_outputdisplay')">EDIT DATA</button>
+					<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('offlineoverlay_delete_browser')">DELETE DATA</button>
+				</div>
+			</div>
+
+			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
+			<div class="flow_pages" id="offlinefailed_to_access" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<h2>&#10060; FAILED TO ACCESS</h2>
+				<div class="button_pair" id="" style="display:flex">
+				</div>
+			</div>
+
+			<!------------------Fingerprint Holder for Delete------------------------------!>
+			<input id="fingerprint_holder" autocomplete="off" value="" style="display:none">
+
+			<!----------------------------Successfully Deleted Data--------------------------------------------------------------!>
+			<div class="flow_pages" id="offlinedelete_success" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<h2>&#10004; SUCCESSFULLY DELETED DATA</h2>
+				<div class="button_pair" id="" style="display:flex">
+				</div>
+			</div>
+
+			<!----------------------------Failed to Delete--------------------------------------------------------------!>
+			<div class="flow_pages" id="offlinedelete_failed" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<h2>&#10060; FAILED TO DELETE</h2>
+				<div class="button_pair" id="" style="display:flex">
+				</div>
+			</div>
+<!----------------------------END Access--------------------------------------------------------------!>
+<!----------------------------END Access--------------------------------------------------------------!>
+
+
+<!----------------------------STORE--------------------------------------------------------------!>
+<!----------------------------STORE--------------------------------------------------------------!>
+			<!---------------------------Codeword-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_codeword" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>CODEWORD</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER CODEWORD</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
+					<!--  initiateStore is an async function. here we don't wait for it to finish before moving on to the next page which is great.  --!>
+					<!--  Might need to wait for an error?  --!>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');showPage('offlinestore_obf1pass')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!--------------------------- obf1pass -----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf1pass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf1pass_input');showPage('offlinestore_obf2pass');">CONTINUE</button>
+				</div>
+			</div>
+
+			<!--------------------------- obf2pass -----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf2pass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf2pass_input');showPage('offlinestore_choose');">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------BRANCH: CMD Line or Browser-----------------------!>
+			<div class="flow_pages" id="offlinestore_choose" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<label>STORE DATA</label>
+				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_obf2pass')">BACK</button>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="activatable_by_enter" id='offlinestore_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('offlinestore_opensslpass')">
+							<span style="">BROWSER</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
+						</button>
+					</div>
+					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('offlinestore_codeword_cmd')">
+							<span class="coolpink" style="">COMMAND LINE</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
+						</button>
+						<label class="coolpink" style="align-self:center;">More Secure</label>
+					</div>
+				</div>
+			</div>
+
+			<!---------------------------CMD Line-----------------------!>
+			<!---------------------------Check Codeword-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_codeword_cmd" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>CHECK CODEWORD</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER CODEWORD</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdinput" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_choose')">BACK</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
+																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdinput', 'offlinestore_obf1pass_cmd')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 1-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf1pass_cmd" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_cmdinput" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_cmd')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1pass_cmdinput', 'offlinestore_obf2pass_cmd')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 2-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf2pass_cmd" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_cmdinput" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass_cmd')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf2pass_cmdinput', 'offlinestore_upload')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Upload-----------------------!>
+			<div class="flow_pages" id="offlinestore_upload" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<label>STORE DATA</label>
+				<h2>UPLOAD FILE</h3>
+				<h2 id="offlinestore_upload_warning" style="color:red; display:none">FILE TOO LARGE. 526 byte limit</h2>
+				<h2 id="offlinestore_upload_readytocommit" style="color:orange; display:none">READY TO COMMIT</h2>
+				<label id="uploaddata_length_label" style="color:black"></label>
+				<input autocomplete="off" onchange="catchUpload(event)" id="offlinestore_upload_input" style="border:none;" type="file">
+				<br>
+				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
+				<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
+					<label>Encrypt:</label>
+					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+					<br>
+					<label>Decrypt:</label>
+					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+				</div>
+				<div class="button_pair" id="" style="display:flex;">
+					<!-- when hitting back here go back to CMD Line or Browser? --!>
+					<!--<button class="" id='' style="width:250px;" onclick="showPage('store_choose')">BACK</button>--!>
+					<button class="" id='' style="width:250px;" onclick="showPage('offlinestore_obf2pass_cmd')">BACK</button>
+					<button class="" id='offlinestore_upload_commit_button' style="flex-grow:1;display:none;color:orange" onclick="attemptCMDStoreOffline()">COMMIT DATA TO SERVER</button>
+				</div>
+			</div>
+			<!---------------------------END Store CMD Line Flow-----------------------!>
+
+
+			<!---------------------------Browser-----------------------!>
+			<!---------------------------Pass 3-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_opensslpass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>PASS 3</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER SECRET WORD 3</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_choose')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_opensslpass_input');showPage('offlinestore_codeword_check');">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Codeword-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_codeword_check" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>CHECK CODEWORD</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER CODEWORD</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_checkinput" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_opensslpass')">BACK</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
+																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_checkinput', 'offlinestore_obf1pass_check')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 1-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf1pass_check" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_checkinput" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_check')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1pass_checkinput', 'offlinestore_obf2pass_check')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 2-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf2pass_check" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_checkinput" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass_check')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf2pass_checkinput', 'offlinestore_opensslpass_check')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Check Pass 3-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_opensslpass_check" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>CHECK PASS 3</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
+				<h2>RE-ENTER SECRET WORD 3</h2>
+				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_checkinput" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf2pass_check')">BACK</button>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'check_pass3', 'check_passlock3', 'check_cw')">CONTINUE</button>--!>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_opensslpass_checkinput', 'offlinestore_data')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------Data-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_data" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>STORE FLOW</label>
+					<label>STORE DATA</label>
+					<label id="browserdata_length_label" style="color:black"></label>
+				</div>
+				<textarea class="browser_input" id="offlinestore_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('offlinestore_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_opensslpass_check')">BACK</button>
+					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStoreOffline('offlinestore_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
+					<div id='text_input_warning' style="flex-grow:1;display:none;">
+						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
+					</div>
+				</div>
+			</div>
+			<!---------------------------END Store BROWSER Flow-----------------------!>
+
+			<!---------------------------Edit Success-----------------------!>
+			<div class="flow_pages" id="offlineedit_success" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<h2>&#10004; SECRET DATA SUCCESSFULLY EDITED AND SAVED TO DATABASE</h2>
+			</div>
+
+			<!---------------------------Store Success-----------------------!>
+			<div class="flow_pages" id="offlinestore_success" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>--!>
+					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
+				</div>
+			</div>
+
+			<!---------------------------Store Fail-----------------------!>
+			<div class="flow_pages" id="offlinestore_failed" style="display:none">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+				<h2>&#10060; FAILED TO STORE</h2>
+				<div class="button_pair" id="" style="display:flex;">
+					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>--!>
+					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
+				</div>
+			</div>
+
+<!----------------------------END STORE--------------------------------------------------------------!>
+<!----------------------------END OFFLINE FLOW--------------------------------------------------------------!>
+<!----------------------------END OFFLINE FLOW--------------------------------------------------------------!>
+<!----------------------------END OFFLINE FLOW--------------------------------------------------------------!>
+
+
+
+
+<!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
 			<!--------------------------  HOME  ----------------------------!>
 			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='go_store_flow' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 
@@ -316,8 +796,8 @@
 				<h3 style="color:red;">TIMED OUT!</h3>
 				<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='go_store_flow' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_load_flow' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 <!----------------------------Access--------------------------------------------------------------!>
@@ -432,8 +912,8 @@
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex">
-					<button class="" id='go_store' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
-					<button class="" id='go_load' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
@@ -453,8 +933,6 @@
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex">
-					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>--!>
-					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
 					<button class="" id='save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStore('access_data_outputdisplay')">SAVE DATA</button>
 					<button class="" id='editdata_button' style="flex-grow:1" onclick="editData('access_data_outputdisplay')">EDIT DATA</button>
 					<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
@@ -465,8 +943,6 @@
 			<div class="flow_pages" id="failed_to_access" style="display:none">
 				<h2>&#10060; FAILED TO ACCESS</h2>
 				<div class="button_pair" id="" style="display:flex">
-					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>--!>
-					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
 				</div>
 			</div>
 
@@ -477,8 +953,6 @@
 			<div class="flow_pages" id="delete_success" style="display:none">
 				<h2>&#10004; SUCCESSFULLY DELETED DATA</h2>
 				<div class="button_pair" id="" style="display:flex">
-					<!--<button class="" id='go_store' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>--!>
-					<!--<button class="" id='go_load' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
 				</div>
 			</div>
 
@@ -486,8 +960,6 @@
 			<div class="flow_pages" id="delete_failed" style="display:none">
 				<h2>&#10060; FAILED TO DELETE</h2>
 				<div class="button_pair" id="" style="display:flex">
-					<!--<button class="" id='go_store' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>--!>
-					<!--<button class="" id='go_load' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
 				</div>
 			</div>
 <!----------------------------END Access--------------------------------------------------------------!>
@@ -774,40 +1246,6 @@
 <!--------------------------------------END New Site Flow ------------------------------------------!>
 <!--------------------------------------END New Site Flow ------------------------------------------!>
 
-			<!---------------------------REITERATION STEP (NOT USED)-----------------------!>
-			<div class="flow_pages passlock" id="passlock_reiteration" style="display:none;">
-				<h2 id="">This is the REITERATION Step</h2>
-				<h3 id="">Eloquent text explaining how this works.</h3>
-				<div style="display:flex; flex-direction:column;">
-					<label id="">PASSWORD 1 (maybe this appears only if you've chosen browser?):</label>
-					<div style="display:flex;">
-						<input id="reiteration_pass1" autocomplete="off" type="password" value="" style="">
-						<button id="show_reiteration_pass1" style="" onclick="showPassword('pass1')">SHOW</button>
-					</div>
-					<label id="">PASSWORD 2:</label>
-					<div style="display:flex;">
-						<input id="reiteration_pass2" autocomplete="off" type="password" value="" style="">
-						<button id="show_reiteration_pass2" style="" onclick="showPassword('pass2')">SHOW</button>
-					</div>
-					<label id="">PASSWORD 3:</label>
-					<div style="display:flex;">
-						<input id="reiteration_pass3" autocomplete="off" type="password" value="" style="">
-						<button id="show_reiteration_pass3" style="" onclick="showPassword('pass3')">SHOW</button>
-					</div>
-					<label id="">CODEWORD:</label>
-					<div style="display:flex;">
-						<input id="reiteration_codeword" autocomplete="off" type="password" value="" style="">
-						<button id="show_reiteration_codeword" style="" onclick="showPassword('codeword')">SHOW</button>
-					</div>
-				</div>
-				<div style="display:flex; flex-direction:row;">
-					<button id="reiteration_cancel" style="flex-grow:1; " onclick="showPage('passlock_cw')">BACK</button>
-					<button id="reiteration_commit" style="flex-grow:1; " onclick="showPage('')">READY TO STORE DATA</button>
-				</div>
-				<h3 id="" style="align-self:center; display:inline; color:red;">Errors, important information can go here.</h3>
-			</div>
-<!------------------------------------ Passlock Steps --------------------------------------------------------------------------!>
-
 						<!------ Create New Offline DBase  ---!>
 			<div id="create_new_offline_dbase_div" class="flow_pages" style="display:none; ">
 				<h2 id="create_offline_dbase_label_h2">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
@@ -834,11 +1272,15 @@
 
 <!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
+		<!--<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>--!>
+		<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="makeNewOfflineIfNeeded();showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>
+<!--
 		<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseFlow()">CREATE NEW OFFLINE DBASE</button>
 		<div style="display:flex">
 			<button id="toggle_debug_button" style="flex-grow:1" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
 			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
 		</div>
+----------------!>
 	</div>
 <!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 
@@ -1110,6 +1552,8 @@
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <script>
+
+	// Dev site / Main site toggle.
 	// Start on main site.
 	let site = "main_site";
 	function toggleSite(){
@@ -1127,562 +1571,6 @@
 			document.getElementById("toggle_site_button").innerHTML = "Show Main Site";
 		}
 	}
-
-	function convertBase64(){
-		// determine what kind of input is in top, ints or base64.
-		const input = document.getElementById("dev_b64_top").value;
-		let numbers = new Array();
-		// If input includes any commas, we assume it's an int string.	
-		if( input.includes(',') ){
-			// convert ints into base64
-			console.log("top input: found int string");
-			const numbers = input.split(',').map(Number);
-			console.log(numbers);
-			const output = bytesToBase64(numbers);
-			document.getElementById("dev_b64_bot").value = output;
-			document.getElementById("input_length_label").innerHTML = numbers.length;
-			document.getElementById("output_length_label").innerHTML = output.length;
-		}else{
-			// convert base64 into ints
-			console.log("top input: found base64 chars");
-			const output = base64ToBytes(input);
-			document.getElementById("dev_b64_bot").value = output;
-			document.getElementById("input_length_label").innerHTML = input.length;
-			document.getElementById("output_length_label").innerHTML = output.length;
-		}
-	}
-
-
-
-	//////////////////////////////////////////////////////////////
-	//		Dev Site Tooltip Content & Functionality			//
-	//////////////////////////////////////////////////////////////
-
-	//OpenSSL Encrypt Tooltip Content 
-	//OpenSSL Encrypt Tooltip Content 
-	//OpenSSL Encrypt Tooltip Content 
-	const html_openssl_enc_title= `
-		<p>
-			OpenSSL was chosen for the base encryption because it is widely available from the command line and its featureset includes aes-256-cbc symmetric encryption/decryption which is good enough for the US government as described in its spec document,
-			<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
-			
-			<br><br>
-		</p>
-		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
-	`;
-
-	const html_openssl_enc_importkey = `
-		<p>
-			importKey() is a method for importing key material (e.g. a password) in a secure way that adheres to the SubtleCrypto guidelines set by the World Wide Web Consortium (the top authority/consensus for web design).<br><br>
-
-			In this recreation of OpenSSL’s command line encrypt functionality, we are using PBKDF2 as our key derivation algorithm because it offers a secure path to convert raw password key material into a cryptoKey object we can then feed into the SubtleCrypo encrypt() method which is currently the most secure way to encrypt data in a web browser. <br><br>
-
-			The ‘most secure way to encrypt data in a web browser’ is known because of the W3C Recommendation (an offical release) by the World Wide Web Consortium.<br><br>
-
-			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">importKey() MDN Documentation</a><br>
-			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
-			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
-			<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
-		</p>
-		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
-	`;
-
-	const html_openssl_enc_derivebits = `
-		<p>
-			deriveBits() computes raw data for both the Initialization Vector (IV) and Key required for the AES-CBC algorithm utilized in the encrypt() digest.<br><br>
-
-			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/derivebits" target="_blank">deriveBits() MDN Documentation</a><br>
-			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-deriveBits" target="_blank">deriveBits() W3C Specification/Documentation</a><br>
-		</p>
-		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
-	`;
-
-	const html_openssl_enc_encrypt = `
-		<p>
-			encrypt() encrypts data using the specified algorithm (AES-CBC in this case) along with parameter datas like an IV.<br><br>
-
-			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
-			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-encrypt" target="_blank">encrypt() W3C Specification/Documentation</a><br>
-			<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
-		</p>
-		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
-	`;
-
-	const html_openssl_enc_binary = `
-		<p>
-			The browser converts the binary stored arraybuffers into human readable bytes which is why binary numbers are showing up as 23, 129, 284, etc.
-
-		</p>
-		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
-	`;
-
-	const html_openssl_enc_newline = `
-		<p>
-			In order to mirror exactly the output of the openssl command line encrypt/decrypt functions we need a newline byte that delimits the end of the linux file which is how input is treated from the command line. In other words openssl treats all command line input as a file which in linux always ends with a newline character, so we have to add it here to produce the same output and make sure command line encrypted data can be decrypted by our system and vice versa.
-
-		</p>
-		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
-	`;
-
-	const html_openssl_enc_salted = `
-		<p>
-			OpenSSL command line encryption output includes the string literal prepend “Salted__”.
-
-		</p>
-		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
-	`;
-
-	const html_openssl_enc_randsalt = `
-		<p>
-			It also includes a number 8 bytes long as a randomly generated salt which is used to run the encryption and then inserted after the “Salted__” literal. This number is needed to run the decryption.
-
-		</p>
-		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
-	`;
-	//OpenSSL Encrypt Tooltip Content 
-
-	//OpenSSL Encrypt Tooltip Functions
-	function showTipRandSalt(){
-		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_randsalt;
-		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipSalted(){
-		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_salted;
-		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipBinary(){
-		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_binary;
-		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipNewline(){
-		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_newline;
-		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipOpenSSLTitle(){
-		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_title;
-		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipEncDeriveBits(){
-		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_derivebits;
-		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipImportKeyEnc(){
-		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_importkey;
-		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipEncEncrypt(){
-		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_encrypt;
-		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
-	}
-
-	function hideTipEnc(){
-		document.getElementById("dev_enc_openssl_tooltip").style.display = "none";
-	}
-	//OpenSSL Encrypt Tooltip Functions
-
-	//OpenSSL Decrypt Tooltip Content
-	//OpenSSL Decrypt Tooltip Content
-	//OpenSSL Decrypt Tooltip Content
-	const html_openssl_dec_importkey = `
-		<p>
-			importKey() is a method for importing key material (e.g. a password) in a secure way that adheres to the SubtleCrypto guidelines set by the World Wide Web Consortium (the top authority/consensus for web design).<br><br>
-
-			In this recreation of OpenSSL’s command line DECRYPT functionality, we are using PBKDF2 as our key derivation algorithm because it offers a secure path to convert raw password key material into a cryptoKey object we can then feed into the SubtleCrypo encrypt() method which is currently the most secure way to encrypt data in a web browser. <br><br>
-
-			The ‘most secure way to encrypt data in a web browser’ is known because of the W3C Recommendation (an offical release) by the World Wide Web Consortium.<br><br>
-
-			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">importKey() MDN Documentation</a><br>
-			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
-			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
-			<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
-		</p>
-		<button class="glossy_button" onclick="hideTipDec()">Close</button>
-	`;
-
-	const html_openssl_dec_derivebits = `
-		<p>
-			deriveBits() computes raw data for both the Initialization Vector (IV) and Key required for the AES-CBC algorithm utilized in the decrypt() digest.<br><br>
-
-			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/derivebits" target="_blank">deriveBits() MDN Documentation</a><br>
-			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-deriveBits" target="_blank">deriveBits() W3C Specification/Documentation</a><br>
-		</p>
-		<button class="glossy_button" onclick="hideTipDec()">Close</button>
-	`;
-
-	const html_openssl_dec_decrypt= `
-		<p>
-			decrypt() decrypts data using the specified algorithm (AES-CBC in this case) along with parameter datas like an IV.<br><br>
-
-			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/decrypt" target="_blank">decrypt() MDN Documentation</a><br>
-			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-decrypt" target="_blank">decrypt() W3C Specification/Documentation</a><br>
-			<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
-		</p>
-		<button class="glossy_button" onclick="hideTipDec()">Close</button>
-	`;
-
-	const html_openssl_dec_title = `
-		<p>
-			We chose openssl for the base encryption because it is widely available from the command line and its featureset includes aes-256-cbc symmetric encryption/decryption which is good enough for the US government as described in its spec document, RFC3602.
-
-		</p>
-		<button class="glossy_button" onclick="hideTipDec()">Close</button>
-	`;
-	//OpenSSL Decrypt Tooltip Content
-
-	//OpenSSL Decrypt Tooltip Functions
-	function showTipDecTitle(){
-		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_title
-		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipDecDeriveBits(){
-		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_derivebits;
-		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipImportKeyDec(){
-		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_importkey;
-		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
-	}
-
-	function showTipDecDecrypt(){
-		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_decrypt;
-		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
-	}
-
-	function hideTipDec(){
-		document.getElementById("dev_dec_openssl_tooltip").style.display = "none";
-	}
-	//OpenSSL Decrypt Tooltip Functions
-
-	//Obf1 Encrypt Tooltip Content
-	const html_obf1_enc_shasum = `
-		<p>OBF1 ENCRYPT SHASUM TOOLTIP</p>
-		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
-		<br>
-		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
-		<br>
-		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
-	`;
-
-	const html_obf1_enc_zero = `
-		<p>OBF1 Why Zero Pad Works</p>
-		<br>
-		We can use zero padding here because of the identity: X⊕0=X
-		<br>
-		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
-	`;
-
-	const html_obf1_enc_convert = `
-		<p>OBF1 ENCRYPT convert to 1000 chars b58.</p>
-		<img src="./svg_images/get_1000_b58_chars.svg" style="" alt="" />
-		<br>
-		The blocking is a bit tricky converting bytes of size up to 256 to precisely 1000 characters of base58 characters (which have a size of 58). 256 divided by 58 = 4.413793... so we currently employ a ‘guess and check’ with tapering strategy by popping bytes then converting the binary number to base 58 and checking the number of characters it converted to. If we go from 1001 characters to 999, we know we missed 1000 and enable a subroutine that converts the number from 8-bit bytes into 4-bit words which are chunks of size up to 16 giving us the precision to guarantee 1000 base 58 characters of output.
-
-		<br>
-		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
-	`;
-
-	const html_obf1_enc_title = `
-		<p>
-			Obf1 utilizes our Shasum function to produce entropy which is then XOR’d into the data.  We then convert the binary data from the XOR into exactly 1000 characters of base58 represented data. This turns out to be non-trivial so we implement a ‘guess-and-check’ style mechanism to ensure outputs of the same length. 
-		<br>
-		<br>
-			Our secret sauce is meant as a type of blocking that obfuscates the length of the stored data. As such our system is designed to store all data in blocks of 1000 base 58 characters. This is so that if and when an attacker accesses the stored and obfuscated data, it will be harder to decrypt. There was a time when everyone trusted Google and they deserved that trust and everything was great. That time is over. Now if you’re not expecting data leaks and planning for your ‘secure’ storage to be leaked at some point, are you really trying? We are attempting to help solve the problem of trusting ‘secure’ systems.
-
-
-		</p>
-		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
-	`;
-	//Obf1 Encrypt Tooltip Content
-
-	//Obf1 Encrypt Tooltip Functions
-	function showTipObf1EncTitle(){
-		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_title;
-		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
-	}
-
-	function showTipObf1EncZeroPad(){
-		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_zero;
-		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
-	}
-
-	function showTipObf1EncShasum(){
-		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_shasum;
-		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
-	}
-
-	function showTipObf1EncConvert(){
-		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_convert;
-		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
-	}
-
-	function hideTipObf1Enc(){
-		document.getElementById("dev_enc_obf1_tooltip").style.display = "none";
-	}
-	//Obf1 Encrypt Tooltip Functions
-
-	//Obf1 DECRYPT Tooltip Content
-	const html_obf1_dec_shasum = `
-		<p>OBF1 DECRYPT SHASUM TOOLTIP</p>
-		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
-		<br>
-		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
-		<br>
-		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
-	`;
-
-	const html_obf1_dec_inverse = `
-		<p>OBF1 DECRYPT INVERSE</p>
-		<img src="./svg_images/obf1_inverse.svg" style="" alt="" />
-		<br>
-		When more precision is needed for the Obf1 Encrypt binary bytes (8 bits) are converted to binary words (4 bits). When this is needed a single character is added to the left of the data. So when decrypting we run it first without stripping that leftmost character, then check if it looks like correctly decrypted data. If not we strip that single added character which will be representative of the binary word added in the encrypt step.
-		<br>
-		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
-	`;
-
-	const html_obf1_dec_title = `
-		<p>
-			To decrypt data from Obf1 we precisely recreate the entropy and XOR again. The decrypt works because a number XOR'd with another number twice is the same number.
-
-		<br>
-		<br>
-			Our secret sauce is meant as a type of blocking that obfuscates the length of the stored data. As such our system is designed to store all data in blocks of 1000 base 58 characters. This is so that if and when an attacker accesses the stored and obfuscated data, it will be harder to decrypt. There was a time when everyone trusted Google and they deserved that trust and everything was great. That time is over. Now if you’re not expecting data leaks and planning for your ‘secure’ storage to be leaked at some point, are you really trying? We are attempting to help solve the problem of trusting ‘secure’ systems.
-
-
-		</p>
-		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
-	`;
-	//Obf1 DECRYPT Tooltip Content
-
-	//Obf1 DECRYPT Tooltip Functions
-	function showTipObf1DecTitle(){
-		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_title;
-		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
-	}
-
-	function showTipObf1DecShasum(){
-		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_shasum;
-		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
-	}
-
-	function showTipObf1DecInverse(){
-		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_inverse;
-		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
-	}
-
-
-	function hideTipObf1Dec(){
-		document.getElementById("dev_dec_obf1_tooltip").style.display = "none";
-	}
-	//Obf1 DECRYPT Tooltip Functions
-
-	//Obf2 Encrypt Tooltip Content
-	const html_obf2_enc_shasum = `
-		<p>obf2 enCRYPT SHASUM TOOLTIP</p>
-		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
-		<br>
-		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
-		<br>
-		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
-	`;
-	const html_obf2_enc_modulo = `
-		<p>obf2 enCRYPT SUM AND MODULO FUNCTION</p>
-		<img src="./svg_images/sum_and_modulo.svg" style="" alt="" />
-		<br>
-			For the second round of obfuscation we sum the index of each base58 character with entropy produced from our shasum function and then modulo the output.
-		<br>
-		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
-	`;
-
-	const html_obf2_enc_title = `
-		<p>
-			For the second round of obfuscation we sum the index of each base58 character with entropy produced from our shasum function and then modulo the output.
-		<br>
-
-		</p>
-		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
-	`;
-	//Obf2 Encrypt Tooltip Content
-
-	//Obf2 Encrypt Tooltip Functions
-	function showTipObf2EncTitle(){
-		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_title;
-		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
-	}
-
-	function showTipObf2EncShasum(){
-		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_shasum;
-		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
-	}
-
-	function showTipObf2EncModulo(){
-		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_modulo;
-		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
-	}
-
-	function hideTipObf2Enc(){
-		document.getElementById("dev_enc_obf2_tooltip").style.display = "none";
-	}
-	//Obf2 Encrypt Tooltip Functions
-
-	//Obf2 DECRYPT Tooltip Content
-	const html_obf2_dec_shasum = `
-		<p>obf2 decrypt SHASUM TOOLTIP</p>
-		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
-		<br>
-		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
-		<br>
-		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
-	`;
-	const html_obf2_dec_modulo = `
-		<p>obf2 decrypt SUM AND MODULO FUNCTION</p>
-		<img src="./svg_images/inverse_sum_and_mod.svg" style="" alt="" />
-		<br>
-		To run the inverse of our sum and mod function we can simply take the difference of the indexes and then check if the answer is negative, adding 58 in that case as we know it got modulo’d during the encryption step.
-		<br>
-		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
-	`;
-
-	const html_obf2_dec_title = `
-		<p>
-			To run the inverse of our sum and mod function we can simply take the difference of the indexes and then check if the answer is negative, adding 58 in that case as we know it got modulo’d during the encryption step.
-		<br>
-		</p>
-		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
-	`;
-	//Obf2 DECRYPT Tooltip Content
-
-	//Obf2 DECRYPT Tooltip Functions
-	function showTipObf2DecTitle(){
-		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_title;
-		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
-	}
-
-	function showTipObf2DecShasum(){
-		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_shasum;
-		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
-	}
-
-	function showTipObf2DecModulo(){
-		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_modulo;
-		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
-	}
-
-	function hideTipObf2Dec(){
-		document.getElementById("dev_dec_obf2_tooltip").style.display = "none";
-	}
-	//Obf2 DECRYPT Tooltip Functions
-
-
-	//////////////////////////////////////////////////////////////
-	//		Dev Site Hook-into-main-functionality functions		//
-	//////////////////////////////////////////////////////////////
-
-	// Rolls a random salt manually for Dev Site's encrypt OpenSSL.
-	async function devManualSalt(){
-		const salt = window.crypto.getRandomValues(new Uint8Array(8));
-		document.getElementById("dev_enc_openssl_derivebits_salt").value = salt;
-		document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
-	}
-
-	// Dev Site Hook function for encOpenSSL()
-	async function devEncOpenSSL(){
-		const input_password = document.getElementById("dev_enc_openssl_password_input").value;
-		const input_plaintext = document.getElementById("dev_enc_openssl_plaintext_input").value;
-		//const key_derivation_algorithm = document.querySelector('input[type=radio][name=algo]:checked').value;
-		const iterations = document.getElementById("dev_enc_openssl_derivebits_iterations").value;
-		//const hash = document.getElementById("dev_enc_openssl_derivebits_hash").value;
-		const hash = document.querySelector('input[type=radio][name=digest_hash]:checked').value;
-		const digest_algo = document.getElementById("dev_enc_openssl_encrypt_algorithm").value;
-
-		const output_base64 = await encOpenSSL(input_plaintext, input_password, iterations, hash, digest_algo);
-		document.getElementById("dev_enc_openssl_encrypted_data_base64").value = output_base64;
-		// Propagate encrypt outputs to inverse decrypt function and next encrypt for now.
-		document.getElementById("dev_dec_openssl_decrypt_algorithm").value = digest_algo;
-		document.getElementById("dev_dec_openssl_password_input").value = input_password;
-		document.getElementById("dev_dec_openssl_ciphertext_input").value = output_base64;
-		document.getElementById("dev_dec_openssl_derivebits_iterations").value = iterations;
-		if( hash === 'SHA-256' ){
-			document.getElementById("SHA-256_dec").checked = true;
-		}else if( hash === 'SHA-384' ){
-			document.getElementById("SHA-384_dec").checked = true;
-		}else if( hash === 'SHA-512' ){
-			document.getElementById("SHA-512_dec").checked = true;
-		}
-		// Proopagate to next encrypt step.
-		document.getElementById("dev_enc_obf1_b64_input_data").value = output_base64;
-	}
-
-	// Dev Site Hook function for decOpenSSL()
-	async function devDecOpenSSL(){
-		const input_password = document.getElementById("dev_dec_openssl_password_input").value;
-		const input_plaintext = document.getElementById("dev_dec_openssl_ciphertext_input").value;
-		//const algorithm = document.getElementById("dev_enc_openssl_derivebits_algorithm").value;
-		const iterations = document.getElementById("dev_dec_openssl_derivebits_iterations").value;
-		//const hash = document.getElementById("dev_dec_openssl_derivebits_hash").value;
-		const hash = document.querySelector('input[type=radio][name=digest_hash_dec]:checked').value;
-		const digest_algo = document.getElementById("dev_dec_openssl_decrypt_algorithm").value;
-
-		const decrypted_plaintext = await decOpenSSL(input_plaintext, input_password, iterations, hash, digest_algo);
-		document.getElementById("dev_dec_openssl_decrypted_plaintext").value = decrypted_plaintext;
-	}
-
-	// Dev Site Hook function for obf1Encrypt()
-	async function devEncObf1(){
-		const input_password = document.getElementById("dev_enc_obf1_password_input").value;
-		const input_b64_encoded_data = document.getElementById("dev_enc_obf1_b64_input_data").value;
-
-		const output_1000_b64 = await obf1Encrypt(input_b64_encoded_data, input_password);
-		document.getElementById("dev_enc_obf1_b64_output").value = output_1000_b64;
-		// Propagate encrypt outputs to decrypt.
-		document.getElementById("dev_dec_obf1_password_input").value = input_password;
-		document.getElementById("dev_dec_obf1_b64_ciphertext").value = output_1000_b64;
-		// Proopagate to next encrypt step.
-		//document.getElementById("dev_enc_obf2_password_input").value = input_password;
-		document.getElementById("dev_enc_obf2_ciphertext_b64").value = output_1000_b64;
-	}
-
-	// Dev Site Hook function for obf1Decrypt()
-	async function devDecObf1(){
-		const input_password = document.getElementById("dev_dec_obf1_password_input").value;
-		const input_b64_encoded_data = document.getElementById("dev_dec_obf1_b64_ciphertext").value;
-
-		const output_b64 = await obf1Decrypt(input_b64_encoded_data, input_password);
-		console.log("output length: " + output_b64.length);
-		document.getElementById("dev_dec_obf1_data_b64_output").value = output_b64;
-	}
-
-	// Dev Site Hook function for obf1Encrypt()
-	async function devEncObf2(){
-		const input_password = document.getElementById("dev_enc_obf2_password_input").value;
-		const input_b64_ciphertext = document.getElementById("dev_enc_obf2_ciphertext_b64").value;
-
-		const output_final = await obf2Encrypt(input_b64_ciphertext, input_password);
-		document.getElementById("dev_enc_obf2_final_encrypted").value = output_final;
-		// Propagate encrypt outputs to decrypt.
-		document.getElementById("dev_dec_obf2_password_input").value = input_password;
-		document.getElementById("dev_dec_obf2_final_encrypted").value = output_final;
-	}
-
-	// Dev Site Hook function for obf2Decrypt()
-	async function devDecObf2(){
-		const input_password = document.getElementById("dev_dec_obf2_password_input").value;
-		const input_final_encrypted = document.getElementById("dev_dec_obf2_final_encrypted").value;
-
-		const output_ciphertext_b64 = await obf2Decrypt(input_final_encrypted, input_password);
-		document.getElementById("dev_dec_obf2_ciphertext_b64").value = output_ciphertext_b64;
-	}
-
-
-
 
 	//////////////////////////////////////////////////////////////
 	//		Global Flags & Page Load Function					//
@@ -1738,35 +1626,6 @@
 		//document.getElementById('access_data_outputdisplay').style.backgroundColor = '#434343';
 	}
 
-
-	function securityReset(){
-		// Reset Browser Access edit buttons.
-		document.getElementById("editdata_button").style.display = "inline";
-		document.getElementById("delete_button").style.display = "inline";
-		document.getElementById("save_button").style.display = "none";
-		// Keep access cleartext display disabled.
-		showDisabledColors();
-		// Hide running byte total.
-		document.getElementById("browserdata_length_label").innerHTML = '';
-		document.getElementById("uploaddata_length_label").innerHTML = '';
-		// Clear Store Upload file input.
-		document.getElementById('store_upload_input').value = null;
-		// Hide Store Upload commit button
-		document.getElementById("store_upload_commit_button").style.display = "none";
-		// Hide READY TO COMMIT message.
-		document.getElementById("store_upload_readytocommit").style.display = "none";
-		// Delete cleartext outdisplay which is shown at the end of the Browser Access Flow.
-		document.getElementById("access_data_outputdisplay").value = '';
-		// Clear fingerprint held for delete.
-		document.getElementById("fingerprint_holder").value = '';
-		// Check if we're online and inform user if we are or not.
-		updateOnlineStatus();
-		// Hide pass check warnings (passlock flow).
-		hidePassWarnings();
-		// Reset delete overlay
-		deleteCheckHide('overlay_delete_cmd');
-		deleteCheckHide('overlay_delete_browser');
-	}
 	// Show Overlay
 	function deleteCheckShow(targetId){
 		//console.log("deleteCheck SHOW hit. targetId: " + targetId);
@@ -1814,6 +1673,35 @@
 			}
 		}
 	});
+
+	function securityReset(){
+		// Reset Browser Access edit buttons.
+		document.getElementById("editdata_button").style.display = "inline";
+		document.getElementById("delete_button").style.display = "inline";
+		document.getElementById("save_button").style.display = "none";
+		// Keep access cleartext display disabled.
+		showDisabledColors();
+		// Hide running byte total.
+		document.getElementById("browserdata_length_label").innerHTML = '';
+		document.getElementById("uploaddata_length_label").innerHTML = '';
+		// Clear Store Upload file input.
+		document.getElementById('store_upload_input').value = null;
+		// Hide Store Upload commit button
+		document.getElementById("store_upload_commit_button").style.display = "none";
+		// Hide READY TO COMMIT message.
+		document.getElementById("store_upload_readytocommit").style.display = "none";
+		// Delete cleartext outdisplay which is shown at the end of the Browser Access Flow.
+		document.getElementById("access_data_outputdisplay").value = '';
+		// Clear fingerprint held for delete.
+		document.getElementById("fingerprint_holder").value = '';
+		// Check if we're online and inform user if we are or not.
+		updateOnlineStatus();
+		// Hide pass check warnings (passlock flow).
+		hidePassWarnings();
+		// Reset delete overlay
+		deleteCheckHide('overlay_delete_cmd');
+		deleteCheckHide('overlay_delete_browser');
+	}
 
 	// Keep track of the page we're on. Start on home page.
 	let currentPage = 'home';
@@ -1894,163 +1782,6 @@
 		console.log("File input contents: " + document.getElementById('store_upload_input').value);
 		document.getElementById('store_upload_input').value = null;
 		console.log("File input contents: " + document.getElementById('store_upload_input').value);
-	}
-
-	// Used to check password length as user flows through interface.
-	// Inputs: current_div is the div presently shown to the user.
-	// 		   next_div is the id of the next page in the flow which will be accessed if the password length is validated.
-	// Output: Warns user and doesn't pass if length outside constraints.
-	function checkPassLength(current_div, next_div){
-		// Get all inputs in the active user-shown div (should only be 1).
-		let input_array = document.getElementById(current_div).getElementsByTagName('input');
-		if( input_array.length > 1 ){
-			throw new Error('More than 1 input found in active div. This should never trigger.');
-		}
-		// Get the current length of the value in the password/codeword field.
-		let length = input_array[0].value.length;
-		// Change global password length constraints here.
-		// Start at 1 to catch empty passowords/codeword. Can change later.
-		if( length < 1 ){
-			// Activate text informing user of error.
-			//document.getElementById("password_length_warning").style.display = "inline";
-			
-			// Show all password warnings.
-			pass_warn_elements = document.getElementsByClassName('pass_length_warn');
-			for (let i = 0; i < pass_warn_elements.length; i++) {
-				pass_warn_elements[i].style.display = "inline";
-			}
-		}else{
-			// User may access next function.
-			if( next_div === 'executeStore' ){
-				storeExecute();
-			}else if( next_div === 'executeLoad' ){
-				loadExecute();
-			}else{
-				showPage(next_div);
-			}
-		}
-	} //checkPassLength()
-
-/*
-	// Clears all fields that could contain sensitive data.
-	// Resets delete overlay
-	function securityReset(){
-		console.log("CLEARING FIELDS FOR SECURITY-- SECURITY RESET ENABLED");
-		// Reset delete overlay
-		deleteCheckHide('overlay_text');
-		deleteCheckHide('overlay_download');
-		// Clear store fields
-		document.getElementById("store_data").value = '';
-		document.getElementById("upload_data").value = '';
-		document.getElementById("store_codeword").value = '';
-		document.getElementById("store_pass_1").value = '';
-		document.getElementById("store_pass_2").value = '';
-		document.getElementById("store_pass_3").value = '';
-		// Clear load
-		document.getElementById("load_codeword").value = '';
-		document.getElementById("load_pass_1").value = '';
-		document.getElementById("load_pass_2").value = '';
-		document.getElementById("load_pass_3").value = '';
-		// Clear output display
-		document.getElementById("output_display").value = '';
-		// Reset download flag
-		download_flag = 'false';
-		// Check if we're online and inform user if we are or not.
-		updateOnlineStatus();
-		// Clear uploaded file
-		document.getElementById("store_upload_input").value = null;
-		// Clear full offline database warning. Don't think we need this because why would you ever want it off?
-		//document.getElementById("full_offline_dbase_warning").style.display = "none";
-	}
-*/
-	// These standalone functions are required to set upload_flag in javascript.
-	// User choose text input, set flag to false.
-	function storeDefault(){
-		upload_flag = 'false';
-		showPage('store2');
-	}
-
-	// User choose upload, set flag to true.
-	function storeUpload(){
-		upload_flag = 'true';
-		showPage('store_upload');
-	}
-
-	// On page store4, back either goes to text input or file input depending on previous user choice.
-	function storeBack(){
-		if( upload_flag === 'true' ){
-			showPage('store_upload');
-		}else{
-			showPage('store3');
-		}
-	}
-
-	// Store flow walk finisher.
-	// async needed to handle crypto functionality
-	async function storeExecute(){
-		// Main Function Call
-		let outcome = await deepStore();
-
-		if( outcome == 1 ){
-			//Success
-			showPage('store6');
-		}else if(outcome == "fullsuccess"){
-			showPage('store9');
-		}else if(outcome == "offline"){
-			// Stored to offline dbase but not to server.
-			showPage('store8');
-		}else{
-			// Failed to do anything.
-			showPage('store7');
-		}
-	}//storeExecute()
-
-	// User choose text output, set flag to false.
-	function loadDefault(){
-		download_flag = 'false';
-		showPage('load2');
-	}
-
-	// User choose file output, set flag to true.
-	function loadDownload(){
-		download_flag = 'true';
-		showPage('load3');
-	}
-
-	// On page store4, back either goes to text input or file input depending on previous user choice.
-	function loadBack(){
-		if( download_flag === 'true' ){
-			showPage('load_choose');
-		}else{
-			showPage('load2');
-		}
-	}
-
-	// Load flow walk finisher.
-	function loadExecute(){
-		// Main Function Call
-		deepLoad();
-		//showPage('load5');
-	}
-
-	// Delete flow walk finisher.
-	async function deleteExecute(){
-		// Main Function Call
-		const outcome = await deepDelete();
-		
-		if( outcome == "success" ){	
-			showPage('delete5');
-		}else if(outcome == "failed server"){ 
-			showPage('delete6');
-		}else if(outcome == "failed all"){ 
-			showPage('delete7');
-		}else{
-			console.log("error: delete inform failed.");
-			showPage('delete7');
-		}
-
-		// Also delete user inputted data.
-		securityReset();
 	}
 
 	// Called on change of text area, checks length of that text area and shows warning if input data too long.
@@ -2147,31 +1878,6 @@
 			document.getElementById("init_offdbase_statuslabel").style.display = "flex";
 		}
 	}
-
-/*
-	async function attemptCMDAccess(){
-		const fingerprint = await getFpForAccess();
-		//console.log("CMD Access. fingerprint: " + fingerprint);
-		// First try to load from offline dbase.
-		let encryptedData = attemptLoadOfflineDBase(fingerprint);
-		//console.log("attempted load from offline dbase: " + encryptedData);
-		// Try load from server if that fails.
-		if(encryptedData === 'miss'){
-			// serverLoad returns either undefined or encrypted data in string form.
-			encryptedData = await serverLoad(fingerprint);
-		}
-		//if(encryptedData === undefined || encryptedData === 'miss' || encryptedData === 'failed to load'){ // there appears to be a problem.
-		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
-			showPage('failed_to_access');
-			resetPasslock();
-		}else{
-			showPage('access_file');
-			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
-			holdFpForDelete(fingerprint);
-			decryptAndDownloadFile(encryptedData);
-		}
-	}
-*/
 
 	// Fill a new offline dbase with random fingerprints and datas.
 	function createNewOfflineDBase(){
@@ -2435,229 +2141,147 @@ console.log("checking data is valid: " + data);
 		}
 	}
 
-
 	//////////////////////////////////////////////////////////////
-	//					Core Functions						    //
 	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	////////////////OFFLINE FUNCTIONALITY//////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	function makeNewOfflineIfNeeded(){
+		if( document.getElementById("offline_dbase_pointer").innerHTML == "" ){
+			createNewOfflineDBase();
+			console.log("new offline dbase created for prototype offline flow.");
+		}
+	}
 
-	// Main Store Function Handler
-	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
-	// Inputs: Plaintext held in inputs hidden from the user until all data is ready for the server query.
-	// Output: Functionality.
-/*
-	async function deepStore(){
-		// Get save data from user.
-		const plaintext = document.getElementById("store_data").value;
-		// Get code/passwords from user.
-		const codeword = document.getElementById("store_codeword").value;
-		const pass_1 = document.getElementById("store_pass_1").value;
-		const pass_2 = document.getElementById("store_pass_2").value;
-		const pass_3 = document.getElementById("store_pass_3").value;
-	*/
-/*
-	async function deepStore( plaintext, cleartextSet ){
-		const uploadtext = document.getElementById("upload_data").value;
-		const pass_1 = cleartextSet[0];
-		const pass_2 = cleartextSet[1];
-		const pass_3 = cleartextSet[2];
-		const codeword = cleartextSet[3];
+	// Use separate storage object for offline secure data. Cleartext stored here.
+	let offlineData = {};
+	// Extract, encrypt, and store data at inputId to global passlockedData Object.
+	function extractInputDataOffline(inputId){
+		const keyword = extractKeyword(inputId);
+		//console.log("keyword: " + keyword);
+		const cleartextData = extractCleartextData(inputId);
+		//console.log("cleartextData: " + cleartextData);
+		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
+		//passlockedData[keyword] = await passlockEncrypt(cleartextData);
+		offlineData[keyword] = cleartextData;
+	}
 
-		console.log("cleartext: " + plaintext);
-		console.log("pass1: " + pass_1);
-		console.log("pass2: " + pass_2);
-		console.log("pass3: " + pass_3);
-		console.log("codeword: " + codeword);
-		
-		let encrypted_data;
-		// Use flag set by storeUpload() to determine which enc stack to use.
-		if( upload_flag == 'true' ){
-			// Grab upload_flag value for server database flag.
-			// Double Encrypt
-			encrypted_data = await encryptDouble(uploadtext, pass_2, pass_3);
-			// reset flag once it is used
-			upload_flag = 'false';
+	// Checks existing encrypted pass at index vs reiteration step encrypted value.
+	function checkDataOffline(inputId, nextPageId){
+		const keyword = extractKeyword(inputId);
+		const cleartextPass = extractCleartextData(inputId);
+		//const encryptedPassword = await passlockEncrypt(cleartextPass);
+		//if(passlockedData[keyword] === encryptedPassword){
+		if(offlineData[keyword] === cleartextPass){
+			// Password re-iterated successfully, continue to next page.
+			showPage(nextPageId);
 		}else{
-			// Triple Encrypt
-			encrypted_data = await encryptStack(plaintext, pass_1, pass_2, pass_3);
+			showPassWarnings();
+			// Re-iterated password doesn't match original.
+			throw Error("Offline Passwords are different!");
+			// Failed to re-iterate, Stay on this page.
 		}
+	}
 
-		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
-		// fingerprint length check
-		if( fp_hex.length != 64 ){
-			throw new Error('Fingerprint length INVALID!');
-		}
+	async function attemptCMDStoreOffline(){
+		//const fingerprintAndData = await getFpAndDataForStore();
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
+		const data = await encryptDouble(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['data']);
+		//storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
+		//const offline_dbase_store_outcome = await handleOfflineDBaseStore(fp_hex, encrypted_data);
+		const outcome = storeSingleRecordToOfflineDBase(fingerprint, data);
+		console.log("CMD Offline Store outcome: " + outcome);
+	}
+
+	// storeDataToServer() can be used for both Store Flows because the fail/pass outcome is the same for both Browser and CMD.
+	async function attemptBrowserStoreOffline(inputId){
+		extractInputDataOffline(inputId);
+		//const fingerprintAndData = await getFpAndDataForStore();
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
+		const data = await encryptTriple(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['opensslpass'], offlineData['data']);
+		//storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
+		//const offline_dbase_store_outcome = await handleOfflineDBaseStore(fp_hex, encrypted_data);
+		const outcome = storeSingleRecordToOfflineDBase(fingerprint, data);
+		console.log("Browser Offline Store outcome: " + outcome);
+	}
+/*
+	async function editDataOffline(){
+		document.getElementById('access_data_outputdisplay').disabled = false;
+		// Turn on textarea so user can edit.
+		document.getElementById('access_data_outputdisplay').focus();
+		// 
+		showEnabledColors();
+		// Hide both existing buttons
+		document.getElementById("editdata_button").style.display = "none";
+		document.getElementById("delete_button").style.display = "none";
+		// Show single SAVE button
+		document.getElementById("save_button").style.display = "inline";
+		// Show them again on save? Or go to store success/fail?
+	}
 */
-/*
-	async function deepStore( fp_hex, encrypted_data){
-		let offline_dbase_store_outcome;
-		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
-			offline_dbase_store_outcome = await handleOfflineDBaseStore(fp_hex, encrypted_data);
-			// Return from deepStore() unless the offline dbase is full, in which case store that single normally by not returning from deepStore.
-			if( offline_dbase_store_outcome != "full" ){
-				return offline_dbase_store_outcome;
-			}
-		}
+	async function attemptCMDAccessOffline(){
+		//const fingerprint = await getFpForAccess();
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
+		const encryptedData = attemptLoadOfflineDBase(fingerprint);
 
-		// Attempt to store a record to the server.
-		const server_response = await serverStore(fp_hex, encrypted_data);
-		if( server_response != null){
-			sr_store_result = server_response.response;
-			// Store returned 0 (fail).
-			if( Number(sr_store_result) != 1){
-				throw new Error('STORE ERROR!');
-			}
+		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
+			showPage('offlinefailed_to_access');
 		}else{
-			return;
+			showPage('offlineaccess_file');
+			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
+			//holdFpForDelete(fingerprint);
+			decryptAndDownloadFileOffline(encryptedData);
 		}
+	}
 
-		// Check Load
-		// return of 0 means fingerprint form check fails
-		// return of empty means fingerprint returned nothing
-		const sr_load = await serverLoad(fp_hex);
-
-		// Report Results
-		if(sr_load != null){ // Looks like we have to use this nested loop for null check or code will break.
-			if(encrypted_data  === sr_load.data && offline_dbase_store_outcome === "full"){
-				return "fullsuccess";
-			}else if(encrypted_data  === sr_load.data){
-				return 1;
-			}else{
-				return 0;
-				// Maybe delete the record if it fails to load correctly?
-			}
-		}else{
-			return 0;
-		}
-	}//deepStore()
-*/
-/*
-	// Main Access Function Handler
-	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
-	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
-	// Output: functionality.
-	async function deepLoad(){
-		// Get code/passwords from user.
-		const codeword = document.getElementById("load_codeword").value;
-		const pass_1 = document.getElementById("load_pass_1").value;
-		const pass_2 = document.getElementById("load_pass_2").value;
-		const pass_3 = document.getElementById("load_pass_3").value;
-
-
-		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
-		// fingerprint length check
-		if( fp_hex.length != 64 ){
-			throw new Error('Fingerprint length INVALID!');
-		}
-
-		// First check offline database for record.
-		const data_from_offline_dbase = attemptLoadOfflineDBase(fp_hex);
-		if( data_from_offline_dbase != "miss" ){
-			// Decrypt Block
-			await decryptAndShowUser(data_from_offline_dbase);
-			return;
-		}
-
-		console.log("Querying server...");
-
-		// Load from server
-		const sr_load = await serverLoad(fp_hex);
-		if(sr_load == null){
-			showPage('failed_to_access');
-			return;
-		}else{
-			if( sr_load.data == "" ){
-				showPage('failed_to_access');
-				return;
-			}
-		}
-
-		// Decrypt Block
-		await decryptAndShowUser(sr_load.data);
-	}//deepLoad()
-
-	// Decrypts input encrypted_data and decides whether to show the user in plaintext or give them a file to decrypt.
-	async function decryptAndShowUser(encrypted_data){
-		console.log("decryptAndShowUser entered.");
-		const pass_1 = document.getElementById("load_pass_1").value;
-		const pass_2 = document.getElementById("load_pass_2").value;
-		const pass_3 = document.getElementById("load_pass_3").value;
-
-		// Your Encryption
-		if( download_flag == 'true' ){
-			console.log("File encryption - your encryption.");
-			showPage('load_download');
-			// Double Decrypt
-			decrypted_data = await decryptDouble(encrypted_data, pass_2, pass_3);
-			const bytes = base64ToBytes( decrypted_data );
+	async function decryptAndDownloadFileOffline(encryptedData){
+		const decryptedData  = await decryptDouble(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['data']);
+			// bytes is Uint8Array
+			const bytes = base64ToBytes(decryptedData);
 			// Produce file for user to decrypt.
 			let blob = new Blob([bytes]);
 			let a = document.createElement('a');
 			a.href = window.URL.createObjectURL(blob);
-			a.download = 'secretword_output_file.txt';
+			a.download = 'offlinefile.enc';
 			a.click();
-		}else{ // Our Encryption
-			console.log("our encryption.");
-			showPage('load_text');
-			// Triple Decrypt
-			const decrypted = await decryptStack(encrypted_data , pass_1, pass_2, pass_3);
-			console.log("decrypted: " + decrypted);
-			// Report Results 
-			document.getElementById("output_display").value = decrypted;
+	}
+
+	async function attemptBrowserAccessOffline(inputId){
+		// Encrypt and save OpenSSL password to passlockedData object.
+		//await extractInputData(inputId);
+		extractInputDataOffline(inputId);
+		//const fingerprint = await getFpForAccess();
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
+		//console.log("fingerprint:" + fingerprint + " offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1pass]:" + offlineData['obf1pass'] + " offlineData[obf2pass]:" + offlineData['obf2pass']);
+		// First attempt loading from offline dbase. Can return 'miss'.
+		const encryptedData = attemptLoadOfflineDBase(fingerprint);
+		//console.log("encryptedData: " + encryptedData);
+		// Report outcome of Access attempt.
+		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
+			showPage('offlinefailed_to_access');
+		}else{
+			showPage('offlineaccess_cleartext');
+			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
+			//holdFpForDelete(fingerprint);
+			await decryptAndShowCleartextOffline(encryptedData);
 		}
 	}
 
-	// Main Delete Function Handler
-	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
-	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
-	// Output: functionality.
-	async function deepDelete(){
-		// Get code/passwords from user.
-		// For Delete, we will now be in the Access flow and should be able to use already entered values.
-		const codeword = document.getElementById("load_codeword").value;
-		const pass_1 = document.getElementById("load_pass_1").value;
-		const pass_2 = document.getElementById("load_pass_2").value;
-		const pass_3 = document.getElementById("load_pass_3").value;
+	async function decryptAndShowCleartextOffline(encryptedData){
+		//const cleartextSet = await passlockDecryptSet();
+		//const decryptedData  = await decryptTriple(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['opensslpass'], encryptedData);
+		//console.log("offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1pass]:" + offlineData['obf1pass'] + " offlineData[obf2pass]:" + offlineData['obf2pass'] + " offlineData[opensslpass]:" + offlineData['opensslpass']);;
+		console.log("encryptedData: " + encryptedData);
 
-		const fp_hex = await computeFingerprint(codeword, pass_2, pass_3);
-		// fingerprint length check
-		if( fp_hex.length != 64 ){
-			throw new Error('Fingerprint length INVALID!');
-		}
+		const decryptedData  = await decryptTriple(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['opensslpass'], encryptedData);
+		console.log("decryptedData: " + decryptedData);
+		// Reveal cleartext to user.
+		document.getElementById("offlineaccess_data_outputdisplay").value = decryptedData;
+	}
 
-		let offline_dbase_delete_success = '';
-		// If there's an offline dbase, also try to delete it there.
-		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
-			console.log("deepDelete() -- Attempting Offline Database Delete with fingerprint: " + fp_hex);
-			const outcome = await deleteSingleRecordOfflineDBase(fp_hex);
-			if( outcome != "success" ){
-					console.log("failed offline dbase");
-				return "failed offline dbase";
-			}else{
-				offline_dbase_delete_success = '1';
-			}
-		}
-
-		// Load from server
-		const sr_delete = await serverDelete(fp_hex);
-		//return sr_delete.response;
-		if( sr_delete != null){
-			console.log("what is delete success response? 1?: " + "~" + sr_delete.response + "~");
-			if( sr_delete.response == '1' ){
-				console.log("success");
-				return "success";
-			}
-		}
-
-		if( offline_dbase_deleted ){
-				console.log("failed server");
-			return "failed server";
-		}else{
-				console.log("failed all");
-			return "failed all";
-		}
-	}//deepDelete()
-
-*/
 	//////////////////////////////////////////////////////////////
 	//			Passlock Functions							    //
 	//////////////////////////////////////////////////////////////
@@ -2760,9 +2384,9 @@ console.log("checking data is valid: " + data);
 	// Extract, encrypt, and store data at inputId to global passlockedData Object.
 	async function extractInputData(inputId){
 		const keyword = extractKeyword(inputId);
-console.log("keyword: " + keyword);
+		//console.log("keyword: " + keyword);
 		const cleartextData = extractCleartextData(inputId);
-console.log("cleartextData: " + cleartextData);
+		//console.log("cleartextData: " + cleartextData);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
 		passlockedData[keyword] = await passlockEncrypt(cleartextData);
 	}
@@ -3864,6 +3488,7 @@ console.log(blob);
 	async function decryptTriple(obf1Pass, obf2Pass, opensslPass, encryptedData){
 		const obf2Decrypted = await obf2Decrypt(encryptedData, obf2Pass);
 		const obf1Decrypted = await obf1Decrypt(obf2Decrypted, obf1Pass);
+console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + opensslPass);
 		const cleartext = await decOpenSSL(obf1Decrypted, opensslPass);
 		return cleartext;
 	}//decryptTriple()
@@ -4156,6 +3781,560 @@ console.log(blob);
 			window.debug = function() {};
 		}
 	}	
+
+
+	//////////////////////////////////////////////////////////////
+	//		Dev Site Tooltip Content & Functionality			//
+	//////////////////////////////////////////////////////////////
+
+	// Dev site base64 converter.
+	function convertBase64(){
+		// determine what kind of input is in top, ints or base64.
+		const input = document.getElementById("dev_b64_top").value;
+		let numbers = new Array();
+		// If input includes any commas, we assume it's an int string.	
+		if( input.includes(',') ){
+			// convert ints into base64
+			console.log("top input: found int string");
+			const numbers = input.split(',').map(Number);
+			console.log(numbers);
+			const output = bytesToBase64(numbers);
+			document.getElementById("dev_b64_bot").value = output;
+			document.getElementById("input_length_label").innerHTML = numbers.length;
+			document.getElementById("output_length_label").innerHTML = output.length;
+		}else{
+			// convert base64 into ints
+			console.log("top input: found base64 chars");
+			const output = base64ToBytes(input);
+			document.getElementById("dev_b64_bot").value = output;
+			document.getElementById("input_length_label").innerHTML = input.length;
+			document.getElementById("output_length_label").innerHTML = output.length;
+		}
+	}
+
+	//OpenSSL Encrypt Tooltip Content 
+	//OpenSSL Encrypt Tooltip Content 
+	//OpenSSL Encrypt Tooltip Content 
+	const html_openssl_enc_title= `
+		<p>
+			OpenSSL was chosen for the base encryption because it is widely available from the command line and its featureset includes aes-256-cbc symmetric encryption/decryption which is good enough for the US government as described in its spec document,
+			<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
+			
+			<br><br>
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_importkey = `
+		<p>
+			importKey() is a method for importing key material (e.g. a password) in a secure way that adheres to the SubtleCrypto guidelines set by the World Wide Web Consortium (the top authority/consensus for web design).<br><br>
+
+			In this recreation of OpenSSL’s command line encrypt functionality, we are using PBKDF2 as our key derivation algorithm because it offers a secure path to convert raw password key material into a cryptoKey object we can then feed into the SubtleCrypo encrypt() method which is currently the most secure way to encrypt data in a web browser. <br><br>
+
+			The ‘most secure way to encrypt data in a web browser’ is known because of the W3C Recommendation (an offical release) by the World Wide Web Consortium.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">importKey() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+			<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_derivebits = `
+		<p>
+			deriveBits() computes raw data for both the Initialization Vector (IV) and Key required for the AES-CBC algorithm utilized in the encrypt() digest.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/derivebits" target="_blank">deriveBits() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-deriveBits" target="_blank">deriveBits() W3C Specification/Documentation</a><br>
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_encrypt = `
+		<p>
+			encrypt() encrypts data using the specified algorithm (AES-CBC in this case) along with parameter datas like an IV.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-encrypt" target="_blank">encrypt() W3C Specification/Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_binary = `
+		<p>
+			The browser converts the binary stored arraybuffers into human readable bytes which is why binary numbers are showing up as 23, 129, 284, etc.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_newline = `
+		<p>
+			In order to mirror exactly the output of the openssl command line encrypt/decrypt functions we need a newline byte that delimits the end of the linux file which is how input is treated from the command line. In other words openssl treats all command line input as a file which in linux always ends with a newline character, so we have to add it here to produce the same output and make sure command line encrypted data can be decrypted by our system and vice versa.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_salted = `
+		<p>
+			OpenSSL command line encryption output includes the string literal prepend “Salted__”.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+
+	const html_openssl_enc_randsalt = `
+		<p>
+			It also includes a number 8 bytes long as a randomly generated salt which is used to run the encryption and then inserted after the “Salted__” literal. This number is needed to run the decryption.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipEnc()">Close</button>
+	`;
+	//OpenSSL Encrypt Tooltip Content 
+
+	//OpenSSL Encrypt Tooltip Functions
+	function showTipRandSalt(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_randsalt;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipSalted(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_salted;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipBinary(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_binary;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipNewline(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_newline;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipOpenSSLTitle(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_title;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipEncDeriveBits(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_derivebits;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipImportKeyEnc(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_importkey;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipEncEncrypt(){
+		document.getElementById("dev_enc_openssl_tooltip").innerHTML = html_openssl_enc_encrypt;
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "inline";
+	}
+
+	function hideTipEnc(){
+		document.getElementById("dev_enc_openssl_tooltip").style.display = "none";
+	}
+	//OpenSSL Encrypt Tooltip Functions
+
+	//OpenSSL Decrypt Tooltip Content
+	//OpenSSL Decrypt Tooltip Content
+	//OpenSSL Decrypt Tooltip Content
+	const html_openssl_dec_importkey = `
+		<p>
+			importKey() is a method for importing key material (e.g. a password) in a secure way that adheres to the SubtleCrypto guidelines set by the World Wide Web Consortium (the top authority/consensus for web design).<br><br>
+
+			In this recreation of OpenSSL’s command line DECRYPT functionality, we are using PBKDF2 as our key derivation algorithm because it offers a secure path to convert raw password key material into a cryptoKey object we can then feed into the SubtleCrypo encrypt() method which is currently the most secure way to encrypt data in a web browser. <br><br>
+
+			The ‘most secure way to encrypt data in a web browser’ is known because of the W3C Recommendation (an offical release) by the World Wide Web Consortium.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey" target="_blank">importKey() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+			<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+		</p>
+		<button class="glossy_button" onclick="hideTipDec()">Close</button>
+	`;
+
+	const html_openssl_dec_derivebits = `
+		<p>
+			deriveBits() computes raw data for both the Initialization Vector (IV) and Key required for the AES-CBC algorithm utilized in the decrypt() digest.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/derivebits" target="_blank">deriveBits() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-deriveBits" target="_blank">deriveBits() W3C Specification/Documentation</a><br>
+		</p>
+		<button class="glossy_button" onclick="hideTipDec()">Close</button>
+	`;
+
+	const html_openssl_dec_decrypt= `
+		<p>
+			decrypt() decrypts data using the specified algorithm (AES-CBC in this case) along with parameter datas like an IV.<br><br>
+
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/decrypt" target="_blank">decrypt() MDN Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-decrypt" target="_blank">decrypt() W3C Specification/Documentation</a><br>
+			<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+		</p>
+		<button class="glossy_button" onclick="hideTipDec()">Close</button>
+	`;
+
+	const html_openssl_dec_title = `
+		<p>
+			We chose openssl for the base encryption because it is widely available from the command line and its featureset includes aes-256-cbc symmetric encryption/decryption which is good enough for the US government as described in its spec document, RFC3602.
+
+		</p>
+		<button class="glossy_button" onclick="hideTipDec()">Close</button>
+	`;
+	//OpenSSL Decrypt Tooltip Content
+
+	//OpenSSL Decrypt Tooltip Functions
+	function showTipDecTitle(){
+		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_title
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipDecDeriveBits(){
+		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_derivebits;
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipImportKeyDec(){
+		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_importkey;
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
+	}
+
+	function showTipDecDecrypt(){
+		document.getElementById("dev_dec_openssl_tooltip").innerHTML = html_openssl_dec_decrypt;
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "inline";
+	}
+
+	function hideTipDec(){
+		document.getElementById("dev_dec_openssl_tooltip").style.display = "none";
+	}
+	//OpenSSL Decrypt Tooltip Functions
+
+	//Obf1 Encrypt Tooltip Content
+	const html_obf1_enc_shasum = `
+		<p>OBF1 ENCRYPT SHASUM TOOLTIP</p>
+		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
+		<br>
+		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
+		<br>
+		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
+	`;
+
+	const html_obf1_enc_zero = `
+		<p>OBF1 Why Zero Pad Works</p>
+		<br>
+		We can use zero padding here because of the identity: X⊕0=X
+		<br>
+		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
+	`;
+
+	const html_obf1_enc_convert = `
+		<p>OBF1 ENCRYPT convert to 1000 chars b58.</p>
+		<img src="./svg_images/get_1000_b58_chars.svg" style="" alt="" />
+		<br>
+		The blocking is a bit tricky converting bytes of size up to 256 to precisely 1000 characters of base58 characters (which have a size of 58). 256 divided by 58 = 4.413793... so we currently employ a ‘guess and check’ with tapering strategy by popping bytes then converting the binary number to base 58 and checking the number of characters it converted to. If we go from 1001 characters to 999, we know we missed 1000 and enable a subroutine that converts the number from 8-bit bytes into 4-bit words which are chunks of size up to 16 giving us the precision to guarantee 1000 base 58 characters of output.
+
+		<br>
+		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
+	`;
+
+	const html_obf1_enc_title = `
+		<p>
+			Obf1 utilizes our Shasum function to produce entropy which is then XOR’d into the data.  We then convert the binary data from the XOR into exactly 1000 characters of base58 represented data. This turns out to be non-trivial so we implement a ‘guess-and-check’ style mechanism to ensure outputs of the same length. 
+		<br>
+		<br>
+			Our secret sauce is meant as a type of blocking that obfuscates the length of the stored data. As such our system is designed to store all data in blocks of 1000 base 58 characters. This is so that if and when an attacker accesses the stored and obfuscated data, it will be harder to decrypt. There was a time when everyone trusted Google and they deserved that trust and everything was great. That time is over. Now if you’re not expecting data leaks and planning for your ‘secure’ storage to be leaked at some point, are you really trying? We are attempting to help solve the problem of trusting ‘secure’ systems.
+
+
+		</p>
+		<button class="glossy_button" onclick="hideTipObf1Enc()">Close</button>
+	`;
+	//Obf1 Encrypt Tooltip Content
+
+	//Obf1 Encrypt Tooltip Functions
+	function showTipObf1EncTitle(){
+		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_title;
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
+	}
+
+	function showTipObf1EncZeroPad(){
+		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_zero;
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
+	}
+
+	function showTipObf1EncShasum(){
+		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_shasum;
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
+	}
+
+	function showTipObf1EncConvert(){
+		document.getElementById("dev_enc_obf1_tooltip").innerHTML = html_obf1_enc_convert;
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "inline";
+	}
+
+	function hideTipObf1Enc(){
+		document.getElementById("dev_enc_obf1_tooltip").style.display = "none";
+	}
+	//Obf1 Encrypt Tooltip Functions
+
+	//Obf1 DECRYPT Tooltip Content
+	const html_obf1_dec_shasum = `
+		<p>OBF1 DECRYPT SHASUM TOOLTIP</p>
+		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
+		<br>
+		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
+		<br>
+		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
+	`;
+
+	const html_obf1_dec_inverse = `
+		<p>OBF1 DECRYPT INVERSE</p>
+		<img src="./svg_images/obf1_inverse.svg" style="" alt="" />
+		<br>
+		When more precision is needed for the Obf1 Encrypt binary bytes (8 bits) are converted to binary words (4 bits). When this is needed a single character is added to the left of the data. So when decrypting we run it first without stripping that leftmost character, then check if it looks like correctly decrypted data. If not we strip that single added character which will be representative of the binary word added in the encrypt step.
+		<br>
+		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
+	`;
+
+	const html_obf1_dec_title = `
+		<p>
+			To decrypt data from Obf1 we precisely recreate the entropy and XOR again. The decrypt works because a number XOR'd with another number twice is the same number.
+
+		<br>
+		<br>
+			Our secret sauce is meant as a type of blocking that obfuscates the length of the stored data. As such our system is designed to store all data in blocks of 1000 base 58 characters. This is so that if and when an attacker accesses the stored and obfuscated data, it will be harder to decrypt. There was a time when everyone trusted Google and they deserved that trust and everything was great. That time is over. Now if you’re not expecting data leaks and planning for your ‘secure’ storage to be leaked at some point, are you really trying? We are attempting to help solve the problem of trusting ‘secure’ systems.
+
+
+		</p>
+		<button class="glossy_button" onclick="hideTipObf1Dec()">Close</button>
+	`;
+	//Obf1 DECRYPT Tooltip Content
+
+	//Obf1 DECRYPT Tooltip Functions
+	function showTipObf1DecTitle(){
+		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_title;
+		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
+	}
+
+	function showTipObf1DecShasum(){
+		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_shasum;
+		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
+	}
+
+	function showTipObf1DecInverse(){
+		document.getElementById("dev_dec_obf1_tooltip").innerHTML = html_obf1_dec_inverse;
+		document.getElementById("dev_dec_obf1_tooltip").style.display = "inline";
+	}
+
+
+	function hideTipObf1Dec(){
+		document.getElementById("dev_dec_obf1_tooltip").style.display = "none";
+	}
+	//Obf1 DECRYPT Tooltip Functions
+
+	//Obf2 Encrypt Tooltip Content
+	const html_obf2_enc_shasum = `
+		<p>obf2 enCRYPT SHASUM TOOLTIP</p>
+		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
+		<br>
+		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
+		<br>
+		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
+	`;
+	const html_obf2_enc_modulo = `
+		<p>obf2 enCRYPT SUM AND MODULO FUNCTION</p>
+		<img src="./svg_images/sum_and_modulo.svg" style="" alt="" />
+		<br>
+			For the second round of obfuscation we sum the index of each base58 character with entropy produced from our shasum function and then modulo the output.
+		<br>
+		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
+	`;
+
+	const html_obf2_enc_title = `
+		<p>
+			For the second round of obfuscation we sum the index of each base58 character with entropy produced from our shasum function and then modulo the output.
+		<br>
+
+		</p>
+		<button class="glossy_button" onclick="hideTipObf2Enc()">Close</button>
+	`;
+	//Obf2 Encrypt Tooltip Content
+
+	//Obf2 Encrypt Tooltip Functions
+	function showTipObf2EncTitle(){
+		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_title;
+		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
+	}
+
+	function showTipObf2EncShasum(){
+		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_shasum;
+		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
+	}
+
+	function showTipObf2EncModulo(){
+		document.getElementById("dev_enc_obf2_tooltip").innerHTML = html_obf2_enc_modulo;
+		document.getElementById("dev_enc_obf2_tooltip").style.display = "inline";
+	}
+
+	function hideTipObf2Enc(){
+		document.getElementById("dev_enc_obf2_tooltip").style.display = "none";
+	}
+	//Obf2 Encrypt Tooltip Functions
+
+	//Obf2 DECRYPT Tooltip Content
+	const html_obf2_dec_shasum = `
+		<p>obf2 decrypt SHASUM TOOLTIP</p>
+		<img src="./svg_images/shasum_extension.svg" style="" alt="" />
+		<br>
+		By chaining SHA-256 hashes together we create entropy, effectively creating a pseudorandom function with an inputted password as its seed.
+		<br>
+		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
+	`;
+	const html_obf2_dec_modulo = `
+		<p>obf2 decrypt SUM AND MODULO FUNCTION</p>
+		<img src="./svg_images/inverse_sum_and_mod.svg" style="" alt="" />
+		<br>
+		To run the inverse of our sum and mod function we can simply take the difference of the indexes and then check if the answer is negative, adding 58 in that case as we know it got modulo’d during the encryption step.
+		<br>
+		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
+	`;
+
+	const html_obf2_dec_title = `
+		<p>
+			To run the inverse of our sum and mod function we can simply take the difference of the indexes and then check if the answer is negative, adding 58 in that case as we know it got modulo’d during the encryption step.
+		<br>
+		</p>
+		<button class="glossy_button" onclick="hideTipObf2Dec()">Close</button>
+	`;
+	//Obf2 DECRYPT Tooltip Content
+
+	//Obf2 DECRYPT Tooltip Functions
+	function showTipObf2DecTitle(){
+		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_title;
+		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
+	}
+
+	function showTipObf2DecShasum(){
+		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_shasum;
+		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
+	}
+
+	function showTipObf2DecModulo(){
+		document.getElementById("dev_dec_obf2_tooltip").innerHTML = html_obf2_dec_modulo;
+		document.getElementById("dev_dec_obf2_tooltip").style.display = "inline";
+	}
+
+	function hideTipObf2Dec(){
+		document.getElementById("dev_dec_obf2_tooltip").style.display = "none";
+	}
+	//Obf2 DECRYPT Tooltip Functions
+
+
+	//////////////////////////////////////////////////////////////
+	//		Dev Site Hook-into-main-functionality functions		//
+	//////////////////////////////////////////////////////////////
+
+	// Rolls a random salt manually for Dev Site's encrypt OpenSSL.
+	async function devManualSalt(){
+		const salt = window.crypto.getRandomValues(new Uint8Array(8));
+		document.getElementById("dev_enc_openssl_derivebits_salt").value = salt;
+		document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
+	}
+
+	// Dev Site Hook function for encOpenSSL()
+	async function devEncOpenSSL(){
+		const input_password = document.getElementById("dev_enc_openssl_password_input").value;
+		const input_plaintext = document.getElementById("dev_enc_openssl_plaintext_input").value;
+		//const key_derivation_algorithm = document.querySelector('input[type=radio][name=algo]:checked').value;
+		const iterations = document.getElementById("dev_enc_openssl_derivebits_iterations").value;
+		//const hash = document.getElementById("dev_enc_openssl_derivebits_hash").value;
+		const hash = document.querySelector('input[type=radio][name=digest_hash]:checked').value;
+		const digest_algo = document.getElementById("dev_enc_openssl_encrypt_algorithm").value;
+
+		const output_base64 = await encOpenSSL(input_plaintext, input_password, iterations, hash, digest_algo);
+		document.getElementById("dev_enc_openssl_encrypted_data_base64").value = output_base64;
+		// Propagate encrypt outputs to inverse decrypt function and next encrypt for now.
+		document.getElementById("dev_dec_openssl_decrypt_algorithm").value = digest_algo;
+		document.getElementById("dev_dec_openssl_password_input").value = input_password;
+		document.getElementById("dev_dec_openssl_ciphertext_input").value = output_base64;
+		document.getElementById("dev_dec_openssl_derivebits_iterations").value = iterations;
+		if( hash === 'SHA-256' ){
+			document.getElementById("SHA-256_dec").checked = true;
+		}else if( hash === 'SHA-384' ){
+			document.getElementById("SHA-384_dec").checked = true;
+		}else if( hash === 'SHA-512' ){
+			document.getElementById("SHA-512_dec").checked = true;
+		}
+		// Proopagate to next encrypt step.
+		document.getElementById("dev_enc_obf1_b64_input_data").value = output_base64;
+	}
+
+	// Dev Site Hook function for decOpenSSL()
+	async function devDecOpenSSL(){
+		const input_password = document.getElementById("dev_dec_openssl_password_input").value;
+		const input_plaintext = document.getElementById("dev_dec_openssl_ciphertext_input").value;
+		//const algorithm = document.getElementById("dev_enc_openssl_derivebits_algorithm").value;
+		const iterations = document.getElementById("dev_dec_openssl_derivebits_iterations").value;
+		//const hash = document.getElementById("dev_dec_openssl_derivebits_hash").value;
+		const hash = document.querySelector('input[type=radio][name=digest_hash_dec]:checked').value;
+		const digest_algo = document.getElementById("dev_dec_openssl_decrypt_algorithm").value;
+
+		const decrypted_plaintext = await decOpenSSL(input_plaintext, input_password, iterations, hash, digest_algo);
+		document.getElementById("dev_dec_openssl_decrypted_plaintext").value = decrypted_plaintext;
+	}
+
+	// Dev Site Hook function for obf1Encrypt()
+	async function devEncObf1(){
+		const input_password = document.getElementById("dev_enc_obf1_password_input").value;
+		const input_b64_encoded_data = document.getElementById("dev_enc_obf1_b64_input_data").value;
+
+		const output_1000_b64 = await obf1Encrypt(input_b64_encoded_data, input_password);
+		document.getElementById("dev_enc_obf1_b64_output").value = output_1000_b64;
+		// Propagate encrypt outputs to decrypt.
+		document.getElementById("dev_dec_obf1_password_input").value = input_password;
+		document.getElementById("dev_dec_obf1_b64_ciphertext").value = output_1000_b64;
+		// Proopagate to next encrypt step.
+		//document.getElementById("dev_enc_obf2_password_input").value = input_password;
+		document.getElementById("dev_enc_obf2_ciphertext_b64").value = output_1000_b64;
+	}
+
+	// Dev Site Hook function for obf1Decrypt()
+	async function devDecObf1(){
+		const input_password = document.getElementById("dev_dec_obf1_password_input").value;
+		const input_b64_encoded_data = document.getElementById("dev_dec_obf1_b64_ciphertext").value;
+
+		const output_b64 = await obf1Decrypt(input_b64_encoded_data, input_password);
+		console.log("output length: " + output_b64.length);
+		document.getElementById("dev_dec_obf1_data_b64_output").value = output_b64;
+	}
+
+	// Dev Site Hook function for obf1Encrypt()
+	async function devEncObf2(){
+		const input_password = document.getElementById("dev_enc_obf2_password_input").value;
+		const input_b64_ciphertext = document.getElementById("dev_enc_obf2_ciphertext_b64").value;
+
+		const output_final = await obf2Encrypt(input_b64_ciphertext, input_password);
+		document.getElementById("dev_enc_obf2_final_encrypted").value = output_final;
+		// Propagate encrypt outputs to decrypt.
+		document.getElementById("dev_dec_obf2_password_input").value = input_password;
+		document.getElementById("dev_dec_obf2_final_encrypted").value = output_final;
+	}
+
+	// Dev Site Hook function for obf2Decrypt()
+	async function devDecObf2(){
+		const input_password = document.getElementById("dev_dec_obf2_password_input").value;
+		const input_final_encrypted = document.getElementById("dev_dec_obf2_final_encrypted").value;
+
+		const output_ciphertext_b64 = await obf2Decrypt(input_final_encrypted, input_password);
+		document.getElementById("dev_dec_obf2_ciphertext_b64").value = output_ciphertext_b64;
+	}
+
 
 
 </script>
