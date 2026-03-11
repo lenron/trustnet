@@ -16,19 +16,19 @@
 		font-weight: 600;
 		font-style: normal;
 		color: #54c597;
-		padding: 5px;
 	}
 
-	html {
+	html, body {
 		background-color: #272727;
-	}
-
-	body {
 		display: flex;
 		flex-direction: column;
 		min-height: 100vh;
 		margin: 0;
 		padding: 0;
+	}
+
+	.main_site {
+		height: 100%;
 	}
 
 	.header {
@@ -56,16 +56,10 @@
 
 	.center_html {
 		width: 100%;
+		min-height: 100%;
 		background-color: #272727;
 		flex: 1 auto;
 		display: flex;
-		/*align-self: center;*/
-	}
-
-	.content_html {
-		width: 100%;
-		display: flex;
-		/*align-items: baseline;*/
 		justify-content: center;
 	}
 
@@ -241,9 +235,6 @@
 			height: 220%;
 		}
 		
-		.content_html {
-			margin-top: -100px;
-		}
 	}
 	@media screen and (max-width:500px) {
 /*
@@ -270,9 +261,7 @@
 
 </style>
 <body>
-<button id="toggle_site_button" onclick="toggleSite()">Show Main Site</button>
-<div id="main_site" style="display:inline;">
-
+	<!--------------------------HEADER----------------------------!>
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
@@ -282,6 +271,9 @@
 		</div>
 		<div class="header_content" id="header_right">
 			<div class="header_label" style="">
+				<label id="dev_site_link">DEV SITE</label>
+			</div>
+			<div class="header_label" style="">
 				<label id="howworks">HOW IT WORKS</label>
 			</div>
 			<div class="header_label" style="">
@@ -289,16 +281,21 @@
 			</div>
 		</div>
 	</div>
-	<div id="offline_status_div" style="display:flex; justify-content:space-between;">
+
+	<!--------------------------Online Status---------------------------!>
+	<div id="offline_status_div" style="display:flex; justify-content:space-between; margin:10px;">
 		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
 	</div>
+	<!--------------------------Offline Database Warning----------------------------!>
 	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
 		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS NOW FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
 	</div>
-	<div class="center_html" id="center_html" style="height:100%">
-		<div class="content_html" id="content_html">
 
-			<!-------------------------- OFFLINE HOME  ----------------------------!>
+	<!--------------------------Div Housing for Flow Pages----------------------------!>
+	<div class="center_html" id="center_html" style="">
+
+<!----------------------------Offline Flow Start--------------------------------------------------------------!>
+			<!--------------------------OFFLINE HOME----------------------------!>
 			<div class="flow_pages home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
 				<h2 style="color:red">OFFLINE HOME</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
@@ -307,9 +304,8 @@
 				</div>
 			</div>
 
-<!----------------------------Access--------------------------------------------------------------!>
-<!----------------------------offlineaccess--------------------------------------------------------------!>
-
+<!----------------------------Offline Access--------------------------------------------------------------!>
+			<!---------------------------Codeword-----------------------!>
 			<div class="flow_pages passlock" id="offlineaccess_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 				<h2 style="color:red">OFFLINE FLOW</h2>
@@ -325,7 +321,7 @@
 				</div>
 			</div>
 
-			<!--------------------------- obf1pass -----------------------!>
+			<!---------------------------Obf1pass-----------------------!>
 			<div class="flow_pages passlock" id="offlineaccess_obf1pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
@@ -341,7 +337,7 @@
 				</div>
 			</div>
 
-			<!--------------------------- obf2pass -----------------------!>
+			<!---------------------------Obf2pass-----------------------!>
 			<div class="flow_pages passlock" id="offlineaccess_obf2pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
@@ -357,7 +353,7 @@
 				</div>
 			</div>
 
-			<!---------------------------BRANCH: CMD Line or Browser-----------------------!>
+			<!--------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
 			<div class="flow_pages" id="offlineaccess_choose" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<label>ACCESS DATA</label>
@@ -371,7 +367,6 @@
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<!--<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('store_codeword_cmd')">--!>
 						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="attemptCMDAccessOffline()">
 							<span class="coolpink" style="">COMMAND LINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
@@ -381,7 +376,8 @@
 				</div>
 			</div>
 
-			<!---------------------------Pass 3-----------------------!>
+			<!---------------------------BROWSER Chosen: -----------------------!>
+			<!---------------------------OpenSSL Pass-----------------------!>
 			<div class="flow_pages passlock" id="offlineaccess_opensslpass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
@@ -397,9 +393,8 @@
 				</div>
 			</div>
 
-
 			<!---------------------------Outcome-----------------------!>
-			<!---------------------------Send file to user for download-----------------------!>
+			<!---------------------------File Download-----------------------!>
 			<div class="flow_pages passlock" id="offlineaccess_file" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<h2>&#10004; SUCCESS</h2>
@@ -428,6 +423,7 @@
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('offlineoverlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
+			<!---------------------------END CMD LINE Access Flow-----------------------!>
 
 			<!---------------------------Show Cleartext-----------------------!>
 			<div class="flow_pages passlock" id="offlineaccess_cleartext" style="display:none">
@@ -440,18 +436,17 @@
 						<h2>Are you sure you want to delete this data?</h2> 
 						<div class="button_pair" id="" style="display:flex">
 							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('offlineoverlay_delete_browser')">KEEP DATA</button>
-							<button class="" id='' style="flex-grow:1" onclick="attemptDelete()">DELETE DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="attemptDeleteOffline()">DELETE DATA</button>
 						</div>
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex">
-					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>--!>
-					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
-					<button class="" id='save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStoreOffline('offlineaccess_data_outputdisplay')">SAVE DATA</button>
-					<button class="" id='editdata_button' style="flex-grow:1" onclick="editData('offlineaccess_data_outputdisplay')">EDIT DATA</button>
-					<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('offlineoverlay_delete_browser')">DELETE DATA</button>
+					<button class="" id='offline_save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStoreOffline('offlineaccess_data_outputdisplay')">SAVE DATA</button>
+					<button class="" id='offline_editdata_button' style="flex-grow:1" onclick="editDataOffline()">EDIT DATA</button>
+					<button class="" id='offline_delete_button' style="flex-grow:1" onclick="deleteCheckShow('offlineoverlay_delete_browser')">DELETE DATA</button>
 				</div>
 			</div>
+			<!---------------------------END BROWSER Access Flow-----------------------!>
 
 			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
 			<div class="flow_pages" id="offlinefailed_to_access" style="display:none">
@@ -461,7 +456,7 @@
 				</div>
 			</div>
 
-			<!------------------Fingerprint Holder for Delete------------------------------!>
+			<!----------------------------Fingerprint Holder for Delete------------------------------!>
 			<input id="fingerprint_holder" autocomplete="off" value="" style="display:none">
 
 			<!----------------------------Successfully Deleted Data--------------------------------------------------------------!>
@@ -479,12 +474,9 @@
 				<div class="button_pair" id="" style="display:flex">
 				</div>
 			</div>
-<!----------------------------END Access--------------------------------------------------------------!>
-<!----------------------------END Access--------------------------------------------------------------!>
+<!----------------------------END Offline Access--------------------------------------------------------------!>
 
-
-<!----------------------------STORE--------------------------------------------------------------!>
-<!----------------------------STORE--------------------------------------------------------------!>
+<!----------------------------Offline Store--------------------------------------------------------------!>
 			<!---------------------------Codeword-----------------------!>
 			<div class="flow_pages passlock" id="offlinestore_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
@@ -497,13 +489,11 @@
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
-					<!--  initiateStore is an async function. here we don't wait for it to finish before moving on to the next page which is great.  --!>
-					<!--  Might need to wait for an error?  --!>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');showPage('offlinestore_obf1pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!--------------------------- obf1pass -----------------------!>
+			<!---------------------------Obf1pass-----------------------!>
 			<div class="flow_pages passlock" id="offlinestore_obf1pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
@@ -519,7 +509,7 @@
 				</div>
 			</div>
 
-			<!--------------------------- obf2pass -----------------------!>
+			<!---------------------------Obf2pass-----------------------!>
 			<div class="flow_pages passlock" id="offlinestore_obf2pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
@@ -535,7 +525,7 @@
 				</div>
 			</div>
 
-			<!---------------------------BRANCH: CMD Line or Browser-----------------------!>
+			<!---------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
 			<div class="flow_pages" id="offlinestore_choose" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<label>STORE DATA</label>
@@ -549,7 +539,7 @@
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('offlinestore_codeword_cmd')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('offlinestore_codeword_cmdcheck')">
 							<span class="coolpink" style="">COMMAND LINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
 						</button>
@@ -558,9 +548,9 @@
 				</div>
 			</div>
 
-			<!---------------------------CMD Line-----------------------!>
+			<!---------------------------CMD LINE Chosen: -----------------------!>
 			<!---------------------------Check Codeword-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_codeword_cmd" style="display:none">
+			<div class="flow_pages passlock" id="offlinestore_codeword_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -569,17 +559,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_choose')">BACK</button>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
-																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdinput', 'offlinestore_obf1pass_cmd')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdcheckinput', 'offlinestore_obf1pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 1-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1pass_cmd" style="display:none">
+			<!---------------------------Check Obf1pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf1pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -588,15 +576,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_cmdinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_cmd')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1pass_cmdinput', 'offlinestore_obf2pass_cmd')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_cmdcheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1pass_cmdcheckinput', 'offlinestore_obf2pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 2-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf2pass_cmd" style="display:none">
+			<!---------------------------Check Obf2pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf2pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -605,14 +593,14 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_cmdinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass_cmd')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf2pass_cmdinput', 'offlinestore_upload')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass_cmdcheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf2pass_cmdcheckinput', 'offlinestore_upload')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Upload-----------------------!>
+			<!---------------------------FILE UPLOAD-----------------------!>
 			<div class="flow_pages" id="offlinestore_upload" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<label>STORE DATA</label>
@@ -631,17 +619,14 @@
 					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
-					<!-- when hitting back here go back to CMD Line or Browser? --!>
-					<!--<button class="" id='' style="width:250px;" onclick="showPage('store_choose')">BACK</button>--!>
-					<button class="" id='' style="width:250px;" onclick="showPage('offlinestore_obf2pass_cmd')">BACK</button>
+					<button class="" id='' style="width:250px;" onclick="showPage('offlinestore_obf2pass_cmdcheck')">BACK</button>
 					<button class="" id='offlinestore_upload_commit_button' style="flex-grow:1;display:none;color:orange" onclick="attemptCMDStoreOffline()">COMMIT DATA TO SERVER</button>
 				</div>
 			</div>
-			<!---------------------------END Store CMD Line Flow-----------------------!>
+			<!---------------------------END CMD LINE Store Flow-----------------------!>
 
-
-			<!---------------------------Browser-----------------------!>
-			<!---------------------------Pass 3-----------------------!>
+			<!---------------------------BROWSER Chosen: -----------------------!>
+			<!---------------------------OpenSSL Pass-----------------------!>
 			<div class="flow_pages passlock" id="offlinestore_opensslpass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
@@ -653,12 +638,12 @@
 				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_choose')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_opensslpass_input');showPage('offlinestore_codeword_check');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_opensslpass_input');showPage('offlinestore_codeword_browsercheck');">CONTINUE</button>
 				</div>
 			</div>
 
 			<!---------------------------Check Codeword-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_codeword_check" style="display:none">
+			<div class="flow_pages passlock" id="offlinestore_codeword_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -667,17 +652,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_checkinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_opensslpass')">BACK</button>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
-																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_checkinput', 'offlinestore_obf1pass_check')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_browsercheckinput', 'offlinestore_obf1pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 1-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1pass_check" style="display:none">
+			<!---------------------------Check Obf1pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf1pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -686,15 +669,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_checkinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_check')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1pass_checkinput', 'offlinestore_obf2pass_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_browsercheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1pass_browsercheckinput', 'offlinestore_obf2pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 2-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf2pass_check" style="display:none">
+			<!---------------------------Check Obf2pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf2pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -703,15 +686,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_checkinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass_check')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf2pass_checkinput', 'offlinestore_opensslpass_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass_browsercheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf2pass_browsercheckinput', 'offlinestore_opensslpass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 3-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_opensslpass_check" style="display:none">
+			<!---------------------------Check OpenSSL Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_opensslpass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -720,15 +703,14 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 3</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_checkinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf2pass_check')">BACK</button>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'check_pass3', 'check_passlock3', 'check_cw')">CONTINUE</button>--!>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_opensslpass_checkinput', 'offlinestore_data')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf2pass_browsercheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_opensslpass_browsercheckinput', 'offlinestore_data')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Data-----------------------!>
+			<!---------------------------Enter Data-----------------------!>
 			<div class="flow_pages passlock" id="offlinestore_data" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
@@ -738,14 +720,14 @@
 				</div>
 				<textarea class="browser_input" id="offlinestore_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('offlinestore_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_opensslpass_check')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_opensslpass_browsercheck')">BACK</button>
 					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStoreOffline('offlinestore_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
 					<div id='text_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
 				</div>
 			</div>
-			<!---------------------------END Store BROWSER Flow-----------------------!>
+			<!---------------------------END BROWSER Store Flow-----------------------!>
 
 			<!---------------------------Edit Success-----------------------!>
 			<div class="flow_pages" id="offlineedit_success" style="display:none">
@@ -758,8 +740,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>--!>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
 				</div>
 			</div>
 
@@ -768,21 +748,13 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<h2>&#10060; FAILED TO STORE</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>--!>
-					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
 				</div>
 			</div>
+<!----------------------------END Store--------------------------------------------------------------!>
+<!----------------------------END Offline Flow--------------------------------------------------------------!>
 
-<!----------------------------END STORE--------------------------------------------------------------!>
-<!----------------------------END OFFLINE FLOW--------------------------------------------------------------!>
-<!----------------------------END OFFLINE FLOW--------------------------------------------------------------!>
-<!----------------------------END OFFLINE FLOW--------------------------------------------------------------!>
-
-
-
-
-<!------------------------------------ New Site Flow --------------------------------------------------------------------------!>
-			<!--------------------------  HOME  ----------------------------!>
+<!------------------------------------Online Flow--------------------------------------------------------------------------!>
+			<!--------------------------HOME----------------------------!>
 			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#54c597">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
@@ -791,7 +763,7 @@
 				</div>
 			</div>
 
-			<!--------------------------  TIMED OUT HOME  ----------------------------!>
+			<!--------------------------TIMED OUT HOME----------------------------!>
 			<div class="flow_pages home" id="timed_out_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
 				<h3 style="color:red;">TIMED OUT!</h3>
 				<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
@@ -800,9 +772,9 @@
 					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
-<!----------------------------Access--------------------------------------------------------------!>
-<!----------------------------Access--------------------------------------------------------------!>
 
+<!----------------------------Online Access--------------------------------------------------------------!>
+			<!---------------------------Codeword-----------------------!>
 			<div class="flow_pages passlock" id="access_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
@@ -813,13 +785,11 @@
 				<input autocomplete="off" type="password" value="" id="access_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
-					<!--  initiateStore is an async function. here we don't wait for it to finish before moving on to the next page which is great.  --!>
-					<!--  Might need to wait for an error?  --!>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');showPage('access_obf1pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!--------------------------- obf1pass -----------------------!>
+			<!---------------------------Obf1pass-----------------------!>
 			<div class="flow_pages passlock" id="access_obf1pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
@@ -834,7 +804,7 @@
 				</div>
 			</div>
 
-			<!--------------------------- obf2pass -----------------------!>
+			<!---------------------------Obf2pass-----------------------!>
 			<div class="flow_pages passlock" id="access_obf2pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
@@ -849,7 +819,7 @@
 				</div>
 			</div>
 
-			<!---------------------------BRANCH: CMD Line or Browser-----------------------!>
+			<!---------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
 			<div class="flow_pages" id="access_choose" style="display:none">
 				<label>ACCESS DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
@@ -862,7 +832,6 @@
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<!--<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('store_codeword_cmd')">--!>
 						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="attemptCMDAccess()">
 							<span class="coolpink" style="">COMMAND LINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
@@ -872,7 +841,8 @@
 				</div>
 			</div>
 
-			<!---------------------------Pass 3-----------------------!>
+			<!---------------------------BROWSER Chosen: -----------------------!>
+			<!---------------------------OpenSSL Pass-----------------------!>
 			<div class="flow_pages passlock" id="access_opensslpass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
@@ -887,9 +857,8 @@
 				</div>
 			</div>
 
-
 			<!---------------------------Outcome-----------------------!>
-			<!---------------------------Send file to user for download-----------------------!>
+			<!---------------------------File Download-----------------------!>
 			<div class="flow_pages passlock" id="access_file" style="display:none">
 				<h2>&#10004; SUCCESS</h2>
 				<label>File should automatically download.</label>
@@ -917,6 +886,7 @@
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
+			<!---------------------------END CMD LINE Access Flow-----------------------!>
 
 			<!---------------------------Show Cleartext-----------------------!>
 			<div class="flow_pages passlock" id="access_cleartext" style="display:none">
@@ -934,10 +904,11 @@
 				</div>
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStore('access_data_outputdisplay')">SAVE DATA</button>
-					<button class="" id='editdata_button' style="flex-grow:1" onclick="editData('access_data_outputdisplay')">EDIT DATA</button>
+					<button class="" id='editdata_button' style="flex-grow:1" onclick="editData()">EDIT DATA</button>
 					<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
 				</div>
 			</div>
+			<!---------------------------END BROWSER Access Flow-----------------------!>
 
 			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
 			<div class="flow_pages" id="failed_to_access" style="display:none">
@@ -963,11 +934,8 @@
 				</div>
 			</div>
 <!----------------------------END Access--------------------------------------------------------------!>
-<!----------------------------END Access--------------------------------------------------------------!>
 
-
-<!----------------------------STORE--------------------------------------------------------------!>
-<!----------------------------STORE--------------------------------------------------------------!>
+<!----------------------------Online Store--------------------------------------------------------------!>
 			<!---------------------------Codeword-----------------------!>
 			<div class="flow_pages passlock" id="store_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
@@ -979,13 +947,11 @@
 				<input autocomplete="off" type="password" value="" id="store_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
-					<!--  initiateStore is an async function. here we don't wait for it to finish before moving on to the next page which is great.  --!>
-					<!--  Might need to wait for an error?  --!>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');showPage('store_obf1pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!--------------------------- obf1pass -----------------------!>
+			<!---------------------------Obf1pass-----------------------!>
 			<div class="flow_pages passlock" id="store_obf1pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -1000,7 +966,7 @@
 				</div>
 			</div>
 
-			<!--------------------------- obf2pass -----------------------!>
+			<!---------------------------Obf2pass-----------------------!>
 			<div class="flow_pages passlock" id="store_obf2pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -1015,7 +981,7 @@
 				</div>
 			</div>
 
-			<!---------------------------BRANCH: CMD Line or Browser-----------------------!>
+			<!---------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
 			<div class="flow_pages" id="store_choose" style="display:none">
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
@@ -1028,7 +994,7 @@
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('store_codeword_cmd')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('store_codeword_cmdcheck')">
 							<span class="coolpink" style="">COMMAND LINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
 						</button>
@@ -1037,9 +1003,9 @@
 				</div>
 			</div>
 
-			<!---------------------------CMD Line-----------------------!>
+			<!---------------------------CMD LINE Chosen: -----------------------!>
 			<!---------------------------Check Codeword-----------------------!>
-			<div class="flow_pages passlock" id="store_codeword_cmd" style="display:none">
+			<div class="flow_pages passlock" id="store_codeword_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK CODEWORD</label>
@@ -1047,17 +1013,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="store_codeword_cmdinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_codeword_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
-																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdinput', 'store_obf1pass_cmd')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdcheckinput', 'store_obf1pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 1-----------------------!>
-			<div class="flow_pages passlock" id="store_obf1pass_cmd" style="display:none">
+			<!---------------------------Check Obf1pass-----------------------!>
+			<div class="flow_pages passlock" id="store_obf1pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
@@ -1065,15 +1029,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf1pass_cmdinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf1pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_cmd')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_cmdinput', 'store_obf2pass_cmd')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_cmdcheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_cmdcheckinput', 'store_obf2pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 2-----------------------!>
-			<div class="flow_pages passlock" id="store_obf2pass_cmd" style="display:none">
+			<!---------------------------Check Obf2pass-----------------------!>
+			<div class="flow_pages passlock" id="store_obf2pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 2</label>
@@ -1081,14 +1045,14 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf2pass_cmdinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf2pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_cmd')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_cmdinput', 'store_upload')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_cmdcheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_cmdcheckinput', 'store_upload')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Upload-----------------------!>
+			<!---------------------------FILE UPLOAD-----------------------!>
 			<div class="flow_pages" id="store_upload" style="display:none">
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
@@ -1106,17 +1070,14 @@
 					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
-					<!-- when hitting back here go back to CMD Line or Browser? --!>
-					<!--<button class="" id='' style="width:250px;" onclick="showPage('store_choose')">BACK</button>--!>
-					<button class="" id='' style="width:250px;" onclick="showPage('store_obf2pass_cmd')">BACK</button>
+					<button class="" id='' style="width:250px;" onclick="showPage('store_obf2pass_cmdcheck')">BACK</button>
 					<button class="" id='store_upload_commit_button' style="flex-grow:1;display:none;color:orange" onclick="attemptCMDStore()">COMMIT DATA TO SERVER</button>
 				</div>
 			</div>
-			<!---------------------------END Store CMD Line Flow-----------------------!>
+			<!---------------------------END CMD LINE Store Flow-----------------------!>
 
-
-			<!---------------------------Browser-----------------------!>
-			<!---------------------------Pass 3-----------------------!>
+			<!---------------------------BRWOSER Chosen: -----------------------!>
+			<!---------------------------OpenSSL Pass-----------------------!>
 			<div class="flow_pages passlock" id="store_opensslpass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -1127,12 +1088,12 @@
 				<input autocomplete="off" type="password" value="" id="store_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_opensslpass_input');showPage('store_codeword_check');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_opensslpass_input');showPage('store_codeword_browsercheck');">CONTINUE</button>
 				</div>
 			</div>
 
 			<!---------------------------Check Codeword-----------------------!>
-			<div class="flow_pages passlock" id="store_codeword_check" style="display:none">
+			<div class="flow_pages passlock" id="store_codeword_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK CODEWORD</label>
@@ -1140,17 +1101,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="store_codeword_checkinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_codeword_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_opensslpass')">BACK</button>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(3, 'check_codeword', 'check_cw', 'passlock_data')">CONTINUE</button>--!>
-																<!-------checkPasslock(index, userPassInputId, thisPageId, nextPageId)--------!>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_checkinput', 'store_obf1pass_check')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_browsercheckinput', 'store_obf1pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 1-----------------------!>
-			<div class="flow_pages passlock" id="store_obf1pass_check" style="display:none">
+			<!---------------------------Check Obf1pass-----------------------!>
+			<div class="flow_pages passlock" id="store_obf1pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
@@ -1158,15 +1117,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf1pass_checkinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf1pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_check')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_checkinput', 'store_obf2pass_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_browsercheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_browsercheckinput', 'store_obf2pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 2-----------------------!>
-			<div class="flow_pages passlock" id="store_obf2pass_check" style="display:none">
+			<!---------------------------Check Obf2pass-----------------------!>
+			<div class="flow_pages passlock" id="store_obf2pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 2</label>
@@ -1174,15 +1133,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf2pass_checkinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf2pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_check')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_checkinput', 'store_opensslpass_check')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_browsercheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_browsercheckinput', 'store_opensslpass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Pass 3-----------------------!>
-			<div class="flow_pages passlock" id="store_opensslpass_check" style="display:none">
+			<!---------------------------Check OpenSSL Pass-----------------------!>
+			<div class="flow_pages passlock" id="store_opensslpass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 3</label>
@@ -1190,15 +1149,14 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 3</h2>
-				<input autocomplete="off" type="password" value="" id="store_opensslpass_checkinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_opensslpass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf2pass_check')">BACK</button>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="checkPasslock(2, 'check_pass3', 'check_passlock3', 'check_cw')">CONTINUE</button>--!>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_opensslpass_checkinput', 'store_data')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf2pass_browsercheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_opensslpass_browsercheckinput', 'store_data')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Data-----------------------!>
+			<!---------------------------Enter Data-----------------------!>
 			<div class="flow_pages passlock" id="store_data" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -1207,14 +1165,14 @@
 				</div>
 				<textarea class="browser_input" id="store_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('store_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('store_opensslpass_check')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_opensslpass_browsercheck')">BACK</button>
 					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStore('store_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
 					<div id='text_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
 				</div>
 			</div>
-			<!---------------------------END Store BROWSER Flow-----------------------!>
+			<!---------------------------END BROWSER Store Flow-----------------------!>
 
 			<!---------------------------Edit Success-----------------------!>
 			<div class="flow_pages" id="edit_success" style="display:none">
@@ -1225,8 +1183,6 @@
 			<div class="flow_pages" id="store_success" style="display:none">
 				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>--!>
-					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
 				</div>
 			</div>
 
@@ -1234,19 +1190,12 @@
 			<div class="flow_pages" id="store_failed" style="display:none">
 				<h2>&#10060; FAILED TO STORE</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">STORE DATA</button>--!>
-					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>--!>
 				</div>
 			</div>
+<!---------------------------END Store--------------------------------------------------------------!>
+<!---------------------------END Online Flow--------------------------------------------------------!>
 
-<!----------------------------END STORE--------------------------------------------------------------!>
-<!----------------------------END STORE--------------------------------------------------------------!>
-
-<!--------------------------------------END New Site Flow ------------------------------------------!>
-<!--------------------------------------END New Site Flow ------------------------------------------!>
-<!--------------------------------------END New Site Flow ------------------------------------------!>
-
-						<!------ Create New Offline DBase  ---!>
+			<!---------------Create New Offline DBase-----------------------------------------------!>
 			<div id="create_new_offline_dbase_div" class="flow_pages" style="display:none; ">
 				<h2 id="create_offline_dbase_label_h2">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
 				<h3 id="create_offline_dbase_label_h3">Please enter the following passwords to Access the data you wish to be stored in the offline database.</h3>
@@ -1265,18 +1214,264 @@
 				</div>
 				<h3 id="init_offdbase_statuslabel" style="align-self:center; display:none; color:red;">placeholder</h3>
 			</div>
-
-		</div>		<!-- content_html --!>
 	</div>			<!-- center_html --!>
 
 
-<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
+<!-------------------------------------------- Dev Site----------------------------------------------------!>
+	<div class="flow_pages" id="dev_site" style="display:none">
+		<h2 class="header_title">Development Site -- Crypto Functions</h2>
+
+		<!-- OpenSSL Encrypt -->
+		<h3 style="color:black;">OpenSSL Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
+		<div style="position:relative; border:1px solid; width:1010px;">
+			<img src="./svg_images/openssl_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Encrypt" />
+
+			<!-- Tooltip Object for OpenSSL Encrypt--!>
+			<div class="" id="dev_enc_openssl_tooltip" style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:lightgray; border:5px solid gold;"></div>
+
+			<input id="dev_enc_openssl_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:20px; width:350px;">
+			<input id="dev_enc_openssl_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:20px; width:350px;">
+
+			<!--<input id="dev_enc_openssl_derivebits_algorithm" class="devsite_inputs" type="text" value="PBKDF2" style="position:absolute; top:316px; left:20px; width:183px; height:10px;">--!>
+			<input id="dev_enc_openssl_derivebits_salt" class="devsite_inputs" type="text" style="position:absolute; top:260px; left:26px; width:183px; height:10px;">
+			<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:310px; left:26px; width:183px; height:10px;">
+			<!--<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">--!>
+
+			<!-- Might use a different graphic for this.
+			<a class="glossy_icon" style="position:absolute; top:150px; left:500px;" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a>-->
+
+			<a class="glossy_icon" style="position:absolute; top:165px; left:970px;" href="javascript:void('show tooltip')" onclick="showTipNewline()" >[?]</a>
+
+			<button class="glossy_button" style="position:absolute; top:150px; left:500px;" onclick="showTipBinary()">Why binary shows up like this</button>
+			<!--<button class="glossy_button" style="position:absolute; top:180px; left:770px;" onclick="showTipNewline()">Why newline byte needed</button>-->
+
+			<button class="glossy_button" style="position:absolute; top:250px; left:318px;" onclick="showTipImportKeyEnc()">IMPORT KEY</button>
+
+			<button class="glossy_button" id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:230px; left:106px; width:100px; height:20px; font-size:10px;" onclick="devManualSalt()">Roll Salt</button>
+			<div style="background-color:cornflowerblue; font-size:14px; position:absolute; top:360px; left:20px; ">
+				<fieldset >
+					<legend style="color:black;">Digest Hash:</legend>
+					<div>
+						<input type="radio" id="SHA-256" name="digest_hash" value="SHA-256" checked />
+						<label style="color:black;" for="SHA-256">SHA-256</label>
+					</div>
+					<div>
+						<input type="radio" id="SHA-384" name="digest_hash" value="SHA-384" />
+						<label style="color:black;" for="SHA-384">SHA-384</label>
+					</div>
+					<div>
+						<input type="radio" id="SHA-512" name="digest_hash" value="SHA-512" />
+						<label style="color:black;" for="SHA-512">SHA-512</label>
+					</div>
+				</fieldset>
+			</div>
+
+			<button class="glossy_button" style="position:absolute; top:415px; left:270px; " onclick="showTipEncDeriveBits()">DERIVE BITS</button>
+			<input id="dev_enc_openssl_encrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:578px; width:128px; height:10px;">
+			<textarea id="dev_enc_openssl_encrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:357px; left:540px; width:265px; height:34px;"></textarea>
+			<textarea id="dev_enc_openssl_encrypt_key" class="devsite_inputs" rows="3" style="position:absolute; top:445px; left:439px; width:350px; height:48px;"></textarea>
+
+			<input id="dev_enc_openssl_plaintext_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:465px; width:525px;">
+			<input id="dev_enc_openssl_plaintext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:465px; width:525px;">
+			<input id="dev_enc_openssl_plaintext_with_newline" class="devsite_inputs" type="text" style="position:absolute; top:230px; left:465px; width:525px;">
+
+			<button class="glossy_button" style="position:absolute; top:415px; left:900px; " onclick="showTipEncEncrypt()">ENCRYPT</button>
+			<input id="dev_enc_openssl_encrypted_data" class="devsite_inputs" type="text" style="position:absolute; top:542px; left:340px; width:642px;">
+			<input id="dev_enc_openssl_encrypted_salt_string" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:173px; width:200px; height:10px;">
+			<input id="dev_enc_openssl_encrypted_salt_random" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:400px; width:236px; height:10px;">
+
+			<a class="glossy_icon" style="position:absolute; top:605px; left:25px;" href="javascript:void('show tooltip')" onclick="showTipSalted()" >[?]</a>
+			<a class="glossy_icon" style="position:absolute; top:580px; left:505px;" href="javascript:void('show tooltip')" onclick="showTipRandSalt()" >[?]</a>
+
+			<!--<button class="glossy_button" style="position:absolute; top:615px; left:70px; " onclick="showTipSalted()">Salted Blurb</button>
+			<button class="glossy_button" style="position:absolute; top:630px; left:400px; " onclick="showTipRandSalt()">Random Salt Blurb</button>-->
+
+			<input id="dev_enc_openssl_encrypted_data_two_salts" class="devsite_inputs" type="text" style="position:absolute; top:676px; left:31px; width:950px;">
+			<input id="dev_enc_openssl_encrypted_data_base64" class="devsite_inputs" type="text" style="position:absolute; top:752px; left:31px; width:950px;">
+
+			<button class="glossy_button"id="dev_enc_openssl_encrypt_button" style="width:1000px; height:50px; font-size:18px;" onclick="devEncOpenSSL()">OpenSSL ENCRYPT</button>
+		</div>
+		<br>
+
+		<h3 style="color:red;">OpenSSL Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipDecTitle()" >[?]</a></h3>
+		<div style="position:relative; border:1px solid; width:1010px;">
+			<img src="./svg_images/openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
+
+			<!-- Tooltip Object for OpenSSL Encrypt--!>
+			<div id="dev_dec_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:lightgray; color:black; border:5px solid gold;"></div>
+			<!-- Tooltip Buttons for OpenSSL Decrypt--!>
+			<button class="glossy_button" style="position:absolute; top:220px; left:270px;" onclick="showTipImportKeyDec()">IMPORT KEY</button>
+			<button class="glossy_button" style="position:absolute; top:415px; left:270px; " onclick="showTipDecDeriveBits()">DERIVE BITS</button>
+			<button class="glossy_button" style="position:absolute; top:400px; left:850px; " onclick="showTipDecDecrypt()">DECRYPT</button>
+
+			<input id="dev_dec_openssl_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:14px; width:350px;">
+			<input id="dev_dec_openssl_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:14px; width:350px;">
+
+			<input id="dev_dec_openssl_ciphertext_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:460px; width:525px;">
+			<input id="dev_dec_openssl_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:460px; width:525px;">
+			<input id="dev_dec_openssl_ciphertext_extracted_bytes" class="devsite_inputs" type="text" style="position:absolute; top:210px; left:465px; width:525px;">
+
+			<!--<input id="dev_dec_openssl_derivebits_algorithm" class="devsite_inputs" type="text" value="PBKDF2" style="position:absolute; top:342px; left:14px; width:183px; height:10px;">--!>
+			<input id="dev_dec_openssl_derivebits_salt" class="devsite_inputs" type="text" style="position:absolute; top:291px; left:346px; width:183px; height:10px;">
+			<input id="dev_dec_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:272px; left:16px; width:183px; height:10px;">
+			<!--<input id="dev_dec_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:444px; left:14px; width:183px; height:10px;">--!>
+
+			<div style="background-color:cornflowerblue; font-size:14px; position:absolute; top:320px; left:20px; ">
+				<fieldset >
+					<legend style="color:black;">Digest Hash:</legend>
+					<div>
+						<input type="radio" id="SHA-256_dec" name="digest_hash_dec" value="SHA-256" checked />
+						<label style="color:black;" for="SHA-256_dec">SHA-256</label>
+					</div>
+					<div>
+						<input type="radio" id="SHA-384_dec" name="digest_hash_dec" value="SHA-384" />
+						<label style="color:black;" for="SHA-384_dec">SHA-384</label>
+					</div>
+					<div>
+						<input type="radio" id="SHA-512_dec" name="digest_hash_dec" value="SHA-512" />
+						<label style="color:black;" for="SHA-512_dec">SHA-512</label>
+					</div>
+				</fieldset>
+			</div>
+
+			<input id="dev_dec_openssl_decrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:600px; width:128px; height:10px;">
+			<textarea id="dev_dec_openssl_decrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:363px; left:528px; width:265px; height:34px;"></textarea>
+			<textarea id="dev_dec_openssl_decrypt_key" class="devsite_inputs" rows="3" style="position:absolute; top:450px; left:427px; width:350px; height:48px;"></textarea>
+
+			<input id="dev_dec_openssl_decrypted_bytes" class="devsite_inputs" type="text" style="position:absolute; top:561px; left:17px; width:950px;">
+			<input id="dev_dec_openssl_decrypted_plaintext" class="devsite_inputs" type="text" style="position:absolute; top:638px; left:17px; width:950px;">
+
+			<button class="glossy_button"id="dev_dec_openssl_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecOpenSSL()">OpenSSL <span style="color:red">DECRYPT</span></button>
+		</div>
+		<br>
+
+		<h3 style="color:black;">Obf-1 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf1EncTitle()" >[?]</a></h3>
+		<div style="position:relative; border:1px solid; width:1010px;">
+			<img src="./svg_images/obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
+
+			<!-- Tooltip Object for Obf1 Encrypt--!>
+			<div id="dev_enc_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
+			<!-- Tooltip Buttons for Obf1 Encrypt--!>
+			<!--<button class="glossy_button" style="position:absolute; top:190px; left:320px;" onclick="showTipObf1EncShasum()">SHA SUM</button>
+			<button class="glossy_button" style="position:absolute; top:480px; left:650px;" onclick="showTipObf1EncConvert()">CONVERT</button>-->
+			<a class="glossy_icon" style="position:absolute; top:195px; left:340px;" href="javascript:void('show tooltip')" onclick="showTipObf1EncShasum()" >[?]</a>
+			<a class="glossy_icon" style="position:absolute; top:180px; left:840px;" href="javascript:void('show tooltip')" onclick="showTipObf1EncZeroPad()" >[?]</a>
+			<a class="glossy_icon" style="position:absolute; top:490px; left:660px;" href="javascript:void('show tooltip')" onclick="showTipObf1EncConvert()" >[?]</a>
+
+			<input id="dev_enc_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:380px;">
+			<input id="dev_enc_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:380px;">
+
+			<input id="dev_enc_obf1_b64_input_data" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:512px; width:470px;">
+			<input id="dev_enc_obf1_b64_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:118px; left:512px; width:470px;">
+
+			<input id="dev_enc_obf1_zero_padded_data" class="devsite_inputs" type="text" style="position:absolute; top:260px; left:48px; width:808px;">
+			<input id="dev_enc_obf1_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:324px; left:48px; width:808px;">
+
+			<textarea id="dev_enc_obf1_xord_data" class="devsite_inputs" rows="3" style="position:absolute; top:398px; left:20px; width:965px; height:50px;"></textarea>
+			<textarea id="dev_enc_obf1_b64_output" class="devsite_inputs" rows="3" style="position:absolute; top:541px; left:20px; width:965px; height:102px;"></textarea>
+			<button class="glossy_button"id="dev_enc_obf1_encrypt_button" style="color:black; width:1000px; height:50px; font-size:18px;" onclick="devEncObf1()">Obf-1 ENCRYPT</button>
+		</div>
+		<br>
+
+		<h3 style="color:red;">Obf-1 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf1DecTitle()" >[?]</a></h3>
+		<div style="position:relative; border:1px solid; width:1010px;">
+			<img src="./svg_images/obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
+
+			<!-- Tooltip Object for Obf1 DECRYPT --!>
+			<div id="dev_dec_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
+			<!-- Tooltip Buttons for Obf1 DECRYPT --!>
+			<a class="glossy_icon" style="position:absolute; top:180px; left:320px;" href="javascript:void('show tooltip')" onclick="showTipObf1DecShasum()" >[?]</a>
+
+	<!--		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf1DecShasum()">SHA SUM Obf1 decrypt</button>-->
+			<button class="glossy_button" style="position:absolute; top:330px; left:880px;" onclick="showTipObf1DecInverse()">INVERSE</button>
+
+			<input id="dev_dec_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:374px;">
+			<input id="dev_dec_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:374px;">
+
+			<textarea id="dev_dec_obf1_b64_ciphertext" class="devsite_inputs" rows="3" style="position:absolute; top:38px; left:466px; width:526px; height:160px;"></textarea>
+
+			<input id="dev_dec_obf1_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:256px; left:48px; width:795px;">
+			<input id="dev_dec_obf1_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:319px; left:48px; width:795px;">
+
+			<textarea id="dev_dec_obf1_xor_inversed_data" class="devsite_inputs" rows="3" style="position:absolute; top:405px; left:37px; width:960px; height:50px;"></textarea>
+
+			<input id="dev_dec_obf1_data_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:507px; left:37px; width:950px;">
+			<input id="dev_dec_obf1_data_b64_output" class="devsite_inputs" type="text" style="position:absolute; top:570px; left:37px; width:950px;">
+
+			<button class="glossy_button"id="dev_dec_obf1_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecObf1()">Obf-1 DECRYPT</button>
+		</div>
+		<br>
+
+		<h3 style="color:black;">Obf-2 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf2EncTitle()" >[?]</a></h3>
+		<div style="position:relative; border:1px solid; width:1010px;">
+			<img src="./svg_images/obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
+
+			<!-- Tooltip Object for Obf2 ENCRYPT --!>
+			<div id="dev_enc_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
+			<!-- Tooltip Buttons for Obf2 ENCRYPT --!>
+
+			<a class="glossy_icon" style="position:absolute; top:180px; left:400px;" href="javascript:void('show tooltip')" onclick="showTipObf2EncShasum()" >[?]</a>
+
+			<!--<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2EncShasum()">SHA SUM Obf2 ENCRYPT</button>-->
+			<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2EncModulo()">MODULO Obf2 ENCRYPT</button>
+
+			<input id="dev_enc_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
+			<input id="dev_enc_obf2_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:108px; left:15px; width:374px;">
+			<input id="dev_enc_obf2_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:259px; left:15px; width:730px;">
+
+			<textarea id="dev_enc_obf2_ciphertext_b64" class="devsite_inputs" rows="3" style="position:absolute; top:39px; left:443px; width:537px; height:168px;"></textarea>
+			<textarea id="dev_enc_obf2_password_b64" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
+
+			<textarea id="dev_enc_obf2_final_encrypted" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
+
+			<button class="glossy_button"id="dev_enc_obf2_encrypt_button" style="color:black; width:1000px; height:50px; font-size:18px;" onclick="devEncObf2()">Obf-2 ENCRYPT</button>
+		</div>
+		<br>
+
+		<h3 style="color:red;">Obf-2 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf2DecTitle()" >[?]</a></h3>
+		<div style="position:relative; border:1px solid; width:1010px;">
+			<img src="./svg_images/obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
+
+			<!-- Tooltip Object for Obf2 DECRYPT --!>
+			<div id="dev_dec_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
+			<!-- Tooltip Buttons for Obf2 DECRYPT --!>
+
+
+			<a class="glossy_icon" style="position:absolute; top:180px; left:400px;" href="javascript:void('show tooltip')" onclick="showTipObf2DecShasum()" >[?]</a>
+			<!--<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2DecShasum()">SHA SUM Obf2 DECRYPT</button>-->
+			<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2DecModulo()">MODULO Obf2 Decrypt</button>
+
+			<input id="dev_dec_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
+			<input id="dev_dec_obf2_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:108px; left:15px; width:374px;">
+			<input id="dev_dec_obf2_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:259px; left:15px; width:730px;">
+
+			<textarea id="dev_dec_obf2_final_encrypted" class="devsite_inputs" rows="3" style="position:absolute; top:39px; left:443px; width:537px; height:168px;"></textarea>
+			<textarea id="dev_dec_obf2_password_b64" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
+
+			<textarea id="dev_dec_obf2_ciphertext_b64" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
+
+			<button class="glossy_button"id="dev_dec_obf2_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecObf2()">Obf-2 DECRYPT</button>
+		</div>
+		<br>
+
+		<h3>Base64 Functions -- Convert int array or base64 chars into its converted form</h3>
+		<div style="display:flex; flex-direction:column; ">
+				<label>Input -- Length=<span id="input_length_label"></span></label>
+				<textarea id="dev_b64_top" class="devsite_inputs" rows="5" style=""></textarea>
+				<label>Output -- Length=<span id="output_length_label"></label>
+				<textarea id="dev_b64_bot" class="devsite_inputs" rows="5" style=""></textarea>
+			<button onclick="convertBase64()">Convert Base64</button>
+		</div>
+	</div>
+
+<!-------------------------------------------- Dev Site----------------------------------------------------!>
+	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
-		<!--<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>--!>
-		<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="makeNewOfflineIfNeeded();showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>
-<!--
-		<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseFlow()">CREATE NEW OFFLINE DBASE</button>
-		<div style="display:flex">
+			<!--<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>--!>
+			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="makeNewOfflineIfNeeded();showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>
+	<!--
+			<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseFlow()">CREATE NEW OFFLINE DBASE</button>
+			<div style="display:flex">
 			<button id="toggle_debug_button" style="flex-grow:1" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
 			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
 		</div>
@@ -1289,289 +1484,11 @@
 	<p id="offline_dbase_pointer" style="display:none"></p>
 	<!-- Offline Database flag that we need to do a burst store when we come back online --!>
 	<p id="offline_dbase_update_flag" style="display:none"></p>
-</div>
-
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<!-- Dev Site --!>
-<div class="" id="dev_site" style="display:none">
-	<h2 class="header_title">Development Site -- Crypto Functions</h2>
-
-	<!-- OpenSSL Encrypt -->
-	<h3 style="color:black;">OpenSSL Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a></h3>
-	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="./svg_images/openssl_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Encrypt" />
-
-		<!-- Tooltip Object for OpenSSL Encrypt--!>
-		<div class="" id="dev_enc_openssl_tooltip" style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:lightgray; border:5px solid gold;"></div>
-
-		<input id="dev_enc_openssl_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:20px; width:350px;">
-		<input id="dev_enc_openssl_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:20px; width:350px;">
-
-		<!--<input id="dev_enc_openssl_derivebits_algorithm" class="devsite_inputs" type="text" value="PBKDF2" style="position:absolute; top:316px; left:20px; width:183px; height:10px;">--!>
-		<input id="dev_enc_openssl_derivebits_salt" class="devsite_inputs" type="text" style="position:absolute; top:260px; left:26px; width:183px; height:10px;">
-		<input id="dev_enc_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:310px; left:26px; width:183px; height:10px;">
-		<!--<input id="dev_enc_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:470px; left:20px; width:183px; height:10px;">--!>
-
-		<!-- Might use a different graphic for this.
-		<a class="glossy_icon" style="position:absolute; top:150px; left:500px;" href="javascript:void('show tooltip')" onclick="showTipOpenSSLTitle()" >[?]</a>-->
-
-		<a class="glossy_icon" style="position:absolute; top:165px; left:970px;" href="javascript:void('show tooltip')" onclick="showTipNewline()" >[?]</a>
-
-		<button class="glossy_button" style="position:absolute; top:150px; left:500px;" onclick="showTipBinary()">Why binary shows up like this</button>
-		<!--<button class="glossy_button" style="position:absolute; top:180px; left:770px;" onclick="showTipNewline()">Why newline byte needed</button>-->
-
-		<button class="glossy_button" style="position:absolute; top:250px; left:318px;" onclick="showTipImportKeyEnc()">IMPORT KEY</button>
-
-		<button class="glossy_button" id="dev_enc_openssl_manual_salt_button" style="position:absolute; top:230px; left:106px; width:100px; height:20px; font-size:10px;" onclick="devManualSalt()">Roll Salt</button>
-		<div style="background-color:cornflowerblue; font-size:14px; position:absolute; top:360px; left:20px; ">
-			<fieldset >
-				<legend style="color:black;">Digest Hash:</legend>
-				<div>
-					<input type="radio" id="SHA-256" name="digest_hash" value="SHA-256" checked />
-					<label style="color:black;" for="SHA-256">SHA-256</label>
-				</div>
-				<div>
-					<input type="radio" id="SHA-384" name="digest_hash" value="SHA-384" />
-					<label style="color:black;" for="SHA-384">SHA-384</label>
-				</div>
-				<div>
-					<input type="radio" id="SHA-512" name="digest_hash" value="SHA-512" />
-					<label style="color:black;" for="SHA-512">SHA-512</label>
-				</div>
-			</fieldset>
-		</div>
-
-		<button class="glossy_button" style="position:absolute; top:415px; left:270px; " onclick="showTipEncDeriveBits()">DERIVE BITS</button>
-		<input id="dev_enc_openssl_encrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:578px; width:128px; height:10px;">
-		<textarea id="dev_enc_openssl_encrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:357px; left:540px; width:265px; height:34px;"></textarea>
-		<textarea id="dev_enc_openssl_encrypt_key" class="devsite_inputs" rows="3" style="position:absolute; top:445px; left:439px; width:350px; height:48px;"></textarea>
-
-		<input id="dev_enc_openssl_plaintext_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:465px; width:525px;">
-		<input id="dev_enc_openssl_plaintext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:465px; width:525px;">
-		<input id="dev_enc_openssl_plaintext_with_newline" class="devsite_inputs" type="text" style="position:absolute; top:230px; left:465px; width:525px;">
-
-		<button class="glossy_button" style="position:absolute; top:415px; left:900px; " onclick="showTipEncEncrypt()">ENCRYPT</button>
-		<input id="dev_enc_openssl_encrypted_data" class="devsite_inputs" type="text" style="position:absolute; top:542px; left:340px; width:642px;">
-		<input id="dev_enc_openssl_encrypted_salt_string" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:173px; width:200px; height:10px;">
-		<input id="dev_enc_openssl_encrypted_salt_random" class="devsite_inputs" type="text" style="position:absolute; top:603px; left:400px; width:236px; height:10px;">
-
-		<a class="glossy_icon" style="position:absolute; top:605px; left:25px;" href="javascript:void('show tooltip')" onclick="showTipSalted()" >[?]</a>
-		<a class="glossy_icon" style="position:absolute; top:580px; left:505px;" href="javascript:void('show tooltip')" onclick="showTipRandSalt()" >[?]</a>
-
-		<!--<button class="glossy_button" style="position:absolute; top:615px; left:70px; " onclick="showTipSalted()">Salted Blurb</button>
-		<button class="glossy_button" style="position:absolute; top:630px; left:400px; " onclick="showTipRandSalt()">Random Salt Blurb</button>-->
-
-		<input id="dev_enc_openssl_encrypted_data_two_salts" class="devsite_inputs" type="text" style="position:absolute; top:676px; left:31px; width:950px;">
-		<input id="dev_enc_openssl_encrypted_data_base64" class="devsite_inputs" type="text" style="position:absolute; top:752px; left:31px; width:950px;">
-
-		<button class="glossy_button"id="dev_enc_openssl_encrypt_button" style="width:1000px; height:50px; font-size:18px;" onclick="devEncOpenSSL()">OpenSSL ENCRYPT</button>
-	</div>
-	<br>
-
-	<h3 style="color:red;">OpenSSL Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipDecTitle()" >[?]</a></h3>
-	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="./svg_images/openssl_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="OpenSSL Decrypt" />
-
-		<!-- Tooltip Object for OpenSSL Encrypt--!>
-		<div id="dev_dec_openssl_tooltip"style="z-index:2; display:none; position:absolute; top:100px; left:100px; background-color:lightgray; color:black; border:5px solid gold;"></div>
-		<!-- Tooltip Buttons for OpenSSL Decrypt--!>
-		<button class="glossy_button" style="position:absolute; top:220px; left:270px;" onclick="showTipImportKeyDec()">IMPORT KEY</button>
-		<button class="glossy_button" style="position:absolute; top:415px; left:270px; " onclick="showTipDecDeriveBits()">DERIVE BITS</button>
-		<button class="glossy_button" style="position:absolute; top:400px; left:850px; " onclick="showTipDecDecrypt()">DECRYPT</button>
-
-		<input id="dev_dec_openssl_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:14px; width:350px;">
-		<input id="dev_dec_openssl_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:14px; width:350px;">
-
-		<input id="dev_dec_openssl_ciphertext_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:460px; width:525px;">
-		<input id="dev_dec_openssl_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:116px; left:460px; width:525px;">
-		<input id="dev_dec_openssl_ciphertext_extracted_bytes" class="devsite_inputs" type="text" style="position:absolute; top:210px; left:465px; width:525px;">
-
-		<!--<input id="dev_dec_openssl_derivebits_algorithm" class="devsite_inputs" type="text" value="PBKDF2" style="position:absolute; top:342px; left:14px; width:183px; height:10px;">--!>
-		<input id="dev_dec_openssl_derivebits_salt" class="devsite_inputs" type="text" style="position:absolute; top:291px; left:346px; width:183px; height:10px;">
-		<input id="dev_dec_openssl_derivebits_iterations" class="devsite_inputs" type="text" value="10000" style="position:absolute; top:272px; left:16px; width:183px; height:10px;">
-		<!--<input id="dev_dec_openssl_derivebits_hash" class="devsite_inputs" type="text" value="SHA-256" style="position:absolute; top:444px; left:14px; width:183px; height:10px;">--!>
-
-		<div style="background-color:cornflowerblue; font-size:14px; position:absolute; top:320px; left:20px; ">
-			<fieldset >
-				<legend style="color:black;">Digest Hash:</legend>
-				<div>
-					<input type="radio" id="SHA-256_dec" name="digest_hash_dec" value="SHA-256" checked />
-					<label style="color:black;" for="SHA-256_dec">SHA-256</label>
-				</div>
-				<div>
-					<input type="radio" id="SHA-384_dec" name="digest_hash_dec" value="SHA-384" />
-					<label style="color:black;" for="SHA-384_dec">SHA-384</label>
-				</div>
-				<div>
-					<input type="radio" id="SHA-512_dec" name="digest_hash_dec" value="SHA-512" />
-					<label style="color:black;" for="SHA-512_dec">SHA-512</label>
-				</div>
-			</fieldset>
-		</div>
-
-		<input id="dev_dec_openssl_decrypt_algorithm" class="devsite_inputs" type="text" value="AES-CBC" style="position:absolute; top:304px; left:600px; width:128px; height:10px;">
-		<textarea id="dev_dec_openssl_decrypt_iv" class="devsite_inputs" rows="2" style="position:absolute; top:363px; left:528px; width:265px; height:34px;"></textarea>
-		<textarea id="dev_dec_openssl_decrypt_key" class="devsite_inputs" rows="3" style="position:absolute; top:450px; left:427px; width:350px; height:48px;"></textarea>
-
-		<input id="dev_dec_openssl_decrypted_bytes" class="devsite_inputs" type="text" style="position:absolute; top:561px; left:17px; width:950px;">
-		<input id="dev_dec_openssl_decrypted_plaintext" class="devsite_inputs" type="text" style="position:absolute; top:638px; left:17px; width:950px;">
-
-		<button class="glossy_button"id="dev_dec_openssl_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecOpenSSL()">OpenSSL <span style="color:red">DECRYPT</span></button>
-	</div>
-	<br>
-
-	<h3 style="color:black;">Obf-1 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf1EncTitle()" >[?]</a></h3>
-	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="./svg_images/obf_1_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Encrypt" />
-
-		<!-- Tooltip Object for Obf1 Encrypt--!>
-		<div id="dev_enc_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
-		<!-- Tooltip Buttons for Obf1 Encrypt--!>
-		<!--<button class="glossy_button" style="position:absolute; top:190px; left:320px;" onclick="showTipObf1EncShasum()">SHA SUM</button>
-		<button class="glossy_button" style="position:absolute; top:480px; left:650px;" onclick="showTipObf1EncConvert()">CONVERT</button>-->
-		<a class="glossy_icon" style="position:absolute; top:195px; left:340px;" href="javascript:void('show tooltip')" onclick="showTipObf1EncShasum()" >[?]</a>
-		<a class="glossy_icon" style="position:absolute; top:180px; left:840px;" href="javascript:void('show tooltip')" onclick="showTipObf1EncZeroPad()" >[?]</a>
-		<a class="glossy_icon" style="position:absolute; top:490px; left:660px;" href="javascript:void('show tooltip')" onclick="showTipObf1EncConvert()" >[?]</a>
-
-		<input id="dev_enc_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:380px;">
-		<input id="dev_enc_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:380px;">
-
-		<input id="dev_enc_obf1_b64_input_data" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:512px; width:470px;">
-		<input id="dev_enc_obf1_b64_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:118px; left:512px; width:470px;">
-
-		<input id="dev_enc_obf1_zero_padded_data" class="devsite_inputs" type="text" style="position:absolute; top:260px; left:48px; width:808px;">
-		<input id="dev_enc_obf1_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:324px; left:48px; width:808px;">
-
-		<textarea id="dev_enc_obf1_xord_data" class="devsite_inputs" rows="3" style="position:absolute; top:398px; left:20px; width:965px; height:50px;"></textarea>
-		<textarea id="dev_enc_obf1_b64_output" class="devsite_inputs" rows="3" style="position:absolute; top:541px; left:20px; width:965px; height:102px;"></textarea>
-		<button class="glossy_button"id="dev_enc_obf1_encrypt_button" style="color:black; width:1000px; height:50px; font-size:18px;" onclick="devEncObf1()">Obf-1 ENCRYPT</button>
-	</div>
-	<br>
-
-	<h3 style="color:red;">Obf-1 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf1DecTitle()" >[?]</a></h3>
-	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="./svg_images/obf_1_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 1 Decrypt" />
-
-		<!-- Tooltip Object for Obf1 DECRYPT --!>
-		<div id="dev_dec_obf1_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
-		<!-- Tooltip Buttons for Obf1 DECRYPT --!>
-		<a class="glossy_icon" style="position:absolute; top:180px; left:320px;" href="javascript:void('show tooltip')" onclick="showTipObf1DecShasum()" >[?]</a>
-
-<!--		<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf1DecShasum()">SHA SUM Obf1 decrypt</button>-->
-		<button class="glossy_button" style="position:absolute; top:330px; left:880px;" onclick="showTipObf1DecInverse()">INVERSE</button>
-
-		<input id="dev_dec_obf1_password_input" class="devsite_inputs" type="text" style="position:absolute; top:40px; left:37px; width:374px;">
-		<input id="dev_dec_obf1_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:117px; left:37px; width:374px;">
-
-		<textarea id="dev_dec_obf1_b64_ciphertext" class="devsite_inputs" rows="3" style="position:absolute; top:38px; left:466px; width:526px; height:160px;"></textarea>
-
-		<input id="dev_dec_obf1_ciphertext_bytes" class="devsite_inputs" type="text" style="position:absolute; top:256px; left:48px; width:795px;">
-		<input id="dev_dec_obf1_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:319px; left:48px; width:795px;">
-
-		<textarea id="dev_dec_obf1_xor_inversed_data" class="devsite_inputs" rows="3" style="position:absolute; top:405px; left:37px; width:960px; height:50px;"></textarea>
-
-		<input id="dev_dec_obf1_data_with_countstring" class="devsite_inputs" type="text" style="position:absolute; top:507px; left:37px; width:950px;">
-		<input id="dev_dec_obf1_data_b64_output" class="devsite_inputs" type="text" style="position:absolute; top:570px; left:37px; width:950px;">
-
-		<button class="glossy_button"id="dev_dec_obf1_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecObf1()">Obf-1 DECRYPT</button>
-	</div>
-	<br>
-
-	<h3 style="color:black;">Obf-2 Encrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf2EncTitle()" >[?]</a></h3>
-	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="./svg_images/obf_2_encrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Encrypt" />
-
-		<!-- Tooltip Object for Obf2 ENCRYPT --!>
-		<div id="dev_enc_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
-		<!-- Tooltip Buttons for Obf2 ENCRYPT --!>
-
-		<a class="glossy_icon" style="position:absolute; top:180px; left:400px;" href="javascript:void('show tooltip')" onclick="showTipObf2EncShasum()" >[?]</a>
-
-		<!--<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2EncShasum()">SHA SUM Obf2 ENCRYPT</button>-->
-		<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2EncModulo()">MODULO Obf2 ENCRYPT</button>
-
-		<input id="dev_enc_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
-		<input id="dev_enc_obf2_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:108px; left:15px; width:374px;">
-		<input id="dev_enc_obf2_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:259px; left:15px; width:730px;">
-
-		<textarea id="dev_enc_obf2_ciphertext_b64" class="devsite_inputs" rows="3" style="position:absolute; top:39px; left:443px; width:537px; height:168px;"></textarea>
-		<textarea id="dev_enc_obf2_password_b64" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
-
-		<textarea id="dev_enc_obf2_final_encrypted" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
-
-		<button class="glossy_button"id="dev_enc_obf2_encrypt_button" style="color:black; width:1000px; height:50px; font-size:18px;" onclick="devEncObf2()">Obf-2 ENCRYPT</button>
-	</div>
-	<br>
-
-	<h3 style="color:red;">Obf-2 Decrypt<a class="glossy_icon" style="" href="javascript:void('show tooltip')" onclick="showTipObf2DecTitle()" >[?]</a></h3>
-	<div style="position:relative; border:1px solid; width:1010px;">
-		<img src="./svg_images/obf_2_decrypt_flowchart.drawio.svg" style="width:1000px;" alt="Obf 2 Decrypt" />
-
-		<!-- Tooltip Object for Obf2 DECRYPT --!>
-		<div id="dev_dec_obf2_tooltip"style="z-index:2; display:none; position:absolute; top:225px; left:375px; background-color:lightgray; color:black; border:5px solid gold;"></div>
-		<!-- Tooltip Buttons for Obf2 DECRYPT --!>
-
-
-		<a class="glossy_icon" style="position:absolute; top:180px; left:400px;" href="javascript:void('show tooltip')" onclick="showTipObf2DecShasum()" >[?]</a>
-		<!--<button class="glossy_button" style="position:absolute; top:190px; left:250px;" onclick="showTipObf2DecShasum()">SHA SUM Obf2 DECRYPT</button>-->
-		<button class="glossy_button" style="position:absolute; top:400px; left:770px;" onclick="showTipObf2DecModulo()">MODULO Obf2 Decrypt</button>
-
-		<input id="dev_dec_obf2_password_input" class="devsite_inputs" type="text" style="position:absolute; top:39px; left:15px; width:374px;">
-		<input id="dev_dec_obf2_password_bytes" class="devsite_inputs" type="text" style="position:absolute; top:108px; left:15px; width:374px;">
-		<input id="dev_dec_obf2_sha_extended_bytes" class="devsite_inputs" type="text" style="position:absolute; top:259px; left:15px; width:730px;">
-
-		<textarea id="dev_dec_obf2_final_encrypted" class="devsite_inputs" rows="3" style="position:absolute; top:39px; left:443px; width:537px; height:168px;"></textarea>
-		<textarea id="dev_dec_obf2_password_b64" class="devsite_inputs" rows="3" style="position:absolute; top:335px; left:15px; width:730px; height:110px;"></textarea>
-
-		<textarea id="dev_dec_obf2_ciphertext_b64" class="devsite_inputs" rows="3" style="position:absolute; top:505px; left:15px; width:978px; height:140px;"></textarea>
-
-		<button class="glossy_button"id="dev_dec_obf2_decrypt_button" style="color:red; width:1000px; height:50px; font-size:18px;" onclick="devDecObf2()">Obf-2 DECRYPT</button>
-	</div>
-	<br>
-
-	<h3>Base64 Functions -- Convert int array or base64 chars into its converted form</h3>
-	<div style="display:flex; flex-direction:column; ">
-			<label>Input -- Length=<span id="input_length_label"></span></label>
-			<textarea id="dev_b64_top" class="devsite_inputs" rows="5" style=""></textarea>
-			<label>Output -- Length=<span id="output_length_label"></label>
-			<textarea id="dev_b64_bot" class="devsite_inputs" rows="5" style=""></textarea>
-		<button onclick="convertBase64()">Convert Base64</button>
-	</div>
-</div>
 </body>
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <script>
-
-	// Dev site / Main site toggle.
-	// Start on main site.
-	let site = "main_site";
-	function toggleSite(){
-		if(site === "dev_site"){
-			// Switch to main_site
-			document.getElementById("dev_site").style.display = "none";
-			document.getElementById("main_site").style.display = "inline";
-			site = "main_site";
-			document.getElementById("toggle_site_button").innerHTML = "Show Dev Site";
-		}else{
-			// Switch to dev_site
-			document.getElementById("dev_site").style.display = "inline";
-			document.getElementById("main_site").style.display = "none";
-			site = "dev_site";
-			document.getElementById("toggle_site_button").innerHTML = "Show Main Site";
-		}
-	}
-
 	//////////////////////////////////////////////////////////////
 	//		Global Flags & Page Load Function					//
 	//////////////////////////////////////////////////////////////
@@ -1581,12 +1498,10 @@
 	let download_flag = 'false';
 	// Base 64 character map.
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
 	// Automatically run this function when page loads.
 	window.onload = async function() {
 		// Initial server online check.
 		await updateOnlineStatus();
-
 		// hide create button if already exists.
 		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
 			document.getElementById("create_dbase_button").style.display = "none";
@@ -1594,9 +1509,13 @@
 	}
 
 	// Set Title to link to Home without dropping offline dbase.
-	document.getElementById("titletext").onclick = function() {
+	document.getElementById("titletext").onclick = function(){
 		//location.href = "https://chat.dance/obf";
 		showPage('home');
+	}
+
+	document.getElementById("dev_site_link").onclick = function(){
+		showPage('dev_site');
 	}
 /*
 	// later
@@ -2189,11 +2108,21 @@ console.log("checking data is valid: " + data);
 	async function attemptCMDStoreOffline(){
 		//const fingerprintAndData = await getFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
-		const data = await encryptDouble(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['data']);
+		const encryptedData = await encryptDouble(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['data']);
 		//storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 		//const offline_dbase_store_outcome = await handleOfflineDBaseStore(fp_hex, encrypted_data);
-		const outcome = storeSingleRecordToOfflineDBase(fingerprint, data);
-		console.log("CMD Offline Store outcome: " + outcome);
+		const storeResponse = storeSingleRecordToOfflineDBase(fingerprint, encryptedData);
+		console.log("CMD Offline Store outcome: " + storeResponse);
+		// Load data at fingerprint, should be the encrypted data block we just stored.
+		const loadResponse = attemptLoadOfflineDBase(fingerprint);
+		console.log("loadResponse: " + loadResponse);
+		// Report store outcome.
+		if(encryptedData === loadResponse){
+			showPage('offlinestore_success');
+		}else{
+			// Doesn't look like server stored data properly, report fail.
+			showPage('offlinestore_failed');
+		}
 	}
 
 	// storeDataToServer() can be used for both Store Flows because the fail/pass outcome is the same for both Browser and CMD.
@@ -2201,27 +2130,44 @@ console.log("checking data is valid: " + data);
 		extractInputDataOffline(inputId);
 		//const fingerprintAndData = await getFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
-		const data = await encryptTriple(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['opensslpass'], offlineData['data']);
+		const encryptedData = await encryptTriple(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['opensslpass'], offlineData['data']);
 		//storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 		//const offline_dbase_store_outcome = await handleOfflineDBaseStore(fp_hex, encrypted_data);
-		const outcome = storeSingleRecordToOfflineDBase(fingerprint, data);
-		console.log("Browser Offline Store outcome: " + outcome);
+		const storeResponse = storeSingleRecordToOfflineDBase(fingerprint, encryptedData);
+		console.log("Browser Offline Store outcome: " + storeResponse);
+		// Load data at fingerprint, should be the encrypted data block we just stored.
+		const loadResponse = attemptLoadOfflineDBase(fingerprint);
+		console.log("loadResponse: " + loadResponse);
+		// Report store outcome.
+		if(encryptedData === loadResponse){
+			showPage('offlinestore_success');
+			// We succeeded.
+			if(inputId === 'offlineaccess_data_outputdisplay'){
+				showPage('offlineedit_success');
+			}else{
+				// Server successfully stored data, report success.
+				showPage('offlinestore_success');
+			}
+		}else{
+			// Doesn't look like server stored data properly, report fail.
+			showPage('offlinestore_failed');
+		}
 	}
-/*
+
 	async function editDataOffline(){
-		document.getElementById('access_data_outputdisplay').disabled = false;
+		document.getElementById('offlineaccess_data_outputdisplay').disabled = false;
 		// Turn on textarea so user can edit.
-		document.getElementById('access_data_outputdisplay').focus();
+		document.getElementById('offlineaccess_data_outputdisplay').focus();
 		// 
 		showEnabledColors();
 		// Hide both existing buttons
-		document.getElementById("editdata_button").style.display = "none";
-		document.getElementById("delete_button").style.display = "none";
+		document.getElementById("offline_editdata_button").style.display = "none";
+		document.getElementById("offline_delete_button").style.display = "none";
 		// Show single SAVE button
-		document.getElementById("save_button").style.display = "inline";
+		document.getElementById("offline_save_button").style.display = "inline";
 		// Show them again on save? Or go to store success/fail?
 	}
-*/
+
 	async function attemptCMDAccessOffline(){
 		//const fingerprint = await getFpForAccess();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
