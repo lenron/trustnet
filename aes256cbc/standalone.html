@@ -300,7 +300,6 @@
 	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
 		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS NOW FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
 	</div>
-
 	<!--------------------------Div Housing for Flow Pages----------------------------!>
 	<div class="center_html" id="center_html" style="">
 
@@ -1482,7 +1481,6 @@
 			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="makeNewOfflineIfNeeded();showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>
 			<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseFlow()">CREATE NEW OFFLINE DBASE</button>
 			<div style="display:flex">
-			<button id="toggle_debug_button" style="flex-grow:1" onclick="toggleDebug()">SWITCH TO DEBUG MODE</button>
 			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
 		</div>
 ----------------!>
@@ -3682,34 +3680,6 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		return min + result % rangeSize;
 	}
 
-	//////////////////////////////////////////
-	//				Logging
-	//////////////////////////////////////////
-	// Global flag starts at false for security and UX.
-	let debug_flag = "true";
-	// Need to set the //debug() function on page load.
-	// Debug mode gets turned off with every page load. This is good for security so leave it.
-	setDebug(false);
-	// Use a toggle button for usage.
-	async function toggleDebug(){
-		if( debug_flag === "false"){
-			document.getElementById("toggle_debug_button").innerHTML = "Switch to Normal Mode";
-			// Toggle global flag.
-			debug_flag = "true";
-			// Turn on 
-			setDebug(true);
-			//debug("Debug function activated!");
-			//debug("Warning! Plaintext in console to illustrate Data Flow.");
-		} else {
-			document.getElementById("toggle_debug_button").innerHTML = "Switch to Debug Mode";
-			// Toggle global flag.
-			debug_flag = "false";
-			// Turn off
-			setDebug(false);
-			//debug("Debug function deactivated! MAJOR ERROR if you can see this! Debug function should be turned off!");
-		}
-	}
-
 	// Grab currently running HTML and save it to standalone.html
 	// This saves the offline dbase in addition to creating and downloading a standalone version that can be used offline.
 	function saveOfflineDBase(){
@@ -3730,28 +3700,6 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 
 		document.body.removeChild(element);
 	}
-
-	// Logging function found on stackoverflow
-	// For security, if function setDebug(true) isn't called, //debug(log_message) will do nothing.
-	function setDebug(isDebug) {
-		if (isDebug) {
-			// Turn on warning message.
-			const titletext = document.getElementById("titletext");
-			titletext.style.color = "red";
-			titletext.innerHTML = "DEBUGWORD - CAUTION!!!!<br> SENSITIVE DATA WILL BE SHOWN IN CONSOLE";
-			// Send a message to the console.
-			window.debug = window.console.log.bind(window.console, '%s');
-		} else {
-			// Turn off warning message.
-			const tffitletext = document.getElementById("titletext");
-			//titletext.style.color = "#54c597";
-			titletext.style.color = "red";
-			titletext.innerHTML = "SECRETWORD";
-
-			// Do nothing.
-			window.debug = function() {};
-		}
-	}	
 
 
 	//////////////////////////////////////////////////////////////
