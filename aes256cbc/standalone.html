@@ -3695,19 +3695,14 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		// This will grab a copy of the currently running HTML.
 		allhtml += document.querySelector("html").innerHTML;
 		//console.log(allhtml);
-
 		let element = document.createElement('a');
 		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(allhtml));
 		element.setAttribute('download', 'standalone.html');
-
 		element.style.display = 'none';
 		document.body.appendChild(element);
-
 		element.click();
-
 		document.body.removeChild(element);
 	}
-
 
 	//////////////////////////////////////////////////////////////
 	//		Dev Site Tooltip Content & Functionality			//
