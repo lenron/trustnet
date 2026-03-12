@@ -308,8 +308,8 @@
 			<div class="flow_pages home" id="offline_home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#54c597">
 				<h2 style="color:red">OFFLINE HOME</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="showPage('offlinestore_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="showPage('offlineaccess_codeword')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="resetOfflineData(); showPage('offlinestore_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="resetOfflineData(); showPage('offlineaccess_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 
@@ -326,7 +326,7 @@
 				<input autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input');showPage('offlineaccess_obf1pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); showPage('offlineaccess_obf1pass')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -1510,15 +1510,14 @@
 	window.onload = async function() {
 		// Initial server online check.
 		await updateOnlineStatus();
-		// hide create button if already exists.
-		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
-			document.getElementById("create_dbase_button").style.display = "none";
-		}
+		// Init Database - legacy functionality.
+		makeNewOfflineIfNeeded();
 	}
 
 	// Set Title to link to Home without dropping offline dbase.
 	document.getElementById("titletext").onclick = function(){
-		//location.href = "https://chat.dance/obf";
+		// Clear storage object for security.
+		offlineData = {};
 		showPage('offline_home');
 	}
 
@@ -1688,27 +1687,30 @@
 			// Input Data Length Check
 			//if( checkInputLength(buffer) ){
 			if( checkInputLengthUpload(buffer) ){
-				passlockedData['data'] = await passlockEncrypt(filedata);
+				//passlockedData['data'] = await passlockEncrypt(filedata);
+
+				// Saving data without passlock encryption for Offline Flow usage.
+				offlineData['data'] = filedata;
 				// Show button.
-				document.getElementById("store_upload_commit_button").style.display = "inline";
-				document.getElementById("store_upload_input").style.border = "";
+				document.getElementById("offlinestore_upload_commit_button").style.display = "inline";
+				document.getElementById("offlinestore_upload_input").style.border = "";
 				// Tell user we are READY TO COMMIT. 
-				document.getElementById("store_upload_readytocommit").style.display = "inline";
+				document.getElementById("offlinestore_upload_readytocommit").style.display = "inline";
 				// add red warning text
-				document.getElementById("store_upload_warning").style.display = "none";
+				document.getElementById("offlinestore_upload_warning").style.display = "none";
 			}else{
 				// Data Length too long! Show Warning.
 				// hide continue button
-				document.getElementById("store_upload_commit_button").style.display = "none";
+				document.getElementById("offlinestore_upload_commit_button").style.display = "none";
 				// make border red
-				document.getElementById("store_upload_input").style.border = "thick solid red";
+				document.getElementById("offlinestore_upload_input").style.border = "thick solid red";
 				// add red warning text
-				document.getElementById("store_upload_warning").style.display = "inline";
+				document.getElementById("offlinestore_upload_warning").style.display = "inline";
 			}
 		}
-		console.log("File input contents: " + document.getElementById('store_upload_input').value);
-		document.getElementById('store_upload_input').value = null;
-		console.log("File input contents: " + document.getElementById('store_upload_input').value);
+		console.log("File input contents: " + document.getElementById('offlinestore_upload_input').value);
+		document.getElementById('offlinestore_upload_input').value = null;
+		console.log("File input contents: " + document.getElementById('offlinestore_upload_input').value);
 	}
 
 	// Called on change of text area, checks length of that text area and shows warning if input data too long.
@@ -2083,6 +2085,11 @@ console.log("checking data is valid: " + data);
 		}
 	}
 
+	// Reset user data storage object.
+	function resetOfflineData(){
+		offlineData = {};
+	}
+
 	// Use separate storage object for offline secure data. Cleartext stored here.
 	let offlineData = {};
 	// Extract, encrypt, and store data at inputId to global passlockedData Object.
@@ -2090,10 +2097,10 @@ console.log("checking data is valid: " + data);
 		const keyword = extractKeyword(inputId);
 		//console.log("keyword: " + keyword);
 		const cleartextData = extractCleartextData(inputId);
-		//console.log("cleartextData: " + cleartextData);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
-		//passlockedData[keyword] = await passlockEncrypt(cleartextData);
 		offlineData[keyword] = cleartextData;
+		console.log("offlineData: ");
+		console.log(offlineData);
 	}
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
