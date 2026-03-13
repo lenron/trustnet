@@ -1808,12 +1808,16 @@
 
 		console.log("creating new offline dbase...");
 		// Init pointer.
+		//const pointer = randomInt(0,90);
 		const pointer = randomInt(0,90);
+		
 		console.log("pointer: " + pointer);
 		// Set pointer to data location that will persist if the user decides to download a standalone.html.
 		document.getElementById("offline_dbase_pointer").innerHTML = pointer;
 		let offline_dbase = "";			// Init string.
-		const number_of_records = 100; 	// database size
+		//const number_of_records = 100; 	// database size
+		const number_of_records = 1000; 	// database size
+
 		// Fill the new offline dbase with random data.
 		for(let i=0; i < number_of_records; i++ ){
 			offline_dbase += getRandFingerprint();	// Add a new random fingerprint.
@@ -1829,7 +1833,7 @@
 		for(let i=0; i < 64; i++){
 			// creates an 8 bit number: 0-64
 			// get a random number 0-16
-			const random_value = Math.floor( window.crypto.getRandomValues(new Uint8Array(1)) / 16);
+			const random_value = Math.floor(window.crypto.getRandomValues(new Uint8Array(1)) / 16);
 			//console.log("random buffer: " + random_value);
 			const random_hex_char = random_value.toString(16);
 			//console.log("random hex char: ~" + random_hex_char + "~");
@@ -1846,9 +1850,16 @@
 		// Generate 1000 random b64 chars.
 		for(let i=0; i < 1000; i++){
 			const random_b64_int = randomInt(0,63);
-			//console.log("random b64 value: " + random_b64_int);
+			console.log("random b64 value: " + random_b64_int);
 			const random_b64_char = base64map.charAt(random_b64_int);
-			//console.log("random b64 char: " + random_b64_char);
+			console.log("random b64 char: " + random_b64_char);
+
+
+			const random_value = Math.floor(window.crypto.getRandomValues(new Uint8Array(1)) / 4);
+			console.log("new random b64 value: " + random_value);
+			const random_b64_direct_char = random_value.toBase64()
+			console.log("new random b64 char: " + random_b64_direct_char);
+
 			new_data += random_b64_char;
 		}
 		//console.log("completed random data: " + new_data);
@@ -3632,7 +3643,7 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 	 * @param {number} max - the highest integer in the desired range (inclusive)
 	 * @returns {number} Random number
 	 */
-
+/*
 	function randomInt(min, max){
 		const MAX_RANGE_SIZE = 2 ** 53;
 		const buffer = new Uint32Array(1024);
@@ -3659,6 +3670,7 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		} while (result >= rejectionThreshold);
 		return min + result % rangeSize;
 	}
+*/
 
 	//////////////////////////////////////////////////////////////
 	//		Dev Site Tooltip Content & Functionality			//
@@ -5764,15 +5776,15 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 	//////////////////////////////////////////////////////////////
 
 	function showEnabledColors(){
-		document.getElementById('access_data_outputdisplay').disabled = false;
-		document.getElementById('access_data_outputdisplay').style.color = '#54c597'; // Our 'normal' green.
-		document.getElementById('access_data_outputdisplay').style.backgroundColor = '#272727'; // Normal background
+		document.getElementById('offlineaccess_data_outputdisplay').disabled = false;
+		document.getElementById('offlineaccess_data_outputdisplay').style.color = '#54c597'; // Our 'normal' green.
+		document.getElementById('offlineaccess_data_outputdisplay').style.backgroundColor = '#272727'; // Normal background
 	}
 
 	function showDisabledColors(){
-		document.getElementById('access_data_outputdisplay').disabled = true;
-		document.getElementById('access_data_outputdisplay').style.color = 'gray';
-		//document.getElementById('access_data_outputdisplay').style.backgroundColor = '#434343';
+		document.getElementById('offlineaccess_data_outputdisplay').disabled = true;
+		document.getElementById('offlineaccess_data_outputdisplay').style.color = 'gray';
+		//document.getElementById('offlineaccess_data_outputdisplay').style.backgroundColor = '#434343';
 	}
 
 	// Show Overlay
@@ -6039,12 +6051,17 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 
 		console.log("creating new offline dbase...");
 		// Init pointer.
-		const pointer = randomInt(0,90);
+		do{
+			pointer = Math.floor(window.crypto.getRandomValues(new Uint16Array(1)) / 64);
+		}while(pointer > 998);
+		//const pointer = randomInt(0,90);
 		console.log("pointer: " + pointer);
 		// Set pointer to data location that will persist if the user decides to download a standalone.html.
 		document.getElementById("offline_dbase_pointer").innerHTML = pointer;
 		let offline_dbase = "";			// Init string.
-		const number_of_records = 100; 	// database size
+		//const number_of_records = 100; 	// database size
+		const number_of_records = 1000; 	// database size
+
 		// Fill the new offline dbase with random data.
 		for(let i=0; i < number_of_records; i++ ){
 			offline_dbase += getRandFingerprint();	// Add a new random fingerprint.
@@ -6058,7 +6075,6 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 	function getRandFingerprint(){
 		let new_fingerprint = "";
 		for(let i=0; i < 64; i++){
-			// creates an 8 bit number: 0-64
 			// get a random number 0-16
 			const random_value = Math.floor( window.crypto.getRandomValues(new Uint8Array(1)) / 16);
 			//console.log("random buffer: " + random_value);
@@ -6076,11 +6092,23 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		let new_data = "";
 		// Generate 1000 random b64 chars.
 		for(let i=0; i < 1000; i++){
-			const random_b64_int = randomInt(0,63);
 			//console.log("random b64 value: " + random_b64_int);
-			const random_b64_char = base64map.charAt(random_b64_int);
+			//const random_b64_char = base64map.charAt(random_b64_int);
 			//console.log("random b64 char: " + random_b64_char);
-			new_data += random_b64_char;
+			//const random_value = Math.floor(window.crypto.getRandomValues(new Uint8Array(1)) / 4);
+
+			const singleCharUint8a = new Uint8Array(1);
+			const randomB64Val = Math.floor(window.crypto.getRandomValues(singleCharUint8a) / 4);
+			//console.log("new random Byte value: " + singleCharUint8a);
+			//console.log("new random b64 value: " + randomB64Val);
+
+			//const random_b64_direct_char = randomB64Val.toBase64()
+			//const random_b64_direct_char = randomB64Val.toString(64);
+			const random_b64_direct_char = base64map.charAt(randomB64Val);
+			//console.log("new random b64 char: " + random_b64_direct_char);
+
+			//new_data += random_b64_char;
+			new_data += random_b64_direct_char;
 		}
 		//console.log("completed random data: " + new_data);
 		return new_data;
@@ -6128,7 +6156,7 @@ console.log("checking data is valid: " + data);
 		let pointer = document.getElementById("offline_dbase_pointer").innerHTML;
 		console.log("pulled pointer from DOM object: " + pointer);
 		// Check if offline database is full.
-		if(pointer >= 99){
+		if(pointer >= 999){
 			// Offline Database is full. Inform user.
 			document.getElementById("full_offline_dbase_warning").style.display = "inline";
 			return "full";	//End function.
@@ -6176,7 +6204,7 @@ console.log("checking data is valid: " + data);
 
 		// Check if we hit last save locaation.
 		// If we did, inform user we have reached end of data and they will need to use a new offline database.
-		if(pointer >= 99){ // I think use 99 here because the randomInt() function states the input range is inclusive.
+		if(pointer >= 999){ // I think use 99 here because the randomInt() function states the input range is inclusive.
 			// Offline Database is now full. Inform user.
 			document.getElementById("full_offline_dbase_warning").style.display = "inline";
 		}
