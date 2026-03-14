@@ -1808,8 +1808,7 @@
 
 		console.log("creating new offline dbase...");
 		// Init pointer.
-		//const pointer = randomInt(0,90);
-		const pointer = randomInt(0,90);
+		const pointer = randInt(0,998);
 		
 		console.log("pointer: " + pointer);
 		// Set pointer to data location that will persist if the user decides to download a standalone.html.
@@ -1831,9 +1830,8 @@
 	function getRandFingerprint(){
 		let new_fingerprint = "";
 		for(let i=0; i < 64; i++){
-			// creates an 8 bit number: 0-64
 			// get a random number 0-16
-			const random_value = Math.floor(window.crypto.getRandomValues(new Uint8Array(1)) / 16);
+			const random_value = randInt(0,16);
 			//console.log("random buffer: " + random_value);
 			const random_hex_char = random_value.toString(16);
 			//console.log("random hex char: ~" + random_hex_char + "~");
@@ -1849,21 +1847,43 @@
 		let new_data = "";
 		// Generate 1000 random b64 chars.
 		for(let i=0; i < 1000; i++){
-			const random_b64_int = randomInt(0,63);
+			const random_b64_int = randInt(0,63);
 			console.log("random b64 value: " + random_b64_int);
 			const random_b64_char = base64map.charAt(random_b64_int);
 			console.log("random b64 char: " + random_b64_char);
-
-
-			const random_value = Math.floor(window.crypto.getRandomValues(new Uint8Array(1)) / 4);
-			console.log("new random b64 value: " + random_value);
-			const random_b64_direct_char = random_value.toBase64()
-			console.log("new random b64 char: " + random_b64_direct_char);
 
 			new_data += random_b64_char;
 		}
 		//console.log("completed random data: " + new_data);
 		return new_data;
+	}
+
+	//Generate random integers from 0 to 4,294,967,296.
+	function randInt(min, max){
+		//Number safety checks.
+		if (!(Number.isSafeInteger(min) && Number.isSafeInteger(max))) {
+			throw Error("min and max must be safe integers");
+		}
+		if (min > max) {
+			throw Error("min must be less than or equal to max");
+		}
+		//Create array with proper integer size for the specified range (i.e. 8 bits = 0-255, 16 bits = 0-65535)
+		let randarray;
+		if (max < 256 ){
+			randarray = new Uint8Array(1);
+		}else if (max < 65536){
+			randarray = new Uint16Array(1);
+		}else if (max < 4294967296){
+			randarray = new Uint32Array(1);
+		}else{
+			throw new Error("Max number is too large for this function!");
+		}
+		//Start generating random numbers and reject every number outside our min/max range.
+		let randnum;
+		do{
+			randnum = window.crypto.getRandomValues(randarray);
+		} while (randnum < min || randnum > max);
+		return randnum[0];
 	}
 
 	// Check if a fingerprint looks valid.
@@ -1908,7 +1928,7 @@ console.log("checking data is valid: " + data);
 		let pointer = document.getElementById("offline_dbase_pointer").innerHTML;
 		console.log("pulled pointer from DOM object: " + pointer);
 		// Check if offline database is full.
-		if(pointer >= 99){
+		if(pointer >= 999){
 			// Offline Database is full. Inform user.
 			document.getElementById("full_offline_dbase_warning").style.display = "inline";
 			return "full";	//End function.
@@ -1956,7 +1976,7 @@ console.log("checking data is valid: " + data);
 
 		// Check if we hit last save locaation.
 		// If we did, inform user we have reached end of data and they will need to use a new offline database.
-		if(pointer >= 99){ // I think use 99 here because the randomInt() function states the input range is inclusive.
+		if(pointer >= 999){ // I think use 99 here because the randomInt() function states the input range is inclusive.
 			// Offline Database is now full. Inform user.
 			document.getElementById("full_offline_dbase_warning").style.display = "inline";
 		}
@@ -2031,7 +2051,7 @@ console.log("checking data is valid: " + data);
 			// decrement pointer
 			pointer--;
 			// Check if offline database is no longer full.
-			if(pointer < 99){
+			if(pointer < 999){
 				// Offline Database is full. Inform user.
 				document.getElementById("full_offline_dbase_warning").style.display = "none";
 			}
@@ -5777,7 +5797,8 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 
 	function showEnabledColors(){
 		document.getElementById('offlineaccess_data_outputdisplay').disabled = false;
-		document.getElementById('offlineaccess_data_outputdisplay').style.color = '#54c597'; // Our 'normal' green.
+		//document.getElementById('offlineaccess_data_outputdisplay').style.color = '#54c597'; // Our 'normal' green.
+		document.getElementById('offlineaccess_data_outputdisplay').style.color = 'red'; // Offline Red
 		document.getElementById('offlineaccess_data_outputdisplay').style.backgroundColor = '#272727'; // Normal background
 	}
 
@@ -6050,11 +6071,8 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		document.getElementById("init_offdbase_statuslabel").style.display = "inline";
 
 		console.log("creating new offline dbase...");
-		// Init pointer.
-		do{
-			pointer = Math.floor(window.crypto.getRandomValues(new Uint16Array(1)) / 64);
-		}while(pointer > 998);
-		//const pointer = randomInt(0,90);
+		// Init pointer from 0-998 (inclusive);
+		const pointer = randInt(0,998);
 		console.log("pointer: " + pointer);
 		// Set pointer to data location that will persist if the user decides to download a standalone.html.
 		document.getElementById("offline_dbase_pointer").innerHTML = pointer;
@@ -6076,7 +6094,7 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		let new_fingerprint = "";
 		for(let i=0; i < 64; i++){
 			// get a random number 0-16
-			const random_value = Math.floor( window.crypto.getRandomValues(new Uint8Array(1)) / 16);
+			const random_value = randInt(0,16);
 			//console.log("random buffer: " + random_value);
 			const random_hex_char = random_value.toString(16);
 			//console.log("random hex char: ~" + random_hex_char + "~");
@@ -6092,26 +6110,43 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		let new_data = "";
 		// Generate 1000 random b64 chars.
 		for(let i=0; i < 1000; i++){
+			const random_b64_int = randInt(0,63);
 			//console.log("random b64 value: " + random_b64_int);
-			//const random_b64_char = base64map.charAt(random_b64_int);
+			const random_b64_char = base64map.charAt(random_b64_int);
 			//console.log("random b64 char: " + random_b64_char);
-			//const random_value = Math.floor(window.crypto.getRandomValues(new Uint8Array(1)) / 4);
 
-			const singleCharUint8a = new Uint8Array(1);
-			const randomB64Val = Math.floor(window.crypto.getRandomValues(singleCharUint8a) / 4);
-			//console.log("new random Byte value: " + singleCharUint8a);
-			//console.log("new random b64 value: " + randomB64Val);
-
-			//const random_b64_direct_char = randomB64Val.toBase64()
-			//const random_b64_direct_char = randomB64Val.toString(64);
-			const random_b64_direct_char = base64map.charAt(randomB64Val);
-			//console.log("new random b64 char: " + random_b64_direct_char);
-
-			//new_data += random_b64_char;
-			new_data += random_b64_direct_char;
+			new_data += random_b64_char;
 		}
 		//console.log("completed random data: " + new_data);
 		return new_data;
+	}
+
+	//Generate random integers from 0 to 4,294,967,296.
+	function randInt(min, max){
+		//Number safety checks.
+		if (!(Number.isSafeInteger(min) && Number.isSafeInteger(max))) {
+			throw Error("min and max must be safe integers");
+		}
+		if (min > max) {
+			throw Error("min must be less than or equal to max");
+		}
+		//Create array with proper integer size for the specified range (i.e. 8 bits = 0-255, 16 bits = 0-65535)
+		let randarray;
+		if (max < 256 ){
+			randarray = new Uint8Array(1);
+		}else if (max < 65536){
+			randarray = new Uint16Array(1);
+		}else if (max < 4294967296){
+			randarray = new Uint32Array(1);
+		}else{
+			throw new Error("Max number is too large for this function!");
+		}
+		//Start generating random numbers and reject every number outside our min/max range.
+		let randnum;
+		do{
+			randnum = window.crypto.getRandomValues(randarray);
+		} while (randnum < min || randnum > max);
+		return randnum[0];
 	}
 
 	// Check if a fingerprint looks valid.
@@ -6204,7 +6239,7 @@ console.log("checking data is valid: " + data);
 
 		// Check if we hit last save locaation.
 		// If we did, inform user we have reached end of data and they will need to use a new offline database.
-		if(pointer >= 999){ // I think use 99 here because the randomInt() function states the input range is inclusive.
+		if(pointer >= 999){ // I think use 99 here because the randInt() function states the input range is inclusive.
 			// Offline Database is now full. Inform user.
 			document.getElementById("full_offline_dbase_warning").style.display = "inline";
 		}
@@ -6279,7 +6314,7 @@ console.log("checking data is valid: " + data);
 			// decrement pointer
 			pointer--;
 			// Check if offline database is no longer full.
-			if(pointer < 99){
+			if(pointer < 999){
 				// Offline Database is full. Inform user.
 				document.getElementById("full_offline_dbase_warning").style.display = "none";
 			}
@@ -7901,42 +7936,6 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		const hexArrayBuffer = new Uint8Array(hexBytesArray);
 		return hexArrayBuffer;
 	}//hex2buf()
-
-	/**
-	 * Returns a cryptographically secure random integer between min and max, inclusive.
-	 * Converted from stackoverflow.
-	 *
-	 * @param {number} min - the lowest integer in the desired range (inclusive)
-	 * @param {number} max - the highest integer in the desired range (inclusive)
-	 * @returns {number} Random number
-	 */
-
-	function randomInt(min, max){
-		const MAX_RANGE_SIZE = 2 ** 53;
-		const buffer = new Uint32Array(1024);
-		let offset = buffer.length;
-
-		if (!(Number.isSafeInteger(min) && Number.isSafeInteger(max))) {
-			throw Error("min and max must be safe integers");
-		}
-		if (min > max) {
-			throw Error("min must be less than or equal to max");
-		}
-		const rangeSize = max - min + 1;
-		if (rangeSize > MAX_RANGE_SIZE) {
-			throw Error("(max - min) must be <= Number.MAX_SAFE_INTEGER");
-		}
-		const rejectionThreshold = MAX_RANGE_SIZE - (MAX_RANGE_SIZE % rangeSize);
-		let result;
-		do {
-			if ((offset + 1) >= buffer.length) {
-				crypto.getRandomValues(buffer);
-				offset = 0;
-			}
-			result = (buffer[offset++] & 0x1f_ffff) * 0x1_0000_0000 + buffer[offset++];
-		} while (result >= rejectionThreshold);
-		return min + result % rangeSize;
-	}
 
 	// Grab currently running HTML and save it to standalone.html
 	// This saves the offline dbase in addition to creating and downloading a standalone version that can be used offline.
