@@ -1927,11 +1927,13 @@
 	// Get 64 hex chars for a random fingerprint.
 	function getRandFingerprint(){
 		let new_fingerprint = "";
+		let random_value;
+		let random_hex_char;
 		for(let i=0; i < 64; i++){
 			// get a random number 0-16
-			const random_value = randInt(0,16);
+			random_value = randInt(0,16);
 			//console.log("random buffer: " + random_value);
-			const random_hex_char = random_value.toString(16);
+			random_hex_char = random_value.toString(16);
 			//console.log("random hex char: ~" + random_hex_char + "~");
 			new_fingerprint += random_hex_char;
 		}
@@ -1943,11 +1945,15 @@
 	function getRandData(){
 		// We're going to fill this string with random base64 chars.
 		let new_data = "";
+		let randarray = new Uint8Array(1);
+		let random_b64_int;
+		let random_b64_char;
 		// Generate 1000 random b64 chars.
 		for(let i=0; i < 1000; i++){
-			const random_b64_int = randInt(0,63);
+			//random_b64_int = Math.floor(window.crypto.getRandomValues(randarray)/4);
+			random_b64_int = randInt(0,63);
 			//console.log("random b64 value: " + random_b64_int);
-			const random_b64_char = base64map.charAt(random_b64_int);
+			random_b64_char = base64map.charAt(random_b64_int);
 			//console.log("random b64 char: " + random_b64_char);
 			new_data += random_b64_char;
 		}
