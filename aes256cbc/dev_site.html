@@ -1195,8 +1195,45 @@
 <!---------------------------END Store--------------------------------------------------------------!>
 <!---------------------------END Online Flow--------------------------------------------------------!>
 
+<!---------------------------Offline Database--------------------------------------------------------!>
+			<!--------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
+			<div class="flow_pages " id="ask_for_dbase_pass" style="display:none; ">
+				<h2>WOULD YOU LIKE TO SECURE YOUR OFFLINE DATABASE WITH AN ENCRYPTED POINTER?</h2>
+				<input autocomplete="off" type="password" value="" id="enc_pointer_password" style="display:none">
+				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='yes_button' style="flex-grow:1" onclick="typePointerPassword()">YES</button>
+					<button class="obf_button" id='no_button' style="flex-grow:1" onclick="chooseEncPointer('no')">NO</button>
+					<button class="obf_button" id='yes_password_button' style="flex-grow:1; display:none" onclick="chooseEncPointer('yes')">PASSWORD READY</button>
+				</div>
+			</div>
+
+			<!---------------Offline Database 3 Options-----------------------------------------------!>
+			<div class="flow_pages" id="offline_dbase_3options" style="display:none">
+				<h2 style="align-self:center;">CHOOSE HOW TO CREATE YOUR OFFLINE DATABASE</h2>
+				<div class="" id="" style="display:flex;">
+					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; " onclick="createNewOfflineDBaseFlow()">
+							<span style="">FILL WITH EXISTING DATA</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">Option 1</span>
+						</button>
+					</div>
+					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center; " onclick="showPage('')">
+							<span style="">FILL WITH NEW DATA</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">Option 2</span>
+						</button>
+					</div>
+					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('ask_for_dbase_pass')">
+							<span class="coolpink" style="">FILL OFFLINE</span>
+							<span style="margin-top:4px; color:gray; font-size:15px;">Option 3</span>
+						</button>
+						<label class="coolpink" style="align-self:center;">MOST Secure</label>
+					</div>
+				</div>
+			</div>
 			<!---------------Create New Offline DBase-----------------------------------------------!>
-			<div id="create_new_offline_dbase_div" class="flow_pages" style="display:none; ">
+			<div class="flow_pages" id="create_new_offline_dbase_div" style="display:none; ">
 				<h2 id="create_offline_dbase_label_h2">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
 				<h3 id="create_offline_dbase_label_h3">Please enter the following passwords to Access the data you wish to be stored in the offline database.</h3>
 				<div style="display:flex; flex-direction:column;">
@@ -1469,21 +1506,24 @@
 	<div style="display:flex; flex-direction:column;">
 			<!--<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>--!>
 
-			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="saveOfflineDBase();">DOWNLOAD STANDALONE.HTML</button>
-
+			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_dbase_3options');">CREATE OFFLINE DATABASE</button>
 	<!--
+			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="downloadStandalone();">DOWNLOAD STANDALONE.HTML</button>
+
 			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="makeNewOfflineIfNeeded();showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>
 			<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseFlow()">CREATE NEW OFFLINE DBASE</button>
 			<div style="display:flex">
-			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
+			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="downloadStandalone()">DOWNLOAD STANDALONE.HTML</button>
 		</div>
 ----------------!>
 	</div>
 <!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 
 	<!-- Offline Database Data --!>
-	<p id="offline_dbase" style="display:none"></p>
 	<p id="offline_dbase_pointer" style="display:none"></p>
+	<p id="offline_dbase" style="display:none"></p>
+	<p id="offline_dbase_enc_pointer" style="display:none"></p>
+	<p id="offline_dbase_enc" style="display:none"></p>
 	<!-- Offline Database flag that we need to do a burst store when we come back online --!>
 	<p id="offline_dbase_update_flag" style="display:none"></p>
 </body>
@@ -1723,6 +1763,64 @@
 	}
 
 	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+
+	// Show input for pointer password entry.
+	function typePointerPassword(){
+		// Hide buttons.
+		document.getElementById("yes_button").style.display = 'none';
+		document.getElementById("no_button").style.display = 'none';
+		// Show input.
+		document.getElementById("enc_pointer_password").style.display = 'inline';
+		// Show continue button.
+		document.getElementById("yes_password_button").style.display = 'inline';
+	}
+
+	// Use global variables so they can be accessed inside download standalone.html function.
+	let offlineDatabasePointer = '';
+	let offlineDatabaseEncPointer = '';
+	let offlineDatabase = '';
+	let offlineDatabaseEnc = '';
+
+	async function chooseEncPointer(chosenAnswer){
+		console.log("Running standalone.html creation!");
+		console.log("Password or no password?: " + chosenAnswer);
+		if(chosenAnswer === 'yes'){
+			// Grab database password from input object.
+			const pointerPassword = document.getElementById("enc_pointer_password").value;
+			// Clear for security.
+			document.getElementById("enc_pointer_password").value = "";
+			console.log("YES selected, encrypt pointer using entered password: " + pointerPassword);
+			// Encrypt pointer using possword. Initiallized to 0.
+			const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, '0');
+			console.log("YES selected, tripleEncrypted pointer result:" + offlineDatabaseEncPointer);
+		}else{
+			// Roll random data for pointer. 1 of our 1000 char entries for a encryptTriple'd.
+			offlineDatabaseEncPointer = getRandData();
+			console.log("NO selected, random data pointer result:" + offlineDatabaseEncPointer);
+		}
+		// Init random cleartext pointer.
+		offlineDatabasePointer = randInt(0,998);
+		// Roll random data for both databases.
+		offlineDatabase = getRandDatabase();
+		//console.log("generated offline database WHY IS THERE UNDEFNED??:" + offlineDatabase);
+		offlineDatabaseEnc = getRandDatabase();
+		// Download offline database now that everything is ready.
+		downloadStandalone();
+		showPage('home');
+	}
+
+	function getRandDatabase(){
+		let newRandomDatabase = '';
+		for(let i=0; i < 1000; i++ ){
+			newRandomDatabase += getRandFingerprint();	// Add a new random fingerprint.
+			newRandomDatabase += getRandData();			// Add a set of random data.
+		}
+		return newRandomDatabase;
+	}
+
+	//////////////////////////////////////////////////////////////
 	//				Offline Database Functions					//
 	//////////////////////////////////////////////////////////////
 
@@ -1848,10 +1946,9 @@
 		// Generate 1000 random b64 chars.
 		for(let i=0; i < 1000; i++){
 			const random_b64_int = randInt(0,63);
-			console.log("random b64 value: " + random_b64_int);
+			//console.log("random b64 value: " + random_b64_int);
 			const random_b64_char = base64map.charAt(random_b64_int);
-			console.log("random b64 char: " + random_b64_char);
-
+			//console.log("random b64 char: " + random_b64_char);
 			new_data += random_b64_char;
 		}
 		//console.log("completed random data: " + new_data);
@@ -4245,7 +4342,7 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 	}
 
 
-	function saveOfflineDBase(){
+	function downloadStandalone(){
 		//let allhtml = "<!DOCTYPE HTML>";
 		// This will grab a copy of the currently running HTML.
 		//allhtml += document.querySelector("html").innerHTML;
@@ -4560,7 +4657,7 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 
 <!----------------------------Offline Flow Start--------------------------------------------------------------!>
 			<!--------------------------OFFLINE HOME----------------------------!>
-			<div class="flow_pages home" id="offline_home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#54c597">
+			<div class="flow_pages home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
 				<h2 style="color:red">OFFLINE HOME</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="resetOfflineData(); showPage('offlinestore_codeword')">STORE SECRET DATA</button>
@@ -5459,6 +5556,16 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 <!---------------------------END Store--------------------------------------------------------------!>
 <!---------------------------END Online Flow--------------------------------------------------------!>
 
+			<!--------------------------Ask user for encrypted pointer password-----------------------!>
+			<div class="flow_pages " id="ask_for_dbase_pass" style="display:flex; ">
+				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH AN ENCRYPTED POINTER, PLEASE ENTER IT NOW.</h2>
+				<input autocomplete="off" type="password" value="" id="enc_pointer_password" style="">
+				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="showPage('offline_home')">NO PASSWORD</button>
+					<button class="obf_button" id='yes_password_button' style="flex-grow:1;" onclick="useEncPointer()">PASSWORD READY</button>
+				</div>
+			</div>
+
 			<!---------------Create New Offline DBase-----------------------------------------------!>
 			<div id="create_new_offline_dbase_div" class="flow_pages" style="display:none; ">
 				<h2 id="create_offline_dbase_label_h2">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
@@ -5736,15 +5843,17 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="makeNewOfflineIfNeeded();showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>
 			<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseFlow()">CREATE NEW OFFLINE DBASE</button>
 			<div style="display:flex">
-			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="saveOfflineDBase()">DOWNLOAD STANDALONE.HTML</button>
+			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="downloadStandalone()">DOWNLOAD STANDALONE.HTML</button>
 		</div>
 ----------------!>
 	</div>
 <!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 
 	<!-- Offline Database Data --!>
-	<p id="offline_dbase" style="display:none"></p>
-	<p id="offline_dbase_pointer" style="display:none"></p>
+	<p id="offline_dbase_pointer" style="display:none">${offlineDatabasePointer}</p>
+	<p id="offline_dbase" style="display:none">${offlineDatabase}</p>
+	<p id="offline_dbase_enc_pointer" style="display:none">${offlineDatabaseEncPointer}</p>
+	<p id="offline_dbase_enc" style="display:none">${offlineDatabaseEnc}</p>
 	<!-- Offline Database flag that we need to do a burst store when we come back online --!>
 	<p id="offline_dbase_update_flag" style="display:none"></p>
 </body>
@@ -7939,7 +8048,7 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 
 	// Grab currently running HTML and save it to standalone.html
 	// This saves the offline dbase in addition to creating and downloading a standalone version that can be used offline.
-	function saveOfflineDBase(){
+	function downloadStandalone(){
 		// This line doesn't get applied with the innerHTML call below so add it manually.
 		let allhtml = "<!DOCTYPE HTML>";
 		// This will grab a copy of the currently running HTML.
@@ -8527,7 +8636,7 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		document.body.appendChild(element);
 		element.click();
 		document.body.removeChild(element);
-	}
+	}//downloadStandalone()
 
 </script>
 
