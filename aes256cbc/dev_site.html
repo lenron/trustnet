@@ -1548,6 +1548,7 @@
 		if( document.getElementById("offline_dbase_pointer").innerHTML != "" ){
 			document.getElementById("create_dbase_button").style.display = "none";
 		}
+		//fastGetRandData();
 	}
 
 	// Set Title to link to Home without dropping offline dbase.
@@ -1793,11 +1794,12 @@
 			document.getElementById("enc_pointer_password").value = "";
 			console.log("YES selected, encrypt pointer using entered password: " + pointerPassword);
 			// Encrypt pointer using possword. Initiallized to 0.
-			const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, '0');
+			//const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, '0');
+			const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, 'the pointer starts at: 0');
 			console.log("YES selected, tripleEncrypted pointer result:" + offlineDatabaseEncPointer);
 		}else{
 			// Roll random data for pointer. 1 of our 1000 char entries for a encryptTriple'd.
-			offlineDatabaseEncPointer = getRandData();
+			offlineDatabaseEncPointer = fastGetRandData();
 			console.log("NO selected, random data pointer result:" + offlineDatabaseEncPointer);
 		}
 		// Init random cleartext pointer.
@@ -1811,11 +1813,16 @@
 		showPage('home');
 	}
 
+	//function getRandDatabase(){
+
+
+
 	function getRandDatabase(){
 		let newRandomDatabase = '';
 		for(let i=0; i < 1000; i++ ){
 			newRandomDatabase += getRandFingerprint();	// Add a new random fingerprint.
-			newRandomDatabase += getRandData();			// Add a set of random data.
+			//newRandomDatabase += getRandData();			// Add a set of random data.
+			newRandomDatabase += fastGetRandData();			// Add a set of random data.
 		}
 		return newRandomDatabase;
 	}
@@ -1918,7 +1925,7 @@
 		// Fill the new offline dbase with random data.
 		for(let i=0; i < number_of_records; i++ ){
 			offline_dbase += getRandFingerprint();	// Add a new random fingerprint.
-			offline_dbase += getRandData();			// Add a set of random data.
+			offline_dbase += fastGetRandData();			// Add a set of random data.
 		}
 		//return offline_dbase;
 		document.getElementById("offline_dbase").innerHTML = offline_dbase;
@@ -1941,6 +1948,17 @@
 		return new_fingerprint;
 	}
 
+	function fastGetRandData(){
+		//let randarray = new Uint8Array(750000);
+		let randarray = new Uint8Array(750);
+		window.crypto.getRandomValues(randarray)
+		// now randarray has the total number of bytes we need.
+		let base64 = randarray.toBase64();
+		//console.log(base64);
+		//console.log("length: " + base64.length);
+		return base64;
+	}
+
 	// Get 1000 b64 chars for a random data.
 	function getRandData(){
 		// We're going to fill this string with random base64 chars.
@@ -1950,8 +1968,8 @@
 		let random_b64_char;
 		// Generate 1000 random b64 chars.
 		for(let i=0; i < 1000; i++){
-			//random_b64_int = Math.floor(window.crypto.getRandomValues(randarray)/4);
-			random_b64_int = randInt(0,63);
+			random_b64_int = Math.floor(window.crypto.getRandomValues(randarray)/4);
+			//random_b64_int = randInt(0,63);
 			//console.log("random b64 value: " + random_b64_int);
 			random_b64_char = base64map.charAt(random_b64_int);
 			//console.log("random b64 char: " + random_b64_char);
@@ -2477,8 +2495,12 @@ console.log("checking data is valid: " + data);
 	async function checkPasslock(inputId, nextPageId){
 		const keyword = extractKeyword(inputId);
 		const cleartextPass = extractCleartextData(inputId);
-		const encryptedPassword = await passlockEncrypt(cleartextPass);
-		if(passlockedData[keyword] === encryptedPassword){
+		const decryptedPass = await passlockDecrypt(passlockedData[keyword]);
+		//const encryptedPassword = await passlockEncrypt(cleartextPass);
+		//console.log("cleartextPass: " + cleartextPass);
+		//console.log("decryptedPass: " + decryptedPass);
+		//if(passlockedData[keyword] === encryptedPassword){
+		if(decryptedPass === cleartextPass){
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
@@ -2494,6 +2516,12 @@ console.log("checking data is valid: " + data);
 		const passlock = await getPasslock();
 		const encryptedPassword = await encOpenSSL(cleartextPassword, passlock);
 		return encryptedPassword;
+	}
+
+	async function passlockDecrypt(encryptedData){
+		const passlock = await getPasslock();
+		const cleartextData = await decOpenSSL(encryptedData, passlock);
+		return cleartextData;
 	}
 
 	// Decrypt passlocked password set and return cleartext set.
@@ -3169,6 +3197,12 @@ console.log(blob);
 		// Generate random salt.
 		//let salt = new Uint8Array(8);
 		let salt;
+			// Turning off dev site functionality while testing crypto.
+			// This also illuminated that we need to decrypt password in checkPasslock because enc data will be different with a different random salt which all enc data should get.
+			salt = window.crypto.getRandomValues(new Uint8Array(8));
+			document.getElementById("dev_enc_openssl_derivebits_salt").value = salt;
+			document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
+/*
 		if( document.getElementById("dev_enc_openssl_derivebits_salt").value.trim() === ""){
 			salt = window.crypto.getRandomValues(new Uint8Array(8));
 			document.getElementById("dev_enc_openssl_derivebits_salt").value = salt;
@@ -3184,7 +3218,7 @@ console.log(blob);
 			salt = new Uint8Array(numbers);
 			document.getElementById("dev_enc_openssl_encrypted_salt_random").value = salt;
 		}
-
+*/
 		// Salt is used when hashing, IV (Initialization Vector) for encryption.
 
 		const encoded_pass = new TextEncoder().encode(pass);
@@ -3587,6 +3621,11 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		const obf1PassBuff = enc.encode(obf1Pass);
 		const obf2PassBuff = enc.encode(obf2Pass);
 		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
+console.log("codewordHash:");
+console.log(codewordHash);
+const uint8 = new Uint8Array(codewordHash);
+const cwh_b64 = uint8.toBase64();
+console.log("base64 of codewordHash: " + cwh_b64);
 		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1PassBuff);
 		const obf2pHash = await crypto.subtle.digest('SHA-256', obf2PassBuff);
 		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
@@ -3594,7 +3633,14 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
 		// SHA-256 hash the result.
 		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
+console.log("Fingerprint Hash: " + fingerprintHash);
+console.log(fingerprintHash);
 		const fingerprint = new Uint8Array(fingerprintHash);
+const b64 = fingerprint.toBase64({ omitPadding: true });
+console.log("Fingerprint as buffer: " + fingerprint);
+console.log(fingerprint);
+console.log("Fingerprint as base64: " + b64);
+console.log("Fingerprint length: " + b64.length);
 		const fingerprintHex = buf2hex(fingerprint);
 		// Don't return fingerprint if it's not a good fingerprint.
 		if(checkFingerprintIsValid(fingerprintHex)){
