@@ -1553,8 +1553,8 @@
 
 	// Set Title to link to Home without dropping offline dbase.
 	document.getElementById("titletext").onclick = function(){
-		//location.href = "https://chat.dance/obf";
-		showPage('home');
+		location.href = "https://obf.mkrsvr.org"
+		//showPage('home');
 	}
 
 	document.getElementById("dev_site_link").onclick = function(){
@@ -3711,6 +3711,61 @@ console.log("Fingerprint length: " + b64.length);
 	// Prepends a string equal to the length of the input base64 string to the front of that string in readable format.
 	// Input: varying length string of base64 data.
 	// Output: string with number then colon then input data: 10:<data of length 10>
+	function addCountstring(inputData) {
+		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
+		//const dataUint8 = new Uint8Array;
+		const dataUint8 = Uint8Array.fromBase64(inputData);
+		console.log("back to uint8: " + dataUint8);
+		console.log(dataUint8);
+		const saltRemovedData = dataUint8.slice(8);
+		console.log(saltRemovedData);
+		// Looks like Salted__ was removed.
+		const saltRemovedData64 = saltRemovedData.toBase64();
+		// Count chars.
+		const numChars = saltRemovedData64.length;
+		// Convert to raw byte form.
+		console.log("number bytes: " + numChars);
+		// PUlled from AI.
+		// Convert js number to raw uint bytes.
+		const buffer = new ArrayBuffer(2);
+		const view = new DataView(buffer);
+		// 0 - start at beginning of bytes (offset)
+		view.setUint16(0, numChars, false); // false = big-endian; true = little-endian
+		console.log("raw bytes: " + buffer);
+		console.log(buffer);
+		const rawBytes = new Uint8Array(buffer);
+		console.log("uint8a rawBytes: " + rawBytes);
+		//return new Uint8Array(buffer);
+		// Create random bytes.
+		const twoRandBytes = window.crypto.getRandomValues(new Uint8Array(2));
+		console.log("new random bytes: " + twoRandBytes);
+		console.log(twoRandBytes);
+		// Run XOR 
+		const xordBytes = rawBytes ^ twoRandBytes;
+		console.log("XOR'd bytes: " + twoRandBytes);
+		const xordBytes_0 = rawBytes[0] ^ twoRandBytes[0];
+		const xordBytes_1 = rawBytes[1] ^ twoRandBytes[1];
+		console.log("XOR'd bytes index:0: " + xordBytes_0);
+		console.log("XOR'd bytes index:1: " + xordBytes_1);
+
+
+
+		// Form 'countstring'
+		let countstring = numChars + ':' + data;
+		document.getElementById("dev_enc_obf1_b64_with_countstring").value = countstring;
+		// Convert to binary (Uint8Array).
+		const countstring_binary = new TextEncoder().encode(countstring);
+		// Create uint8array of length 750 as this will be used for obf1 XOR.
+		let big_arr = new Uint8Array(750);
+		// Copy countstring_binary into big_arr matching index 0 to index 0, 1 to 1, etc.
+		big_arr.set(countstring_binary);
+		return big_arr;
+	}//addCountstring()
+
+/*
+	// Prepends a string equal to the length of the input base64 string to the front of that string in readable format.
+	// Input: varying length string of base64 data.
+	// Output: string with number then colon then input data: 10:<data of length 10>
 	function addCountstring(data) {
 		// Count chars.
 		const num_chars = data.length;
@@ -3725,7 +3780,7 @@ console.log("Fingerprint length: " + b64.length);
 		big_arr.set(countstring_binary);
 		return big_arr;
 	}//addCountstring()
-
+*/
 	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	// Inputs: pass is plaintext, length is an integer 
 	// Output: binary byte array (Uint8Array).
