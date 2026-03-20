@@ -32,7 +32,7 @@ my $db_name = 'chatriwe_obf';
 	my $t = localtime;
 	my $time = $t->strftime();
 	# If log exists, we know q->param caught data.
-	my $filename = './log.txt';
+	my $filename = './logs/log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "DELETE\n";

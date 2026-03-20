@@ -45,7 +45,8 @@ if ($q->param){
 
 	# Return fail if data isn't in the proper form.
 	# Match exactly 64 hex chars, (i)gnoring case.
-	if( !($fingerprint =~ /^[0-9a-f]{64}$/i) ){
+	#if( !($fingerprint =~ /^[0-9a-f]{64}$/i) ){
+	if( !($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/) ){
 		print $q->header();
 		# qq{} is a standin for double quotes, used here so we can pass the dub quote char to print.
 		print qq{{"response":"0"}};

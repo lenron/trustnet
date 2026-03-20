@@ -2705,11 +2705,11 @@ console.log(blob);
 		const obf1PassBuff = enc.encode(obf1Pass);
 		const obf2PassBuff = enc.encode(obf2Pass);
 		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
-console.log("codewordHash:");
-console.log(codewordHash);
-const uint8 = new Uint8Array(codewordHash);
-const cwh_b64 = uint8.toBase64();
-console.log("base64 of codewordHash: " + cwh_b64);
+		console.log("codewordHash:");
+		console.log(codewordHash);
+		const uint8 = new Uint8Array(codewordHash);
+		const cwh_b64 = uint8.toBase64();
+		console.log("base64 of codewordHash: " + cwh_b64);
 		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1PassBuff);
 		const obf2pHash = await crypto.subtle.digest('SHA-256', obf2PassBuff);
 		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
@@ -2717,21 +2717,15 @@ console.log("base64 of codewordHash: " + cwh_b64);
 		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
 		// SHA-256 hash the result.
 		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
-console.log("Fingerprint Hash: " + fingerprintHash);
-console.log(fingerprintHash);
+		console.log("Fingerprint Hash: " + fingerprintHash);
+		console.log(fingerprintHash);
 		const fingerprint = new Uint8Array(fingerprintHash);
-const b64 = fingerprint.toBase64({ omitPadding: true });
-console.log("Fingerprint as buffer: " + fingerprint);
-console.log(fingerprint);
-console.log("Fingerprint as base64: " + b64);
-console.log("Fingerprint length: " + b64.length);
-		const fingerprintHex = buf2hex(fingerprint);
-		// Don't return fingerprint if it's not a good fingerprint.
-		if(checkFingerprintIsValid(fingerprintHex)){
-			return fingerprintHex;
-		}else{
-			throw Error("computeFingerprint() failed to produce valid fingerprint!");
-		}
+		const b64 = fingerprint.toBase64({ omitPadding: true });
+		console.log("Fingerprint as buffer: " + fingerprint);
+		console.log(fingerprint);
+		console.log("Fingerprint as base64: " + b64);
+		console.log("Fingerprint length: " + b64.length);
+		return b64;
 	}//computeFingerprint()
 
 	// Check uuid chars which are used for passlock and browserID.
