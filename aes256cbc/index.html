@@ -1295,7 +1295,7 @@
 
 	// Make sure input is exactly 1000 chars of base64 data.
 	function checkDataIsValid(data){
-console.log("checking data is valid: " + data);
+		//console.log("checking data is valid: " + data);
 		//const regex = /^[a-zA-Z0-9\+\/\=]*$/;
 		const regex = /^[a-zA-Z0-9\+\/\=]{1000}$/;
 		if( regex.test(data) ){
@@ -2348,8 +2348,8 @@ console.log(blob);
 		//const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
 		const encrypted_result = await window.crypto.subtle.encrypt({ name: digest_algorithm, iv: ivbytes }, key, plaintextbytes);
 		// Combine (OpenSSL hardcoded) constant salt, random salt, and encrypted result as array buffers, then convert to base64.
-		const const_salt = "Salted__";	// OpenSSL hardcoded.
-		const saltbytes = new TextEncoder().encode(const_salt);
+		const saltedLiteral = "Salted__";	// OpenSSL hardcoded.
+		const saltbytes = new TextEncoder().encode(saltedLiteral);
 		const two_salts = concatBuffer(saltbytes, salt);
 		// Merge salts with encoded ciphertext.
 		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
@@ -2442,28 +2442,28 @@ console.log(blob);
 	// Outputs: 1000 characters of base64 string.
 	async function obf1Encrypt(plaintext64, password) {
 		// Add our custom countstring to the data.
-		let plaintext_binary = addCountstring(plaintext64);
+		let dataWithCountAndRandFiller = addCountstring(plaintext64);
 
 		if(!checkBase64Chars(plaintext64)){
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
 
 		// With conversion to base64, 750 bytes convert to 1000 base64 chars exactly.
-		const array_length = 750;
+		const arrayLength = 750;
 
 		// Prepare password side for XOR.
-		const password_binary = new TextEncoder().encode(password);
-		const pass_binary = await getPassHash(password_binary, array_length);
+		const passwordBytes = new TextEncoder().encode(password);
+		const shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
 
 		// Perform the XOR bitwise byte by byte.
-		let xor_result = new Array();
+		let xorResult = new Array();
 		// XOR is a ^ in javascript
-		for (let i = 0; i < array_length; i++) {
-			xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
+		for (let i = 0; i < arrayLength; i++) {
+			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
 		}
 
-		let result_b64 = bytesToBase64(xor_result);
-		return result_b64;
+		let encryptedBase64 = bytesToBase64(xorResult);
+		return encryptedBase64;
 	}//obf1Encrypt()
 
 	// obf1Decrypt() is the inverse function of obf1Encrypt().
@@ -2471,27 +2471,58 @@ console.log(blob);
 	// Output: decrypted_string is a base64 string
 	async function obf1Decrypt(ciphertext64, password) {
 		// Convert base64 string to Uint8Array of bytes.
-		let decoded_b64_array = base64ToBytes(ciphertext64);
+		let ciphertextBytes = base64ToBytes(ciphertext64);
 
 		// Constant array length. 750 is the total bytes that will fit into 1000 base64 chars.
-		let array_length = 750;
+		let arrayLength = 750;
 		// Compute password for XOR.
-		const password_binary = new TextEncoder().encode(password);
-		let pass_binary = await getPassHash(password_binary, array_length);
+		const passwordBytes = new TextEncoder().encode(password);
+		let shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
 
 		// Inverse of XOR is XOR and is communicative.
 		// XOR password and output to get input.
 		// Regular Array needed for shift, pop.
-		let xor_result = new Array();
+		let xorResult = new Array();
 		// XOR is typically the carrot char: ^ 
-		for (let i = 0; i < array_length; i++) {
-			xor_result.push(pass_binary[i] ^ decoded_b64_array[i]);
+		for (let i = 0; i < arrayLength; i++) {
+			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextBytes[i]);
 		}
-		//console.log("xor_result length: " + xor_result.length);
+		console.log("xorResult: " + xorResult);
+		console.log(xorResult);
+		console.log("xorResult length: " + xorResult.length);
+		// Starting with compiled array.
+		// XOR bytes to get numBytes.
+		let numBytesUint8 = new Uint8Array(2);
+		numBytesUint8[0] = xorResult[0] ^ xorResult[2];
+		numBytesUint8[1] = xorResult[1] ^ xorResult[3];
+		console.log("numBytesUint8: " + numBytesUint8);
+		console.log(numBytesUint8);
+		// Calculate int value from byte numbers.
+		const numBytes = 256 * numBytesUint8[0] + numBytesUint8[1];
+		console.log("numBytes (dec): " + numBytes);
+		const meaningfulDataOffset  = numBytes + 4;
+		const saltedOffset  = numBytes + 8;
+		// Extract meaningful bytes.
+		//let dataBytes = new Uint8Array(numBytes);
+		let dataBytes = xorResult.slice(4, meaningfulDataOffset);
+		console.log("dataBytes: " + dataBytes);
+		// Add Salted__ literal, convert to base64.
+		let dataBytesWithSalt = new Uint8Array(saltedOffset);
+		const saltedLiteral = "Salted__";
+		const saltBytes = new TextEncoder().encode(saltedLiteral);
+		dataBytesWithSalt.set(saltBytes, 0);
+		// Add data.
+		dataBytesWithSalt.set(dataBytes, 8);
+		console.log("dataBytesWithSalt: " + dataBytesWithSalt);
+		// Convert to base64.
+		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
+		console.log("saltedData64: " + saltedData64);
+		return saltedData64;
 
+/*
 		// Decode to show user in dev site.
 		// Decoder works on uint8array's.
-		data_uint8 = Uint8Array.from(xor_result);
+		data_uint8 = Uint8Array.from(xorResult);
 		// Converts bytes to javascript String:
 		// https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
 		const with_countstring = new TextDecoder().decode(data_uint8);
@@ -2501,21 +2532,21 @@ console.log(blob);
 		// Then push that shifted byte onto a new array to be converted into a number later.
 		//
 		// shift(), pop() reduce the size of target array by 1.
-		let shifted_byte = xor_result.shift();
+		let shifted_byte = xorResult.shift();
 		console.log("shifted byte = " + shifted_byte);
 		// Need explicit instantiation for push to work on new variable.
 		let length_array = new Array;
 		length_array.push(shifted_byte);
 		// We've shifted off 1 byte, so we won't enter the while loop if there's 1 length digit.
 		// Shift bytes from countstring decrypted array to length_array until we hit the colon byte.
-		while( xor_result[0] != 58 ){
-			//console.log("xor_result while looping : " + xor_result);
-			shifted_byte = xor_result.shift();
+		while( xorResult[0] != 58 ){
+			//console.log("xorResult while looping : " + xorResult);
+			shifted_byte = xorResult.shift();
 			length_array.push(shifted_byte);
 		}
 		// Shift off colon byte. It's done its job.
-		//shifted_byte = xor_result.shift();
-		xor_result.shift();
+		//shifted_byte = xorResult.shift();
+		xorResult.shift();
 
 		// Convert bytes to a number.
 		length_array = Uint8Array.from(length_array);
@@ -2523,14 +2554,15 @@ console.log(blob);
 		console.log("countstring extracted length value: " + data_length);
 
 		// Remove zeros by slicing off everything after the data bytes end.
-		xor_result = xor_result.slice( 0, data_length );
+		xorResult = xorResult.slice( 0, data_length );
 	
 		// Array needs to be Uint8Array for Decode to work.	
 		// Should now be stripped of zeros and countstring, leaving data.
-		const plaintextbytes = Uint8Array.from(xor_result);
+		const plaintextbytes = Uint8Array.from(xorResult);
 		// Decode precisely stripped array.
 		let output = new TextDecoder().decode(plaintextbytes);
 		return output;
+*/
 	}//obf1Decrypt
 
 	// Encrypting function that adds each index pair of the input_data and password,
@@ -2547,8 +2579,8 @@ console.log(blob);
 		const input_length = input_data.length;
 
 		// Hash, rehash, append password function.
-		const password_binary = new TextEncoder().encode(password);
-		const pass_hash = await getPassHash(password_binary, input_length);
+		const passwordBytes = new TextEncoder().encode(password);
+		const pass_hash = await getPassHash(passwordBytes, input_length);
 
 		pass_b64 = bytesToBase64(pass_hash);
 
@@ -2590,8 +2622,8 @@ console.log(blob);
 		const final_encrypted_length = final_encrypted.length;
 
 		// Hash, rehash, append password function.
-		const password_binary = new TextEncoder().encode(password);
-		const pass_hash = await getPassHash(password_binary, final_encrypted_length);
+		const passwordBytes = new TextEncoder().encode(password);
+		const pass_hash = await getPassHash(passwordBytes, final_encrypted_length);
 
 		// Convert password hash byte array to base64 string.
 		const pass_b64 = bytesToBase64(pass_hash);
@@ -2763,7 +2795,7 @@ console.log("Fingerprint length: " + b64.length);
 	// Prepends a string equal to the length of the input base64 string to the front of that string in readable format.
 	// Input: varying length string of base64 data.
 	// Output: string with number then colon then input data: 10:<data of length 10>
-	function newAddCountstring(inputData) {
+	function addCountstring(inputData) {
 		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
 		//const dataUint8 = new Uint8Array;
 		const dataUint8 = Uint8Array.fromBase64(inputData);
@@ -2771,18 +2803,22 @@ console.log("Fingerprint length: " + b64.length);
 		console.log(dataUint8);
 		const saltRemovedData = dataUint8.slice(8);
 		console.log(saltRemovedData);
+		// Might use numBytes
+		const numBytes = saltRemovedData.length;
+		console.log("numBytes (enc): " + numBytes);
 		// Looks like Salted__ was removed.
 		const saltRemovedData64 = saltRemovedData.toBase64();
 		// Count chars.
 		const numChars = saltRemovedData64.length;
 		// Convert to raw byte form.
-		console.log("number bytes: " + numChars);
+		console.log("numChars: " + numChars);
 		// PUlled from AI.
 		// Convert js number to raw uint bytes.
 		const buffer = new ArrayBuffer(2);
 		const view = new DataView(buffer);
 		// 0 - start at beginning of bytes (offset)
-		view.setUint16(0, numChars, false); // false = big-endian; true = little-endian
+		//view.setUint16(0, numChars, false); // false = big-endian; true = little-endian
+		view.setUint16(0, numBytes, false); // false = big-endian; true = little-endian
 		console.log("raw bytes: " + buffer);
 		console.log(buffer);
 		const rawBytes = new Uint8Array(buffer);
@@ -2793,15 +2829,32 @@ console.log("Fingerprint length: " + b64.length);
 		console.log("new random bytes: " + twoRandBytes);
 		console.log(twoRandBytes);
 		// Run XOR 
-		const xordBytes = rawBytes ^ twoRandBytes;
-		console.log("XOR'd bytes: " + twoRandBytes);
-		const xordBytes_0 = rawBytes[0] ^ twoRandBytes[0];
-		const xordBytes_1 = rawBytes[1] ^ twoRandBytes[1];
-		console.log("XOR'd bytes index:0: " + xordBytes_0);
-		console.log("XOR'd bytes index:1: " + xordBytes_1);
-
-
-
+		let xordBytes = new Uint8Array(2);
+		xordBytes[0]  = rawBytes[0] ^ twoRandBytes[0];
+		xordBytes[1] = rawBytes[1] ^ twoRandBytes[1];
+		console.log("XOR'd bytes: " + xordBytes);
+		console.log(xordBytes);
+		// How many bytes of random data do we need? Note: use 746 instead of 750 here b/c need 4 spaces for 2 random and 2 XORd bytes.
+		const remainingSpace = 746 - numBytes
+		// Compile set of random bytes for filler.
+		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
+		// Compile Byte Stack
+		let dataWithCountBytesAndRandFiller = new Uint8Array(750);
+		console.log("Filling obf1 pre-XOR data array:");
+		console.log(dataWithCountBytesAndRandFiller);
+		// Add rand, XOR bytes (4). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set
+		dataWithCountBytesAndRandFiller.set(twoRandBytes, 0);
+		console.log(dataWithCountBytesAndRandFiller);
+		dataWithCountBytesAndRandFiller.set(xordBytes, 2);
+		console.log(dataWithCountBytesAndRandFiller);
+		dataWithCountBytesAndRandFiller.set(saltRemovedData, 4);
+		console.log(dataWithCountBytesAndRandFiller);
+		const dataOffset = 4 + numBytes;
+		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
+		console.log(dataWithCountBytesAndRandFiller);
+		console.log("Data should now be ready for obf1 XOR.");
+		return dataWithCountBytesAndRandFiller;
+/*
 		// Form 'countstring'
 		let countstring = numChars + ':' + data;
 		// Convert to binary (Uint8Array).
@@ -2811,12 +2864,13 @@ console.log("Fingerprint length: " + b64.length);
 		// Copy countstring_binary into big_arr matching index 0 to index 0, 1 to 1, etc.
 		big_arr.set(countstring_binary);
 		return big_arr;
+*/
 	}//newAddCountstring()
 
 	// Prepends a string equal to the length of the input base64 string to the front of that string in readable format.
 	// Input: varying length string of base64 data.
 	// Output: string with number then colon then input data: 10:<data of length 10>
-	function addCountstring(data) {
+	function oldaddCountstring(data) {
 		// Count chars.
 		const num_chars = data.length;
 		// Form 'countstring'
@@ -2833,9 +2887,9 @@ console.log("Fingerprint length: " + b64.length);
 	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	// Inputs: pass is plaintext, length is an integer 
 	// Output: binary byte array (Uint8Array).
-	async function getPassHash(password_binary, length) {
+	async function getPassHash(passwordBytes, length) {
 		// Take initial SHA256.
-		let sha_cumulative = await crypto.subtle.digest('SHA-256', password_binary);
+		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
 		let	sha_result;
 		// Loop until we have more than the input length number of bytes of data.
 		do{
@@ -6088,8 +6142,8 @@ console.log(blob);
 		const log_encrypted_result = new Uint8Array(encrypted_result);
 		document.getElementById("dev_enc_openssl_encrypted_data").value = log_encrypted_result;
 		// Combine (OpenSSL hardcoded) constant salt, random salt, and encrypted result as array buffers, then convert to base64.
-		const const_salt = "Salted__";	// OpenSSL hardcoded.
-		const saltbytes = new TextEncoder().encode(const_salt);
+		const saltedLiteral = "Salted__";	// OpenSSL hardcoded.
+		const saltbytes = new TextEncoder().encode(saltedLiteral);
 		document.getElementById("dev_enc_openssl_encrypted_salt_string").value = saltbytes;
 		const two_salts = concatBuffer(saltbytes, salt);
 		// Merge salts with encoded ciphertext.
@@ -6193,32 +6247,32 @@ console.log(blob);
 	// Outputs: 1000 characters of base64 string.
 	async function obf1Encrypt(plaintext64, password) {
 		// Add our custom countstring to the data.
-		let plaintext_binary = addCountstring(plaintext64);
-		document.getElementById("dev_enc_obf1_zero_padded_data").value = plaintext_binary;
+		let dataWithCountAndRandFiller = addCountstring(plaintext64);
+		document.getElementById("dev_enc_obf1_zero_padded_data").value = dataWithCountAndRandFiller;
 
 		if(!checkBase64Chars(plaintext64)){
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
 
 		// With conversion to base64, 750 bytes convert to 1000 base64 chars exactly.
-		const array_length = 750;
+		const arrayLength = 750;
 
 		// Prepare password side for XOR.
-		const password_binary = new TextEncoder().encode(password);
-		document.getElementById("dev_enc_obf1_password_bytes").value = password_binary;
-		const pass_binary = await getPassHash(password_binary, array_length);
-		document.getElementById("dev_enc_obf1_sha_extended_bytes").value = pass_binary;
+		const passwordBytes = new TextEncoder().encode(password);
+		document.getElementById("dev_enc_obf1_password_bytes").value = passwordBytes;
+		const shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
+		document.getElementById("dev_enc_obf1_sha_extended_bytes").value = shaExtPasswordBytes;
 
 		// Perform the XOR bitwise byte by byte.
-		let xor_result = new Array();
+		let xorResult = new Array();
 		// XOR is a ^ in javascript
-		for (let i = 0; i < array_length; i++) {
-			xor_result.push(pass_binary[i] ^ plaintext_binary[i]);
+		for (let i = 0; i < arrayLength; i++) {
+			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
 		}
 
-		let result_b64 = bytesToBase64(xor_result);
-		document.getElementById("dev_enc_obf1_xord_data").value = result_b64;
-		return result_b64;
+		let encryptedBase64 = bytesToBase64(xorResult);
+		document.getElementById("dev_enc_obf1_xord_data").value = encryptedBase64;
+		return encryptedBase64;
 	}//obf1Encrypt()
 
 	// obf1Decrypt() is the inverse function of obf1Encrypt().
@@ -6226,32 +6280,32 @@ console.log(blob);
 	// Output: decrypted_string is a base64 string
 	async function obf1Decrypt(ciphertext64, password) {
 		// Convert base64 string to Uint8Array of bytes.
-		let decoded_b64_array = base64ToBytes(ciphertext64);
+		let ciphertextBytes = base64ToBytes(ciphertext64);
 		// Devsite window functrion.
-		document.getElementById("dev_dec_obf1_ciphertext_bytes").value = decoded_b64_array;
+		document.getElementById("dev_dec_obf1_ciphertext_bytes").value = ciphertextBytes;
 
 		// Constant array length. 750 is the total bytes that will fit into 1000 base64 chars.
-		let array_length = 750;
+		let arrayLength = 750;
 		// Compute password for XOR.
-		const password_binary = new TextEncoder().encode(password);
-		document.getElementById("dev_dec_obf1_password_bytes").value = password_binary;
-		let pass_binary = await getPassHash(password_binary, array_length);
-		document.getElementById("dev_dec_obf1_sha_extended_bytes").value = pass_binary;
+		const passwordBytes = new TextEncoder().encode(password);
+		document.getElementById("dev_dec_obf1_password_bytes").value = passwordBytes;
+		let shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
+		document.getElementById("dev_dec_obf1_sha_extended_bytes").value = shaExtPasswordBytes;
 
 		// Inverse of XOR is XOR and is communicative.
 		// XOR password and output to get input.
 		// Regular Array needed for shift, pop.
-		let xor_result = new Array();
+		let xorResult = new Array();
 		// XOR is typically the carrot char: ^ 
-		for (let i = 0; i < array_length; i++) {
-			xor_result.push(pass_binary[i] ^ decoded_b64_array[i]);
+		for (let i = 0; i < arrayLength; i++) {
+			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextBytes[i]);
 		}
-		document.getElementById("dev_dec_obf1_xor_inversed_data").value = xor_result;
-		console.log("xor_result length: " + xor_result.length);
+		document.getElementById("dev_dec_obf1_xor_inversed_data").value = xorResult;
+		console.log("xorResult length: " + xorResult.length);
 
 		// Decode to show user in dev site.
 		// Decoder works on uint8array's.
-		data_uint8 = Uint8Array.from(xor_result);
+		data_uint8 = Uint8Array.from(xorResult);
 		// Converts bytes to javascript String:
 		// https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
 		const with_countstring = new TextDecoder().decode(data_uint8);
@@ -6262,21 +6316,21 @@ console.log(blob);
 		// Then push that shifted byte onto a new array to be converted into a number later.
 		//
 		// shift(), pop() reduce the size of target array by 1.
-		let shifted_byte = xor_result.shift();
+		let shifted_byte = xorResult.shift();
 		console.log("shifted byte = " + shifted_byte);
 		// Need explicit instantiation for push to work on new variable.
 		let length_array = new Array;
 		length_array.push(shifted_byte);
 		// We've shifted off 1 byte, so we won't enter the while loop if there's 1 length digit.
 		// Shift bytes from countstring decrypted array to length_array until we hit the colon byte.
-		while( xor_result[0] != 58 ){
-			//console.log("xor_result while looping : " + xor_result);
-			shifted_byte = xor_result.shift();
+		while( xorResult[0] != 58 ){
+			//console.log("xorResult while looping : " + xorResult);
+			shifted_byte = xorResult.shift();
 			length_array.push(shifted_byte);
 		}
 		// Shift off colon byte. It's done its job.
-		//shifted_byte = xor_result.shift();
-		xor_result.shift();
+		//shifted_byte = xorResult.shift();
+		xorResult.shift();
 
 		// Convert bytes to a number.
 		length_array = Uint8Array.from(length_array);
@@ -6284,11 +6338,11 @@ console.log(blob);
 		console.log("countstring extracted length value: " + data_length);
 
 		// Remove zeros by slicing off everything after the data bytes end.
-		xor_result = xor_result.slice( 0, data_length );
+		xorResult = xorResult.slice( 0, data_length );
 	
 		// Array needs to be Uint8Array for Decode to work.	
 		// Should now be stripped of zeros and countstring, leaving data.
-		const plaintextbytes = Uint8Array.from(xor_result);
+		const plaintextbytes = Uint8Array.from(xorResult);
 		// Decode precisely stripped array.
 		let output = new TextDecoder().decode(plaintextbytes);
 		return output;
@@ -6308,9 +6362,9 @@ console.log(blob);
 		const input_length = input_data.length;
 
 		// Hash, rehash, append password function.
-		const password_binary = new TextEncoder().encode(password);
-		document.getElementById("dev_enc_obf2_password_bytes").value = password_binary;
-		const pass_hash = await getPassHash(password_binary, input_length);
+		const passwordBytes = new TextEncoder().encode(password);
+		document.getElementById("dev_enc_obf2_password_bytes").value = passwordBytes;
+		const pass_hash = await getPassHash(passwordBytes, input_length);
 		document.getElementById("dev_enc_obf2_sha_extended_bytes").value = pass_hash;
 
 		pass_b64 = bytesToBase64(pass_hash);
@@ -6354,9 +6408,9 @@ console.log(blob);
 		const final_encrypted_length = final_encrypted.length;
 
 		// Hash, rehash, append password function.
-		const password_binary = new TextEncoder().encode(password);
-		document.getElementById("dev_dec_obf2_password_bytes").value = password_binary;
-		const pass_hash = await getPassHash(password_binary, final_encrypted_length);
+		const passwordBytes = new TextEncoder().encode(password);
+		document.getElementById("dev_dec_obf2_password_bytes").value = passwordBytes;
+		const pass_hash = await getPassHash(passwordBytes, final_encrypted_length);
 		document.getElementById("dev_dec_obf2_sha_extended_bytes").value = pass_hash;
 
 		// Convert password hash byte array to base64 string.
@@ -6537,9 +6591,9 @@ console.log("fed into decOpenSSL: data: " + obf1Decrypted + " opensslpass: " + o
 	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	// Inputs: pass is plaintext, length is an integer 
 	// Output: binary byte array (Uint8Array).
-	async function getPassHash(password_binary, length) {
+	async function getPassHash(passwordBytes, length) {
 		// Take initial SHA256.
-		let sha_cumulative = await crypto.subtle.digest('SHA-256', password_binary);
+		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
 		let	sha_result;
 		// Loop until we have more than the input length number of bytes of data.
 		do{
