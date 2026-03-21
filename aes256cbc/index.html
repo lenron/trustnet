@@ -1104,18 +1104,45 @@
 	}
 
 	function getRandDatabase(){
-		let newRandomDatabase = '';
+		// const randData = window.crypto.getRandomValues(new Uint8Array(782250)); // TOO BIG, max size 65536
 		// 1000(43 + 1000)
-		// 104300 base64 chars * 3/4 = number bytes needed to generate = 78225
-		//const randData = window.crypto.getRandomValues(new Uint8Array(78225)); // TOO BIG
+		// 1043000 base64 chars * 3/4 = number bytes needed to generate = 782250
+		// 782250 / 65536 = 11.936...
+		// 782250 - (11 * 65536) = 61354
+		// So, need 11 full and 1 almost full.
+		//for(i = 782250; i > 0 
+		let randDatabase = '';
+		let randBytes;
+		let randSet64 = '';
+		let bytesStillNeeded = 782250;
+		let totalBytesUsed = 0;
+		do{
+			if(bytesStillNeeded > 65536){
+				randBytes = window.crypto.getRandomValues(new Uint8Array(65536));
+				bytesStillNeeded -= 65536;
+				totalBytesUsed += 65536;
+			}else{
+				randBytes = window.crypto.getRandomValues(new Uint8Array(bytesStillNeeded));
+				totalBytesUsed += bytesStillNeeded;
+				bytesStillNeeded -= bytesStillNeeded;
+			}
+			console.log("bytesStillNeeded: " + bytesStillNeeded);
+
+			randSet64 = randBytes.toBase64();
+			randDatabase += randSet64;
+
+		}while(bytesStillNeeded > 0);
+
+		return randDatabase;
+	}
+/*
 		// Use half sized arrays instead of 1 that is too big.
 		const randData0 = window.crypto.getRandomValues(new Uint8Array(39113));
 		const randData1 = window.crypto.getRandomValues(new Uint8Array(39112));
 		const randDatabase0 = randData0.toBase64(); // Shouldn't be any padding.
 		const randDatabase1 = randData1.toBase64(); // Shouldn't be any padding.
 		return randDatabase0 + randDatabase1;
-	}
-
+*/
 	//////////////////////////////////////////////////////////////
 	//				Offline Database Functions					//
 	//////////////////////////////////////////////////////////////
