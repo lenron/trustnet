@@ -5306,6 +5306,157 @@ console.log(blob);
 		return hexArrayBuffer;
 	}//hex2buf()
 
+
+	//////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////
+	// Testing Ciphers////////////////////////////
+	/////////////////////////////////////////
+	//////////////////////////////////////////////////////////
+
+	async function decCTR(cleartext, ciphertext, password, digestAlgo='AES-CTR'){
+		console.log("Input length: " + ciphertext.length);
+		console.log(ciphertext);
+		// Derive salt using cleartext input. is 1000 chars long enough?
+		// Surely 1MB worth of intput should be enough randomness?
+		const encodedPassword = new TextEncoder().encode(password);
+	//const encodedCleartext = new TextEncoder().encode(cleartext);
+		//const encodedCleartext = cleartext.atob();
+		const encodedCleartext = Uint8Array.fromBase64(cleartext);
+		const encodedCiphertext = Uint8Array.fromBase64(ciphertext);
+		console.log("Input length bytes: " + encodedCiphertext.length);
+		const salt = await crypto.subtle.digest('SHA-512', encodedCleartext);
+		console.log("salt: " + salt);
+
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",
+			encodedPassword,
+			"PBKDF2",
+			false,
+			["deriveBits", "deriveKey"],
+		);
+
+		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				//name: key_derivation_algo,
+				salt,
+				iterations: 10000,
+				hash: 'SHA-256',
+				//hash: 'SHA-512',
+			},
+			keyMaterial,
+			384, // Size of output.
+		);
+
+		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+		console.log("iv: " + ivbytes);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				//name: 'AES-GCM', 
+				name: digestAlgo, 
+				length: 256
+			}, 
+			false, 
+			['decrypt']
+		);
+
+		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, iv: ivbytes, tagLength: 32 }, key, encodedCleartext);
+		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, iv: ivbytes, }, key, encodedCleartext);
+		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCleartext);
+		const encryptedData = await window.crypto.subtle.decrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCiphertext);
+		const encrypted = new Uint8Array(encryptedData);
+		console.log(encrypted);
+		console.log(encrypted.length);
+		//console.log("encrypted: " + encrypted);
+		//const encrypted64 = encrypted.toBase64({omitPadding: true});
+		const encrypted64 = encrypted.toBase64();
+		//const encrypted64 = encryptedData.toBase64({omitPadding: true});
+		//console.log("encrypted64: " + encrypted64);
+
+		console.log("Output length: " + encrypted64.length);
+		return encrypted64;
+	}
+
+	// Minimal AES-GCM 
+	// No HTML structure, meant to be tested from console.
+	async function encCTR(cleartext, password, digestAlgo='AES-CTR'){
+		console.log("Input length: " + cleartext.length);
+		console.log(cleartext);
+		// Derive salt using cleartext input. is 1000 chars long enough?
+		// Surely 1MB worth of intput should be enough randomness?
+		const encodedPassword = new TextEncoder().encode(password);
+	//const encodedCleartext = new TextEncoder().encode(cleartext);
+		//const encodedCleartext = cleartext.atob();
+		//const encodedCleartext = Uint8Array.fromBase64(cleartext, {lastChunkHandling: "strict"});
+		const encodedCleartext = Uint8Array.fromBase64(cleartext);
+		console.log("Input length bytes: " + encodedCleartext.length);
+		const salt = await crypto.subtle.digest('SHA-512', encodedCleartext);
+		console.log("salt: " + salt);
+
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",
+			encodedPassword,
+			"PBKDF2",
+			false,
+			["deriveBits", "deriveKey"],
+		);
+
+		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				//name: key_derivation_algo,
+				salt,
+				iterations: 10000,
+				hash: 'SHA-256',
+				//hash: 'SHA-512',
+			},
+			keyMaterial,
+			384, // Size of output.
+		);
+
+		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+		console.log("iv: " + ivbytes);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				//name: 'AES-GCM', 
+				name: digestAlgo, 
+				length: 256
+			}, 
+			false, 
+			['encrypt']
+		);
+
+		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, iv: ivbytes, tagLength: 32 }, key, encodedCleartext);
+		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, iv: ivbytes, }, key, encodedCleartext);
+		const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCleartext);
+		const encrypted = new Uint8Array(encryptedData);
+		console.log(encrypted);
+		console.log(encrypted.length);
+		//console.log("encrypted: " + encrypted);
+		//const encrypted64 = encrypted.toBase64({omitPadding: true});
+		const encrypted64 = encrypted.toBase64();
+		//const encrypted64 = encryptedData.toBase64({omitPadding: true});
+		//console.log("encrypted64: " + encrypted64);
+
+		console.log("Output length: " + encrypted64.length);
+		return encrypted64;
+	}
 	// Gonna need this functionality in order to store to disk.
 	//
 	// Grab currently running HTML and save it to standalone.html
