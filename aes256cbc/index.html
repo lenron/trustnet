@@ -1074,7 +1074,7 @@
 			document.getElementById("enc_pointer_password").value = "";
 			console.log("YES selected, encrypt pointer using entered password: " + pointerPassword);
 			// Encrypt pointer using possword. Initiallized to 0.
-			const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, '0');
+			offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, '0');
 			//const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, 'the pointer starts at: 0');
 			console.log("YES selected, tripleEncrypted pointer result: " + offlineDatabaseEncPointer);
 		}else{
@@ -1128,7 +1128,7 @@
 			}
 			console.log("bytesStillNeeded: " + bytesStillNeeded);
 
-			randSet64 = randBytes.toBase64();
+			randSet64 = randBytes.toBase64({omitPadding: true});
 			randDatabase += randSet64;
 
 		}while(bytesStillNeeded > 0);
@@ -2817,7 +2817,7 @@ console.log(blob);
 		//let allhtml = "<!DOCTYPE HTML>";
 		// This will grab a copy of the currently running HTML.
 		//allhtml += document.querySelector("html").innerHTML;
-
+console.log("enc pointer: " + offlineDatabaseEncPointer);
 		// standalone.html static code.
 		const standaloneCode = `
 
@@ -5309,22 +5309,20 @@ console.log(blob);
 
 	//////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////
-	// Testing Ciphers////////////////////////////
+	// Testing AES-CTR Stream Cipher////////////////////////////
 	/////////////////////////////////////////
 	//////////////////////////////////////////////////////////
 
-	async function decCTR(cleartext, ciphertext, password, digestAlgo='AES-CTR'){
+	async function decCTR(ciphertext, password, digestAlgo='AES-CTR'){
 		console.log("Input length: " + ciphertext.length);
 		console.log(ciphertext);
 		// Derive salt using cleartext input. is 1000 chars long enough?
 		// Surely 1MB worth of intput should be enough randomness?
-		const encodedPassword = new TextEncoder().encode(password);
-	//const encodedCleartext = new TextEncoder().encode(cleartext);
-		//const encodedCleartext = cleartext.atob();
-		const encodedCleartext = Uint8Array.fromBase64(cleartext);
 		const encodedCiphertext = Uint8Array.fromBase64(ciphertext);
+		const encodedPassword = new TextEncoder().encode(password);
 		console.log("Input length bytes: " + encodedCiphertext.length);
-		const salt = await crypto.subtle.digest('SHA-512', encodedCleartext);
+		//const salt = await crypto.subtle.digest('SHA-512', encodedCleartext);
+		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
 		console.log("salt: " + salt);
 
 		const keyMaterial = await window.crypto.subtle.importKey(
@@ -5368,21 +5366,12 @@ console.log(blob);
 			['decrypt']
 		);
 
-		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, iv: ivbytes, tagLength: 32 }, key, encodedCleartext);
-		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, iv: ivbytes, }, key, encodedCleartext);
-		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCleartext);
-		const encryptedData = await window.crypto.subtle.decrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCiphertext);
-		const encrypted = new Uint8Array(encryptedData);
-		console.log(encrypted);
-		console.log(encrypted.length);
-		//console.log("encrypted: " + encrypted);
-		//const encrypted64 = encrypted.toBase64({omitPadding: true});
-		const encrypted64 = encrypted.toBase64();
-		//const encrypted64 = encryptedData.toBase64({omitPadding: true});
-		//console.log("encrypted64: " + encrypted64);
-
-		console.log("Output length: " + encrypted64.length);
-		return encrypted64;
+		const decryptedData = await window.crypto.subtle.decrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCiphertext);
+		const decrypted = new Uint8Array(decryptedData);
+		const decrypted64 = decrypted.toBase64();
+		console.log("Decrypted base64: " + decrypted64);
+		console.log("Decrypted output length: " + decrypted64.length);
+		return decrypted64;
 	}
 
 	// Minimal AES-GCM 
@@ -5393,12 +5382,10 @@ console.log(blob);
 		// Derive salt using cleartext input. is 1000 chars long enough?
 		// Surely 1MB worth of intput should be enough randomness?
 		const encodedPassword = new TextEncoder().encode(password);
-	//const encodedCleartext = new TextEncoder().encode(cleartext);
-		//const encodedCleartext = cleartext.atob();
-		//const encodedCleartext = Uint8Array.fromBase64(cleartext, {lastChunkHandling: "strict"});
 		const encodedCleartext = Uint8Array.fromBase64(cleartext);
 		console.log("Input length bytes: " + encodedCleartext.length);
-		const salt = await crypto.subtle.digest('SHA-512', encodedCleartext);
+		//const salt = await crypto.subtle.digest('SHA-512', encodedCleartext);
+		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
 		console.log("salt: " + salt);
 
 		const keyMaterial = await window.crypto.subtle.importKey(
@@ -5416,7 +5403,6 @@ console.log(blob);
 				salt,
 				iterations: 10000,
 				hash: 'SHA-256',
-				//hash: 'SHA-512',
 			},
 			keyMaterial,
 			384, // Size of output.
@@ -5442,21 +5428,14 @@ console.log(blob);
 			['encrypt']
 		);
 
-		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, iv: ivbytes, tagLength: 32 }, key, encodedCleartext);
-		//const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, iv: ivbytes, }, key, encodedCleartext);
-		const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCleartext);
+        const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCleartext);
 		const encrypted = new Uint8Array(encryptedData);
-		console.log(encrypted);
-		console.log(encrypted.length);
-		//console.log("encrypted: " + encrypted);
-		//const encrypted64 = encrypted.toBase64({omitPadding: true});
 		const encrypted64 = encrypted.toBase64();
-		//const encrypted64 = encryptedData.toBase64({omitPadding: true});
-		//console.log("encrypted64: " + encrypted64);
-
-		console.log("Output length: " + encrypted64.length);
+		console.log("Encrypted base64: " + encrypted64);
+		console.log("Encrypted output length: " + encrypted64.length);
 		return encrypted64;
 	}
+
 	// Gonna need this functionality in order to store to disk.
 	//
 	// Grab currently running HTML and save it to standalone.html
@@ -5477,13 +5456,8 @@ console.log(blob);
 	}
 
 </script>
-
 </body>
-
 </html>
-
-
-
 
 		`;
 
