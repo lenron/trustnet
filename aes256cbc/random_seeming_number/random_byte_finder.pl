@@ -15,14 +15,22 @@ use strict;
 
 #Define the range of numbers we want to find random 7-byte combos for.
 my $low_range_num = 0;
-my $high_range_num = 5;
+my $high_range_num = 2;
+my $size_of_random_byte_array = 7;
+
+my $number = int(rand($high_range_num));
+find_7bytevalue_for_one_num($number, $size_of_random_byte_array);
+
+generate_7bytevalue_within_num_range($low_range_num, $high_range_num, $size_of_random_byte_array); 
+exit(0);
+
 
 #Generate a hash to hold the numbers, and our discovered 7-byte solutions.
 my $num_to_randbyte_hashref = generate_hash_with_key_num_range($low_range_num, $high_range_num);
 #Generate byte combos until there's a solution for every number in our range. 
 do{
 	#Generate 7 random bytes.
-	my $rand_arrayref = generate_random_byte_array(7);
+	my $rand_arrayref = generate_random_byte_array($size_of_random_byte_array);
 	#Sum and subtract the bytes in a random (but repeatable fashion).
 	my $rand_array_sum = randomly_add_and_subtract_bytes($rand_arrayref);
 	#If the sum of the bytes is equal to a number within our desired range,
@@ -182,7 +190,7 @@ sub ratio_of_successes_to_failures {
 	my $success_count = 0;
 	my $fail_count = 0;
 	do{
-		my $rand_arrayref = generate_random_byte_array(7);
+		my $rand_arrayref = generate_random_byte_array($size_of_random_byte_array);
 		my $rand_array_sum = randomly_add_and_subtract_bytes($rand_arrayref);
 		if (exists $num_to_randbyte_hashref->{$rand_array_sum}){
 			$success_count++;
@@ -193,4 +201,54 @@ sub ratio_of_successes_to_failures {
 		$current_try++;
 	} while($current_try < $times_to_try);
 	print "For $times_to_try tries:\n\t$success_count sucesses\n\t$fail_count fails\n\tsuccess:fail ratio was ", $success_count/$fail_count, "\n";
+}
+
+
+#find a single 7-byte random series for a given number.
+#This can be used to replace S1.
+sub find_7bytevalue_for_one_num {
+	my $number = shift;
+	my $size_rand_arr = shift;
+	my $rand_arrayref;
+	my $sum = "nothing yet";
+
+	do{
+		#Generate 7 random bytes.
+		$rand_arrayref = generate_random_byte_array($size_rand_arr);
+		#Sum those bytes.
+		$sum = randomly_add_and_subtract_bytes($rand_arrayref);
+	} while($sum != $number);
+
+
+	print "The necessary bytes to generate $number are:\n";
+	foreach my $byte (@{$rand_arrayref}){
+		print "$byte ";
+	}
+	print "\n";
+}
+
+#For finding random data to replace S2 and fill the no-password database.
+sub generate_7bytevalue_within_num_range {
+	#Since the openssl data is restricted in length,
+	#the range here specifies constrains in line with that length.
+	#E.g. we can't have an openssl length of 750, so we shouldn't
+	#allow for our 7-byte combos to be equal to 750.
+	my $low = shift; #Question: what is the minimum output of openssl?
+	my $high = shift;
+	my $size_rand_arr = shift;
+	my $rand_arrayref;
+	my $sum = "nothing yet";
+
+	do{
+		#Generate 7 random bytes.
+		$rand_arrayref = generate_random_byte_array($size_rand_arr);
+		#Sum those bytes.
+		$sum = randomly_add_and_subtract_bytes($rand_arrayref);
+	} while($high < $sum or $sum < $low);
+
+	print "we generated the num $sum with bytes:\n";
+	foreach my $byte (@{$rand_arrayref}){
+		print "$byte ";
+	}
+	print "\n";
 }
