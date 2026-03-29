@@ -326,37 +326,37 @@
 				<input autocomplete="off" type="password" value="" id="access_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');showPage('access_obf1pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');showPage('access_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Obf1pass-----------------------!>
-			<div class="flow_pages passlock" id="access_obf1pass" style="display:none">
+			<!---------------------------obf1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="access_obf1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
 					<label>PASS 1</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="access_obf1pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="access_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_obf1pass_input');showPage('access_obf2pass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_obf1000Pass_input');showPage('access_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Obf2pass-----------------------!>
-			<div class="flow_pages passlock" id="access_obf2pass" style="display:none">
+			<!---------------------------ctrPass-----------------------!>
+			<div class="flow_pages passlock" id="access_ctrPass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
 					<label>PASS 2</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="access_obf2pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="access_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_obf1pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_obf2pass_input');showPage('access_choose');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_obf1000Pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_ctrPass_input');showPage('access_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -365,7 +365,7 @@
 				<label>ACCESS DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('access_obf2pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('access_ctrPass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
 						<button class="activatable_by_enter" id='access_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('access_opensslpass')">
 							<span style="">BROWSER</span>
@@ -488,37 +488,37 @@
 				<input autocomplete="off" type="password" value="" id="store_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');showPage('store_obf1pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');showPage('store_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Obf1pass-----------------------!>
-			<div class="flow_pages passlock" id="store_obf1pass" style="display:none">
+			<!---------------------------obf1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="store_obf1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>PASS 1</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf1pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_obf1pass_input');showPage('store_obf2pass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_obf1000Pass_input');showPage('store_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Obf2pass-----------------------!>
-			<div class="flow_pages passlock" id="store_obf2pass" style="display:none">
+			<!---------------------------ctrPass-----------------------!>
+			<div class="flow_pages passlock" id="store_ctrPass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>PASS 2</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf2pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_obf2pass_input');showPage('store_choose');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1000Pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_ctrPass_input');showPage('store_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -527,7 +527,7 @@
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('store_obf2pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('store_ctrPass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
 						<button class="activatable_by_enter" id='store_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('store_opensslpass')">
 							<span style="">BROWSER</span>
@@ -557,12 +557,12 @@
 				<input autocomplete="off" type="password" value="" id="store_codeword_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdcheckinput', 'store_obf1pass_cmdcheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdcheckinput', 'store_obf1000Pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Obf1pass-----------------------!>
-			<div class="flow_pages passlock" id="store_obf1pass_cmdcheck" style="display:none">
+			<!---------------------------Check obf1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="store_obf1000Pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
@@ -570,15 +570,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf1pass_cmdcheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf1000Pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_cmdcheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_cmdcheckinput', 'store_obf2pass_cmdcheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1000Pass_cmdcheckinput', 'store_ctrPass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Obf2pass-----------------------!>
-			<div class="flow_pages passlock" id="store_obf2pass_cmdcheck" style="display:none">
+			<!---------------------------Check ctrPass-----------------------!>
+			<div class="flow_pages passlock" id="store_ctrPass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 2</label>
@@ -586,10 +586,10 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf2pass_cmdcheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_ctrPass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_cmdcheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_cmdcheckinput', 'store_upload')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1000Pass_cmdcheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_ctrPass_cmdcheckinput', 'store_upload')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -611,7 +611,7 @@
 					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="width:250px;" onclick="showPage('store_obf2pass_cmdcheck')">BACK</button>
+					<button class="" id='' style="width:250px;" onclick="showPage('store_ctrPass_cmdcheck')">BACK</button>
 					<button class="" id='store_upload_commit_button' style="flex-grow:1;display:none;color:orange" onclick="attemptCMDStore()">COMMIT DATA TO SERVER</button>
 				</div>
 			</div>
@@ -645,12 +645,12 @@
 				<input autocomplete="off" type="password" value="" id="store_codeword_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_opensslpass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_browsercheckinput', 'store_obf1pass_browsercheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_browsercheckinput', 'store_obf1000Pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Obf1pass-----------------------!>
-			<div class="flow_pages passlock" id="store_obf1pass_browsercheck" style="display:none">
+			<!---------------------------Check obf1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="store_obf1000Pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
@@ -658,15 +658,15 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf1pass_browsercheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_obf1000Pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_browsercheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1pass_browsercheckinput', 'store_obf2pass_browsercheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1000Pass_browsercheckinput', 'store_ctrPass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Obf2pass-----------------------!>
-			<div class="flow_pages passlock" id="store_obf2pass_browsercheck" style="display:none">
+			<!---------------------------Check ctrPass-----------------------!>
+			<div class="flow_pages passlock" id="store_ctrPass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 2</label>
@@ -674,10 +674,10 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf2pass_browsercheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_ctrPass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1pass_browsercheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf2pass_browsercheckinput', 'store_opensslpass_browsercheck')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1000Pass_browsercheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_ctrPass_browsercheckinput', 'store_opensslpass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -692,7 +692,7 @@
 				<h2>RE-ENTER SECRET WORD 3</h2>
 				<input autocomplete="off" type="password" value="" id="store_opensslpass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf2pass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_ctrPass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_opensslpass_browsercheckinput', 'store_data')">CONTINUE</button>
 				</div>
 			</div>
@@ -781,9 +781,9 @@
 					<label id="">ENTER CODEWORD:</label>
 					<input autocomplete="off" type="password" value="" id="init_codeword_offdbase" style="">
 					<label id="">ENTER PASSWORD 1:</label>
-					<input autocomplete="off" type="password" value="" id="init_obf1pass_offdbase" style="">
+					<input autocomplete="off" type="password" value="" id="init_obf1000Pass_offdbase" style="">
 					<label id="">ENTER PASSWORD 2:</label>
-					<input autocomplete="off" type="password" value="" id="init_obf2pass_offdbase" style="">
+					<input autocomplete="off" type="password" value="" id="init_ctrPass_offdbase" style="">
 				</div>
 				<div style="display:flex; flex-direction:row;">
 					<button id="new_offline_dbase_access_data_button" style="flex-grow:1; " onclick="accessDataForOfflineDBaseCreation()">SUBMIT PASSWORDS</button>
@@ -1190,16 +1190,16 @@
 	async function accessDataForOfflineDBaseCreation(){
 		// Don't need password 1 which is used for command line encryption or its browser backup.
 		const codeword = document.getElementById("init_codeword_offdbase").value;
-		const obf1pass = document.getElementById("init_obf1pass_offdbase").value;
-		const obf2pass = document.getElementById("init_obf2pass_offdbase").value;
+		const obf1000Pass = document.getElementById("init_obf1000Pass_offdbase").value;
+		const ctrPass = document.getElementById("init_ctrPass_offdbase").value;
 		// Clear used values.
 		document.getElementById("init_codeword_offdbase").value = "";
-		document.getElementById("init_obf1pass_offdbase").value = "";
-		document.getElementById("init_obf2pass_offdbase").value = "";
+		document.getElementById("init_obf1000Pass_offdbase").value = "";
+		document.getElementById("init_ctrPass_offdbase").value = "";
 		// Re-focus on first input for ease of use.
 		document.getElementById("init_codeword_offdbase").focus();
 
-		const fingerprint = await computeFingerprint(codeword, obf1pass, obf2pass);
+		const fingerprint = await computeFingerprint(codeword, obf1000Pass, ctrPass);
 
 		console.log("offline dbase creation: Querying server...");
 		encryptedData = await serverLoad(fingerprint);
@@ -1533,7 +1533,7 @@
 		//console.log("new passlock: " + passlock);
 
 		// Data will be stored at keyword's 'location'.
-		// Extract keyword using regex. could be: codeword, obf1pass, obf12pass, opensslpass
+		// Extract keyword using regex. could be: codeword, obf1000Pass, obf12pass, opensslpass
 		const keyword = extractKeyword(inputId);
 		// Extracts either user password or data from DOM object's  value.
 		const cleartextData = extractCleartextData(inputId);
@@ -1614,13 +1614,13 @@
 		// Get cleartext passwords for encryption.
 		const cleartextSet = await passlockDecryptSet();
 		const fingerprintAndData = {};
-		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1pass'], cleartextSet['obf2pass']);
+		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1000Pass'], cleartextSet['ctrPass']);
 		//Check for existence of 'key' in js Object.
 		if('opensslpass' in passlockedData){
 			//console.log("we found opensslpass in passlockedData");
-			fingerprintAndData['data'] = await encryptTriple(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['opensslpass'], cleartextSet['data']);
+			fingerprintAndData['data'] = await encryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], cleartextSet['data']);
 		}else{
-			fingerprintAndData['data'] = await encryptDouble(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['data']);
+			fingerprintAndData['data'] = await encryptDouble(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['data']);
 		}
 		return fingerprintAndData;
 	}
@@ -1656,7 +1656,7 @@
 	async function getFpForAccess(){
 		// Get cleartext passwords for encryption.
 		const cleartextSet = await passlockDecryptSet();
-		const fingerprint = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1pass'], cleartextSet['obf2pass']);
+		const fingerprint = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1000Pass'], cleartextSet['ctrPass']);
 		return fingerprint;
 	}
 
@@ -1686,7 +1686,7 @@
 	async function decryptAndDownloadFile(encryptedData){
 		// Get set of decrypted user passwords.
 		const cleartextSet = await passlockDecryptSet();
-		const decryptedData  = await decryptDouble(cleartextSet['obf1pass'], cleartextSet['obf2pass'], encryptedData);
+		const decryptedData  = await decryptDouble(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], encryptedData);
 
 			// bytes is Uint8Array
 			const bytes = base64ToBytes(decryptedData);
@@ -1737,7 +1737,7 @@ console.log(blob);
 
 	async function decryptAndShowCleartext(encryptedData){
 		const cleartextSet = await passlockDecryptSet();
-		const decryptedData  = await decryptTriple(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['opensslpass'], encryptedData);
+		const decryptedData  = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
 		// Reveal cleartext to user.
 		document.getElementById("access_data_outputdisplay").value = decryptedData;
 		// Delete passlock for secruity.
@@ -2371,7 +2371,7 @@ console.log(blob);
 	// and finally converts the result to a specific length output of 1000 base 64 character string.
 	// Inputs: plaintext64 is base64, password is plaintext.
 	// Outputs: 1000 characters of base64 string.
-	async function obf1Encrypt(plaintext64, password) {
+	async function obf1000Encrypt(plaintext64, password) {
 		// Add our custom countstring to the data.
 		let dataWithCountAndRandFiller = addCountstring(plaintext64);
 
@@ -2395,12 +2395,12 @@ console.log(blob);
 
 		let encryptedBase64 = bytesToBase64(xorResult);
 		return encryptedBase64;
-	}//obf1Encrypt()
+	}//obf1000Encrypt()
 
-	// obf1Decrypt() is the inverse function of obf1Encrypt().
+	// obf1000Decrypt() is the inverse function of obf1000Encrypt().
 	// Inputs: ciphertext64 is a base64 string, password is plaintext
 	// Output: decrypted_string is a base64 string
-	async function obf1Decrypt(ciphertext64, password) {
+	async function obf1000Decrypt(ciphertext64, password) {
 		// Convert base64 string to Uint8Array of bytes.
 		let ciphertextBytes = base64ToBytes(ciphertext64);
 
@@ -2449,155 +2449,183 @@ console.log(blob);
 		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
 		console.log("saltedData64: " + saltedData64);
 		return saltedData64;
-	}//obf1Decrypt
+	}//obf1000Decrypt
 
-	// Encrypting function that adds each index pair of the input_data and password,
-	// then takes the modulo of that result to build an ecrypted string of 1000 base64 characters.
-	// Inputs: input_data is 1000 characters of base64 string, password is plaintext
-	// Output: 1000 chars of base64 string
-	async function obf2Encrypt(input_data, password){
-
-		if(!checkBase64Chars(input_data)){
-			throw new Error('Obfuscation step 2 INVALID characters found!');
+	// Default usage sets input to base64.
+	// Output always packed into base64.
+	async function encCTR(cleartext, password, inputType='base64'){
+		//console.log("encCTR called with inputType: " + inputType);
+		let encodedCleartext;
+		if(inputType === 'base64'){// Default usage.
+			encodedCleartext = Uint8Array.fromBase64(cleartext);
+		}else{
+			encodedCleartext = new TextEncoder().encode(cleartext);
 		}
 
-		// Get size of input data. Should be 1000.
-		const input_length = input_data.length;
+		const encodedPassword = new TextEncoder().encode(password);
+		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
 
-		// Hash, rehash, append password function.
-		const passwordBytes = new TextEncoder().encode(password);
-		const pass_hash = await getPassHash(passwordBytes, input_length);
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",
+			encodedPassword,
+			"PBKDF2",
+			false,
+			["deriveBits", "deriveKey"],
+		);
 
-		pass_b64 = bytesToBase64(pass_hash);
+		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				//name: key_derivation_algo,
+				salt,
+				iterations: 10000,
+				hash: 'SHA-256',
+			},
+			keyMaterial,
+			384, // Size of output.
+		);
 
-		// Create 2 arrays of length 1000.
-		let input_b64_num_arr = new Array(input_length);
-		let pass_b64_num_arr = new Array(input_length);
-		for (let i = 0; i < input_length; i++) {								// input_length should be 1000
-			// Convert each b64 character to its numerical index and store in an array. 
-			input_b64_num_arr[i] = base64map.indexOf(input_data.charAt(i));		// 1000 chars long
-			pass_b64_num_arr[i] = base64map.indexOf(pass_b64.charAt(i));		// there is more data in pass_b64 but we don't use it.
+		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+		console.log("iv: " + ivbytes);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				//name: 'AES-GCM', 
+				name: 'AES-CTR', 
+				length: 256
+			}, 
+			false, 
+			['encrypt']
+		);
+
+        const encryptedBuffer = await window.crypto.subtle.encrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCleartext);
+		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+		const encrypted64 = encryptedUint8.toBase64();
+		return encrypted64;
+	}
+
+	// Default usage sets output to base64.
+	// Input always packed as base64.
+	async function decCTR(ciphertext, password, outputType='base64'){
+		//console.log("decCTR called with outputType: " + outputType);
+		const encodedCiphertext = Uint8Array.fromBase64(ciphertext);
+		const encodedPassword = new TextEncoder().encode(password);
+		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
+
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",
+			encodedPassword,
+			"PBKDF2",
+			false,
+			["deriveBits", "deriveKey"],
+		);
+
+		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				//name: key_derivation_algo,
+				salt,
+				iterations: 10000,
+				hash: 'SHA-256',
+				//hash: 'SHA-512',
+			},
+			keyMaterial,
+			384, // Size of output.
+		);
+
+		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+		console.log("iv: " + ivbytes);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				//name: 'AES-GCM', 
+				name: 'AES-CTR', 
+				length: 256
+			}, 
+			false, 
+			['decrypt']
+		);
+
+		const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCiphertext);
+		const decryptedUint8 = new Uint8Array(decryptedBuffer);
+		let decryptedDecoded;
+		if(outputType === 'base64'){
+			decryptedDecoded = decryptedUint8.toBase64();
+		}else{
+			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
 		}
+		return decryptedDecoded;
+	}
 
-		// Add each index pair and store in new array.
-		let sum_b64_num_arr = new Array(input_length);
-		for (let i = 0; i < input_length; i++) {
-			sum_b64_num_arr[i] = input_b64_num_arr[i] + pass_b64_num_arr[i];
-		}
-
-		// Take the 64 modulo of each index.
-		for (let i = 0; i < input_length; i++) {
-			sum_b64_num_arr[i] = sum_b64_num_arr[i] % 64;
-		}
-
-		// Convert each processed index to b64 characters.
-		let final_encrypted_string = '';
-		for (let i = 0; i < input_length; i++) {
-			final_encrypted_string += base64map.charAt(sum_b64_num_arr[i]);
-		}
-
-		return final_encrypted_string;
-	}//obf2Encrypt()
-
-	// Decrypting function that takes the inverse of obf2Encrypt().
-	// Inputs: final_encrypted is 1000 characters of base64 string, password is plaintext
-	// Output: final_decrypted_string is 1000 chars of base64 string
-	async function obf2Decrypt(final_encrypted, password){
-
-		// Get size of input data. Should be 1000.
-		const final_encrypted_length = final_encrypted.length;
-
-		// Hash, rehash, append password function.
-		const passwordBytes = new TextEncoder().encode(password);
-		const pass_hash = await getPassHash(passwordBytes, final_encrypted_length);
-
-		// Convert password hash byte array to base64 string.
-		const pass_b64 = bytesToBase64(pass_hash);
-
-		// Convert each operand b64 string to an array of corresponding indices.
-		// Create 2 arrays of length 1000.
-		let final_encrypted_b64_num_arr = new Array(final_encrypted_length);
-		let pass_b64_num_arr = new Array(final_encrypted_length);
-		for (let i = 0; i < final_encrypted_length; i++) {
-			// Convert each b64 character to its numerical index. 
-			final_encrypted_b64_num_arr[i] = base64map.indexOf(final_encrypted.charAt(i));
-			pass_b64_num_arr[i] = base64map.indexOf(pass_b64.charAt(i));
-		}
-
-		// Run the inverse of the sum-and-64-modulo encrypt function.
-		let in_b64_num_arr = new Array(final_encrypted_length);
-		for (let i = 0; i < final_encrypted_length; i++) {
-			// If the difference is negative, we know the input got modulo'd and needs that 64 back to produce the inverse data.
-			// Now we can decrypt by taking the difference of each index pair.
-			in_b64_num_arr[i] = final_encrypted_b64_num_arr[i] - pass_b64_num_arr[i];
-			if( in_b64_num_arr[i] < 0 ){
-				in_b64_num_arr[i] += 64;
-			}
-		}
-
-		// Convert the resulting numerical values to b64 chars.
-		let final_decrypted_string = '';
-		for (let i = 0; i < final_encrypted_length; i++) {
-			final_decrypted_string += base64map.charAt(in_b64_num_arr[i]);
-		}
-
-		return final_decrypted_string;
-	}//obf2Decrypt()
 
 	// Encrypt stack used in the case user chooses command line.
-	async function encryptDouble(obf1Pass, obf2Pass, fileData){
+	async function encryptDouble(obf1000Pass, ctrPass, fileData){
 		// Obfuscation Step 1 Encrypt
-		const obf1Encrypted = await obf1Encrypt(fileData, obf1Pass);
+		const obf1000Encrypted = await obf1000Encrypt(fileData, obf1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const obf2Encrypted = await obf2Encrypt(obf1Encrypted, obf2Pass);
-		return obf2Encrypted;
+		const ctrEncrypted = await encCTR(obf1000Encrypted, ctrPass);
+		return ctrEncrypted;
 	}//encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
-	async function encryptTriple(obf1Pass, obf2Pass, opensslPass, cleartextData){
+	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
 		// Obfuscation Step 1 Encrypt
-		const obf1Encrypted = await obf1Encrypt(opensslEncrypted, obf1Pass);
+		const obf1000Encrypted = await obf1000Encrypt(opensslEncrypted, obf1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const obf2Encrypted = await obf2Encrypt(obf1Encrypted, obf2Pass);
-		return obf2Encrypted;
+		const ctrEncrypted = await encCTR(obf1000Encrypted, ctrPass);
+		return ctrEncrypted;
 	}//encryptTriple()
 
 	// Decrypt stack used in the case user chooses Command Line.
-	async function decryptDouble(obf1Pass, obf2Pass, encryptedData){
-		const obf2Decrypted = await obf2Decrypt(encryptedData, obf2Pass);
-		const obf1Decrypted = await obf1Decrypt(obf2Decrypted, obf1Pass);
-		return obf1Decrypted;
+	async function decryptDouble(obf1000Pass, ctrPass, encryptedData){
+		const ctrDecrypted = await decCTR(encryptedData, ctrPass);
+		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
+		return obf1000Decrypted;
 	}//decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
-	async function decryptTriple(obf1Pass, obf2Pass, opensslPass, encryptedData){
-		const obf2Decrypted = await obf2Decrypt(encryptedData, obf2Pass);
-		const obf1Decrypted = await obf1Decrypt(obf2Decrypted, obf1Pass);
-		const cleartext = await decOpenSSL(obf1Decrypted, opensslPass);
+	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
+		const ctrDecrypted = await decCTR(encryptedData, ctrPass);
+		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
+		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);
 		return cleartext;
 	}//decryptTriple()
 
 	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
 	// Inputs: plaintext.
 	// Output: hexadecimal.
-	async function computeFingerprint(codeword, obf1Pass, obf2Pass){
+	async function computeFingerprint(codeword, obf1000Pass, ctrPass){
 		// Convert to lowercase.
 		const codewordLower = codeword.toLowerCase();
 		// Take SHA-256 hash of codeword, obf1_pass, obf2_pass
 		const enc = new TextEncoder();
 		const codewordBuf = enc.encode(codewordLower);
-		const obf1PassBuff = enc.encode(obf1Pass);
-		const obf2PassBuff = enc.encode(obf2Pass);
+		const obf1000PassBuff = enc.encode(obf1000Pass);
+		const ctrPassBuff = enc.encode(ctrPass);
 		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
 		console.log("codewordHash:");
 		console.log(codewordHash);
 		const uint8 = new Uint8Array(codewordHash);
 		const cwh_b64 = uint8.toBase64();
 		console.log("base64 of codewordHash: " + cwh_b64);
-		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1PassBuff);
-		const obf2pHash = await crypto.subtle.digest('SHA-256', obf2PassBuff);
+		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1000PassBuff);
+		const obf2pHash = await crypto.subtle.digest('SHA-256', ctrPassBuff);
 		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
 		const codeword_and_obf1pHash = concatBuffer(codewordHash, obf1pHash)
 		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
@@ -3149,12 +3177,12 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				<input autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); showPage('offlineaccess_obf1pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); showPage('offlineaccess_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Obf1pass-----------------------!>
-			<div class="flow_pages passlock" id="offlineaccess_obf1pass" style="display:none">
+			<!---------------------------obf1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlineaccess_obf1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>ACCESS FLOW</label>
@@ -3162,15 +3190,15 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlineaccess_obf1pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlineaccess_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineaccess_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf1pass_input');showPage('offlineaccess_obf2pass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf1000Pass_input');showPage('offlineaccess_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Obf2pass-----------------------!>
-			<div class="flow_pages passlock" id="offlineaccess_obf2pass" style="display:none">
+			<!---------------------------ctrPass-----------------------!>
+			<div class="flow_pages passlock" id="offlineaccess_ctrPass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>ACCESS FLOW</label>
@@ -3178,10 +3206,10 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlineaccess_obf2pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlineaccess_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineaccess_obf1pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf2pass_input');showPage('offlineaccess_choose');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineaccess_obf1000Pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_ctrPass_input');showPage('offlineaccess_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3191,7 +3219,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				<label>ACCESS DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('offlineaccess_obf2pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('offlineaccess_ctrPass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
 						<button class="activatable_by_enter" id='offlineaccess_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('offlineaccess_opensslpass')">
 							<span style="">BROWSER</span>
@@ -3321,12 +3349,12 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');showPage('offlinestore_obf1pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');showPage('offlinestore_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Obf1pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1pass" style="display:none">
+			<!---------------------------obf1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3334,15 +3362,15 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf1pass_input');showPage('offlinestore_obf2pass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf1000Pass_input');showPage('offlinestore_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Obf2pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf2pass" style="display:none">
+			<!---------------------------ctrPass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_ctrPass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3350,10 +3378,10 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf2pass_input');showPage('offlinestore_choose');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1000Pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_ctrPass_input');showPage('offlinestore_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3363,7 +3391,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_obf2pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_ctrPass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
 						<button class="activatable_by_enter" id='offlinestore_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('offlinestore_opensslpass')">
 							<span style="">BROWSER</span>
@@ -3394,12 +3422,12 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_choose')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdcheckinput', 'offlinestore_obf1pass_cmdcheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdcheckinput', 'offlinestore_obf1000Pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Obf1pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1pass_cmdcheck" style="display:none">
+			<!---------------------------Check obf1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf1000Pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3408,15 +3436,15 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_cmdcheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_cmdcheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1pass_cmdcheckinput', 'offlinestore_obf2pass_cmdcheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1000Pass_cmdcheckinput', 'offlinestore_ctrPass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Obf2pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf2pass_cmdcheck" style="display:none">
+			<!---------------------------Check ctrPass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_ctrPass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3425,10 +3453,10 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_cmdcheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass_cmdcheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf2pass_cmdcheckinput', 'offlinestore_upload')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1000Pass_cmdcheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_ctrPass_cmdcheckinput', 'offlinestore_upload')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3451,7 +3479,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="width:250px;" onclick="showPage('offlinestore_obf2pass_cmdcheck')">BACK</button>
+					<button class="" id='' style="width:250px;" onclick="showPage('offlinestore_ctrPass_cmdcheck')">BACK</button>
 					<button class="" id='offlinestore_upload_commit_button' style="flex-grow:1;display:none;color:orange" onclick="attemptCMDStoreOffline()">COMMIT DATA TO SERVER</button>
 				</div>
 			</div>
@@ -3487,12 +3515,12 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_opensslpass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_browsercheckinput', 'offlinestore_obf1pass_browsercheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_browsercheckinput', 'offlinestore_obf1000Pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Obf1pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1pass_browsercheck" style="display:none">
+			<!---------------------------Check obf1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_obf1000Pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3501,15 +3529,15 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1pass_browsercheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_browsercheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1pass_browsercheckinput', 'offlinestore_obf2pass_browsercheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1000Pass_browsercheckinput', 'offlinestore_ctrPass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check Obf2pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf2pass_browsercheck" style="display:none">
+			<!---------------------------Check ctrPass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_ctrPass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3518,10 +3546,10 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER SECRET WORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf2pass_browsercheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1pass_browsercheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf2pass_browsercheckinput', 'offlinestore_opensslpass_browsercheck')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1000Pass_browsercheck')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_ctrPass_browsercheckinput', 'offlinestore_opensslpass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3537,7 +3565,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				<h2>RE-ENTER SECRET WORD 3</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf2pass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_ctrPass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_opensslpass_browsercheckinput', 'offlinestore_data')">CONTINUE</button>
 				</div>
 			</div>
@@ -4142,8 +4170,8 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 
 	async function attemptCMDStoreOffline(){
 		//const fingerprintAndData = await getFpAndDataForStore();
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
-		const encryptedData = await encryptDouble(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['data']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		const encryptedData = await encryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['data']);
 		//storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 		//const offline_dbase_store_outcome = await handleOfflineDBaseStore(fingerprint, encrypted_data);
 		const storeResponse = storeSingleRecordToOfflineDBase(fingerprint, encryptedData);
@@ -4164,8 +4192,8 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 	async function attemptBrowserStoreOffline(inputId){
 		extractInputDataOffline(inputId);
 		//const fingerprintAndData = await getFpAndDataForStore();
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
-		const encryptedData = await encryptTriple(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['opensslpass'], offlineData['data']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		const encryptedData = await encryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], offlineData['data']);
 		//storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 		//const offline_dbase_store_outcome = await handleOfflineDBaseStore(fingerprint, encrypted_data);
 		const storeResponse = storeSingleRecordToOfflineDBase(fingerprint, encryptedData);
@@ -4205,7 +4233,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 
 	async function attemptCMDAccessOffline(){
 		//const fingerprint = await getFpForAccess();
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const encryptedData = attemptLoadOfflineDBase(fingerprint);
 
 		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
@@ -4219,7 +4247,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 	}
 
 	async function decryptAndDownloadFileOffline(encryptedData){
-		const decryptedData  = await decryptDouble(offlineData['obf1pass'], offlineData['obf2pass'], encryptedData);
+		const decryptedData  = await decryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], encryptedData);
 			// bytes is Uint8Array
 			const bytes = base64ToBytes(decryptedData);
 			// Produce file for user to decrypt.
@@ -4235,8 +4263,8 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 		//await extractInputData(inputId);
 		extractInputDataOffline(inputId);
 		//const fingerprint = await getFpForAccess();
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
-		//console.log("fingerprint:" + fingerprint + " offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1pass]:" + offlineData['obf1pass'] + " offlineData[obf2pass]:" + offlineData['obf2pass']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		//console.log("fingerprint:" + fingerprint + " offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1000Pass]:" + offlineData['obf1000Pass'] + " offlineData[ctrPass]:" + offlineData['ctrPass']);
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const encryptedData = attemptLoadOfflineDBase(fingerprint);
 		//console.log("encryptedData: " + encryptedData);
@@ -4253,18 +4281,18 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 
 	async function decryptAndShowCleartextOffline(encryptedData){
 		//const cleartextSet = await passlockDecryptSet();
-		//const decryptedData  = await decryptTriple(cleartextSet['obf1pass'], cleartextSet['obf2pass'], cleartextSet['opensslpass'], encryptedData);
-		//console.log("offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1pass]:" + offlineData['obf1pass'] + " offlineData[obf2pass]:" + offlineData['obf2pass'] + " offlineData[opensslpass]:" + offlineData['opensslpass']);;
+		//const decryptedData  = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
+		//console.log("offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1000Pass]:" + offlineData['obf1000Pass'] + " offlineData[ctrPass]:" + offlineData['ctrPass'] + " offlineData[opensslpass]:" + offlineData['opensslpass']);;
 		console.log("encryptedData: " + encryptedData);
 
-		const decryptedData  = await decryptTriple(offlineData['obf1pass'], offlineData['obf2pass'], offlineData['opensslpass'], encryptedData);
+		const decryptedData  = await decryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], encryptedData);
 		console.log("decryptedData: " + decryptedData);
 		// Reveal cleartext to user.
 		document.getElementById("offlineaccess_data_outputdisplay").value = decryptedData;
 	}
 
 	async function attemptDeleteOffline(){
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1pass'], offlineData['obf2pass']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const deleteResponse = await deleteSingleRecordOfflineDBase(fingerprint);
 		//const deleteResponse = await serverDelete(fingerprint);
 		// Report delete outcome.
@@ -4863,7 +4891,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 	// and finally converts the result to a specific length output of 1000 base 64 character string.
 	// Inputs: plaintext64 is base64, password is plaintext.
 	// Outputs: 1000 characters of base64 string.
-	async function obf1Encrypt(plaintext64, password) {
+	async function obf1000Encrypt(plaintext64, password) {
 		// Add our custom countstring to the data.
 		let dataWithCountAndRandFiller = addCountstring(plaintext64);
 
@@ -4887,12 +4915,12 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 
 		let encryptedBase64 = bytesToBase64(xorResult);
 		return encryptedBase64;
-	}//obf1Encrypt()
+	}//obf1000Encrypt()
 
-	// obf1Decrypt() is the inverse function of obf1Encrypt().
+	// obf1000Decrypt() is the inverse function of obf1000Encrypt().
 	// Inputs: ciphertext64 is a base64 string, password is plaintext
 	// Output: decrypted_string is a base64 string
-	async function obf1Decrypt(ciphertext64, password) {
+	async function obf1000Decrypt(ciphertext64, password) {
 		// Convert base64 string to Uint8Array of bytes.
 		let ciphertextBytes = base64ToBytes(ciphertext64);
 		// Devsite window functrion.
@@ -4942,155 +4970,182 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
 		console.log("saltedData64: " + saltedData64);
 		return saltedData64;
-	}//obf1Decrypt
+	}//obf1000Decrypt
 
-	// Encrypting function that adds each index pair of the input_data and password,
-	// then takes the modulo of that result to build an ecrypted string of 1000 base64 characters.
-	// Inputs: input_data is 1000 characters of base64 string, password is plaintext
-	// Output: 1000 chars of base64 string
-	async function obf2Encrypt(input_data, password){
-
-		if(!checkBase64Chars(input_data)){
-			throw new Error('Obfuscation step 2 INVALID characters found!');
+	// Default usage sets input to base64.
+	// Output always packed into base64.
+	async function encCTR(cleartext, password, inputType='base64'){
+		//console.log("encCTR called with inputType: " + inputType);
+		let encodedCleartext;
+		if(inputType === 'base64'){// Default usage.
+			encodedCleartext = Uint8Array.fromBase64(cleartext);
+		}else{
+			encodedCleartext = new TextEncoder().encode(cleartext);
 		}
 
-		// Get size of input data. Should be 1000.
-		const input_length = input_data.length;
+		const encodedPassword = new TextEncoder().encode(password);
+		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
 
-		// Hash, rehash, append password function.
-		const passwordBytes = new TextEncoder().encode(password);
-		const pass_hash = await getPassHash(passwordBytes, input_length);
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",
+			encodedPassword,
+			"PBKDF2",
+			false,
+			["deriveBits", "deriveKey"],
+		);
 
-		pass_b64 = bytesToBase64(pass_hash);
+		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				//name: key_derivation_algo,
+				salt,
+				iterations: 10000,
+				hash: 'SHA-256',
+			},
+			keyMaterial,
+			384, // Size of output.
+		);
 
-		// Create 2 arrays of length 1000.
-		let input_b64_num_arr = new Array(input_length);
-		let pass_b64_num_arr = new Array(input_length);
-		for (let i = 0; i < input_length; i++) {								// input_length should be 1000
-			// Convert each b64 character to its numerical index and store in an array. 
-			input_b64_num_arr[i] = base64map.indexOf(input_data.charAt(i));		// 1000 chars long
-			pass_b64_num_arr[i] = base64map.indexOf(pass_b64.charAt(i));		// there is more data in pass_b64 but we don't use it.
+		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+		console.log("iv: " + ivbytes);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				//name: 'AES-GCM', 
+				name: 'AES-CTR', 
+				length: 256
+			}, 
+			false, 
+			['encrypt']
+		);
+
+        const encryptedBuffer = await window.crypto.subtle.encrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCleartext);
+		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+		const encrypted64 = encryptedUint8.toBase64();
+		return encrypted64;
+	}//encCTR()
+
+	// Default usage sets output to base64.
+	// Input always packed as base64.
+	async function decCTR(ciphertext, password, outputType='base64'){
+		//console.log("decCTR called with outputType: " + outputType);
+		const encodedCiphertext = Uint8Array.fromBase64(ciphertext);
+		const encodedPassword = new TextEncoder().encode(password);
+		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
+
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",
+			encodedPassword,
+			"PBKDF2",
+			false,
+			["deriveBits", "deriveKey"],
+		);
+
+		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				//name: key_derivation_algo,
+				salt,
+				iterations: 10000,
+				hash: 'SHA-256',
+				//hash: 'SHA-512',
+			},
+			keyMaterial,
+			384, // Size of output.
+		);
+
+		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
+		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+		console.log("iv: " + ivbytes);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keybytes, 
+			{
+				//name: 'AES-GCM', 
+				name: 'AES-CTR', 
+				length: 256
+			}, 
+			false, 
+			['decrypt']
+		);
+
+		const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCiphertext);
+		const decryptedUint8 = new Uint8Array(decryptedBuffer);
+		let decryptedDecoded;
+		if(outputType === 'base64'){
+			decryptedDecoded = decryptedUint8.toBase64();
+		}else{
+			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
 		}
-
-		// Add each index pair and store in new array.
-		let sum_b64_num_arr = new Array(input_length);
-		for (let i = 0; i < input_length; i++) {
-			sum_b64_num_arr[i] = input_b64_num_arr[i] + pass_b64_num_arr[i];
-		}
-
-		// Take the 64 modulo of each index.
-		for (let i = 0; i < input_length; i++) {
-			sum_b64_num_arr[i] = sum_b64_num_arr[i] % 64;
-		}
-
-		// Convert each processed index to b64 characters.
-		let final_encrypted_string = '';
-		for (let i = 0; i < input_length; i++) {
-			final_encrypted_string += base64map.charAt(sum_b64_num_arr[i]);
-		}
-
-		return final_encrypted_string;
-	}//obf2Encrypt()
-
-	// Decrypting function that takes the inverse of obf2Encrypt().
-	// Inputs: final_encrypted is 1000 characters of base64 string, password is plaintext
-	// Output: final_decrypted_string is 1000 chars of base64 string
-	async function obf2Decrypt(final_encrypted, password){
-
-		// Get size of input data. Should be 1000.
-		const final_encrypted_length = final_encrypted.length;
-
-		// Hash, rehash, append password function.
-		const passwordBytes = new TextEncoder().encode(password);
-		const pass_hash = await getPassHash(passwordBytes, final_encrypted_length);
-
-		// Convert password hash byte array to base64 string.
-		const pass_b64 = bytesToBase64(pass_hash);
-
-		// Convert each operand b64 string to an array of corresponding indices.
-		// Create 2 arrays of length 1000.
-		let final_encrypted_b64_num_arr = new Array(final_encrypted_length);
-		let pass_b64_num_arr = new Array(final_encrypted_length);
-		for (let i = 0; i < final_encrypted_length; i++) {
-			// Convert each b64 character to its numerical index. 
-			final_encrypted_b64_num_arr[i] = base64map.indexOf(final_encrypted.charAt(i));
-			pass_b64_num_arr[i] = base64map.indexOf(pass_b64.charAt(i));
-		}
-
-		// Run the inverse of the sum-and-64-modulo encrypt function.
-		let in_b64_num_arr = new Array(final_encrypted_length);
-		for (let i = 0; i < final_encrypted_length; i++) {
-			// If the difference is negative, we know the input got modulo'd and needs that 64 back to produce the inverse data.
-			// Now we can decrypt by taking the difference of each index pair.
-			in_b64_num_arr[i] = final_encrypted_b64_num_arr[i] - pass_b64_num_arr[i];
-			if( in_b64_num_arr[i] < 0 ){
-				in_b64_num_arr[i] += 64;
-			}
-		}
-
-		// Convert the resulting numerical values to b64 chars.
-		let final_decrypted_string = '';
-		for (let i = 0; i < final_encrypted_length; i++) {
-			final_decrypted_string += base64map.charAt(in_b64_num_arr[i]);
-		}
-
-		return final_decrypted_string;
-	}//obf2Decrypt()
+		return decryptedDecoded;
+	}//decCTR
 
 	// Encrypt stack used in the case user chooses command line.
-	async function encryptDouble(obf1Pass, obf2Pass, fileData){
+	async function encryptDouble(obf1000Pass, ctrPass, fileData){
 		// Obfuscation Step 1 Encrypt
-		const obf1Encrypted = await obf1Encrypt(fileData, obf1Pass);
+		const obf1000Encrypted = await obf1000Encrypt(fileData, obf1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const obf2Encrypted = await obf2Encrypt(obf1Encrypted, obf2Pass);
-		return obf2Encrypted;
+		const ctrEncrypted = await encCTR(obf1000Encrypted, ctrPass);
+		return ctrEncrypted;
 	}//encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
-	async function encryptTriple(obf1Pass, obf2Pass, opensslPass, cleartextData){
+	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
 		// Obfuscation Step 1 Encrypt
-		const obf1Encrypted = await obf1Encrypt(opensslEncrypted, obf1Pass);
+		const obf1000Encrypted = await obf1000Encrypt(opensslEncrypted, obf1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const obf2Encrypted = await obf2Encrypt(obf1Encrypted, obf2Pass);
-		return obf2Encrypted;
+		const ctrEncrypted = await encCTR(obf1000Encrypted, ctrPass);
+		return ctrEncrypted;
 	}//encryptTriple()
 
 	// Decrypt stack used in the case user chooses Command Line.
-	async function decryptDouble(obf1Pass, obf2Pass, encryptedData){
-		const obf2Decrypted = await obf2Decrypt(encryptedData, obf2Pass);
-		const obf1Decrypted = await obf1Decrypt(obf2Decrypted, obf1Pass);
-		return obf1Decrypted;
+	async function decryptDouble(obf1000Pass, ctrPass, encryptedData){
+		const ctrDecrypted = await decCTR(encryptedData, ctrPass);
+		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
+		return obf1000Decrypted;
 	}//decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
-	async function decryptTriple(obf1Pass, obf2Pass, opensslPass, encryptedData){
-		const obf2Decrypted = await obf2Decrypt(encryptedData, obf2Pass);
-		const obf1Decrypted = await obf1Decrypt(obf2Decrypted, obf1Pass);
-		const cleartext = await decOpenSSL(obf1Decrypted, opensslPass);
+	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
+		const ctrDecrypted = await decCTR(encryptedData, ctrPass);
+		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
+		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);
 		return cleartext;
 	}//decryptTriple()
 
 	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
 	// Inputs: plaintext.
 	// Output: hexadecimal.
-	async function computeFingerprint(codeword, obf1Pass, obf2Pass){
+	async function computeFingerprint(codeword, obf1000Pass, ctrPass){
 		// Convert to lowercase.
 		const codewordLower = codeword.toLowerCase();
 		// Take SHA-256 hash of codeword, obf1_pass, obf2_pass
 		const enc = new TextEncoder();
 		const codewordBuf = enc.encode(codewordLower);
-		const obf1PassBuff = enc.encode(obf1Pass);
-		const obf2PassBuff = enc.encode(obf2Pass);
+		const obf1000PassBuff = enc.encode(obf1000Pass);
+		const ctrPassBuff = enc.encode(ctrPass);
 		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
 		console.log("codewordHash:");
 		console.log(codewordHash);
 		const uint8 = new Uint8Array(codewordHash);
 		const cwh_b64 = uint8.toBase64();
 		console.log("base64 of codewordHash: " + cwh_b64);
-		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1PassBuff);
-		const obf2pHash = await crypto.subtle.digest('SHA-256', obf2PassBuff);
+		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1000PassBuff);
+		const obf2pHash = await crypto.subtle.digest('SHA-256', ctrPassBuff);
 		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
 		const codeword_and_obf1pHash = concatBuffer(codewordHash, obf1pHash)
 		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
@@ -5306,135 +5361,6 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 		return hexArrayBuffer;
 	}//hex2buf()
 
-
-	//////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////
-	// Testing AES-CTR Stream Cipher////////////////////////////
-	/////////////////////////////////////////
-	//////////////////////////////////////////////////////////
-
-	async function decCTR(ciphertext, password, digestAlgo='AES-CTR'){
-		console.log("Input length: " + ciphertext.length);
-		console.log(ciphertext);
-		// Derive salt using cleartext input. is 1000 chars long enough?
-		// Surely 1MB worth of intput should be enough randomness?
-		const encodedCiphertext = Uint8Array.fromBase64(ciphertext);
-		const encodedPassword = new TextEncoder().encode(password);
-		console.log("Input length bytes: " + encodedCiphertext.length);
-		//const salt = await crypto.subtle.digest('SHA-512', encodedCleartext);
-		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
-		console.log("salt: " + salt);
-
-		const keyMaterial = await window.crypto.subtle.importKey(
-			"raw",
-			encodedPassword,
-			"PBKDF2",
-			false,
-			["deriveBits", "deriveKey"],
-		);
-
-		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
-			{
-				name: "PBKDF2",
-				//name: key_derivation_algo,
-				salt,
-				iterations: 10000,
-				hash: 'SHA-256',
-				//hash: 'SHA-512',
-			},
-			keyMaterial,
-			384, // Size of output.
-		);
-
-		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
-		const keybytes = derivedKeyBuffer.slice(0, 32);
-		const ivbytes = derivedKeyBuffer.slice(32);
-		console.log("iv: " + ivbytes);
-
-		// Import the PBKDF2 derived key bits into a key object made specifically 
-		// for use with the aes-cbc 256 algorithm.
-		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		let key = await window.crypto.subtle.importKey(
-			'raw', 
-			keybytes, 
-			{
-				//name: 'AES-GCM', 
-				name: digestAlgo, 
-				length: 256
-			}, 
-			false, 
-			['decrypt']
-		);
-
-		const decryptedData = await window.crypto.subtle.decrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCiphertext);
-		const decrypted = new Uint8Array(decryptedData);
-		const decrypted64 = decrypted.toBase64();
-		console.log("Decrypted base64: " + decrypted64);
-		console.log("Decrypted output length: " + decrypted64.length);
-		return decrypted64;
-	}
-
-	// Minimal AES-GCM 
-	// No HTML structure, meant to be tested from console.
-	async function encCTR(cleartext, password, digestAlgo='AES-CTR'){
-		console.log("Input length: " + cleartext.length);
-		console.log(cleartext);
-		// Derive salt using cleartext input. is 1000 chars long enough?
-		// Surely 1MB worth of intput should be enough randomness?
-		const encodedPassword = new TextEncoder().encode(password);
-		const encodedCleartext = Uint8Array.fromBase64(cleartext);
-		console.log("Input length bytes: " + encodedCleartext.length);
-		//const salt = await crypto.subtle.digest('SHA-512', encodedCleartext);
-		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
-		console.log("salt: " + salt);
-
-		const keyMaterial = await window.crypto.subtle.importKey(
-			"raw",
-			encodedPassword,
-			"PBKDF2",
-			false,
-			["deriveBits", "deriveKey"],
-		);
-
-		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
-			{
-				name: "PBKDF2",
-				//name: key_derivation_algo,
-				salt,
-				iterations: 10000,
-				hash: 'SHA-256',
-			},
-			keyMaterial,
-			384, // Size of output.
-		);
-
-		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
-		const keybytes = derivedKeyBuffer.slice(0, 32);
-		const ivbytes = derivedKeyBuffer.slice(32);
-		console.log("iv: " + ivbytes);
-
-		// Import the PBKDF2 derived key bits into a key object made specifically 
-		// for use with the aes-cbc 256 algorithm.
-		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		let key = await window.crypto.subtle.importKey(
-			'raw', 
-			keybytes, 
-			{
-				//name: 'AES-GCM', 
-				name: digestAlgo, 
-				length: 256
-			}, 
-			false, 
-			['encrypt']
-		);
-
-        const encryptedData = await window.crypto.subtle.encrypt({ name: digestAlgo, counter: ivbytes, length: 64}, key, encodedCleartext);
-		const encrypted = new Uint8Array(encryptedData);
-		const encrypted64 = encrypted.toBase64();
-		console.log("Encrypted base64: " + encrypted64);
-		console.log("Encrypted output length: " + encrypted64.length);
-		return encrypted64;
-	}
 
 	// Gonna need this functionality in order to store to disk.
 	//
