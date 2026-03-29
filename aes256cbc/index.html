@@ -2763,6 +2763,63 @@ console.log(blob);
 		return dataWithCountBytesAndRandFiller;
 	}//addCountstring()
 
+	// Find set of bytes that compute to an exact value.
+	function find7ByteSetForValue(targetValue){
+		let computedValue;
+		let sevenByteUint8;
+		let numTries = 0;
+		do{
+			numTries++;
+			sevenByteUint8 = roll7Byte();
+			computedValue = eval7ByteValue(sevenByteUint8);
+			console.log("Find exact value. computedValue:" + computedValue + " number tries:" + numTries);
+		}while(computedValue != targetValue);
+		return sevenByteUint8;
+	}
+
+	// Find set of bytes that compute to a value in the input range.
+	function find7ByteSetInRange(targetMin, targetMax){
+		let computedValue;
+		let sevenByteUint8;
+		let numTries = 0;
+		do{
+			numTries++;
+			sevenByteUint8 = roll7Byte();
+			computedValue = eval7ByteValue(sevenByteUint8);
+			console.log("Find within range. computedValue: " + computedValue);
+		}while(computedValue < targetMin || computedValue > targetMax);
+		return sevenByteUint8;
+	}
+
+	// Generate 7 bytes with cryptographically strong random values.
+	function roll7Byte(){
+		return window.crypto.getRandomValues(new Uint8Array(7));
+	}
+
+	// Convert 7Byte array into mathematical expression then evaluate it.
+	function eval7ByteValue(sevenByteUint8){
+		// Start with empty expression.
+		let mathExpression = "";
+		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
+		for(let i=0; i < 7; i++){
+			if(i % 2 === 0){
+				// Even index bytes -->  numbers
+				mathExpression += sevenByteUint8[i];
+			}else{
+				// Odd index bytes --> symbols
+				if(sevenByteUint8[i] % 2 === 0){
+					// Even bytes convert to (+)
+					mathExpression += "+";
+				}else{
+					// Odd bytes convert to (-)
+					mathExpression += "-";
+				}
+			}
+		}
+		console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
+		return Math.abs(eval(mathExpression));
+	}
+
 	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	// Inputs: pass is plaintext, length is an integer 
 	// Output: binary byte array (Uint8Array).
