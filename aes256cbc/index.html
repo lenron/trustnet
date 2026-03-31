@@ -2661,11 +2661,8 @@ console.log(blob);
 		const obf1000PassBuff = enc.encode(obf1000Pass);
 		const ctrPassBuff = enc.encode(ctrPass);
 		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
-		console.log("codewordHash:");
-		console.log(codewordHash);
 		const uint8 = new Uint8Array(codewordHash);
 		const cwh_b64 = uint8.toBase64();
-		console.log("base64 of codewordHash: " + cwh_b64);
 		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1000PassBuff);
 		const obf2pHash = await crypto.subtle.digest('SHA-256', ctrPassBuff);
 		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
@@ -2673,14 +2670,8 @@ console.log(blob);
 		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
 		// SHA-256 hash the result.
 		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
-		console.log("Fingerprint Hash: " + fingerprintHash);
-		console.log(fingerprintHash);
 		const fingerprint = new Uint8Array(fingerprintHash);
 		const b64 = fingerprint.toBase64({ omitPadding: true });
-		console.log("Fingerprint as buffer: " + fingerprint);
-		console.log(fingerprint);
-		console.log("Fingerprint as base64: " + b64);
-		console.log("Fingerprint length: " + b64.length);
 		return b64;
 	}//computeFingerprint()
 
@@ -2741,6 +2732,12 @@ console.log(blob);
 			return 1; // Length Check Passed.
 		}
 	}//checkInputLength()
+
+	////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////
+	//				7Byte Functions
+	////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////
 
 	// Input: 
 	// Output: 
@@ -2822,7 +2819,6 @@ console.log(blob);
 		//console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
 		return Math.abs(eval(mathExpression));
 	}
-
 
 	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	// Inputs: pass is plaintext, length is an integer 
@@ -3676,7 +3672,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 
 			<!--------------------------Ask user for encrypted pointer password-----------------------!>
 			<div class="flow_pages" id="ask_for_dbase_pass" style="display:flex; ">
-				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH AN ENCRYPTED POINTER, PLEASE ENTER IT NOW.</h2>
+				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
 				<input autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="resetOfflineData(); showPage('offline_home')">NO PASSWORD</button>
