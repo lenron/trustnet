@@ -3405,7 +3405,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				<h2>ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');showPage('offlinestore_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
@@ -3655,7 +3655,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 			<!---------------------------Store Success-----------------------!>
 			<div class="flow_pages" id="offlinestore_success" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
-				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
+				<h2>&#10004; SECRET DATA SUCCESSFULLY ENCRYPTED AND STORED TO MEMORY. STILL NEEDS STORED TO DISK BY CLICKING BUTTON BELOW:</h2>
 				<div class="button_pair" id="" style="display:flex;">
 				</div>
 			</div>
@@ -3680,17 +3680,17 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 				</div>
 			</div>
 
+	</div> <!-------------------------------------------- Center HTML----------------------------------------------------!>
+	
+
 	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
-			<!--<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>--!>
-	<!--
-			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="makeNewOfflineIfNeeded();showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>
-			<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseFlow()">CREATE NEW OFFLINE DBASE</button>
-			<div style="display:flex">
-			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="downloadStandalone()">DOWNLOAD STANDALONE.HTML</button>
+		<div id="savetodisk_warning" style="background-color:yellow; display:none; flex-direction:column;">
+			<h2>NEW DATA HAS BEEN STORED TO MEMORY. IN ORDER TO SAVE TO DISK PLEASE CLICK THIS BUTTON TO SAVE CURRENTLY RUNNING HTML TO A FILE. THIS WILL ALLOW YOUR DATA TO PERSIST THROUGH REBOOTS.</h2>
+			<button id='' style="align-self:center;" onclick="saveToDisk(); showPage('offline_home')">SAVE DATA TO DISK</button>
 		</div>
-----------------!>
 	</div>
+</div>
 <!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 
 	<!-- Offline Database Data --!>
@@ -4250,6 +4250,8 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 		console.log("loadResponse: " + loadResponse);
 		// Report store outcome.
 		if(encryptedData === loadResponse){
+			// Data successfully stored to memory. Still needs saved to disk which must happen 'manually' by user.
+			setSaveToDiskReminder();
 			showPage('offlinestore_success');
 		}else{
 			// Doesn't look like server stored data properly, report fail.
@@ -4275,7 +4277,8 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 			if(inputId === 'offlineaccess_data_outputdisplay'){
 				showPage('offlineedit_success');
 			}else{
-				// Server successfully stored data, report success.
+				// Data successfully stored to memory. Still needs saved to disk which must happen 'manually' by user.
+				setSaveToDiskReminder();
 				showPage('offlinestore_success');
 			}
 		}else{
@@ -5438,12 +5441,22 @@ console.log(decryptedDecoded);
 		return hexArrayBuffer;
 	}//hex2buf()
 
+	function clearSaveToDiskReminder(){
+		document.getElementById("savetodisk_warning").style.display = "none";
+	}
+
+	function setSaveToDiskReminder(){
+		document.getElementById("savetodisk_warning").style.display = "flex";
+	}
 
 	// Gonna need this functionality in order to store to disk.
 	//
 	// Grab currently running HTML and save it to standalone.html
 	// This saves the offline dbase in addition to creating and downloading a standalone version that can be used offline.
-	function downloadStandalone(){
+	function saveToDisk(){
+		// Clear reminder flag first or it will be active in saved file.
+		clearSaveToDiskReminder();
+
 		// This line doesn't get applied with the innerHTML call below so add it manually.
 		let allhtml = "<!DOCTYPE HTML>";
 		// This will grab a copy of the currently running HTML.
