@@ -1054,22 +1054,6 @@
 		}
 	}
 
-	//////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////
-
-	// Show input for pointer password entry.
-	function typePointerPassword(){
-		// Hide buttons.
-		document.getElementById("yes_button").style.display = 'none';
-		document.getElementById("no_button").style.display = 'none';
-		// Show input.
-		document.getElementById("enc_pointer_password").style.display = 'inline';
-		// Show continue button.
-		document.getElementById("yes_password_button").style.display = 'inline';
-		document.getElementById("enc_pointer_password").focus();
-	}
-
 	// Use global variables so they can be accessed inside download standalone.html function.
 	let offlineDatabasePointer = '';
 	let offlineDatabaseEncPointer = '';
@@ -1092,7 +1076,7 @@
 		}else{
 			console.log("No Password Chosen for offline database creation.");
 			// Roll random data for pointer. 1 of our 1000 char entries for a encryptTriple'd.
-			offlineDatabaseEncPointer = fastGetRandData();
+			offlineDatabaseEncPointer = getRandData();
 			// Create and encrypt Offline Database.
 			const randomDatabase = getRandDatabase();
 			// Use a randomly generated 43 char password.
@@ -1109,7 +1093,7 @@
 		showPage('home');
 	}//createOfflineDBase()
 
-	function fastGetRandData(){
+	function getRandData(){
 		const randarray = window.crypto.getRandomValues(new Uint8Array(750));
 		return randarray.toBase64();
 	}
@@ -1245,8 +1229,7 @@
 
 		let result;
 		if(encryptedData !== "failed to load"){
-			//result = await storeOfflineDBase(fingerprint, encryptedData);
-			// Select encrypted or regular offline database.
+			// Select encrypted or not enc offline database.
 			if(offlineData['offlineDBasePass'] === undefined){
 				result = await storeOfflineDBase(fingerprint, encryptedData);
 			}else{
@@ -1307,7 +1290,6 @@
 	// Make sure input is exactly 1000 chars of base64 data.
 	function checkDataIsValid(data){
 		//console.log("checking data is valid: " + data);
-		//const regex = /^[a-zA-Z0-9\+\/\=]*$/;
 		const regex = /^[a-zA-Z0-9\+\/\=]{1000}$/;
 		if(regex.test(data)){
 			return 1;
@@ -1316,17 +1298,20 @@
 		}
 	}
 
+	// Use regex to search for a fingerprint location in an offline database.
 	function searchForFingerprint(fingerprint, offlineDatabase){
 		const regex = new RegExp(String.raw`${fingerprint}`, "g");
 		return offlineDatabase.search(regex);
 	}
 
+	// Fingerprint was found, only replace the data.
 	function replaceData(fingerprintLocation, encrypted_data, offlineDatabase){
 		const fp_offset = fingerprintLocation + 43;
 		const offset_end = fingerprintLocation + 1043;
 		return offlineDatabase.substring(0, fp_offset) + encrypted_data + offlineDatabase.substring(offset_end);
 	}
 
+	// Fingerprint was not found, replace both fingerprint and data.
 	function replaceFingerprintAndData(pointer, fingerprint, encrypted_data, offlineDatabase){
 		const pointer_offset = pointer * 1043;
 		const pointer_end = pointer_offset + 1043;
@@ -1375,6 +1360,7 @@
 				document.getElementById("full_offline_dbase_warning").style.display = "inline";
 			}
 		}
+
 		// Now save modified offline dbase back to html so it will persist when saving a standalone.html.
 		offlineDatabaseObj.innerHTML = replacement_offlineDatabase;
 		//Check Load, return success or failure.
@@ -1384,7 +1370,7 @@
 		}else{
 			return "fail";
 		}
-	}
+	}//storeOfflineDBase()
 
 	async function storeEncOfflineDBase(fingerprint, encrypted_data){
 		if(!checkFingerprintIsValid(fingerprint)){
@@ -1440,7 +1426,7 @@
 		}else{
 			return "fail";
 		}
-	}
+	}//storeEncOfflineDBase()
 
 	async function attemptLoadOfflineDBase(fingerprint){
 		// Load offline database.
@@ -1449,7 +1435,6 @@
 			offlineDatabase = document.getElementById("offline_dbase").innerHTML;
 		}else{
 			const encOfflineDatabase = document.getElementById("offline_dbase_enc").innerHTML;
-			console.log(encOfflineDatabase);
 			offlineDatabase  = await decCTR(encOfflineDatabase, offlineData['offlineDBasePass']);
 		}
 
@@ -1469,9 +1454,10 @@
 		}
 	}
 
+
 	// Delete record from offline dbase at fingerprint location.
 	// then decrement pointer if found.
-	function deleteSingleRecordOfflineDBase(fingerprint){
+	async function deleteRecordOfflineDBase(fingerprint){
 		// Check that fingerprint is valid.
 		if(!checkFingerprintIsValid(fingerprint)){
 			throw new Error('Attempt to DELETE single record in offline dbase failed! FINGERPRINT is invalid.');
@@ -1480,43 +1466,46 @@
 		}
 
 		// Load offline database.
-		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
+		let pointer;
+		let offlineDatabase;
+		if(offlineData['offlineDBasePass'] === undefined){
+			pointer = document.getElementById("offline_dbase_pointer").innerHTML;
+			offlineDatabase = document.getElementById("offline_dbase").innerHTML;
+		}else{
+			const encPointer = document.getElementById("offline_dbase_enc_pointer").innerHTML;
+			const encOfflineDatabase = document.getElementById("offline_dbase_enc").innerHTML;
+			pointer = await decryptTriple(offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], encPointer);
+			offlineDatabase  = await decCTR(encOfflineDatabase, offlineData['offlineDBasePass']);
+		}
 
 		// Find record in offline dbase if it exists.
-		const regex = new RegExp(String.raw`${fingerprint}`, "g");
-		console.log("regex used for deleteSingleRecordOfflineDBase: " + regex);
+		const fingerprintLocation = searchForFingerprint(fingerprint, offlineDatabase);
 
-		// -1 returned on miss.
-		const search_outcome = offline_dbase.search(regex);
-		console.log("regex search outcome for delete call: " + search_outcome);
-
-		// If the record exists, delete the fingerprint and data at search_outcome location.
-		if(search_outcome > -1){
-			console.log("found fingerprint in offline dbase");
-			// Remove all data from search_outcome to offset end, which should be the fingerprint and data of the found record.
-			const offset_end = search_outcome + 1043;
-			const replacement_offline_dbase = offline_dbase.substring(0, search_outcome) + offline_dbase.substring(offset_end);
-			// Now save modified offline dbase back to html.
-			document.getElementById("offline_dbase").innerHTML = replacement_offline_dbase;
-			// We've found and deleted the data, now decrement pointer.
-			console.log("pointer BEFORE delete: " + document.getElementById("offline_dbase_pointer").innerHTML);
-			let pointer = document.getElementById("offline_dbase_pointer").innerHTML;
-			// decrement pointer
+		// If the record exists, delete the fingerprint and data at fingerprintLocation location by storing randomly generated fingerprint/data data, decrementing pointer.
+		if(fingerprintLocation > -1){
+			const randFingerprint = getRandFingerprint();
+			const randData = getRandData();
+			const replacement_offlineDatabase = replaceFingerprintAndData(pointer, randFingerprint, randData, offlineDatabase);
 			pointer--;
-			// Check if offline database is no longer full.
 			if(pointer < 999){
-				// Offline Database is full. Inform user.
+				// Offline Database is no longer full.
 				document.getElementById("full_offline_dbase_warning").style.display = "none";
 			}
-			// Save pointer back to persistent storage.
-			document.getElementById("offline_dbase_pointer").innerHTML = pointer;
-			console.log("Decremented pointer AFTER delete: " + document.getElementById("offline_dbase_pointer").innerHTML);
+
+			if(offlineData['offlineDBasePass'] === undefined){
+				document.getElementById("offline_dbase_pointer").innerHTML = pointer;
+				document.getElementById("offline_dbase").innerHTML = replacement_offlineDatabase;
+			}else{
+				document.getElementById("offline_dbase_enc_pointer").innerHTML = await encryptTriple(offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], pointer);
+				document.getElementById("offline_dbase_enc").innerHTML = await encCTR(replacement_offlineDatabase, offlineData['offlineDBasePass']);
+			}
+
 			return "success";
 		}else{
 			// We didn't find it! return fail.
 			return "failed";
 		}
-	}
+	}//deleteRecordOfflineDBase()
 
 	//////////////////////////////////////////////////////////////
 	//			Passlock Functions							    //
@@ -1620,9 +1609,7 @@
 	// Extract, encrypt, and store data at inputId to global passlockedData Object.
 	async function extractInputData(inputId){
 		const keyword = extractKeyword(inputId);
-		//console.log("keyword: " + keyword);
 		const cleartextData = extractCleartextData(inputId);
-		//console.log("cleartextData: " + cleartextData);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
 		passlockedData[keyword] = await passlockEncrypt(cleartextData);
 	}
@@ -1632,10 +1619,6 @@
 		const keyword = extractKeyword(inputId);
 		const cleartextPass = extractCleartextData(inputId);
 		const decryptedPass = await passlockDecrypt(passlockedData[keyword]);
-		//const encryptedPassword = await passlockEncrypt(cleartextPass);
-		//console.log("cleartextPass: " + cleartextPass);
-		//console.log("decryptedPass: " + decryptedPass);
-		//if(passlockedData[keyword] === encryptedPassword){
 		if(decryptedPass === cleartextPass){
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
@@ -1712,8 +1695,6 @@
 		document.getElementById("delete_button").style.display = "none";
 		// Show single SAVE button
 		document.getElementById("save_button").style.display = "inline";
-
-		// Show them again on save? Or go to store success/fail?
 	}
 
 	async function getFpForAccess(){
@@ -1726,15 +1707,7 @@
 	async function attemptCMDAccess(){
 		const fingerprint = await getFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
-		// First try to load from offline dbase.
-		//let encryptedData = attemptLoadOfflineDBase(fingerprint);
-		//console.log("attempted load from offline dbase: " + encryptedData);
-		// Try load from server if that fails.
-		//if(encryptedData === 'miss'){
-			// serverLoad returns either undefined or encrypted data in string form.
-			const encryptedData = await serverLoad(fingerprint);
-		//}
-		//if(encryptedData === undefined || encryptedData === 'miss' || encryptedData === 'failed to load'){ // there appears to be a problem.
+		const encryptedData = await serverLoad(fingerprint);
 		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 			resetPasslock();
@@ -1753,13 +1726,8 @@
 
 			// bytes is Uint8Array
 			const bytes = base64ToBytes(decryptedData);
-console.log("bytes: ");
-console.log(bytes);
-console.log([bytes]);
 			// Produce file for user to decrypt.
 			let blob = new Blob([bytes]);
-console.log("blob:");
-console.log(blob);
 			let a = document.createElement('a');
 			a.href = window.URL.createObjectURL(blob);
 			a.download = 'yourfile.enc';
@@ -2780,7 +2748,8 @@ console.log(blob);
 		let numTries = 0;
 		do{
 			numTries++;
-			sevenByteUint8 = roll7Byte();
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
 			computedValue = eval7ByteValue(sevenByteUint8);
 		}while(computedValue != targetValue);
 		return sevenByteUint8;
@@ -2793,15 +2762,11 @@ console.log(blob);
 		let numTries = 0;
 		do{
 			numTries++;
-			sevenByteUint8 = roll7Byte();
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
 			computedValue = eval7ByteValue(sevenByteUint8);
 		}while(computedValue < targetMin || computedValue > targetMax);
 		return sevenByteUint8;
-	}
-
-	// Generate 7 bytes with cryptographically strong random values.
-	function roll7Byte(){
-		return window.crypto.getRandomValues(new Uint8Array(7));
 	}
 
 	// Convert 7Byte array into mathematical expression then evaluate it.
@@ -3338,7 +3303,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 						<h2>Are you sure you want to delete this data?</h2> 
 						<div class="button_pair" id="" style="display:flex">
 							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('offlineoverlay_delete_cmd')">KEEP DATA</button>
-							<button class="" id='' style="flex-grow:1" onclick="attemptDelete()">DELETE DATA</button>
+							<button class="" id='' style="flex-grow:1" onclick="attemptDeleteOffline()">DELETE DATA</button>
 						</div>
 					</div>
 				</div>
@@ -3943,6 +3908,17 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 		}
 	}
 
+	function getRandData(){
+		const randarray = window.crypto.getRandomValues(new Uint8Array(750));
+		return randarray.toBase64();
+	}
+
+	function getRandFingerprint(){
+		// 32 bytes is the output of SHA-256
+		const randarray = window.crypto.getRandomValues(new Uint8Array(32));
+		return randarray.toBase64({omitPadding: true});
+	}
+
 	//Generate random integers from 0 to 4,294,967,296.
 	function randInt(min, max){
 		//Number safety checks.
@@ -4148,7 +4124,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 
 	// Delete record from offline dbase at fingerprint location.
 	// then decrement pointer if found.
-	function deleteSingleRecordOfflineDBase(fingerprint){
+	async function deleteRecordOfflineDBase(fingerprint){
 		// Check that fingerprint is valid.
 		if(!checkFingerprintIsValid(fingerprint)){
 			throw new Error('Attempt to DELETE single record in offline dbase failed! FINGERPRINT is invalid.');
@@ -4157,43 +4133,46 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 		}
 
 		// Load offline database.
-		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
+		let pointer;
+		let offlineDatabase;
+		if(offlineData['offlineDBasePass'] === undefined){
+			pointer = document.getElementById("offline_dbase_pointer").innerHTML;
+			offlineDatabase = document.getElementById("offline_dbase").innerHTML;
+		}else{
+			const encPointer = document.getElementById("offline_dbase_enc_pointer").innerHTML;
+			const encOfflineDatabase = document.getElementById("offline_dbase_enc").innerHTML;
+			pointer = await decryptTriple(offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], encPointer);
+			offlineDatabase  = await decCTR(encOfflineDatabase, offlineData['offlineDBasePass']);
+		}
 
 		// Find record in offline dbase if it exists.
-		const regex = new RegExp(String.raw\`\${fingerprint}\`, "g");
-		console.log("regex used for deleteSingleRecordOfflineDBase: " + regex);
+		const fingerprintLocation = searchForFingerprint(fingerprint, offlineDatabase);
 
-		// -1 returned on miss.
-		const search_outcome = offline_dbase.search(regex);
-		console.log("regex search outcome for delete call: " + search_outcome);
-
-		// If the record exists, delete the fingerprint and data at search_outcome location.
-		if(search_outcome > -1){
-			console.log("found fingerprint in offline dbase");
-			// Remove all data from search_outcome to offset end, which should be the fingerprint and data of the found record.
-			const offset_end = search_outcome + 1043;
-			const replacement_offline_dbase = offline_dbase.substring(0, search_outcome) + offline_dbase.substring(offset_end);
-			// Now save modified offline dbase back to html.
-			document.getElementById("offline_dbase").innerHTML = replacement_offline_dbase;
-			// We've found and deleted the data, now decrement pointer.
-			console.log("pointer BEFORE delete: " + document.getElementById("offline_dbase_pointer").innerHTML);
-			let pointer = document.getElementById("offline_dbase_pointer").innerHTML;
-			// decrement pointer
+		// If the record exists, delete the fingerprint and data at fingerprintLocation location by storing randomly generated fingerprint/data data, decrementing pointer.
+		if(fingerprintLocation > -1){
+			const randFingerprint = getRandFingerprint();
+			const randData = getRandData();
+			const replacement_offlineDatabase = replaceFingerprintAndData(pointer, randFingerprint, randData, offlineDatabase);
 			pointer--;
-			// Check if offline database is no longer full.
 			if(pointer < 999){
-				// Offline Database is full. Inform user.
+				// Offline Database is no longer full.
 				document.getElementById("full_offline_dbase_warning").style.display = "none";
 			}
-			// Save pointer back to persistent storage.
-			document.getElementById("offline_dbase_pointer").innerHTML = pointer;
-			console.log("Decremented pointer AFTER delete: " + document.getElementById("offline_dbase_pointer").innerHTML);
+
+			if(offlineData['offlineDBasePass'] === undefined){
+				document.getElementById("offline_dbase_pointer").innerHTML = pointer;
+				document.getElementById("offline_dbase").innerHTML = replacement_offlineDatabase;
+			}else{
+				document.getElementById("offline_dbase_enc_pointer").innerHTML = await encryptTriple(offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], pointer);
+				document.getElementById("offline_dbase_enc").innerHTML = await encCTR(replacement_offlineDatabase, offlineData['offlineDBasePass']);
+			}
+
 			return "success";
 		}else{
 			// We didn't find it! return fail.
 			return "failed";
 		}
-	}
+	}//deleteRecordOfflineDBase()
 
 	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////
@@ -4390,8 +4369,7 @@ console.log("enc pointer: " + offlineDatabaseEncPointer);
 
 	async function attemptDeleteOffline(){
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
-		const deleteResponse = await deleteSingleRecordOfflineDBase(fingerprint);
-		//const deleteResponse = await serverDelete(fingerprint);
+		const deleteResponse = await deleteRecordOfflineDBase(fingerprint);
 		// Report delete outcome.
 		if(deleteResponse === "success"){
 			// Server successfully stored data, report success.
@@ -5341,7 +5319,8 @@ console.log(decryptedDecoded);
 		let numTries = 0;
 		do{
 			numTries++;
-			sevenByteUint8 = roll7Byte();
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
 			computedValue = eval7ByteValue(sevenByteUint8);
 		}while(computedValue != targetValue);
 		return sevenByteUint8;
@@ -5354,15 +5333,11 @@ console.log(decryptedDecoded);
 		let numTries = 0;
 		do{
 			numTries++;
-			sevenByteUint8 = roll7Byte();
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
 			computedValue = eval7ByteValue(sevenByteUint8);
 		}while(computedValue < targetMin || computedValue > targetMax);
 		return sevenByteUint8;
-	}
-
-	// Generate 7 bytes with cryptographically strong random values.
-	function roll7Byte(){
-		return window.crypto.getRandomValues(new Uint8Array(7));
 	}
 
 	// Convert 7Byte array into mathematical expression then evaluate it.
