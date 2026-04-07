@@ -1070,7 +1070,7 @@
 			offlineDatabaseEncPointer = await encryptTriple(offlineDBasePass, offlineDBasePass, offlineDBasePass, '0');
 			// Create and encrypt Offline Database.
 			const randomDatabase = getRandDatabase();
-			offlineDatabaseEnc = await encCTR(randomDatabase, offlineDBasePass);
+			offlineDatabaseEnc = await encryptAESCTR(randomDatabase, offlineDBasePass);
 			//const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, 'the pointer starts at: 0');
 			console.log("YES selected, tripleEncrypted pointer result: " + offlineDatabaseEncPointer);
 		}else{
@@ -1081,7 +1081,7 @@
 			const randomDatabase = getRandDatabase();
 			// Use a randomly generated 43 char password.
 			const randomFingerprint = getRandFingerprint();
-			offlineDatabaseEnc = await encCTR(randomDatabase, randomFingerprint);
+			offlineDatabaseEnc = await encryptAESCTR(randomDatabase, randomFingerprint);
 			console.log("NO selected, random data pointer result:" + offlineDatabaseEncPointer);
 		}
 		// Init random cleartext pointer.
@@ -2258,13 +2258,15 @@
 
 	// Default usage sets input to base64.
 	// Output always packed into base64.
-	async function encCTR(cleartext, password, inputType='base64'){
-		//console.log("encCTR called with inputType: " + inputType);
+	async function encryptAESCTR(cleartext, password, inputType='base64'){
+		//console.log("encryptAESCTR called with inputType: " + inputType);
 		let encodedCleartext;
 		if(inputType === 'base64'){// Default usage.
 			encodedCleartext = Uint8Array.fromBase64(cleartext);
-		}else{
+		}else if(inputType === 'utf8'){
 			encodedCleartext = new TextEncoder().encode(cleartext);
+		}else{
+			throw new Error("Invalid encryptAESCTR inputType parameter!");
 		}
 
 		const encodedPassword = new TextEncoder().encode(password);
@@ -2318,9 +2320,9 @@
 
 	// Default usage sets output to base64.
 	// Input always packed as base64.
-	async function decCTR(ciphertext, password, outputType='base64'){
-		//console.log("decCTR called with outputType: " + outputType);
-		const encodedCiphertext = Uint8Array.fromBase64(ciphertext);
+	async function decryptAESCTR(ciphertext, password, outputType='base64'){
+		//console.log("decryptAESCTR called with outputType: " + outputType);
+		const encodedCiphertextUint8 = Uint8Array.fromBase64(ciphertext);
 		const encodedPassword = new TextEncoder().encode(password);
 		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
 
@@ -2365,13 +2367,15 @@
 			['decrypt']
 		);
 
-		const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCiphertext);
+		const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCiphertextUint8);
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
 		if(outputType === 'base64'){
 			decryptedDecoded = decryptedUint8.toBase64();
-		}else{
+		}else if(outputType === 'utf8'){
 			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
+		}else{
+			throw new Error("Invalid decryptAESCTR outputType parameter!");
 		}
 		return decryptedDecoded;
 	}
@@ -2382,7 +2386,7 @@
 		// Obfuscation Step 1 Encrypt
 		const obf1000Encrypted = await obf1000Encrypt(fileData, obf1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		return ctrEncrypted;
 	}//encryptDouble()
 
@@ -2393,20 +2397,20 @@
 		// Obfuscation Step 1 Encrypt
 		const obf1000Encrypted = await obf1000Encrypt(opensslEncrypted, obf1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		return ctrEncrypted;
 	}//encryptTriple()
 
 	// Decrypt stack used in the case user chooses Command Line.
 	async function decryptDouble(obf1000Pass, ctrPass, encryptedData){
-		const ctrDecrypted = await decCTR(encryptedData, ctrPass);
+		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
 		return obf1000Decrypted;
 	}//decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
-		const ctrDecrypted = await decCTR(encryptedData, ctrPass);
+		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
 		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);
 		return cleartext;
@@ -2532,9 +2536,7 @@
 	function find7ByteSetForValue(targetValue){
 		let computedValue;
 		let sevenByteUint8;
-		let numTries = 0;
 		do{
-			numTries++;
 			// Roll 7 random bytes.
 			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
 			computedValue = eval7ByteValue(sevenByteUint8);
@@ -2546,9 +2548,7 @@
 	function find7ByteSetInRange(targetMin, targetMax){
 		let computedValue;
 		let sevenByteUint8;
-		let numTries = 0;
 		do{
-			numTries++;
 			// Roll 7 random bytes.
 			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
 			computedValue = eval7ByteValue(sevenByteUint8);
@@ -2661,7 +2661,7 @@
 	// Generates standalone html file from static code held in multiline string below:
 	function downloadStandalone(){
 		// standalone.html static code.
-		const standaloneCode = `
+		//const standaloneCode = `
 
 <!DOCTYPE HTML>
 <html>
@@ -3775,8 +3775,10 @@
 	}
 
 	// Selects either Unencrypted or Encrypted database pointer based on if user inputted an offline database password at the start of the Flow.
-	async function getOfflineDBasePointer(){
-		if(offlineData['offlineDBasePass'] === undefined){
+	async function getOfflineDBasePointer(offlineDatabaseType){
+		// To determine which database pointer to return, first check if user entered an Offline Database password.
+		//if(offlineData['offlineDBasePass'] === undefined){
+		if(offlineDatabaseType === 'unencrypted'){
 			return document.getElementById("offline_dbase_pointer").innerHTML;
 		}else{
 			const encPointer = document.getElementById("offline_dbase_enc_pointer").innerHTML;
@@ -3785,18 +3787,24 @@
 	}
 
 	// Returns either Unencrypted or Encrypted full offline database depending if user entered an offline database password.
-	async function getOfflineDBase(){
-		if(offlineData['offlineDBasePass'] === undefined){
+	async function getOfflineDBase(offlineDatabaseType){
+		// To determine which database pointer to return, first check if user entered an Offline Database password.
+		//if(offlineData['offlineDBasePass'] === undefined){
+		if(offlineDatabaseType === 'unencrypted'){
+			// User didn't enter password, return unencrypted as-is.
 			return document.getElementById("offline_dbase").innerHTML;
 		}else{
+			// We need to decrypt the encrypted offline database which is stored in the html element.
 			const encOfflineDatabase = document.getElementById("offline_dbase_enc").innerHTML;
-			return await decCTR(encOfflineDatabase, offlineData['offlineDBasePass']);
+			return await decryptAESCTR(encOfflineDatabase, offlineData['offlineDBasePass']);
 		}
 	}
 
 	// Saves pointer to memory-stored HTML.
-	async function setPointer(pointer){
-		if(offlineData['offlineDBasePass'] === undefined){
+	async function setOfflineDBasePointer(pointer, offlineDatabaseType){
+		// To determine which database pointer to return, first check if user entered an Offline Database password.
+		//if(offlineData['offlineDBasePass'] === undefined){
+		if(offlineDatabaseType === 'unencrypted'){
 			document.getElementById("offline_dbase_pointer").innerHTML = pointer;
 		}else{
 			document.getElementById("offline_dbase_enc_pointer").innerHTML = await encryptTriple(offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], pointer);
@@ -3804,16 +3812,17 @@
 	}
 
 	// Saves full database to its home in html memory.
-	async function setOfflineDBase(dbase){
-		if(offlineData['offlineDBasePass'] === undefined){
+	async function setOfflineDBase(dbase, offlineDatabaseType){
+		// To determine which database pointer to return, first check if user entered an Offline Database password.
+		//if(offlineData['offlineDBasePass'] === undefined){
+		if(offlineDatabaseType === 'unencrypted'){
 			document.getElementById("offline_dbase").innerHTML = dbase;
 		}else{
-			document.getElementById("offline_dbase_enc").innerHTML = await encCTR(dbase, offlineData['offlineDBasePass']);
+			document.getElementById("offline_dbase_enc").innerHTML = await encryptAESCTR(dbase, offlineData['offlineDBasePass']);
 		}
 	}
 
-	// Store single record to the offline database selected by if user enters offline database password or not.
-	async function storeOfflineDBase(fingerprint, encryptedData){
+	function checkFingerprintAndData(fingerprint, encryptedData){
 		if(!checkFingerprintIsValid(fingerprint)){
 			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.');
 		}else{
@@ -3824,10 +3833,25 @@
 		}else{
 			console.log("DATA IS VALID!");
 		}
+	}
 
+	function getOfflineDatabaseType(){
+		// To determine which database pointer to return, first check if user entered an Offline Database password.
+		if(offlineData['offlineDBasePass'] === undefined){
+			return "unencrypted";
+		}else{
+			return "encrypted";
+		}
+	} 
+
+	// Store single record to the offline database selected by if user enters offline database password or not.
+	async function storeOfflineDBase(fingerprint, encryptedData){
+		checkFingerprintAndData(fingerprint, encryptedData);
+
+		const offlineDatabaseType = getOfflineDatabaseType();
 		// Select either ENC or UNENC pointer, offline database depending if user entered ENC passowrd or chose No Password.
-		let pointer = await getOfflineDBasePointer();
-		let offlineDatabase = await getOfflineDBase();
+		let pointer = await getOfflineDBasePointer(offlineDatabaseType);
+		let offlineDatabase = await getOfflineDBase(offlineDatabaseType);
 		console.log("got pointer: " + pointer);
 		//console.log("got offlineDBase: " + offlineDatabase);
 
@@ -3862,8 +3886,8 @@
 		//console.log("setting offlineDBase: " + replacement_offlineDatabase);
 
 		// Save pointer and offline database to in-memory HTML. ENC or UNENC determined by if an offline database ENC password was entered at flow start.
-		await setPointer(pointer);
-		await setOfflineDBase(replacement_offlineDatabase);
+		await setOfflineDBasePointer(pointer, offlineDatabaseType);
+		await setOfflineDBase(replacement_offlineDatabase, offlineDatabaseType);
 		//Check Load, return success or failure.
 		const load_check_data = await attemptLoadOfflineDBase(fingerprint);
 		if(load_check_data === encryptedData){
@@ -3877,8 +3901,8 @@
 	// Try to load record at fingerprint. Works on both ENC and UNENC offline databases.
 	async function attemptLoadOfflineDBase(fingerprint){
 		console.log("Attempting Load. fingerprint: " + fingerprint);
-		// Load offline database.
-		let offlineDatabase = await getOfflineDBase();
+		const offlineDatabaseType = getOfflineDatabaseType();
+		let offlineDatabase = await getOfflineDBase(offlineDatabaseType);
 		//console.log("load dbase: " + offlineDatabase);
 		// Search for fingerprint in offline dbase using regex.
 		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
@@ -3908,9 +3932,10 @@
 			console.log("Delete Offline Database record attempt: FINGERPRINT IS VALID!");
 		}
 
+		const offlineDatabaseType = getOfflineDatabaseType();
 		// Select either ENC or UNENC pointer, offline database depending on if user entered ENC passowrd.
-		let pointer = await getOfflineDBasePointer();
-		let offlineDatabase = await getOfflineDBase();
+		let pointer = await getOfflineDBasePointer(offlineDatabaseType);
+		let offlineDatabase = await getOfflineDBase(offlineDatabaseType);
 
 		console.log("before delete pointer: " + pointer);
 		//console.log("before delete database: " + offlineDatabase);
@@ -3933,8 +3958,8 @@
 			//console.log("after delete database: " + replacement_offlineDatabase);
 			console.log("Offline Database length AFTER Delete: " + offlineDatabase.length);
 
-			await setPointer(pointer);
-			await setOfflineDBase(replacement_offlineDatabase);
+			await setOfflineDBasePointer(pointer, offlineDatabaseType);
+			await setOfflineDBase(replacement_offlineDatabase, offlineDatabaseType);
 
 			// Check that it was in fact deleted. Fingerprint should be random chars now and therefore miss on a correctly exexuted delete.
 			const outcome = await attemptLoadOfflineDBase(fingerprint);
@@ -4805,13 +4830,15 @@
 
 	// Default usage sets input to base64.
 	// Output always packed into base64.
-	async function encCTR(cleartext, password, inputType='base64'){
-		//console.log("encCTR called with inputType: " + inputType);
+	async function encryptAESCTR(cleartext, password, inputType='base64'){
+		//console.log("encryptAESCTR called with inputType: " + inputType);
 		let encodedCleartext;
 		if(inputType === 'base64'){// Default usage.
 			encodedCleartext = Uint8Array.fromBase64(cleartext);
-		}else{
+		}else if(inputType === 'utf8'){
 			encodedCleartext = new TextEncoder().encode(cleartext);
+		}else{
+			throw new Error("Invalid encryptAESCTR inputType parameter!");
 		}
 
 		const encodedPassword = new TextEncoder().encode(password);
@@ -4860,14 +4887,14 @@
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
 		const encrypted64 = encryptedUint8.toBase64();
 		return encrypted64;
-	}//encCTR()
+	}//encryptAESCTR()
 
 	// Default usage sets output to base64.
 	// Input always packed as base64.
-	async function decCTR(ciphertext, password, outputType='base64'){
-		//console.log("decCTR called with outputType: " + outputType);
-		//console.log("decCTR ciphertext: " + ciphertext + " password: " + password);
-		const encodedCiphertext = Uint8Array.fromBase64(ciphertext);
+	async function decryptAESCTR(ciphertext, password, outputType='base64'){
+		//console.log("decryptAESCTR called with outputType: " + outputType);
+		//console.log("decryptAESCTR ciphertext: " + ciphertext + " password: " + password);
+		const encodedCiphertextUint8 = Uint8Array.fromBase64(ciphertext);
 		const encodedPassword = new TextEncoder().encode(password);
 		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
 
@@ -4911,23 +4938,25 @@
 			['decrypt']
 		);
 
-		const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCiphertext);
+		const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCiphertextUint8);
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
 		if(outputType === 'base64'){
 			decryptedDecoded = decryptedUint8.toBase64();
-		}else{
+		}else if(outputType === 'utf8'){
 			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
+		}else{
+			throw new Error("Invalid decryptAESCTR outputType parameter!");
 		}
 		return decryptedDecoded;
-	}//decCTR
+	}//decryptAESCTR
 
 	// Encrypt stack used in the case user chooses command line.
 	async function encryptDouble(obf1000Pass, ctrPass, fileData){
 		// Obfuscation Step 1 Encrypt
 		const obf1000Encrypted = await obf1000Encrypt(fileData, obf1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		return ctrEncrypted;
 	}//encryptDouble()
 
@@ -4938,20 +4967,20 @@
 		// Obfuscation Step 1 Encrypt
 		const obf1000Encrypted = await obf1000Encrypt(opensslEncrypted, obf1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		return ctrEncrypted;
 	}//encryptTriple()
 
 	// Decrypt stack used in the case user chooses Command Line.
 	async function decryptDouble(obf1000Pass, ctrPass, encryptedData){
-		const ctrDecrypted = await decCTR(encryptedData, ctrPass);
+		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
 		return obf1000Decrypted;
 	}//decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
-		const ctrDecrypted = await decCTR(encryptedData, ctrPass);
+		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
 		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);
 		return cleartext;
@@ -5071,9 +5100,7 @@
 	function find7ByteSetForValue(targetValue){
 		let computedValue;
 		let sevenByteUint8;
-		let numTries = 0;
 		do{
-			numTries++;
 			// Roll 7 random bytes.
 			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
 			computedValue = eval7ByteValue(sevenByteUint8);
@@ -5085,9 +5112,7 @@
 	function find7ByteSetInRange(targetMin, targetMax){
 		let computedValue;
 		let sevenByteUint8;
-		let numTries = 0;
 		do{
-			numTries++;
 			// Roll 7 random bytes.
 			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
 			computedValue = eval7ByteValue(sevenByteUint8);
