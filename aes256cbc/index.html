@@ -1075,7 +1075,7 @@
 			console.log("YES selected, tripleEncrypted pointer result: " + offlineDatabaseEncPointer);
 		}else{
 			console.log("No Password Chosen for offline database creation.");
-			// Roll random data for pointer. 1 of our 1000 char entries for a encryptTriple'd.
+			// Roll random data for pointer. 1 of our 1024 char entries for a encryptTriple'd.
 			offlineDatabaseEncPointer = getRandData();
 			// Create and encrypt Offline Database.
 			const randomDatabase = getRandDatabase();
@@ -1112,7 +1112,7 @@
 		let randData;
 		let randData64;
 
-		for(let i=0; i < 1000; i++){
+		for(let i=0; i < 1024; i++){
 			// Roll random fingerprint.
 			randFingerprint = getRandFingerprint();
 			// Roll 7Byte set.
@@ -1134,16 +1134,14 @@
 
 	function getRandDatabase(){
 		// const randData = window.crypto.getRandomValues(new Uint8Array(782250)); // TOO BIG, max size 65536
-		// 1000(43 + 1000)
-		// 1043000 base64 chars * 3/4 = number bytes needed to generate = 782250
-		// 782250 / 65536 = 11.936...
-		// 782250 - (11 * 65536) = 61354
-		// So, need 11 full and 1 almost full.
-		//for(i = 782250; i > 0 
+		// 1000(43 + 1024)
+		// 1067000 *3/4 = 788250
 		let randDatabase = '';
 		let randBytes;
 		let randSet64 = '';
-		let bytesStillNeeded = 782250;
+		//let bytesStillNeeded = 782250;
+		//let bytesStillNeeded = 788250;
+		let bytesStillNeeded = 800250;
 		let totalBytesUsed = 0;
 		do{
 			if(bytesStillNeeded > 65536){
@@ -1283,10 +1281,10 @@
 		}
 	}
 
-	// Make sure input is exactly 1000 chars of base64 data.
+	// Make sure input is exactly 1024 chars of base64 data.
 	function checkDataIsValid(data){
 		//console.log("checking data is valid: " + data);
-		const regex = /^[a-zA-Z0-9\+\/\=]{1000}$/;
+		const regex = /^[a-zA-Z0-9\+\/\=]{1024}$/;
 		if(regex.test(data)){
 			return 1;
 		}else{
@@ -1495,7 +1493,7 @@
 		const fingerprint = await getFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
 		const encryptedData = await serverLoad(fingerprint);
-		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
+		if(encryptedData.length !== 1024 || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 			resetPasslock();
 		}else{
@@ -1529,7 +1527,7 @@
 		const fingerprint = await getFpForAccess();
 		const encryptedData = await serverLoad(fingerprint);
 		// Report outcome of Access attempt.
-		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
+		if(encryptedData.length !== 1024 || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 			resetPasslock();
 		}else{
@@ -1739,7 +1737,7 @@
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Load responseObj.data: " + responseObj.data);
-			if( responseObj.data.length === 1000 && checkBase64Chars(responseObj.data)){ // Data looks good.
+			if(responseObj.data.length === 1024 && checkBase64Chars(responseObj.data)){ // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.data;
 			}else{
@@ -1932,9 +1930,11 @@
 		let fp_end;
 		let data_end;
 		for(let i=0; i < offline_dbase_pointer; i++ ){
-			fp_start = i * 1043;
+			//fp_start = i * 1043;
+			fp_start = i * 1067;
 			fp_end = fp_start + 43;
-			data_end = fp_end + 1000;
+			//data_end = fp_end + 1000;
+			data_end = fp_end + 1024;
 
 			offline_dbase_json_flat += '{"fingerprint":"' + offline_dbase.substring(fp_start, fp_end) + '",';
 			offline_dbase_json_flat += '"data":"' + offline_dbase.substring(fp_end, data_end) + '"},';
@@ -2270,7 +2270,10 @@
 		}
 
 		const encodedPassword = new TextEncoder().encode(password);
-		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
+		// Compute a random salt that will be prepended to the data for use with decrypt.
+		// This increases our data record size to 1024.
+		//const salt = await window.crypto.getRandomValues(new Uint8Array(8));
+		const salt = await window.crypto.getRandomValues(new Uint8Array(18));
 
 		const keyMaterial = await window.crypto.subtle.importKey(
 			"raw",
@@ -2314,17 +2317,25 @@
 
         const encryptedBuffer = await window.crypto.subtle.encrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCleartext);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
-		const encrypted64 = encryptedUint8.toBase64();
+		const saltAndData = concatBuffer(salt, encryptedUint8);
+		const encrypted64 = saltAndData.toBase64();
+		console.log("ciphertext:" + encrypted64 + " password:" + password);
+		console.log("length:" + encrypted64.length);
+		console.log("salt: " + salt);
 		return encrypted64;
-	}
+	}//encryptAESCTR()
 
 	// Default usage sets output to base64.
 	// Input always packed as base64.
 	async function decryptAESCTR(ciphertext, password, outputType='base64'){
 		//console.log("decryptAESCTR called with outputType: " + outputType);
-		const encodedCiphertextUint8 = Uint8Array.fromBase64(ciphertext);
+		const saltAndCiphertext = Uint8Array.fromBase64(ciphertext);
 		const encodedPassword = new TextEncoder().encode(password);
-		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
+		// Extract salt from front of ciphertext.
+		const salt = new Uint8Array(saltAndCiphertext.slice(0,18));
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertext.slice(18));
+		console.log("ciphertext:" + ciphertext + " password:" + password);
+		console.log("salt: " + salt);
 
 		const keyMaterial = await window.crypto.subtle.importKey(
 			"raw",
@@ -2378,7 +2389,7 @@
 			throw new Error("Invalid decryptAESCTR outputType parameter!");
 		}
 		return decryptedDecoded;
-	}
+	}//decryptAESCTR()
 
 
 	// Encrypt stack used in the case user chooses command line.
@@ -2661,7 +2672,7 @@
 	// Generates standalone html file from static code held in multiline string below:
 	function downloadStandalone(){
 		// standalone.html static code.
-		//const standaloneCode = `
+		const standaloneCode = `
 
 <!DOCTYPE HTML>
 <html>
@@ -3743,10 +3754,10 @@
 		}
 	}
 
-	// Make sure input is exactly 1000 chars of base64 data.
+	// Make sure input is exactly 1024 chars of base64 data.
 	function checkDataIsValid(data){
 		console.log("checking data is valid: " + data);
-		const regex = /^[a-zA-Z0-9\\+\\/\\=]{1000}$/;
+		const regex = /^[a-zA-Z0-9\\+\\/\\=]{1024}$/;
 		if(regex.test(data)){
 			return 1;
 		}else{
@@ -3763,14 +3774,14 @@
 	// Replaces one 1000-char data record at the given fingerprintStartIndex location. 
 	function replaceData(fingerprintStartIndex, encryptedData, offlineDatabase){
 		const fingerprintEndIndex = fingerprintStartIndex + 43;
-		const dataEndIndex = fingerprintStartIndex + 1043;
+		const dataEndIndex = fingerprintStartIndex + 1067;
 		return offlineDatabase.substring(0, fingerprintEndIndex) + encryptedData + offlineDatabase.substring(dataEndIndex);
 	}
 
 	// Replaces the randomly generated 'dummy' chars with 43 length fingerprint and 1000 length encrypted data.
 	function replaceFingerprintAndData(pointer, fingerprint, encryptedData, offlineDatabase){
-		const pointer_offset = pointer * 1043;
-		const pointer_end = pointer_offset + 1043;
+		const pointer_offset = pointer * 1067;
+		const pointer_end = pointer_offset + 1067;
 		return offlineDatabase.substring(0, pointer_offset) + fingerprint + encryptedData + offlineDatabase.substring(pointer_end);
 	}
 
@@ -3918,7 +3929,7 @@
 	// Retrieve one 1000-char data record from an offline database. 
 	function getRecordOfflineDBase(fingerprintStartIndex, offlineDatabase){
 			const fingerprintEndIndex = fingerprintStartIndex + 43;
-			const dataEndIndex = fingerprintEndIndex + 1000;
+			const dataEndIndex = fingerprintEndIndex + 1024;
 			// Get the data between fingerprintEndIndex and dataEndIndex.
 			return offlineDatabase.substring(fingerprintEndIndex, dataEndIndex);
 	}
@@ -4112,7 +4123,7 @@
 		// Add additional parameter?
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 
-		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
+		if(encryptedData.length !== 1024 || !checkBase64Chars(encryptedData)){
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_file');
@@ -4141,7 +4152,7 @@
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
-		if(encryptedData.length !== 1000 || !checkBase64Chars(encryptedData)){
+		if(encryptedData.length !== 1024 || !checkBase64Chars(encryptedData)){
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_cleartext');
@@ -4308,11 +4319,10 @@
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Load responseObj.data: " + responseObj.data);
-			if( responseObj.data.length === 1000 && checkBase64Chars(responseObj.data)){ // Data looks good.
+			if(responseObj.data.length === 1024 && checkBase64Chars(responseObj.data)){ // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.data;
 			}else{
-				//throw Error("serverLoad: Load length NOT 1000 chars! Something went wrong!?");
 				console.log("serverLoad: Failed to load encrypted data.");
 				return "failed to load";
 			}
@@ -4501,9 +4511,11 @@
 		let fp_end;
 		let data_end;
 		for(let i=0; i < offline_dbase_pointer; i++ ){
-			fp_start = i * 1043;
+			//fp_start = i * 1043;
+			fp_start = i * 1067;
 			fp_end = fp_start + 43;
-			data_end = fp_end + 1000;
+			//data_end = fp_end + 1000;
+			data_end = fp_end + 1024;
 
 			offline_dbase_json_flat += '{"fingerprint":"' + offline_dbase.substring(fp_start, fp_end) + '",';
 			offline_dbase_json_flat += '"data":"' + offline_dbase.substring(fp_end, data_end) + '"},';
@@ -4842,7 +4854,9 @@
 		}
 
 		const encodedPassword = new TextEncoder().encode(password);
-		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
+		// Compute a random salt that will be prepended to the data for use with decrypt.
+		// This increases our data record size to 1024.
+		const salt = await window.crypto.getRandomValues(new Uint8Array(18));
 
 		const keyMaterial = await window.crypto.subtle.importKey(
 			"raw",
@@ -4885,7 +4899,8 @@
 
         const encryptedBuffer = await window.crypto.subtle.encrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCleartext);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
-		const encrypted64 = encryptedUint8.toBase64();
+		const saltAndData = concatBuffer(salt, encryptedUint8);
+		const encrypted64 = saltAndData.toBase64();
 		return encrypted64;
 	}//encryptAESCTR()
 
@@ -4893,10 +4908,13 @@
 	// Input always packed as base64.
 	async function decryptAESCTR(ciphertext, password, outputType='base64'){
 		//console.log("decryptAESCTR called with outputType: " + outputType);
-		//console.log("decryptAESCTR ciphertext: " + ciphertext + " password: " + password);
-		const encodedCiphertextUint8 = Uint8Array.fromBase64(ciphertext);
+		const saltAndCiphertext = Uint8Array.fromBase64(ciphertext);
 		const encodedPassword = new TextEncoder().encode(password);
-		const salt = await crypto.subtle.digest('SHA-256', encodedPassword);
+		// Extract salt from front of ciphertext.
+		const salt = new Uint8Array(saltAndCiphertext.slice(0,18));
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertext.slice(18));
+		console.log("ciphertext:" + ciphertext + " password:" + password);
+		console.log("salt: " + salt);
 
 		const keyMaterial = await window.crypto.subtle.importKey(
 			"raw",
@@ -4949,7 +4967,7 @@
 			throw new Error("Invalid decryptAESCTR outputType parameter!");
 		}
 		return decryptedDecoded;
-	}//decryptAESCTR
+	}//decryptAESCTR()
 
 	// Encrypt stack used in the case user chooses command line.
 	async function encryptDouble(obf1000Pass, ctrPass, fileData){
@@ -5025,7 +5043,7 @@
 	// Input: input is a string.
 	// Output: Returns false if non-base58 characters are detected.
 	function checkBase64Chars(input){
-		// From the first char(^) to the last($), match exactly 1000 base64 chars.
+		// From the first char(^) to the last($), match base64 chars.
 		const regex = /^[a-zA-Z0-9\\+\\/\\=]*$/;
 		if( regex.test(input) ){
 			// Return true/valid

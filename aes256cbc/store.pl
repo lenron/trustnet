@@ -32,7 +32,7 @@ if ($q->param){
 	my $t = localtime;
 	my $time = $t->strftime();
 	# If log exists, we know q->param caught data.
-	my $filename = './log.txt';
+	my $filename = './logs/log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "\n\nSTORE\n";
@@ -53,10 +53,8 @@ if ($q->param){
 	print $fh "data: $data\n";
 
 	# Return fail if data isn't in the proper form.
-	# Match exactly 64 hex chars, (i)gnoring case.      Match exactly 1000 base58 chars.
-	#if( !($fingerprint =~ /^[0-9a-f]{64}$/i) || !($data =~ /^[1-9A-HJ-NP-Za-km-z]{1000}$/) ){
-	#if( !($fingerprint =~ /^[0-9a-f]{64}$/i) || !($data =~ /^[a-zA-Z0-9\+\/]{1000}$/) ){
-	if( !($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/) || !($data =~ /^[a-zA-Z0-9\+\/]{1000}$/) ){
+	# Match exactly 64 hex chars, (i)gnoring case.      Match exactly 1008 base58 chars.
+	if( !($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/) || !($data =~ /^[a-zA-Z0-9\+\/]{1024}$/) ){
 		print $q->header();
 		# qq{} is a standin for double quotes, used here so we can pass the dub quote char to print.
 		print qq{{"response":"0"}};
