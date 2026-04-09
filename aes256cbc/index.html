@@ -2075,7 +2075,7 @@
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
-		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
 		const ivbytes = derivedKeyBuffer.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
@@ -2083,7 +2083,7 @@
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
-			keybytes, 
+			keyBytes, 
 			{
 				//name: 'AES-CBC', 
 				name: digest_algorithm,
@@ -2140,7 +2140,7 @@
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
-		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
 		const ivbytes = derivedKeyBuffer.slice(32);
 
 		// Extract the encrypted phrase (data) from OpenSSL input
@@ -2151,7 +2151,7 @@
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
-			keybytes, 
+			keyBytes, 
 			{
 				//name: 'AES-CBC', 
 				name: digest_algorithm, 
@@ -2256,132 +2256,155 @@
 		return saltedData64;
 	}//obf1000Decrypt
 
-	// Default usage sets input to base64.
+	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 	// Output always packed into base64.
 	async function encryptAESCTR(cleartext, password, inputType='base64'){
-		//console.log("encryptAESCTR called with inputType: " + inputType);
-		let encodedCleartext;
+		console.log("encryptAESCTR called with inputType: " + inputType);
+		let cleartextUint8;
+		// Select input processing type based on function input parameter.
 		if(inputType === 'base64'){// Default usage.
-			encodedCleartext = Uint8Array.fromBase64(cleartext);
+			cleartextUint8 = Uint8Array.fromBase64(cleartext);
 		}else if(inputType === 'utf8'){
-			encodedCleartext = new TextEncoder().encode(cleartext);
+			cleartextUint8 = new TextEncoder().encode(cleartext);
 		}else{
 			throw new Error("Invalid encryptAESCTR inputType parameter!");
 		}
-
-		const encodedPassword = new TextEncoder().encode(password);
+		// Convert password text into Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
 		// Compute a random salt that will be prepended to the data for use with decrypt.
-		// This increases our data record size to 1024.
-		//const salt = await window.crypto.getRandomValues(new Uint8Array(8));
-		const salt = await window.crypto.getRandomValues(new Uint8Array(18));
+		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
+		// This increases our Triple Encrypted Data Record size to 1024.
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
 
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		const keyMaterial = await window.crypto.subtle.importKey(
-			"raw",
-			encodedPassword,
-			"PBKDF2",
-			false,
-			["deriveBits", "deriveKey"],
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// allowed use of this key.
 		);
 
-		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
-			{
-				name: "PBKDF2",
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
 				//name: key_derivation_algo,
-				salt,
-				iterations: 10000,
-				hash: 'SHA-256',
+				salt: randSalt,					// salt (at least 16 bytes for security;
+				iterations: 10000,				// strength
+				hash: 'SHA-256',				// 
 			},
-			keyMaterial,
-			384, // Size of output.
+			keyMaterial,						//
+			384,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
-
-		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
-		const keybytes = derivedKeyBuffer.slice(0, 32);
-		const ivbytes = derivedKeyBuffer.slice(32);
-		console.log("iv: " + ivbytes);
+		// Split the derived bits into key and iv for the encrypt call.
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		// Take first 256 bits derived from deriveBits above for the cryptoKey.
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// Here using same derivation method as for AES-CBC's Initialization Vector.
+		// AES-CTR uses a nonce and a counter block which seems to do a similar thing to an IV. 
+		// Take the rest of the bits (should be 128)
+		// First half of these 128 bits are the nonce.
+		// Second half is the counter.
+		// Slice everything 32 index and after.
+		// |-keyBytes-| |-nonce-| |-counter-| (where X is 32 bit chunk)
+		//  xxxx xxxx 	xx 			xx
+		//
+		// AES-CTR parameters described here:
+		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
+		const nonceAndCounterBytes = derivedKeyBuffer.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
-			'raw', 
-			keybytes, 
-			{
-				//name: 'AES-GCM', 
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
 				name: 'AES-CTR', 
-				length: 256
+				length: 256			// Length in bits of input.
 			}, 
-			false, 
-			['encrypt']
+			false,					// extractable boolean 
+			['encrypt']				// keyUsages
 		);
 
-        const encryptedBuffer = await window.crypto.subtle.encrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCleartext);
+		// MDN syntax: encrypt(algorithm, key, data)
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
-		const saltAndData = concatBuffer(salt, encryptedUint8);
+		// Wrap salt with encoded data so it can be used in the decrypt.
+		const saltAndData = concatBuffer(randSalt, encryptedUint8);
+		// This function outputs base64.
 		const encrypted64 = saltAndData.toBase64();
 		console.log("ciphertext:" + encrypted64 + " password:" + password);
 		console.log("length:" + encrypted64.length);
-		console.log("salt: " + salt);
+		console.log("salt: " + randSalt);
 		return encrypted64;
 	}//encryptAESCTR()
 
 	// Default usage sets output to base64.
 	// Input always packed as base64.
-	async function decryptAESCTR(ciphertext, password, outputType='base64'){
-		//console.log("decryptAESCTR called with outputType: " + outputType);
-		const saltAndCiphertext = Uint8Array.fromBase64(ciphertext);
-		const encodedPassword = new TextEncoder().encode(password);
-		// Extract salt from front of ciphertext.
-		const salt = new Uint8Array(saltAndCiphertext.slice(0,18));
-		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertext.slice(18));
-		console.log("ciphertext:" + ciphertext + " password:" + password);
-		console.log("salt: " + salt);
+	async function decryptAESCTR(saltAndCiphertext, password, outputType='base64'){
+		// Convert password into bytes.
+		const passwordUint8 = new TextEncoder().encode(password);
+		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
+		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
+		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		// Cast array returned by slice into a (usable) Uint8Array.
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
 
+		console.log("decryptAESCTR called with outputType: " + outputType);
+		console.log("ciphertext:" + saltAndCiphertext + " password:" + password);
+		console.log("salt: " + packedSalt);
+
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		const keyMaterial = await window.crypto.subtle.importKey(
-			"raw",
-			encodedPassword,
-			"PBKDF2",
-			false,
-			["deriveBits", "deriveKey"],
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// allowed use of this key.
 		);
 
-		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
-			{
-				name: "PBKDF2",
-				//name: key_derivation_algo,
-				salt,
-				iterations: 10000,
-				hash: 'SHA-256',
-				//hash: 'SHA-512',
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				salt: packedSalt,					// salt (at least 16 bytes for security;
+				iterations: 10000,				// strength
+				hash: 'SHA-256',				// 
 			},
-			keyMaterial,
-			384, // Size of output.
+			keyMaterial,						//
+			384,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 
-		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
-		const keybytes = derivedKeyBuffer.slice(0, 32);
-		const ivbytes = derivedKeyBuffer.slice(32);
-		console.log("iv: " + ivbytes);
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// 64 nonce bytes with 64 counter block bytes.
+		const nonceAndCounterBytes = derivedKeyBuffer.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
-			'raw', 
-			keybytes, 
-			{
-				//name: 'AES-GCM', 
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
 				name: 'AES-CTR', 
-				length: 256
+				length: 256			// Length in bits of input.
 			}, 
-			false, 
-			['decrypt']
+			false,					// extractable boolean 
+			['decrypt']				// keyUsages
 		);
 
-		const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCiphertextUint8);
+		// MDN syntax: decrypt(algorithm, key, data)
+		const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
-		if(outputType === 'base64'){
+		// Select output data type based on function parameter.
+		if(outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 			decryptedDecoded = decryptedUint8.toBase64();
 		}else if(outputType === 'utf8'){
 			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
@@ -2390,7 +2413,6 @@
 		}
 		return decryptedDecoded;
 	}//decryptAESCTR()
-
 
 	// Encrypt stack used in the case user chooses command line.
 	async function encryptDouble(obf1000Pass, ctrPass, fileData){
@@ -2630,7 +2652,7 @@
 	// bytesToBase64(new TextEncoder().encode("a Ā 𐀀 文 🦄")); // "YSDEgCDwkICAIOaWhyDwn6aE"
 	// new TextDecoder().decode(base64ToBytes("YSDEgCDwkICAIOaWhyDwn6aE")); // "a Ā 𐀀 文 🦄"
 	// Input: base 64 string.
-	// Output: Uint8Array which is a binary byte array.
+	// Output: Uint9Array which is a binary byte array.
 	function base64ToBytes(base64) {
 		const binString = atob(base64);
 		return Uint8Array.from(binString, (m) => m.codePointAt(0));
@@ -4654,7 +4676,7 @@
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
-		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
 		const ivbytes = derivedKeyBuffer.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
@@ -4662,7 +4684,7 @@
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
-			keybytes, 
+			keyBytes, 
 			{
 				//name: 'AES-CBC', 
 				name: digest_algorithm,
@@ -4722,7 +4744,7 @@
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
-		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
 		const ivbytes = derivedKeyBuffer.slice(32);
 
 		// Extract the encrypted phrase (data) from OpenSSL input
@@ -4733,7 +4755,7 @@
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
-			keybytes, 
+			keyBytes, 
 			{
 				//name: 'AES-CBC', 
 				name: digest_algorithm, 
@@ -4844,29 +4866,29 @@
 	// Output always packed into base64.
 	async function encryptAESCTR(cleartext, password, inputType='base64'){
 		//console.log("encryptAESCTR called with inputType: " + inputType);
-		let encodedCleartext;
+		let cleartextUint8;
 		if(inputType === 'base64'){// Default usage.
-			encodedCleartext = Uint8Array.fromBase64(cleartext);
+			cleartextUint8 = Uint8Array.fromBase64(cleartext);
 		}else if(inputType === 'utf8'){
-			encodedCleartext = new TextEncoder().encode(cleartext);
+			cleartextUint8 = new TextEncoder().encode(cleartext);
 		}else{
 			throw new Error("Invalid encryptAESCTR inputType parameter!");
 		}
 
-		const encodedPassword = new TextEncoder().encode(password);
+		const passwordUint8 = new TextEncoder().encode(password);
 		// Compute a random salt that will be prepended to the data for use with decrypt.
 		// This increases our data record size to 1024.
 		const salt = await window.crypto.getRandomValues(new Uint8Array(18));
 
 		const keyMaterial = await window.crypto.subtle.importKey(
 			"raw",
-			encodedPassword,
+			passwordUint8,
 			"PBKDF2",
 			false,
 			["deriveBits", "deriveKey"],
 		);
 
-		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
 			{
 				name: "PBKDF2",
 				//name: key_derivation_algo,
@@ -4878,8 +4900,8 @@
 			384, // Size of output.
 		);
 
-		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
-		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
 		const ivbytes = derivedKeyBuffer.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
@@ -4887,7 +4909,7 @@
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
-			keybytes, 
+			keyBytes, 
 			{
 				//name: 'AES-GCM', 
 				name: 'AES-CTR', 
@@ -4897,7 +4919,7 @@
 			['encrypt']
 		);
 
-        const encryptedBuffer = await window.crypto.subtle.encrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, encodedCleartext);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({ name: 'AES-CTR', counter: ivbytes, length: 64}, key, cleartextUint8);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
 		const saltAndData = concatBuffer(salt, encryptedUint8);
 		const encrypted64 = saltAndData.toBase64();
@@ -4908,23 +4930,23 @@
 	// Input always packed as base64.
 	async function decryptAESCTR(ciphertext, password, outputType='base64'){
 		//console.log("decryptAESCTR called with outputType: " + outputType);
-		const saltAndCiphertext = Uint8Array.fromBase64(ciphertext);
-		const encodedPassword = new TextEncoder().encode(password);
+		const saltAndCiphertextBytes = Uint8Array.fromBase64(ciphertext);
+		const passwordUint8 = new TextEncoder().encode(password);
 		// Extract salt from front of ciphertext.
-		const salt = new Uint8Array(saltAndCiphertext.slice(0,18));
-		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertext.slice(18));
+		const salt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
 		console.log("ciphertext:" + ciphertext + " password:" + password);
 		console.log("salt: " + salt);
 
 		const keyMaterial = await window.crypto.subtle.importKey(
 			"raw",
-			encodedPassword,
+			passwordUint8,
 			"PBKDF2",
 			false,
 			["deriveBits", "deriveKey"],
 		);
 
-		const pbkdf2GeneratedBits = await window.crypto.subtle.deriveBits(
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
 			{
 				name: "PBKDF2",
 				//name: key_derivation_algo,
@@ -4937,8 +4959,8 @@
 			384, // Size of output.
 		);
 
-		const derivedKeyBuffer = new Uint8Array(pbkdf2GeneratedBits);
-		const keybytes = derivedKeyBuffer.slice(0, 32);
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
 		const ivbytes = derivedKeyBuffer.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
@@ -4946,7 +4968,7 @@
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
-			keybytes, 
+			keyBytes, 
 			{
 				//name: 'AES-GCM', 
 				name: 'AES-CTR', 
