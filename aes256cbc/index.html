@@ -1132,35 +1132,25 @@
 	}
 */
 
+	//Generate the random bytes composing our database.
 	function getRandDatabase(){
-		// const randData = window.crypto.getRandomValues(new Uint8Array(782250)); // TOO BIG, max size 65536
-		// 1000(43 + 1024)
-		// 1067000 *3/4 = 788250
-		let randDatabase = '';
-		let randBytes;
-		let randSet64 = '';
-		//let bytesStillNeeded = 782250;
-		//let bytesStillNeeded = 788250;
-		let bytesStillNeeded = 800250;
-		let totalBytesUsed = 0;
+		// Each record has 43 base64 chars for fingerprint and 1024 chars for the data.
+		// There are 1000 records, so 1000*(1024+43) = 1,067,000 base64 chars.
+		// So we need 1067000 base64 chars * (3 raw bytes/4 base 64 chars) = 800250 raw bytes from subtle crypto.
+
+		let randBytes = new Uint8Array(0);			// random raw bytes that will be converted to base64 database
+		let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
 		do{
 			if(bytesStillNeeded > 65536){
-				randBytes = window.crypto.getRandomValues(new Uint8Array(65536));
-				bytesStillNeeded -= 65536;
-				totalBytesUsed += 65536;
+				randBytes = concatBuffer(randBytes, window.crypto.getRandomValues(new Uint8Array(65536)));
+				bytesStillNeeded -= 65536; // 65,536 is the max size of a Uint8Array that getRandomValues can fill.
 			}else{
-				randBytes = window.crypto.getRandomValues(new Uint8Array(bytesStillNeeded));
-				totalBytesUsed += bytesStillNeeded;
-				bytesStillNeeded -= bytesStillNeeded;
+				randBytes = concatBuffer(randBytes, window.crypto.getRandomValues(new Uint8Array(bytesStillNeeded)));
+				bytesStillNeeded -= bytesStillNeeded;  //bytesStillNeeded is zero now.
 			}
-			//console.log("bytesStillNeeded: " + bytesStillNeeded);
-
-			randSet64 = randBytes.toBase64({omitPadding: true});
-			randDatabase += randSet64;
-
 		}while(bytesStillNeeded > 0);
-		console.log("randomly produced database length: " + randDatabase.length);
-		return randDatabase;
+		//Now that we've generated all 800250 random raw bytes, convert them to 1,067,000 base64 characters.
+		return randBytes.toBase64();
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -2694,7 +2684,7 @@
 	// Generates standalone html file from static code held in multiline string below:
 	function downloadStandalone(){
 		// standalone.html static code.
-		//const standaloneCode = `
+		const standaloneCode = `
 
 <!DOCTYPE HTML>
 <html>
