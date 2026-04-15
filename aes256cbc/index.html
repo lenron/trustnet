@@ -822,15 +822,12 @@
 	</div>
 <!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 </body>
-<!----------------------------------JAVASCRIPT-------------------------------------!>
-<!----------------------------------JAVASCRIPT-------------------------------------!>
-<!----------------------------------JAVASCRIPT-------------------------------------!>
 <script>
 	//////////////////////////////////////////////////////////////
 	//		Global Flags & Page Load Function					//
 	//////////////////////////////////////////////////////////////
 
-	// Single Record:
+	// Single Record (TOTAL_RECORD_LENGTH):
 	//        43	       1024
 	// |--fingerprint--||--Data--|
 
@@ -843,13 +840,10 @@
 	const CMDINPUT_LENGTH_LIMIT = 544;
 	const TRUE = 1;
 	const FALSE = 0;
-
-	// Global flags. 
-	let upload_flag = 'false';
-	let download_flag = 'false';
-	// Base 64 character map.
+	// Base 64 character map. Char location (index) is what makes this a base64 map.
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	// Automatically run this function when page loads.
+
+	// Automatically run this function on page load.
 	window.onload = async function() {
 		// Initial server online check.
 		await updateOnlineStatus();
@@ -881,36 +875,40 @@
 	//		UI & flowwalker Handler Functions					//
 	//////////////////////////////////////////////////////////////
 
+	// Change text colors when editing record.
 	function showEnabledColors(){
 		document.getElementById('access_data_outputdisplay').disabled = false;
 		document.getElementById('access_data_outputdisplay').style.color = '#54c597'; // Our 'normal' green.
 		document.getElementById('access_data_outputdisplay').style.backgroundColor = '#272727'; // Normal background
-	}
+	}// showEnabledColors()
 
+	// Change text colors when editing is disabled.
 	function showDisabledColors(){
 		document.getElementById('access_data_outputdisplay').disabled = true;
 		document.getElementById('access_data_outputdisplay').style.color = 'gray';
 		//document.getElementById('access_data_outputdisplay').style.backgroundColor = '#434343';
-	}
+	}// showDisabledColors()
 
-	// Show Overlay
+	// Show overlay where user can DELETE record.
 	function deleteCheckShow(targetId){
 		//console.log("deleteCheck SHOW hit. targetId: " + targetId);
 		document.getElementById(targetId).style.display = "flex";
-	}
+	}// deleteCheckShow()
+
 	// Hide Overlay
 	function deleteCheckHide(targetId){
 		//console.log("deleteCheck HIDE hit. targetId: " + targetId);
 		document.getElementById(targetId).style.display = "none";
-	}
+	}// deleteCheckHide()
 
+	// Warning shown on 'password check' part of flow if second time user enters password doesn't match first.
 	function showPassWarnings(){
 		// Show all password warnings.
 		pass_check_elements = document.getElementsByClassName('pass_check_warning');
 		for (let i = 0; i < pass_check_elements.length; i++) {
 			pass_check_elements[i].style.display = "inline";
 		}
-	}
+	}// showPassWarnings()
 
 	function hidePassWarnings(){
 		// Show all password warnings.
@@ -918,9 +916,10 @@
 		for (let i = 0; i < pass_check_elements.length; i++) {
 			pass_check_elements[i].style.display = "none";
 		}
-	}
+	}// hidePassWarnings()
 
-	// Catch Enter.
+	// Detect when user presses 'Enter' on their keyboard.
+	// Then on current page click button if it contains class 'activatable_by_enter'
 	window.addEventListener("keydown", function(event){
 		if(event.key === "Enter"){
 			// If focused element is an input, enter clicks the button with activatable_by_enter.
@@ -939,7 +938,7 @@
 				// Focused element isn't an Input, do nothng I guess?
 			}
 		}
-	});
+	});// Listener for Enter
 
 	function securityReset(){
 		// Reset Browser Access edit buttons.
@@ -968,7 +967,7 @@
 		// Reset delete overlay
 		deleteCheckHide('overlay_delete_cmd');
 		deleteCheckHide('overlay_delete_browser');
-	}
+	}// securityReset()
 
 	// Keep track of the page we're on. Start on home page.
 	let currentPage = 'home';
@@ -1011,7 +1010,7 @@
 				document.getElementById(buttonObj.id).focus();
 			}
 		}
-	}
+	}// showPage()
 
 	// Catch File Ingest
 	// listener is placed inline of the html
@@ -1049,13 +1048,12 @@
 		console.log("File input contents: " + document.getElementById('store_upload_input').value);
 		document.getElementById('store_upload_input').value = null;
 		console.log("File input contents: " + document.getElementById('store_upload_input').value);
-	}
+	}// catchUpload()
 
 	// Called on change of text area, checks length of that text area and shows warning if input data too long.
 	function checkTextInputLength(input_id){
-		//let input = document.getElementById("store_data").value;
 		let input = document.getElementById(input_id).value;
-		if( checkInputLength(input) ){
+		if(checkInputLength(input)){
 			// Length OK, turn off warning
 			document.getElementById("text_input_warning").style.display = "none";
 			// display button
@@ -1066,17 +1064,18 @@
 			// remove button
 			document.getElementById("text_input_continue").style.display = "none";
 		}
-	}
+	}// checkTextInputLength()
 
-	// Use global variables so they can be accessed inside download standalone.html function.
-	let offlineDatabasePointer = '';
-	let offlineDatabaseEncPointer = '';
-	let offlineDatabase = '';
-	let offlineDatabaseEnc = '';
-
+	// Create Encrypted and Unencrypted offline database stack if 1000 records worth of dummy base64 data.
+	// Also create record location pointers for those databases to function.
 	async function createOfflineDBase(chosenAnswer){
+		let offlineDatabase = '';
+		let offlineDatabasePointer = '';
+		let offlineDatabaseEnc = '';
+		let offlineDatabaseEncPointer = '';
+		// User can chose a password for the encrypted offline database.
 		if(chosenAnswer === 'yes'){
-			// Extract Input value.
+			// User entered a password to encrypt the offline database with.
 			const offlineDBasePass = document.getElementById('offlineDBasePass_input').value;
 			document.getElementById("offlineDBasePass_input").value = "";
 			console.log("Using offlineDBasePass to encrypt Offline Database: " + offlineDBasePass);
@@ -1088,6 +1087,7 @@
 			//const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, 'the pointer starts at: 0');
 			console.log("YES selected, tripleEncrypted pointer result: " + offlineDatabaseEncPointer);
 		}else{
+			// User chose no password. Fill Encrypted offline database with dummy data.
 			console.log("No Password Chosen for offline database creation.");
 			// Roll random data for pointer. 1 of our 1024 char entries for a encryptTriple'd.
 			offlineDatabaseEncPointer = getRandData();
@@ -1103,20 +1103,20 @@
 		// Roll random data for both databases.
 		offlineDatabase = getRandDatabase();
 		// Download offline database now that everything is ready.
-		downloadStandalone();
+		downloadStandalone(offlineDatabase, offlineDatabasePointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
 		showPage('home');
-	}//createOfflineDBase()
+	}// createOfflineDBase()
 
 	function getRandData(){
 		const randarray = window.crypto.getRandomValues(new Uint8Array(750));
 		return randarray.toBase64();
-	}
+	}// getRandData()
 
 	function getRandFingerprint(){
 		// 32 bytes is the output of SHA-256
 		const randarray = window.crypto.getRandomValues(new Uint8Array(32));
 		return randarray.toBase64({omitPadding: true});
-	}
+	}// getRandFingerprint()
 
 /*
 	function getRandDatabase(){
@@ -1165,7 +1165,7 @@
 		}while(bytesStillNeeded > 0);
 		//Now that we've generated all 800250 random raw bytes, convert them to 1,067,000 base64 characters.
 		return randBytes.toBase64();
-	}
+	}// getRandDatabase()
 
 	//////////////////////////////////////////////////////////////
 	//				Offline Database Functions					//
@@ -1176,14 +1176,14 @@
 		showPage("create_new_offline_dbase_div");
 		// New code to handle this needed:
 
-	}
+	}// createNewOfflineDBaseFlow()
 
 	// Delete the entire offline dbase.
 	function deleteOfflineDBase(){
 		console.log("DELETING offline dbase...");
 		document.getElementById("offline_dbase_pointer").innerHTML = "";
 		document.getElementById("offline_dbase").innerHTML = "";
-	}
+	}// deleteOfflineDBase()
 
 	// Leave the Create New Offline Database page and KEEP the new offline dbase.
 	function doneNewOfflineDBase(){
@@ -1191,7 +1191,7 @@
 		document.getElementById("create_dbase_button").style.display = "none";
 		document.getElementById("init_offdbase_statuslabel").style.display = "none";
 		showPage("home");
-	}
+	}// doneNewOfflineDBase()
 
 	// Leave the Create New Offline Database page and DELETE the new offline dbase.
 	function cancelNewOfflineDBase(){
@@ -1201,13 +1201,13 @@
 		// hide create button while dbase exists
 		//document.getElementById("create_dbase_button").style.display = "none";
 		showPage("home");
-	}
+	}// cancelNewOfflineDBase()
 
 	// Transform Cancel button into Done button. This function called once there is valid data in the offline dbase.
 	function hideCancelShowDone(){
 		document.getElementById("new_offline_dbase_cancel_button").style.display = "none";
 		document.getElementById("new_offline_dbase_completed_button").style.display = "inline";
-	}
+	}// hideCancelShowDone()
 
 	// Handles Create New Offline DBase UI while user is adding records.
 	// Takes the inputted passwords/codeword and queries the server for existing records in an attempt to add them to the offline dbase.
@@ -1244,7 +1244,7 @@
 			document.getElementById("init_offdbase_statuslabel").innerHTML = "FAILED TO ADD DATA TO OFFLINE DATABASE";
 			document.getElementById("init_offdbase_statuslabel").style.display = "flex";
 		}
-	}
+	}// accessDataForOfflineDBaseCreation()
 
 	//Generate random integers from 0 to 4,294,967,296.
 	function randInt(min, max){
@@ -1272,29 +1272,28 @@
 			randnum = window.crypto.getRandomValues(randarray);
 		}while(randnum < min || randnum > max);
 		return randnum[0];
-	}
+	}// randInt()
 
-	// Check if a fingerprint looks valid.
+	// Returns TRUE if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint){
-		// false if any non-hex chars or not 64 long.
+		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
 		const regex = new RegExp(`^[A-Za-z0-9+/]{${FINGERPRINT_LENGTH}}$`);
 		if(regex.test(fingerprint)){
 			return TRUE;
 		}else{
 			return FALSE;
 		}
-	}
+	}// checkFingerprintIsValid()
 
-	// Make sure input is exactly 1024 chars of base64 data.
+	// Returns TRUE if input has precisely DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
-		//console.log("checking data is valid: " + data);
 		const regex = new RegExp(`^[A-Za-z0-9+/]{${DATA_LENGTH}}$`);
 		if(regex.test(data)){
 			return TRUE;
 		}else{
 			return FALSE;
 		}
-	}
+	}// checkDataIsValid()
 
 	//////////////////////////////////////////////////////////////
 	//			Passlock Functions							    //
@@ -1319,7 +1318,7 @@
 			await serverDeletePasslock(browserId);
 			browserId = null;
 		}
-	}
+	}// resetPasslock()
 
 	// Return passlock for encrypt/decrypt functions if not timed out.
 	// Only works on getting existing passlock that hasn't timed out.
@@ -1339,7 +1338,7 @@
 			// Looks good.
 			return passlock;
 		}
-	}
+	}// getPasslock()
 
 	// Generate a browser_id, passlock and save to server as a key-value pair.
 	async function generatePasslock(){
@@ -1350,7 +1349,7 @@
 		// If handling error inside function, don't need 'await' here?
 		serverSetPasslock(browserId, passlock);
 		return passlock;
-	}
+	}// generatePasslock()
 
 	// Resets any old data.
 	// Generates a new passlock for encrypting user cleartext passwords and data.
@@ -1379,21 +1378,21 @@
 		const cleartextData = extractCleartextData(inputId);
 		// OpenSSL encrypt user data and store in global Object. 
 		passlockedData[keyword] = await encOpenSSL(cleartextData, passlock);
-	}
+	}// initPasslockFlow()
 
 	// Use regex to extract keyword from input ID.
 	function extractKeyword(inputId){
 		const regex = new RegExp(/^\w+_(?<keyword>\w+)_\w+$/);
 		const match = regex.exec(inputId);
 		return match.groups.keyword;
-	}
+	}// extractKeyword()
 
 	//Function that extracts user password from html and deletes it from the html source.
 	function extractCleartextData(inputId){
 		const cleartextData = document.getElementById(inputId).value;
 		document.getElementById(inputId).value = ""; //delete password from html
 		return cleartextData;
-	}
+	}// extractCleartextData()
 
 	// Extract, encrypt, and store data at inputId to global passlockedData Object.
 	async function extractInputData(inputId){
@@ -1401,7 +1400,7 @@
 		const cleartextData = extractCleartextData(inputId);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
 		passlockedData[keyword] = await passlockEncrypt(cleartextData);
-	}
+	}// extractInputData()
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
 	async function checkPasslock(inputId, nextPageId){
@@ -1417,20 +1416,20 @@
 			throw Error("Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
 		}
-	}
+	}// checkPasslock()
 
 	// Use previously generated passlock to encrypt input.
 	async function passlockEncrypt(cleartextPassword){
 		const passlock = await getPasslock();
 		const encryptedPassword = await encOpenSSL(cleartextPassword, passlock);
 		return encryptedPassword;
-	}
+	}// passlockEncrypt()
 
 	async function passlockDecrypt(encryptedData){
 		const passlock = await getPasslock();
 		const cleartextData = await decOpenSSL(encryptedData, passlock);
 		return cleartextData;
-	}
+	}// passlockDecrypt()
 
 	// Decrypt passlocked password set and return cleartext set.
 	async function passlockDecryptSet(){
@@ -1442,7 +1441,7 @@
 		console.log("Cleartext Set: ");
 		console.log(cleartextSet);
 		return cleartextSet;
-	}
+	}// passlockDecryptSet()
 
 	async function getFpAndDataForStore(){
 		// Get cleartext passwords for encryption.
@@ -1457,21 +1456,20 @@
 			fingerprintAndData['data'] = await encryptDouble(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['data']);
 		}
 		return fingerprintAndData;
-	}
+	}// getFpAndDataForStore()
 
 	async function attemptCMDStore(){
 		const fingerprintAndData = await getFpAndDataForStore();
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
-	}
+	}// attemptCMDStore()
 
 	// storeDataToServer() can be used for both Store Flows because the fail/pass outcome is the same for both Browser and CMD.
 	async function attemptBrowserStore(inputId){
-		
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprintAndData = await getFpAndDataForStore();
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], inputId);
-	}
+	}// attemptBrowserStore()
 
 	async function editData(){
 		document.getElementById('access_data_outputdisplay').disabled = false;
@@ -1484,14 +1482,14 @@
 		document.getElementById("delete_button").style.display = "none";
 		// Show single SAVE button
 		document.getElementById("save_button").style.display = "inline";
-	}
+	}// editData()
 
 	async function getFpForAccess(){
 		// Get cleartext passwords for encryption.
 		const cleartextSet = await passlockDecryptSet();
 		const fingerprint = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1000Pass'], cleartextSet['ctrPass']);
 		return fingerprint;
-	}
+	}// getFpForAccess()
 
 	async function attemptCMDAccess(){
 		const fingerprint = await getFpForAccess();
@@ -1506,7 +1504,7 @@
 			holdFpForDelete(fingerprint);
 			decryptAndDownloadFile(encryptedData);
 		}
-	}
+	}// attemptCMDAccess()
 
 	async function decryptAndDownloadFile(encryptedData){
 		// Get set of decrypted user passwords.
@@ -1523,7 +1521,7 @@
 			a.click();
 		// Delete passlock for secruity.
 		await resetPasslock();
-	}
+	}// decryptAndDownloadFile()
 
 	async function attemptBrowserAccess(inputId){
 		// Encrypt and save OpenSSL password to passlockedData object.
@@ -1540,29 +1538,27 @@
 			holdFpForDelete(fingerprint);
 			await decryptAndShowCleartext(encryptedData);
 		}
-	}
+	}// attemptBrowserAccess()
 
 	function getStoredFp(){
 		const fingerprint = document.getElementById("fingerprint_holder").value;
 		// Clear fingerprint held for delete. Always do this?
 		document.getElementById("fingerprint_holder").value = '';
 		return fingerprint;
-	}
+	}// getStoredFp()
 
 	function holdFpForDelete(fingerprint){
 		// Set fingerprint holder to fingerprint.
 		document.getElementById("fingerprint_holder").value = fingerprint;
 		console.log("fingerprint now held in HTML: " + document.getElementById("fingerprint_holder").value);
-	}
+	}// holdFpForDelete()
 
 	async function decryptAndShowCleartext(encryptedData){
 		const cleartextSet = await passlockDecryptSet();
 		const decryptedData  = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
 		// Reveal cleartext to user.
 		document.getElementById("access_data_outputdisplay").value = decryptedData;
-		// Delete passlock for secruity.
-		//await resetPasslock();
-	}
+	}// decryptAndShowCleartext()
 
 	// Main Delete Function Handler
 	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
@@ -1580,7 +1576,7 @@
 			// Doesn't look like server stored data properly, report fail.
 			showPage('delete_failed');
 		}
-	}//attemptDelete()
+	}// attemptDelete()
 
 	// Return either pass or fail to show outcome of store, pass or fail to user.
 	// Legacy code probably needs full rewrite.
@@ -1605,7 +1601,7 @@
 			showPage('store_failed');
 		}
 		await resetPasslock();
-	}//storeDataToServer()
+	}// storeDataToServer()
 
 
 	//////////////////////////////////////////////////////////////
@@ -1616,13 +1612,13 @@
 	function unsetUpdateFlag(){
 		console.log("Clearing pending Burst Store update flag.");
 		document.getElementById("offline_dbase_update_flag").innerHTML = "";
-	}
+	}// unsetUpdateFlag()
 
 	// If burst store fails because we're offline, set flag to try burst store next time we check.
 	function setUpdateFlag(){
 		console.log("Setting pending Burst Store update flag.");
 		document.getElementById("offline_dbase_update_flag").innerHTML = "pending";
-	}
+	}// setUpdateFlag()
 
 	// Check for pending offline dbase store and try to execute it.
 	async function checkForPendingStoreAndExecute(){
@@ -1649,7 +1645,7 @@
 				setUpdateFlag();
 			}
 		}
-	}
+	}// checkForPendingStoreAndExecute()
 
 	// Check if we're online or not and inform user.
 	async function updateOnlineStatus(){
@@ -1664,7 +1660,7 @@
 		}else{
 			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
 		}
-	}
+	}// updateOnlineStatus()
 
 	// Check if we're online 
 	async function checkOnline(){
@@ -1691,7 +1687,7 @@
 			console.log("HTTP error. Status: " + fetchResponseObject.status);
 			return "offline";
 		}
-	}
+	}// checkOnline()
 
 	// We need to set the origin differently depending if we're a standalone file or not.
 	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
@@ -1710,7 +1706,7 @@
 			server_origin = '/obf/';
 		}
 		return server_origin;
-	}
+	}// getServerOrigin()
 
 	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
 	// This type of URI used instead of a direct link to the file for security.
@@ -1753,7 +1749,7 @@
 		} catch (error) { // Catch rejected promise.
 			console.error(error.message);
 		}
-	}//serverLoad()
+	}// serverLoad()
 
 	// Stores data to fingerprint location.
 	// Returns "success" or "error".
@@ -1795,7 +1791,7 @@
 		}catch(error){ // Catch rejected promise.
 			console.error(error.message);
 		}
-	}//serverStore()
+	}// serverStore()
 
 	// Runs after Store or Access call completes as a security measure to ensure user passlocks exist only as long as necessary.
 	async function serverDeletePasslock(passedBrowserId) {
@@ -1839,7 +1835,7 @@
 		} catch (error) { // Catch rejected promise.
 			console.error(error.message);
 		}
-	}//serverDeletePasslock()
+	}// serverDeletePasslock()
 
 	async function serverSetPasslock(browser_id, passlock) {
 		let SERVER_URL = getServerOrigin();
@@ -1879,9 +1875,9 @@
 		} catch (error) { // Catch rejected promise.
 			console.error(error.message);
 		}
-	}//serverSetPasslock()
+	}// serverSetPasslock()
 
-	// needs update.
+	// 
 	async function serverGetPasslock(browserId){
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exegetpasslock;';
@@ -1920,7 +1916,7 @@
 		} catch (error) { // Catch rejected promise.
 			console.error(error.message);
 		}
-	}//serverGetPasslock()
+	}// serverGetPasslock()
 
 	// Create a json string containing every record in the offline dbase from 0 to pointer.
 	function convertOfflineDBaseToJSONString(){
@@ -1946,7 +1942,7 @@
 		offline_dbase_json_flat += ']}';
 
 		return offline_dbase_json_flat;
-	}
+	}// convertOfflineDBaseToJSONString()
 
 	// Inputs: none but pulls data from offline dbase object.
 	// Output: sends a json string representation of the offline dbase 
@@ -1984,7 +1980,7 @@
 			}
 		}
 		return;
-	}//sendOfflineDBaseToServer()
+	}// sendOfflineDBaseToServer()
 
 	// Endpoint /obf/exedelete will attempt to delete.
 	// Input: fingerprint is hexadecimal.
@@ -2026,7 +2022,7 @@
 		}catch(error){ // Catch rejected promise.
 			console.error(error.message);
 		}
-	}//serverDelete()
+	}// serverDelete()
 
 
 	//////////////////////////////////////////////////////////////
@@ -2106,7 +2102,7 @@
 		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
 		const encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
 		return encrypted_output_buf.toBase64();
-	}//encOpenSSL()
+	}// encOpenSSL()
 
 	// Our implementation of OpenSSL's decrypt function.
 	// Inputs: ciphertext64 is base64. pass is plaintext.
@@ -2170,7 +2166,7 @@
 		// Pop single newline added in enc (openssl emulation).
 		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
 		return decrypted_string;
-	}//decOpenSSL()
+	}// decOpenSSL()
 
 	// Process plaintext password into a Key Object usable by subtlecrypto functions.
 	// Input: Plaintext password.
@@ -2185,7 +2181,7 @@
 			false,
 			["deriveBits", "deriveKey"],
 		);
-	}//getKeyMaterial()
+	}// getKeyMaterial()
 
 	// Encrypting function that prepends a countstring, then runs an XOR on the byte arrrays of the input data and password,
 	// and finally converts the result to a specific length output of 1000 base 64 character string.
@@ -2215,7 +2211,7 @@
 		// toBase64() works on Uint8Arrays
 		xorResult = new Uint8Array(xorResult);
 		return xorResult.toBase64();
-	}//obf1000Encrypt()
+	}// obf1000Encrypt()
 
 	// obf1000Decrypt() is the inverse function of obf1000Encrypt().
 	// Inputs: ciphertext64 is a base64 string, password is plaintext
@@ -2256,7 +2252,7 @@
 		// Convert to base64.
 		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
 		return saltedData64;
-	}//obf1000Decrypt
+	}// obf1000Decrypt()
 
 	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 	// Output always packed into base64.
@@ -2342,7 +2338,7 @@
 		console.log("length:" + encrypted64.length);
 		console.log("salt: " + randSalt);
 		return encrypted64;
-	}//encryptAESCTR()
+	}// encryptAESCTR()
 
 	// Default usage sets output to base64.
 	// Input always packed as base64.
@@ -2414,7 +2410,7 @@
 			throw new Error("Invalid decryptAESCTR outputType parameter!");
 		}
 		return decryptedDecoded;
-	}//decryptAESCTR()
+	}// decryptAESCTR()
 
 	// Encrypt stack used in the case user chooses command line.
 	async function encryptDouble(obf1000Pass, ctrPass, fileData){
@@ -2423,7 +2419,7 @@
 		// Obfuscation Step 2 Encrypt
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		return ctrEncrypted;
-	}//encryptDouble()
+	}// encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData){
@@ -2434,14 +2430,14 @@
 		// Obfuscation Step 2 Encrypt
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		return ctrEncrypted;
-	}//encryptTriple()
+	}// encryptTriple()
 
 	// Decrypt stack used in the case user chooses Command Line.
 	async function decryptDouble(obf1000Pass, ctrPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
 		return obf1000Decrypted;
-	}//decryptDouble()
+	}// decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
@@ -2449,7 +2445,7 @@
 		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
 		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);
 		return cleartext;
-	}//decryptTriple()
+	}// decryptTriple()
 
 	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
 	// Inputs: plaintext.
@@ -2475,9 +2471,9 @@
 		const fingerprint = new Uint8Array(fingerprintHash);
 		const b64 = fingerprint.toBase64({ omitPadding: true });
 		return b64;
-	}//computeFingerprint()
+	}// computeFingerprint()
 
-	// Check uuid chars which are used for passlock and browserID.
+	// Return TRUE if input only contains uuid chars which are used for passlock and browserID.
 	function checkUUIDChars(input){
 		const regex = new RegExp(/^[a-f0-9-]*$/);
 		if(regex.test(input)){
@@ -2485,12 +2481,10 @@
 		}else{
 			return FALSE;
 		}
-	}//checkUUIDChars()
+	}// checkUUIDChars()
 
-	// Input: input is a string.
-	// Output: Returns false if non-base58 characters are detected.
+	// Return TRUE if input only contains base64 chars, including padding char: '='
 	function checkBase64Chars(input){
-		// From the first char(^) to the last($), match exactly 1000 base64 chars.
 		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
 		if(regex.test(input)){
 			// Return true/valid
@@ -2499,7 +2493,7 @@
 			// Return false/invalid
 			return FALSE;
 		}
-	}//checkBase64Chars()
+	}// checkBase64Chars()
 
 	// Input: input is a string.
 	// Output: Returns false if the input length (in bytes) is over 526.
@@ -2516,7 +2510,7 @@
 		}else{
 			return TRUE; // Length Check Passed.
 		}
-	}//checkInputLength()
+	}// checkInputLength()
 
 	// Input: input is a string.
 	// Output: Returns false if the input length (in bytes) is over 544.
@@ -2533,11 +2527,11 @@
 		}else{
 			return TRUE; // Length Check Passed.
 		}
-	}//checkInputLength()
+	}// checkInputLength()
 
 	////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////
-	//				7Byte Functions
+	//				7Byte Functions                       //
 	////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////
 
@@ -2565,7 +2559,7 @@
 		const dataOffset = 7 + dataLength;
 		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
 		return dataWithCountBytesAndRandFiller;
-	}//add7ByteAndRandFiller()
+	}// add7ByteAndRandFiller()
 
 	// Find set of bytes that compute to an exact value.
 	function find7ByteSetForValue(targetValue){
@@ -2577,7 +2571,7 @@
 			computedValue = eval7ByteValue(sevenByteUint8);
 		}while(computedValue != targetValue);
 		return sevenByteUint8;
-	}
+	}// find7ByteSetForValue()
 
 	// Find set of bytes that compute to a value in the input range.
 	function find7ByteSetInRange(targetMin, targetMax){
@@ -2589,7 +2583,7 @@
 			computedValue = eval7ByteValue(sevenByteUint8);
 		}while(computedValue < targetMin || computedValue > targetMax);
 		return sevenByteUint8;
-	}
+	}// find7ByteSetInRange()
 
 	// Convert 7Byte array into mathematical expression then evaluate it.
 	function eval7ByteValue(sevenByteUint8){
@@ -2613,11 +2607,11 @@
 		}
 		//console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
 		return Math.abs(eval(mathExpression));
-	}
+	}// eval7ByteValue()
 
 	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	// Inputs: pass is plaintext, length is an integer 
-	// Output: binary byte array (Uint8Array).
+	// Output: Uint8Array
 	async function getPassHash(passwordBytes, length) {
 		// Take initial SHA256.
 		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
@@ -2631,7 +2625,7 @@
 		// Truncate array to size <length>
 		sha_cumulative = sha_cumulative.slice(0, length);
 		return sha_cumulative;
-	}//getPassHash()
+	}// getPassHash()
 
 	// Concatenates ArrayBuffers.
 	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
@@ -2646,37 +2640,14 @@
 		tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
 		return tmp;
-	}//concatBuffer()
-
-	// Converts an ArrayBuffer into a hex string.
-	// Input: buffer is an ArrayBuffer.
-	// Output: hex string.
-	function buf2hex(buffer) {
-		return [...new Uint8Array(buffer)]
-			.map(x => x.toString(16).padStart(2, '0'))
-			.join('');
-	}//buf2hex()
-
-	// Keeping unused function because it is symetrical to a used one.
-	// Converts a hex string into an ArrayBuffer.
-	// Input: hex string.
-	// Output: buffer is an ArrayBuffer.
-	function hex2buf(hexString){
-		// convert to a number array representing the hex bytes.
-		const hexBytesArray = new Array;
-		for(let i=0; i < hexString.length; i+=2){
-			hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
-		}
-		const hexArrayBuffer = new Uint8Array(hexBytesArray);
-		return hexArrayBuffer;
-	}//hex2buf()
+	}// concatBuffer()
 
 	// Generates standalone html file from static code held in multiline string below:
-	function downloadStandalone(){
-		// standalone.html static code.
+	function downloadStandalone(offlineDatabase, offlineDatabasePointer, offlineDatabaseEnc, offlineDatabaseEncPointer){
 // !@#$ = search for this spot (turn on/off syntax highlighting)
-		const standaloneCode = `
 
+		// standalone.html static code.
+		const standaloneCode = `
 <!DOCTYPE HTML>
 <html>
 <meta content="text/plain;charset=utf-8" http-equiv="Content-Type" />
@@ -3493,9 +3464,6 @@
 	const TRUE = 1;
 	const FALSE = 0;
 
-	// Global flags. 
-	let upload_flag = 'false';
-	let download_flag = 'false';
 	// Base 64 character map.
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	// Automatically run this function when page loads.
@@ -3759,10 +3727,9 @@
 		return randnum[0];
 	}
 
-	// Check if a fingerprint looks valid.
+	// Returns TRUE if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint){
-		// false if any non-hex chars or not 64 long.
-		// Need escapes on the backticks and dollar sign below while this exists in a multi-line string that uses backticks.
+		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
 		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${FINGERPRINT_LENGTH}}$\`);
 		if(regex.test(fingerprint)){
 			return TRUE;
@@ -3771,10 +3738,8 @@
 		}
 	}
 
-	// Make sure input is exactly 1024 chars of base64 data.
+	// Returns TRUE if input has precisely DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
-		console.log("checking data is valid: " + data);
-		// Need escapes on the backticks and dollar sign below while this exists in a multi-line string that uses backticks.
 		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${DATA_LENGTH}}$\`);
 		if(regex.test(data)){
 			return TRUE;
@@ -5117,29 +5082,6 @@
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
 		return tmp;
 	}//concatBuffer()
-
-	// Converts an ArrayBuffer into a hex string.
-	// Input: buffer is an ArrayBuffer.
-	// Output: hex string.
-	function buf2hex(buffer) {
-		return [...new Uint8Array(buffer)]
-			.map(x => x.toString(16).padStart(2, '0'))
-			.join('');
-	}//buf2hex()
-
-	// Keeping unused function because it is symetrical to a used one.
-	// Converts a hex string into an ArrayBuffer.
-	// Input: hex string.
-	// Output: buffer is an ArrayBuffer.
-	function hex2buf(hexString){
-		// convert to a number array representing the hex bytes.
-		const hexBytesArray = new Array;
-		for(let i=0; i < hexString.length; i+=2){
-			hexBytesArray.push(parseInt(hexString.substring(i, i+2), 16));
-		}
-		const hexArrayBuffer = new Uint8Array(hexBytesArray);
-		return hexArrayBuffer;
-	}//hex2buf()
 
 	function clearSaveToDiskReminder(){
 		document.getElementById("savetodisk_warning").style.display = "none";
