@@ -830,6 +830,20 @@
 	//		Global Flags & Page Load Function					//
 	//////////////////////////////////////////////////////////////
 
+	// Single Record:
+	//        43	       1024
+	// |--fingerprint--||--Data--|
+
+	// Constant declarations.
+	const FINGERPRINT_LENGTH = 43;
+	const DATA_LENGTH = 1024;
+	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
+	const PASSLOCK_LENGTH = 36;
+	const BROWSERINPUT_LENGTH_LIMIT = 526;
+	const CMDINPUT_LENGTH_LIMIT = 544;
+	const TRUE = 1;
+	const FALSE = 0;
+
 	// Global flags. 
 	let upload_flag = 'false';
 	let download_flag = 'false';
@@ -1009,7 +1023,7 @@
 		reader.onload = async function(e){
 			let buffer = e.target.result;
 			const buffer_uint8a = new Uint8Array(buffer);
-			let filedata = bytesToBase64(buffer_uint8a);
+			let filedata = buffer_uint8a.toBase64();
 			//console.log("filedata: " + filedata);
 			// Input Data Length Check
 			//if( checkInputLength(buffer) ){
@@ -1260,30 +1274,25 @@
 		return randnum[0];
 	}
 
-	const DATA_LENGTH = 1024;
-	const TOTAL_RECORD_LENGTH = 1067;
-		const FINGERPRINT_LENGTH = 43;
-
 	// Check if a fingerprint looks valid.
 	function checkFingerprintIsValid(fingerprint){
 		// false if any non-hex chars or not 64 long.
-		//const regex = /^[a-zA-Z0-9\+\/]{43}$/;
 		const regex = new RegExp(`^[A-Za-z0-9+/]{${FINGERPRINT_LENGTH}}$`);
 		if(regex.test(fingerprint)){
-			return 1;
+			return TRUE;
 		}else{
-			return 0;
+			return FALSE;
 		}
 	}
 
 	// Make sure input is exactly 1024 chars of base64 data.
 	function checkDataIsValid(data){
 		//console.log("checking data is valid: " + data);
-		const regex = /^[a-zA-Z0-9\+\/\=]{1024}$/;
+		const regex = new RegExp(`^[A-Za-z0-9+/]{${DATA_LENGTH}}$`);
 		if(regex.test(data)){
-			return 1;
+			return TRUE;
 		}else{
-			return 0;
+			return FALSE;
 		}
 	}
 
@@ -1323,7 +1332,7 @@
 		}
 
 		const passlock = await serverGetPasslock(browserId);
-		if(passlock.length !== 36 || !checkUUIDChars(passlock)){ // Data doesn't look like a passlock.
+		if(passlock.length !== PASSLOCK_LENGTH || !checkUUIDChars(passlock)){ // Data doesn't look like a passlock.
 			//showPage("unable_to_retrieve_passlock");
 			throw Error("Unable to retrieve passlock!");
 		}else{
@@ -1374,7 +1383,7 @@
 
 	// Use regex to extract keyword from input ID.
 	function extractKeyword(inputId){
-		const regex = /^\w+_(?<keyword>\w+)_\w+$/;
+		const regex = new RegExp(/^\w+_(?<keyword>\w+)_\w+$/);
 		const match = regex.exec(inputId);
 		return match.groups.keyword;
 	}
@@ -1505,7 +1514,7 @@
 		const decryptedData  = await decryptDouble(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], encryptedData);
 
 			// bytes is Uint8Array
-			const bytes = base64ToBytes(decryptedData);
+			const bytes = Uint8Array.fromBase64(decryptedData);
 			// Produce file for user to decrypt.
 			let blob = new Blob([bytes]);
 			let a = document.createElement('a');
@@ -1692,8 +1701,8 @@
 		const url_origin = window.location.origin;
 		let server_origin = '';
 		// If we're standalone, set address to chat.dance instead of a relative path.
-		const regex = /^file/;
-		if( regex.test(url_origin) ){
+		const regex = new RegExp(/^file/);
+		if(regex.test(url_origin)){
 			//console.log("We're a standalone file!");
 			server_origin = 'https://chat.dance/obf/';
 		}else{
@@ -1899,7 +1908,7 @@
 			//console.log(responseObj);
 			//console.log("responseObj.passlock: " + responseObj.passlock);
 			//console.log("responseObj.passlock.length: " + responseObj.passlock.length);
-			if(responseObj.passlock.length === 36 && checkUUIDChars(responseObj.passlock)){ // Data looks good.
+			if(responseObj.passlock.length === PASSLOCK_LENGTH && checkUUIDChars(responseObj.passlock)){ // Data looks good.
 				//console.log("serverGetPasslock: Successfully retrieved existing passlock.");
 				return responseObj.passlock;
 			}else{
@@ -2096,8 +2105,7 @@
 		// Merge salts with encoded ciphertext.
 		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
 		const encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
-		let out64 = bytesToBase64(encrypted_output_buf);
-		return out64;
+		return encrypted_output_buf.toBase64();
 	}//encOpenSSL()
 
 	// Our implementation of OpenSSL's decrypt function.
@@ -2105,8 +2113,9 @@
 	// Output: decrypted plaintext.
 	//async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash=, digest_algorithm) {
 	async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
+		
 		// Convert input base 64 to binary.
-		const ciphertextbytes = base64ToBytes(ciphertext64);
+		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
 		// ciphertext is now in a form that is ready to give to the encryption function.
 		// Prepare inputs for digest.
 		//const digest_hash = 'SHA-256';
@@ -2203,9 +2212,9 @@
 		for (let i = 0; i < arrayLength; i++) {
 			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
 		}
-
-		let encryptedBase64 = bytesToBase64(xorResult);
-		return encryptedBase64;
+		// toBase64() works on Uint8Arrays
+		xorResult = new Uint8Array(xorResult);
+		return xorResult.toBase64();
 	}//obf1000Encrypt()
 
 	// obf1000Decrypt() is the inverse function of obf1000Encrypt().
@@ -2213,7 +2222,7 @@
 	// Output: decrypted_string is a base64 string
 	async function obf1000Decrypt(ciphertext64, password) {
 		// Convert base64 string to Uint8Array of bytes.
-		let ciphertextBytes = base64ToBytes(ciphertext64);
+		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
 
 		// Constant array length. 750 is the total bytes that will fit into 1000 base64 chars.
 		let arrayLength = 750;
@@ -2227,7 +2236,7 @@
 		let xorResult = new Array();
 		// XOR is typically the carrot char: ^ 
 		for (let i = 0; i < arrayLength; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextBytes[i]);
+			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
 		}
 		// Slice off set of bytes that represent data lenght.
 		const sevenByteSlice = xorResult.slice(0, 7);
@@ -2470,11 +2479,11 @@
 
 	// Check uuid chars which are used for passlock and browserID.
 	function checkUUIDChars(input){
-		const regex = /^[a-f0-9\-]*$/;
-		if( regex.test(input) ){
-			return 1;
+		const regex = new RegExp(/^[a-f0-9-]*$/);
+		if(regex.test(input)){
+			return TRUE;
 		}else{
-			return 0;
+			return FALSE;
 		}
 	}//checkUUIDChars()
 
@@ -2482,13 +2491,13 @@
 	// Output: Returns false if non-base58 characters are detected.
 	function checkBase64Chars(input){
 		// From the first char(^) to the last($), match exactly 1000 base64 chars.
-		const regex = /^[a-zA-Z0-9\+\/\=]*$/;
-		if( regex.test(input) ){
+		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
+		if(regex.test(input)){
 			// Return true/valid
-			return 1;
+			return TRUE;
 		}else{
 			// Return false/invalid
-			return 0;
+			return FALSE;
 		}
 	}//checkBase64Chars()
 
@@ -2497,32 +2506,32 @@
 	function checkInputLength(input){
 		// show input size in bytes
 		let size = new Blob([input]).size;
-		let difference = 526 - size;
+		let difference = BROWSERINPUT_LENGTH_LIMIT - size;
 		// Show running count of data length.
 		let size_string = "Byte length remaining: " + difference;
 		//console.log("size_string: " + size_string);
 		document.getElementById("browserdata_length_label").innerHTML = size_string;
-		if(size > 526){
-			return 0; // Length Check Failed.
+		if(size > BROWSERINPUT_LENGTH_LIMIT){
+			return FALSE; // Length Check Failed.
 		}else{
-			return 1; // Length Check Passed.
+			return TRUE; // Length Check Passed.
 		}
 	}//checkInputLength()
 
 	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over 526.
+	// Output: Returns false if the input length (in bytes) is over 544.
 	function checkInputLengthUpload(input){
 		// show input size in bytes
 		let size = new Blob([input]).size;
-		let difference = 544 - size;
+		let difference = CMDINPUT_LENGTH_LIMIT - size;
 		// Show running count of data length.
 		let size_string = "Byte length remaining: " + difference;
 		//console.log("size_string: " + size_string);
 		document.getElementById("uploaddata_length_label").innerHTML = size_string;
-		if(size > 544){
-			return 0; // Length Check Failed.
+		if(size > CMDINPUT_LENGTH_LIMIT){
+			return FALSE; // Length Check Failed.
 		}else{
-			return 1; // Length Check Passed.
+			return TRUE; // Length Check Passed.
 		}
 	}//checkInputLength()
 
@@ -2638,28 +2647,6 @@
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
 		return tmp;
 	}//concatBuffer()
-
-	// Code for function found here:
-	// https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa
-	// MDN funcction Usage:
-	// bytesToBase64(new TextEncoder().encode("a Ā 𐀀 文 🦄")); // "YSDEgCDwkICAIOaWhyDwn6aE"
-	// new TextDecoder().decode(base64ToBytes("YSDEgCDwkICAIOaWhyDwn6aE")); // "a Ā 𐀀 文 🦄"
-	// Input: base 64 string.
-	// Output: Uint9Array which is a binary byte array.
-	function base64ToBytes(base64) {
-		const binString = atob(base64);
-		return Uint8Array.from(binString, (m) => m.codePointAt(0));
-	}
-
-	// MDN function
-	// Input: Should work on any Array or typed array.
-	// Output: Base 64 string.
-	function bytesToBase64(bytes) {
-		const binString = Array.from(bytes, (byte) =>
-			String.fromCodePoint(byte),
-		).join("");
-		return btoa(binString);
-	}
 
 	// Converts an ArrayBuffer into a hex string.
 	// Input: buffer is an ArrayBuffer.
@@ -3493,6 +3480,19 @@
 	//		Global Flags & Page Load Function					//
 	//////////////////////////////////////////////////////////////
 
+	// Single Record:
+	//        43	       1024
+	// |--fingerprint--||--Data--|
+
+	// Constants declaration.
+	const FINGERPRINT_LENGTH = 43;
+	const DATA_LENGTH = 1024;
+	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
+	const BROWSERINPUT_LENGTH_LIMIT = 526;
+	const CMDINPUT_LENGTH_LIMIT = 544;
+	const TRUE = 1;
+	const FALSE = 0;
+
 	// Global flags. 
 	let upload_flag = 'false';
 	let download_flag = 'false';
@@ -3675,7 +3675,7 @@
 		reader.onload = async function(e){
 			let buffer = e.target.result;
 			const buffer_uint8a = new Uint8Array(buffer);
-			let filedata = bytesToBase64(buffer_uint8a);
+			let filedata = buffer_uint8a.toBase64();
 			//console.log("filedata: " + filedata);
 			// Input Data Length Check
 			if(checkInputLengthUpload(buffer)){
@@ -3762,13 +3762,12 @@
 	// Check if a fingerprint looks valid.
 	function checkFingerprintIsValid(fingerprint){
 		// false if any non-hex chars or not 64 long.
-		//const regex = /^[a-zA-Z0-9\\+\\/]{43}$/;
 		// Need escapes on the backticks and dollar sign below while this exists in a multi-line string that uses backticks.
 		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${FINGERPRINT_LENGTH}}$\`);
 		if(regex.test(fingerprint)){
-			return 1;
+			return TRUE;
 		}else{
-			return 0;
+			return FALSE;
 		}
 	}
 
@@ -3776,12 +3775,11 @@
 	function checkDataIsValid(data){
 		console.log("checking data is valid: " + data);
 		// Need escapes on the backticks and dollar sign below while this exists in a multi-line string that uses backticks.
-		const regex = /^[a-zA-Z0-9\\+\\/\\=]{1024}$/;
-		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${FINGERPRINT_LENGTH}}$\`);
+		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${DATA_LENGTH}}$\`);
 		if(regex.test(data)){
-			return 1;
+			return TRUE;
 		}else{
-			return 0;
+			return FALSE;
 		}
 	}
 
@@ -3790,13 +3788,6 @@
 	//                 Offline Database Manipulation                     //
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
-
-	// Single Record:
-	// 43					1024
-	// |--fingerprint--||--Data--|
-	const FINGERPRINT_LENGTH = 43;
-	const DATA_LENGTH = 1024;
-	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
 
 	// Replaces one 1000-char data record at the given fingerprintStartIndex location. 
 	function replaceData(fingerprintStartIndex, encryptedData, offlineDatabase){
@@ -4039,7 +4030,7 @@
 
 	// Use regex to extract keyword from input ID.
 	function extractKeyword(inputId){
-		const regex = /^\\w+_(?<keyword>\\w+)_\\w+$/;
+		const regex = new RegExp(/^\\w+_(?<keyword>\\w+)_\\w+$/);
 		const match = regex.exec(inputId);
 		return match.groups.keyword;
 	}
@@ -4165,7 +4156,7 @@
 	async function decryptAndDownloadFileOffline(encryptedData){
 		const decryptedData  = await decryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], encryptedData);
 			// bytes is Uint8Array
-			const bytes = base64ToBytes(decryptedData);
+			const bytes = Uint8Array.fromBase64(decryptedData);
 			// Produce file for user to decrypt.
 			let blob = new Blob([bytes]);
 			let a = document.createElement('a');
@@ -4309,8 +4300,8 @@
 		const url_origin = window.location.origin;
 		let server_origin = '';
 		// If we're standalone, set address to chat.dance instead of a relative path.
-		const regex = /^file/;
-		if( regex.test(url_origin) ){
+		const regex = new RegExp(/^file/);
+		if(regex.test(url_origin)){
 			//console.log("We're a standalone file!");
 			server_origin = 'https://chat.dance/obf/';
 		}else{
@@ -4403,131 +4394,6 @@
 			console.error(error.message);
 		}
 	}//serverStore()
-
-	// Runs after Store or Access call completes as a security measure to ensure user passlocks exist only as long as necessary.
-	async function serverDeletePasslock(passedBrowserId) {
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exepasslockdelete;';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					browser_id: passedBrowserId,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(\`Response status: \${fetchResponseObject.status}\`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			// checkResponseObject(response_obj);
-			console.log("delete passlock response: ");
-			console.log(responseObj);
-			// Handle database query outcome.
-			//console.log("Store responseObj.response: " + responseObj.response);
-			//if( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
-			if(responseObj.response !== "passlock successfully deleted"){ // there appears to be a problem.
-				//console.log("Error Deleting. browser_id: " + browserId);
-				throw Error("serverDeletePasslock() Failed to delete passlock!");
-				return "error";
-			}else{
-				console.log("Passlock successfully deleted from database.");
-				return "success";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}//serverDeletePasslock()
-
-	async function serverSetPasslock(browser_id, passlock) {
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exesetpasslock;';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					browser_id: browser_id,
-					passlock: passlock,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(\`Response status: \${fetchResponseObject.status}\`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const response_obj = await fetchResponseObject.json();
-			//checkResponseObject(response_obj, "Message specific to serverSetPasslock");
-			console.log("set passlock response: ");
-			console.log(response_obj);
-			// Handle database query outcome.
-			if( response_obj.response != 1 ){ // there appears to be a problem.
-				throw Error("serverSetPasslock() database store error!");
-			}else{
-				console.log("New passlock successfully stored to database.");
-				return;
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}//serverSetPasslock()
-
-	// needs update.
-	async function serverGetPasslock(browserId){
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exegetpasslock;';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					browser_id: browserId,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(\`Response status: \${fetchResponseObject.status}\`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
-			//console.log("responseObj.passlock: " + responseObj.passlock);
-			//console.log("responseObj.passlock.length: " + responseObj.passlock.length);
-			if(responseObj.passlock.length === 36 && checkUUIDChars(responseObj.passlock)){ // Data looks good.
-				//console.log("serverGetPasslock: Successfully retrieved existing passlock.");
-				return responseObj.passlock;
-			}else{
-				throw Error("serverGetPasslock: Failed to load passlock.");
-				//console.log("serverGetPasslock: Failed to load passlock.");
-				return "failed to get passlock";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}//serverGetPasslock()
 
 	// Create a json string containing every record in the offline dbase from 0 to pointer.
 	function convertOfflineDBaseToJSONString(){
@@ -4712,8 +4578,7 @@
 		// Merge salts with encoded ciphertext.
 		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
 		const encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
-		let out64 = bytesToBase64(encrypted_output_buf);
-		return out64;
+		return encrypted_output_buf.toBase64();
 	}//encOpenSSL()
 
 	// Our implementation of OpenSSL's decrypt function.
@@ -4721,8 +4586,9 @@
 	// Output: decrypted plaintext.
 	//async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash=, digest_algorithm) {
 	async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
+
 		// Convert input base 64 to binary.
-		const ciphertextbytes = base64ToBytes(ciphertext64);
+		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
 		// ciphertext is now in a form that is ready to give to the encryption function.
 
 		// Prepare inputs for digest.
@@ -4821,9 +4687,9 @@
 		for (let i = 0; i < arrayLength; i++) {
 			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
 		}
-
-		let encryptedBase64 = bytesToBase64(xorResult);
-		return encryptedBase64;
+		// toBase64() works on Uint8Arrays
+		xorResult = new Uint8Array(xorResult);
+		return xorResult.toBase64();
 	}//obf1000Encrypt()
 
 	// obf1000Decrypt() is the inverse function of obf1000Encrypt().
@@ -4831,7 +4697,7 @@
 	// Output: decrypted_string is a base64 string
 	async function obf1000Decrypt(ciphertext64, password) {
 		// Convert base64 string to Uint8Array of bytes.
-		let ciphertextBytes = base64ToBytes(ciphertext64);
+		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
 		// Devsite window functrion.
 
 		// Constant array length. 750 is the total bytes that will fit into 1000 base64 chars.
@@ -4846,7 +4712,7 @@
 		let xorResult = new Array();
 		// XOR is typically the carrot char: ^ 
 		for (let i = 0; i < arrayLength; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextBytes[i]);
+			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
 		}
 		// Slice off set of bytes that represent data lenght.
 		const sevenByteSlice = xorResult.slice(0, 7);
@@ -5089,11 +4955,11 @@
 
 	// Check uuid chars which are used for passlock and browserID.
 	function checkUUIDChars(input){
-		const regex = /^[a-f0-9\\-]*$/;
-		if( regex.test(input) ){
-			return 1;
+		const regex = new RegExp(/^[a-f0-9-]*$/);
+		if(regex.test(input)){
+			return TRUE;
 		}else{
-			return 0;
+			return FALSE;
 		}
 	}//checkUUIDChars()
 
@@ -5101,13 +4967,13 @@
 	// Output: Returns false if non-base58 characters are detected.
 	function checkBase64Chars(input){
 		// From the first char(^) to the last($), match base64 chars.
-		const regex = /^[a-zA-Z0-9\\+\\/\\=]*$/;
-		if( regex.test(input) ){
+		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
+		if(regex.test(input)){
 			// Return true/valid
-			return 1;
+			return TRUE;
 		}else{
 			// Return false/invalid
-			return 0;
+			return FALSE;
 		}
 	}//checkBase64Chars()
 
@@ -5116,32 +4982,32 @@
 	function checkInputLength(input){
 		// show input size in bytes
 		let size = new Blob([input]).size;
-		let difference = 526 - size;
+		let difference = BROWSERINPUT_LENGTH_LIMIT - size;
 		// Show running count of data length.
 		let size_string = "Byte length remaining: " + difference;
 		//console.log("size_string: " + size_string);
 		document.getElementById("offlinebrowserdata_length_label").innerHTML = size_string;
-		if(size > 526){
-			return 0; // Length Check Failed.
+		if(size > BROWSERINPUT_LENGTH_LIMIT){
+			return FALSE; // Length Check Failed.
 		}else{
-			return 1; // Length Check Passed.
+			return TRUE; // Length Check Passed.
 		}
 	}//checkInputLength()
 
 	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over 526.
+	// Output: Returns false if the input length (in bytes) is over 544.
 	function checkInputLengthUpload(input){
 		// show input size in bytes
 		let size = new Blob([input]).size;
-		let difference = 544 - size;
+		let difference = CMDINPUT_LENGTH_LIMIT - size;
 		// Show running count of data length.
 		let size_string = "Byte length remaining: " + difference;
 		//console.log("size_string: " + size_string);
 		document.getElementById("offlineuploaddata_length_label").innerHTML = size_string;
-		if(size > 544){
-			return 0; // Length Check Failed.
+		if(size > CMDINPUT_LENGTH_LIMIT){
+			return FALSE; // Length Check Failed.
 		}else{
-			return 1; // Length Check Passed.
+			return TRUE; // Length Check Passed.
 		}
 	}//checkInputLength()
 
@@ -5155,7 +5021,7 @@
 		const dataLength = dataSansSalt.length;
 		// Find a 7Byte set that represents dataLength.
 		const sevenByteSet = find7ByteSetForValue(dataLength);
-		// Leave spoace for 7Byte set.
+		// Leave space for 7Byte set.
 		const remainingSpace = 743 - dataLength;
 		// Compile set of random bytes for filler.
 		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
@@ -5251,28 +5117,6 @@
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
 		return tmp;
 	}//concatBuffer()
-
-	// Code for function found here:
-	// https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa
-	// MDN funcction Usage:
-	// bytesToBase64(new TextEncoder().encode("a Ā 𐀀 文 🦄")); // "YSDEgCDwkICAIOaWhyDwn6aE"
-	// new TextDecoder().decode(base64ToBytes("YSDEgCDwkICAIOaWhyDwn6aE")); // "a Ā 𐀀 文 🦄"
-	// Input: base 64 string.
-	// Output: Uint8Array which is a binary byte array.
-	function base64ToBytes(base64) {
-		const binString = atob(base64);
-		return Uint8Array.from(binString, (m) => m.codePointAt(0));
-	}
-
-	// MDN function
-	// Input: Should work on any Array or typed array.
-	// Output: Base 64 string.
-	function bytesToBase64(bytes) {
-		const binString = Array.from(bytes, (byte) =>
-			String.fromCodePoint(byte),
-		).join("");
-		return btoa(binString);
-	}
 
 	// Converts an ArrayBuffer into a hex string.
 	// Input: buffer is an ArrayBuffer.
