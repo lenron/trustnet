@@ -833,14 +833,17 @@
 
 	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
+	const FINGERPRINT_BYTE_LENGTH = 32;
 	const DATA_LENGTH = 1024;
 	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
 	const PASSLOCK_LENGTH = 36;
 	const BROWSERINPUT_LENGTH_LIMIT = 526;
 	const CMDINPUT_LENGTH_LIMIT = 544;
-	const TRUE = 1;
-	const FALSE = 0;
-	// Base 64 character map. Char location (index) is what makes this a base64 map.
+	const PREBASE64_RANDDATA_BYTE_LENGTH = 768;
+	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
+	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
+	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
+
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 	// Automatically run this function on page load.
@@ -1108,13 +1111,15 @@
 	}// createOfflineDBase()
 
 	function getRandData(){
-		const randarray = window.crypto.getRandomValues(new Uint8Array(750));
+		// Pick a value that will convert into 1024 base64 chars.
+		const randarray = window.crypto.getRandomValues(new Uint8Array(PREBASE64_RANDDATA_BYTE_LENGTH));
 		return randarray.toBase64();
 	}// getRandData()
 
 	function getRandFingerprint(){
 		// 32 bytes is the output of SHA-256
-		const randarray = window.crypto.getRandomValues(new Uint8Array(32));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_BYTE_LENGTH));
+		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
 		return randarray.toBase64({omitPadding: true});
 	}// getRandFingerprint()
 
@@ -1274,24 +1279,24 @@
 		return randnum[0];
 	}// randInt()
 
-	// Returns TRUE if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
+	// Returns true if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint){
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
 		const regex = new RegExp(`^[A-Za-z0-9+/]{${FINGERPRINT_LENGTH}}$`);
 		if(regex.test(fingerprint)){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}// checkFingerprintIsValid()
 
-	// Returns TRUE if input has precisely DATA_LENGTH (1024) base64 chars.
+	// Returns true if input has precisely DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
 		const regex = new RegExp(`^[A-Za-z0-9+/]{${DATA_LENGTH}}$`);
 		if(regex.test(data)){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}// checkDataIsValid()
 
@@ -1382,9 +1387,9 @@
 
 	// Use regex to extract keyword from input ID.
 	function extractKeyword(inputId){
-		const regex = new RegExp(/^\w+_(?<keyword>\w+)_\w+$/);
-		const match = regex.exec(inputId);
-		return match.groups.keyword;
+		const regex = new RegExp(/^\w+_(\w+)_\w+$/);
+		const match = inputId.match(regex);
+		return match[1];
 	}// extractKeyword()
 
 	//Function that extracts user password from html and deletes it from the html source.
@@ -2067,7 +2072,7 @@
 				hash: digest_hash,
 			},
 			keyMaterial,
-			384,
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
 
@@ -2132,7 +2137,7 @@
 				hash: digest_hash,
 			},
 			keyMaterial,
-			384,
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
 
@@ -2196,7 +2201,7 @@
 		}
 
 		// With conversion to base64, 750 bytes convert to 1000 base64 chars exactly.
-		const arrayLength = 750;
+		const arrayLength = PREBASE64_1000DATA_BYTE_LENGTH;
 
 		// Prepare password side for XOR.
 		const passwordBytes = new TextEncoder().encode(password);
@@ -2221,7 +2226,7 @@
 		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
 
 		// Constant array length. 750 is the total bytes that will fit into 1000 base64 chars.
-		let arrayLength = 750;
+		let arrayLength = PREBASE64_1000DATA_BYTE_LENGTH;
 		// Compute password for XOR.
 		const passwordBytes = new TextEncoder().encode(password);
 		let shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
@@ -2294,7 +2299,7 @@
 				hash: 'SHA-256',				// 
 			},
 			keyMaterial,						//
-			384,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 		// Split the derived bits into key and iv for the encrypt call.
 		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
@@ -2375,7 +2380,7 @@
 				hash: 'SHA-256',				// digest algorithm
 			},
 			keyMaterial,						// input data as cryptoKey object
-			384,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 
 		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
@@ -2443,7 +2448,7 @@
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
-		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);
+		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
 		return cleartext;
 	}// decryptTriple()
 
@@ -2469,29 +2474,30 @@
 		// SHA-256 hash the result.
 		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
 		const fingerprint = new Uint8Array(fingerprintHash);
-		const b64 = fingerprint.toBase64({ omitPadding: true });
+		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
+		const b64 = fingerprint.toBase64({omitPadding: true});
 		return b64;
 	}// computeFingerprint()
 
-	// Return TRUE if input only contains uuid chars which are used for passlock and browserID.
+	// Return true if input only contains uuid chars which are used for passlock and browserID.
 	function checkUUIDChars(input){
 		const regex = new RegExp(/^[a-f0-9-]*$/);
 		if(regex.test(input)){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}// checkUUIDChars()
 
-	// Return TRUE if input only contains base64 chars, including padding char: '='
+	// Return true if input only contains base64 chars, including padding char: '='
 	function checkBase64Chars(input){
 		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
 		if(regex.test(input)){
 			// Return true/valid
-			return TRUE;
+			return true;
 		}else{
 			// Return false/invalid
-			return FALSE;
+			return false;
 		}
 	}// checkBase64Chars()
 
@@ -2506,9 +2512,9 @@
 		//console.log("size_string: " + size_string);
 		document.getElementById("browserdata_length_label").innerHTML = size_string;
 		if(size > BROWSERINPUT_LENGTH_LIMIT){
-			return FALSE; // Length Check Failed.
+			return false; // Length Check Failed.
 		}else{
-			return TRUE; // Length Check Passed.
+			return true; // Length Check Passed.
 		}
 	}// checkInputLength()
 
@@ -2523,9 +2529,9 @@
 		//console.log("size_string: " + size_string);
 		document.getElementById("uploaddata_length_label").innerHTML = size_string;
 		if(size > CMDINPUT_LENGTH_LIMIT){
-			return FALSE; // Length Check Failed.
+			return false; // Length Check Failed.
 		}else{
-			return TRUE; // Length Check Passed.
+			return true; // Length Check Passed.
 		}
 	}// checkInputLength()
 
@@ -2546,11 +2552,11 @@
 		// Find a 7Byte set that represents dataLength.
 		const sevenByteSet = find7ByteSetForValue(dataLength);
 		// Leave spoace for 7Byte set.
-		const remainingSpace = 743 - dataLength;
+		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
 		// Compile set of random bytes for filler.
 		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
 		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(750);
+		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
 		// Prepend 7Byte set.
 		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
 		// Next fill in data.
@@ -3455,14 +3461,18 @@
 	//        43	       1024
 	// |--fingerprint--||--Data--|
 
-	// Constants declaration.
+	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
+	const FINGERPRINT_BYTE_LENGTH = 32;
 	const DATA_LENGTH = 1024;
 	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
+	const PASSLOCK_LENGTH = 36;
 	const BROWSERINPUT_LENGTH_LIMIT = 526;
 	const CMDINPUT_LENGTH_LIMIT = 544;
-	const TRUE = 1;
-	const FALSE = 0;
+	const PREBASE64_RANDDATA_BYTE_LENGTH = 768;
+	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
+	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
+	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
 
 	// Base 64 character map.
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -3689,13 +3699,13 @@
 	}
 
 	function getRandData(){
-		const randarray = window.crypto.getRandomValues(new Uint8Array(750));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(PREBASE64_RANDDATA_BYTE_LENGTH));
 		return randarray.toBase64();
 	}
 
 	function getRandFingerprint(){
 		// 32 bytes is the output of SHA-256
-		const randarray = window.crypto.getRandomValues(new Uint8Array(32));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_BYTE_LENGTH));
 		return randarray.toBase64({omitPadding: true});
 	}
 
@@ -3726,25 +3736,25 @@
 		} while (randnum < min || randnum > max);
 		return randnum[0];
 	}
-
-	// Returns TRUE if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
+// !@#
+	// Returns true if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint){
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
 		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${FINGERPRINT_LENGTH}}$\`);
 		if(regex.test(fingerprint)){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}
 
-	// Returns TRUE if input has precisely DATA_LENGTH (1024) base64 chars.
+	// Returns true if input has precisely DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
 		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${DATA_LENGTH}}$\`);
 		if(regex.test(data)){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -3754,17 +3764,23 @@
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 
-	// Replaces one 1000-char data record at the given fingerprintStartIndex location. 
+	// Replaces one 1024-char data record at the given fingerprintStartIndex location. 
 	function replaceData(fingerprintStartIndex, encryptedData, offlineDatabase){
 		const fingerprintEndIndex = fingerprintStartIndex + FINGERPRINT_LENGTH;
 		const dataEndIndex = fingerprintStartIndex + TOTAL_RECORD_LENGTH;
 		// |--database before record (including fingerprint) --| |-- data --|
 		return offlineDatabase.substring(0, fingerprintEndIndex) + encryptedData + offlineDatabase.substring(dataEndIndex);
 	}
-
-	// Replaces the randomly generated 'dummy' chars with 43 length fingerprint and 1000 length encrypted data.
-	function replaceFingerprintAndData(pointer, fingerprint, encryptedData, offlineDatabase){
-		const recordStart = pointer * TOTAL_RECORD_LENGTH;
+// just input fingerprint, use search function inside this function.
+	// Replaces the randomly generated 'dummy' chars with 43 length fingerprint and 1024 length encrypted data.
+	//function replaceFingerprintAndData(pointer, fingerprint, encryptedData, offlineDatabase){
+	//
+	// Need fingerprintStartIndex as this function will be used with randomly generated fingerprints (for delete) which will not find the proper location.
+	function replaceFingerprintAndData(fingerprintStartIndex, fingerprint, encryptedData, offlineDatabase){
+		//const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
+		// Multiplying moves us to record at pointer.
+		//const recordStart = pointer * TOTAL_RECORD_LENGTH;
+		const recordStart = fingerprintStartIndex * TOTAL_RECORD_LENGTH;
 		const recordEnd = recordStart + TOTAL_RECORD_LENGTH;
 		// Compile replacement database. 
 		return offlineDatabase.substring(0, recordStart) + fingerprint + encryptedData + offlineDatabase.substring(recordEnd);
@@ -3859,6 +3875,7 @@
 			return "full";
 		}
 
+		// Perform the data manipulation for the store.
 		// Get the location of fingerprint in Offline Database. Returns -1 if not found.
 		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
 		let replacement_offlineDatabase;
@@ -3870,10 +3887,12 @@
 			// Fingerprint doesn't exist in database; store inputted fingerprint at pointer location.
 			console.log("Didn't find existing record in offline database. Adding new at pointer location...");
 			replacement_offlineDatabase = replaceFingerprintAndData(pointer, fingerprint, encryptedData, offlineDatabase);
+			//replacement_offlineDatabase = replaceFingerprintAndData(fingerprint, encryptedData, offlineDatabase);
 			// New record was inserted, move pointer to next 'location' in offline database.
 			pointer++;
 			// Check if we just hit last save locaation.
 			if(pointer > 999){
+				// Only turn on the warning, informing the user to not store any more.
 				document.getElementById("full_offline_dbase_warning").style.display = "inline";
 			}
 		}
@@ -3885,13 +3904,6 @@
 		// Save pointer and offline database to in-memory HTML. ENC or UNENC determined by if an offline database ENC password was entered at flow start.
 		await setOfflineDBasePointer(pointer, offlineDatabaseType);
 		await setOfflineDBase(replacement_offlineDatabase, offlineDatabaseType);
-		//Check Load, return success if loaded data maches stored data.
-		const load_check_data = await attemptLoadOfflineDBase(fingerprint);
-		if(load_check_data === encryptedData){
-			return "success";
-		}else{
-			return "fail";
-		}
 	}//storeOfflineDBase()
 
 	// Try to load record at fingerprint. Works on both ENC and UNENC offline databases.
@@ -3919,15 +3931,19 @@
 			return offlineDatabase.substring(fingerprintEndIndex, dataEndIndex);
 	}
 
-	// Delete record from offline dbase at fingerprint location.
-	// Random data is generated and 'backfilled' increasing security and keeping Offline Database length the same.
-	async function deleteRecordOfflineDBase(fingerprint){
+	function checkFingerprint(fingerprint){
 		if(!checkFingerprintIsValid(fingerprint)){
 			throw new Error('Attempt to DELETE single record in offline dbase failed! FINGERPRINT is invalid.');
 		}else{
 			console.log("Delete Offline Database record attempt: FINGERPRINT IS VALID!");
 		}
+	}
 
+	// Delete record from offline dbase at fingerprint location.
+	// Random data is generated and 'backfilled' increasing security and keeping Offline Database length the same.
+	async function deleteRecordOfflineDBase(fingerprint){
+		checkFingerprint(fingerprint);
+		// Which database to operate on.
 		const offlineDatabaseType = getOfflineDatabaseType();
 		// Select either ENC or UNENC pointer, offline database depending on if user entered ENC passowrd.
 		let pointer = await getOfflineDBasePointer(offlineDatabaseType);
@@ -3941,32 +3957,42 @@
 		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
 		// If the record exists, delete the fingerprint and data at fingerprintStartIndex location by overwriting with randonly generated, decrementing pointer.
 		if(fingerprintStartIndex > -1){
+			// Get data that will be used to 'backfill'
 			const randFingerprint = getRandFingerprint();
 			const randData = getRandData();
+			//const replacement_offlineDatabase = replaceFingerprintAndData(pointer, randFingerprint, randData, offlineDatabase);
+			// Need fingerprint start index for delete because randFingerprint won't match anything.
+			const replacement_offlineDatabase = replaceFingerprintAndData(fingerprintStartIndex, randFingerprint, randData, offlineDatabase);
+
+			// Pointer points to NEXT record to store.
 			pointer--;
 			if(pointer < 999){
 				// Offline Database is no longer full.
 				document.getElementById("full_offline_dbase_warning").style.display = "none";
 			}
-			const replacement_offlineDatabase = replaceFingerprintAndData(pointer, randFingerprint, randData, offlineDatabase);
+			//const replacement_offlineDatabase = replaceFingerprintAndData(pointer, randFingerprint, randData, offlineDatabase);
+			//const replacement_offlineDatabase = replaceFingerprintAndData(randFingerprint, randData, offlineDatabase);
 
 			console.log("after delete pointer: " + pointer);
 			//console.log("after delete database: " + replacement_offlineDatabase);
 			console.log("Offline Database length AFTER Delete: " + offlineDatabase.length);
 
+			// Saved updated pointer to its location in HTML.
 			await setOfflineDBasePointer(pointer, offlineDatabaseType);
+			// Saved updated offline databse to its location in HTML (next to pointer).
 			await setOfflineDBase(replacement_offlineDatabase, offlineDatabaseType);
 
 			// Check that it was in fact deleted. Fingerprint should be random chars now and therefore miss on a correctly exexuted delete.
 			const outcome = await attemptLoadOfflineDBase(fingerprint);
 			if(outcome === "miss"){
-				console.log("Delete successful: returned miss from load attempt.");
+				//console.log("Delete successful: returned miss from load attempt.");
 				return "success";
 			}else{
-				return "failed to delete";
+				console.log("Failed to delete data from offline database.");
+				return "failed";
 			}
 		}else{
-			// We didn't find it! return fail.
+			console.log("Failed to find fingerprint, data to delete.");
 			return "failed";
 		}
 	}//deleteRecordOfflineDBase()
@@ -3995,9 +4021,9 @@
 
 	// Use regex to extract keyword from input ID.
 	function extractKeyword(inputId){
-		const regex = new RegExp(/^\\w+_(?<keyword>\\w+)_\\w+$/);
-		const match = regex.exec(inputId);
-		return match.groups.keyword;
+		const regex = new RegExp(/^\\w+_(\\w+)_\\w+$/);
+		const match = inputId.match(regex);
+		return match[1];
 	}
 
 	//Function that extracts user password from html and deletes it from the html source.
@@ -4109,7 +4135,7 @@
 		// Add additional parameter?
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 
-		if(encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if(encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_file');
@@ -4138,7 +4164,7 @@
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
-		if(encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if(encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_cleartext');
@@ -4507,7 +4533,7 @@
 				hash: digest_hash,
 			},
 			keyMaterial,
-			384,
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
 
@@ -4575,7 +4601,7 @@
 				hash: digest_hash,
 			},
 			keyMaterial,
-			384,
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
 		);
 		const derivedKeyBuffer = new Uint8Array(derived_bits);
 
@@ -4640,7 +4666,7 @@
 		}
 
 		// With conversion to base64, 750 bytes convert to 1000 base64 chars exactly.
-		const arrayLength = 750;
+		const arrayLength = PREBASE64_1000DATA_BYTE_LENGTH;
 
 		// Prepare password side for XOR.
 		const passwordBytes = new TextEncoder().encode(password);
@@ -4666,7 +4692,7 @@
 		// Devsite window functrion.
 
 		// Constant array length. 750 is the total bytes that will fit into 1000 base64 chars.
-		let arrayLength = 750;
+		let arrayLength = PREBASE64_1000DATA_BYTE_LENGTH;
 		// Compute password for XOR.
 		const passwordBytes = new TextEncoder().encode(password);
 		let shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
@@ -4739,7 +4765,7 @@
 				hash: 'SHA-256',				// 
 			},
 			keyMaterial,						//
-			384,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 		// Split the derived bits into key and iv for the encrypt call.
 		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
@@ -4820,7 +4846,7 @@
 				hash: 'SHA-256',				// 
 			},
 			keyMaterial,						//
-			384,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 
 		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
@@ -4922,9 +4948,9 @@
 	function checkUUIDChars(input){
 		const regex = new RegExp(/^[a-f0-9-]*$/);
 		if(regex.test(input)){
-			return TRUE;
+			return true;
 		}else{
-			return FALSE;
+			return false;
 		}
 	}//checkUUIDChars()
 
@@ -4935,10 +4961,10 @@
 		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
 		if(regex.test(input)){
 			// Return true/valid
-			return TRUE;
+			return true;
 		}else{
 			// Return false/invalid
-			return FALSE;
+			return false;
 		}
 	}//checkBase64Chars()
 
@@ -4953,9 +4979,9 @@
 		//console.log("size_string: " + size_string);
 		document.getElementById("offlinebrowserdata_length_label").innerHTML = size_string;
 		if(size > BROWSERINPUT_LENGTH_LIMIT){
-			return FALSE; // Length Check Failed.
+			return false; // Length Check Failed.
 		}else{
-			return TRUE; // Length Check Passed.
+			return true; // Length Check Passed.
 		}
 	}//checkInputLength()
 
@@ -4970,9 +4996,9 @@
 		//console.log("size_string: " + size_string);
 		document.getElementById("offlineuploaddata_length_label").innerHTML = size_string;
 		if(size > CMDINPUT_LENGTH_LIMIT){
-			return FALSE; // Length Check Failed.
+			return false; // Length Check Failed.
 		}else{
-			return TRUE; // Length Check Passed.
+			return true; // Length Check Passed.
 		}
 	}//checkInputLength()
 
@@ -4991,7 +5017,7 @@
 		// Compile set of random bytes for filler.
 		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
 		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(750);
+		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
 		// Prepend 7Byte set.
 		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
 		// Next fill in data.
