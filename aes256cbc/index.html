@@ -3780,20 +3780,14 @@ console.log("UNENC offlinedbase length: " + offlineDatabase.length);
 	// Used for delete, RandDAta is needed to backfill keeping offlineDatabase the same length.
 	// Used for store when fingerprint exists.
 	function replaceFingerprintAndData(fingerprint, offlineDatabase, newData='delete'){
-console.log("fingerprint input: " + fingerprint);
-console.log("newData input: " + newData);
 		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
 		// Use a random fingerprint and data if neither were specified.
 		if (newData === 'delete'){
-console.log("delete triggered: " + newData);
 			fingerprint = getRandFingerprint();
 			newData = getRandData();
 		}
-console.log("newData about to get saved: " + newData);
-console.log("fingerprint about to get saved: " + fingerprint);
-		const recordStart = fingerprintStartIndex * TOTAL_RECORD_LENGTH;
-		const recordEnd = recordStart + TOTAL_RECORD_LENGTH;
-		return offlineDatabase.substring(0, recordStart) + fingerprint + newData + offlineDatabase.substring(recordEnd);
+		const recordEnd = fingerprintStartIndex + TOTAL_RECORD_LENGTH;
+		return offlineDatabase.substring(0, fingerprintStartIndex) + fingerprint + newData + offlineDatabase.substring(recordEnd);
 	}
 
 	// Selects either Unencrypted or Encrypted database pointer based on if user inputted an offline database password at the start of the Flow.
@@ -3888,7 +3882,6 @@ console.log("fingerprint about to get saved: " + fingerprint);
 		checkFingerprintAndData(fingerprint, encryptedData);
 		// Retrieve the database and pointer for the Flow we are in.
 		let pointer = await getOfflineDBasePointer();
-console.log("store called. pointer: " + pointer);
 		let offlineDatabase = await getOfflineDBase();
 		//Check if the offline database is full.
 		if(checkIfOfflineDBaseIsFull(pointer)){
@@ -3945,17 +3938,13 @@ console.log("store called. pointer: " + pointer);
 	async function deleteRecordOfflineDBase(fingerprint){
 		checkFingerprint(fingerprint);
 		// Select either ENC or UNENC pointer, offline database depending on if user entered ENC passowrd.
-		//let pointer = await getOfflineDBasePointer();
 		let offlineDatabase = await getOfflineDBase();
 		// Find record in offline dbase if it exists.
 		// If the record exists, delete the fingerprint and data at fingerprintStartIndex location by overwriting with randonly generated, decrementing pointer.
 		if(fingerprintExists(fingerprint, offlineDatabase)){
 			// Calling with empty third parameter indicates to replace with random data (deleting the record).
 			const replacement_offlineDatabase = replaceFingerprintAndData(fingerprint, offlineDatabase);
-			// Pointer points to NEXT record to store.
-			//pointer--;
-			//checkIfOfflineDBaseIsFull(pointer);
-			//await setOfflineDBasePointer(pointer);
+
 			await setOfflineDBase(replacement_offlineDatabase);
 			// Check that it was in fact deleted. Fingerprint should be random chars now and therefore miss on a correctly exexuted delete.
 			const outcome = await attemptLoadOfflineDBase(fingerprint);
