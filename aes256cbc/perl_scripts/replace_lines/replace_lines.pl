@@ -36,7 +36,7 @@ sub replace_oldline_with_newline {
 	while(my $line = <$fh>){
 		my $match_found = "no";
 		foreach my $oldline (keys %hash){
-			if ($line =~ /^$oldline$/){
+			if ($line =~ /^\Q$oldline\E$/){
 				$match_found = "yes";
 				print $new_fh $oldline_newline{$oldline}, "\n";
 			}
@@ -58,7 +58,7 @@ sub matches_found {
 	open (my $fh, "<", $file);
 	while(my $line = <$fh>){
 		foreach my $oldline (keys %hash){
-			if ($line =~ /^$oldline$/){
+			if ($line =~ /^\Q$oldline\E$/){
 				$match_found = "yes";
 			}
 		}
