@@ -1105,6 +1105,8 @@
 		offlineDatabasePointer = randInt(0,998);
 		// Roll random data for both databases.
 		offlineDatabase = getRandDatabase();
+console.log("ENC offlinedbase length: " + offlineDatabaseEnc.length);
+console.log("UNENC offlinedbase length: " + offlineDatabase.length);
 		// Download offline database now that everything is ready.
 		downloadStandalone(offlineDatabase, offlineDatabasePointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
 		showPage('home');
@@ -1158,6 +1160,7 @@
 		// So we need 1067000 base64 chars * (3 raw bytes/4 base 64 chars) = 800250 raw bytes from subtle crypto.
 
 		let randBytes = new Uint8Array(0);			// random raw bytes that will be converted to base64 database
+		//let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
 		let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
 		do{
 			if(bytesStillNeeded > 65536){
@@ -3764,32 +3767,39 @@
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 
-	// Replaces one 1024-char data record at the given fingerprintStartIndex location. 
-	function replaceData(fingerprintStartIndex, encryptedData, offlineDatabase){
-		const fingerprintEndIndex = fingerprintStartIndex + FINGERPRINT_LENGTH;
-		const dataEndIndex = fingerprintStartIndex + TOTAL_RECORD_LENGTH;
-		// |--database before record (including fingerprint) --| |-- data --|
-		return offlineDatabase.substring(0, fingerprintEndIndex) + encryptedData + offlineDatabase.substring(dataEndIndex);
-	}
-// just input fingerprint, use search function inside this function.
 	// Replaces the randomly generated 'dummy' chars with 43 length fingerprint and 1024 length encrypted data.
-	//function replaceFingerprintAndData(pointer, fingerprint, encryptedData, offlineDatabase){
-	//
-	// Need fingerprintStartIndex as this function will be used with randomly generated fingerprints (for delete) which will not find the proper location.
-	function replaceFingerprintAndData(fingerprintStartIndex, fingerprint, encryptedData, offlineDatabase){
-		//const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
+	// Used for store when fingerprint does not exist. Pointer needed for this function. 
+	function storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, encryptedData, offlineDatabase){
 		// Multiplying moves us to record at pointer.
-		//const recordStart = pointer * TOTAL_RECORD_LENGTH;
-		const recordStart = fingerprintStartIndex * TOTAL_RECORD_LENGTH;
+		const recordStart = pointer * TOTAL_RECORD_LENGTH;
 		const recordEnd = recordStart + TOTAL_RECORD_LENGTH;
 		// Compile replacement database. 
 		return offlineDatabase.substring(0, recordStart) + fingerprint + encryptedData + offlineDatabase.substring(recordEnd);
 	}
 
+	// Used for delete, RandDAta is needed to backfill keeping offlineDatabase the same length.
+	// Used for store when fingerprint exists.
+	function replaceFingerprintAndData(fingerprint, offlineDatabase, newData='delete'){
+console.log("fingerprint input: " + fingerprint);
+console.log("newData input: " + newData);
+		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
+		// Use a random fingerprint and data if neither were specified.
+		if (newData === 'delete'){
+console.log("delete triggered: " + newData);
+			fingerprint = getRandFingerprint();
+			newData = getRandData();
+		}
+console.log("newData about to get saved: " + newData);
+console.log("fingerprint about to get saved: " + fingerprint);
+		const recordStart = fingerprintStartIndex * TOTAL_RECORD_LENGTH;
+		const recordEnd = recordStart + TOTAL_RECORD_LENGTH;
+		return offlineDatabase.substring(0, recordStart) + fingerprint + newData + offlineDatabase.substring(recordEnd);
+	}
+
 	// Selects either Unencrypted or Encrypted database pointer based on if user inputted an offline database password at the start of the Flow.
-	async function getOfflineDBasePointer(offlineDatabaseType){
+	async function getOfflineDBasePointer(){
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
-		if(offlineDatabaseType === 'unencrypted'){
+		if(getOfflineDatabaseType() === 'unencrypted'){
 			return document.getElementById("offline_dbase_pointer").innerHTML;
 		}else{
 			const encPointer = document.getElementById("offline_dbase_enc_pointer").innerHTML;
@@ -3798,9 +3808,9 @@
 	}
 
 	// Returns either Unencrypted or Encrypted full offline database depending if user entered an offline database password.
-	async function getOfflineDBase(offlineDatabaseType){
+	async function getOfflineDBase(){
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
-		if(offlineDatabaseType === 'unencrypted'){
+		if(getOfflineDatabaseType() === 'unencrypted'){
 			// User didn't enter password, return unencrypted as-is.
 			return document.getElementById("offline_dbase").innerHTML;
 		}else{
@@ -3811,9 +3821,9 @@
 	}
 
 	// Saves pointer to memory-stored HTML.
-	async function setOfflineDBasePointer(pointer, offlineDatabaseType){
+	async function setOfflineDBasePointer(pointer){
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
-		if(offlineDatabaseType === 'unencrypted'){
+		if(getOfflineDatabaseType() === 'unencrypted'){
 			document.getElementById("offline_dbase_pointer").innerHTML = pointer;
 		}else{
 			document.getElementById("offline_dbase_enc_pointer").innerHTML = await encryptTriple(offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], pointer);
@@ -3821,9 +3831,9 @@
 	}
 
 	// Saves full database to its home in html memory.
-	async function setOfflineDBase(dbase, offlineDatabaseType){
+	async function setOfflineDBase(dbase){
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
-		if(offlineDatabaseType === 'unencrypted'){
+		if(getOfflineDatabaseType() === 'unencrypted'){
 			document.getElementById("offline_dbase").innerHTML = dbase;
 		}else{
 			document.getElementById("offline_dbase_enc").innerHTML = await encryptAESCTR(dbase, offlineData['offlineDBasePass']);
@@ -3835,8 +3845,7 @@
 			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.');
 		}else{
 			console.log("FINGERPRINT IS VALID!");
-		}
-		if(!checkDataIsValid(encryptedData)){
+		}if(!checkDataIsValid(encryptedData)){
 			throw new Error('Attempt to store to offline dbase failed! DATA is invalid.');
 		}else{
 			console.log("DATA IS VALID!");
@@ -3852,71 +3861,63 @@
 		}
 	} 
 
-	// Store single record to the offline database selected by if user enters offline database password or not.
-	async function storeOfflineDBase(fingerprint, encryptedData){
-		// Reject invalid data.
-		checkFingerprintAndData(fingerprint, encryptedData);
-		// Determine which Offline Database Flow (Encrypted or Unencrypted) we are in.
-		const offlineDatabaseType = getOfflineDatabaseType();
-		// Retrieve the database and pointer for the Flow we are in.
-		let pointer = await getOfflineDBasePointer(offlineDatabaseType);
-		let offlineDatabase = await getOfflineDBase(offlineDatabaseType);
-
-		console.log("We are in the ~" + offlineDatabaseType + "~ Flow.");
-		console.log("Retrieved pointer: " + pointer);
-		//console.log("Retrieved offlineDBase: " + offlineDatabase);
-		// Check how long database is. Should stay the same? could be a good integrity check?
-		console.log("Offline Database length BEFORE Store: " + offlineDatabase.length);
-
+	function checkIfOfflineDBaseIsFull(pointer){
 		// Check if offline database is full.
 		if(pointer > 999){//999 is ok because we should still be able to store to the last location in the 1000 record databaase. 
 			// Inform user offline database is full.
 			document.getElementById("full_offline_dbase_warning").style.display = "inline";
+			return true;
+		}else{
+			document.getElementById("full_offline_dbase_warning").style.display = "none";
+			return false;
+		}
+	}
+
+	function fingerprintExists(fingerprint, offlineDatabase){
+		// -1 will indicate that the fingerprint was not found.
+		if(offlineDatabase.indexOf(fingerprint) >= 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	// Store single record to the offline database selected by if user enters offline database password or not.
+	async function storeOfflineDBase(fingerprint, encryptedData){
+		// Reject invalid data.
+		checkFingerprintAndData(fingerprint, encryptedData);
+		// Retrieve the database and pointer for the Flow we are in.
+		let pointer = await getOfflineDBasePointer();
+console.log("store called. pointer: " + pointer);
+		let offlineDatabase = await getOfflineDBase();
+		//Check if the offline database is full.
+		if(checkIfOfflineDBaseIsFull(pointer)){
 			return "full";
 		}
-
-		// Perform the data manipulation for the store.
-		// Get the location of fingerprint in Offline Database. Returns -1 if not found.
-		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
+		// Variable to hold the new database.
 		let replacement_offlineDatabase;
-		if(fingerprintStartIndex > -1){
-			// Fingerprint was found in the database, replace old data with new data.
-			console.log("Found existing record in offline database. Replacing it...");
-			replacement_offlineDatabase = replaceData(fingerprintStartIndex, encryptedData, offlineDatabase);
+		//Check if the fingerprint matches the database and replace the data.
+		if(fingerprintExists(fingerprint, offlineDatabase)){
+			replacement_offlineDatabase = replaceFingerprintAndData(fingerprint, offlineDatabase, encryptedData);
+		// If the fingerprint was not found, store a new value in the database.
 		}else{
-			// Fingerprint doesn't exist in database; store inputted fingerprint at pointer location.
-			console.log("Didn't find existing record in offline database. Adding new at pointer location...");
-			replacement_offlineDatabase = replaceFingerprintAndData(pointer, fingerprint, encryptedData, offlineDatabase);
-			//replacement_offlineDatabase = replaceFingerprintAndData(fingerprint, encryptedData, offlineDatabase);
-			// New record was inserted, move pointer to next 'location' in offline database.
+			replacement_offlineDatabase = storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, encryptedData, offlineDatabase);
 			pointer++;
-			// Check if we just hit last save locaation.
-			if(pointer > 999){
-				// Only turn on the warning, informing the user to not store any more.
-				document.getElementById("full_offline_dbase_warning").style.display = "inline";
-			}
+			checkIfOfflineDBaseIsFull(pointer);
 		}
-
-		console.log("Offline Database length AFTER Store: " + offlineDatabase.length);
-		console.log("setting pointer: " + pointer);
-		//console.log("setting offlineDBase: " + replacement_offlineDatabase);
-
 		// Save pointer and offline database to in-memory HTML. ENC or UNENC determined by if an offline database ENC password was entered at flow start.
-		await setOfflineDBasePointer(pointer, offlineDatabaseType);
-		await setOfflineDBase(replacement_offlineDatabase, offlineDatabaseType);
-	}//storeOfflineDBase()
+		await setOfflineDBasePointer(pointer);
+		await setOfflineDBase(replacement_offlineDatabase);
+	}
 
 	// Try to load record at fingerprint. Works on both ENC and UNENC offline databases.
 	async function attemptLoadOfflineDBase(fingerprint){
-		console.log("Attempting Load. fingerprint: " + fingerprint);
-		const offlineDatabaseType = getOfflineDatabaseType();
-		let offlineDatabase = await getOfflineDBase(offlineDatabaseType);
-		//console.log("load dbase: " + offlineDatabase);
+		//console.log("Attempting Load. fingerprint: " + fingerprint);
+		let offlineDatabase = await getOfflineDBase();
 		// Search for fingerprint in offline dbase using regex.
-		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
 		// fingerprintStartIndex will be the index of the beginning of the matched fingerprint.
-		if(fingerprintStartIndex > -1){
-			return getRecordOfflineDBase(fingerprintStartIndex, offlineDatabase);
+		if(fingerprintExists(fingerprint, offlineDatabase)){
+			return getRecordOfflineDBase(fingerprint, offlineDatabase);
 		}else{
 			// Did  not find data on load attempt.
 			return "miss";
@@ -3924,11 +3925,12 @@
 	}//attemptLoadOfflineDBase(()
 
 	// Retrieve one 1000-char data record from an offline database. 
-	function getRecordOfflineDBase(fingerprintStartIndex, offlineDatabase){
-			const fingerprintEndIndex = fingerprintStartIndex + FINGERPRINT_LENGTH;
-			const dataEndIndex = fingerprintEndIndex + DATA_LENGTH;
-			// Get the data between fingerprintEndIndex and dataEndIndex.
-			return offlineDatabase.substring(fingerprintEndIndex, dataEndIndex);
+	function getRecordOfflineDBase(fingerprint, offlineDatabase){
+		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
+		const fingerprintEndIndex = fingerprintStartIndex + FINGERPRINT_LENGTH;
+		const dataEndIndex = fingerprintEndIndex + DATA_LENGTH;
+		// Get the data between fingerprintEndIndex and dataEndIndex.
+		return offlineDatabase.substring(fingerprintEndIndex, dataEndIndex);
 	}
 
 	function checkFingerprint(fingerprint){
@@ -3939,49 +3941,22 @@
 		}
 	}
 
-	// Delete record from offline dbase at fingerprint location.
 	// Random data is generated and 'backfilled' increasing security and keeping Offline Database length the same.
 	async function deleteRecordOfflineDBase(fingerprint){
 		checkFingerprint(fingerprint);
-		// Which database to operate on.
-		const offlineDatabaseType = getOfflineDatabaseType();
 		// Select either ENC or UNENC pointer, offline database depending on if user entered ENC passowrd.
-		let pointer = await getOfflineDBasePointer(offlineDatabaseType);
-		let offlineDatabase = await getOfflineDBase(offlineDatabaseType);
-
-		console.log("before delete pointer: " + pointer);
-		//console.log("before delete database: " + offlineDatabase);
-		console.log("Offline Database length BEFORE Delete: " + offlineDatabase.length);
-
+		//let pointer = await getOfflineDBasePointer();
+		let offlineDatabase = await getOfflineDBase();
 		// Find record in offline dbase if it exists.
-		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
 		// If the record exists, delete the fingerprint and data at fingerprintStartIndex location by overwriting with randonly generated, decrementing pointer.
-		if(fingerprintStartIndex > -1){
-			// Get data that will be used to 'backfill'
-			const randFingerprint = getRandFingerprint();
-			const randData = getRandData();
-			//const replacement_offlineDatabase = replaceFingerprintAndData(pointer, randFingerprint, randData, offlineDatabase);
-			// Need fingerprint start index for delete because randFingerprint won't match anything.
-			const replacement_offlineDatabase = replaceFingerprintAndData(fingerprintStartIndex, randFingerprint, randData, offlineDatabase);
-
+		if(fingerprintExists(fingerprint, offlineDatabase)){
+			// Calling with empty third parameter indicates to replace with random data (deleting the record).
+			const replacement_offlineDatabase = replaceFingerprintAndData(fingerprint, offlineDatabase);
 			// Pointer points to NEXT record to store.
-			pointer--;
-			if(pointer < 999){
-				// Offline Database is no longer full.
-				document.getElementById("full_offline_dbase_warning").style.display = "none";
-			}
-			//const replacement_offlineDatabase = replaceFingerprintAndData(pointer, randFingerprint, randData, offlineDatabase);
-			//const replacement_offlineDatabase = replaceFingerprintAndData(randFingerprint, randData, offlineDatabase);
-
-			console.log("after delete pointer: " + pointer);
-			//console.log("after delete database: " + replacement_offlineDatabase);
-			console.log("Offline Database length AFTER Delete: " + offlineDatabase.length);
-
-			// Saved updated pointer to its location in HTML.
-			await setOfflineDBasePointer(pointer, offlineDatabaseType);
-			// Saved updated offline databse to its location in HTML (next to pointer).
-			await setOfflineDBase(replacement_offlineDatabase, offlineDatabaseType);
-
+			//pointer--;
+			//checkIfOfflineDBaseIsFull(pointer);
+			//await setOfflineDBasePointer(pointer);
+			await setOfflineDBase(replacement_offlineDatabase);
 			// Check that it was in fact deleted. Fingerprint should be random chars now and therefore miss on a correctly exexuted delete.
 			const outcome = await attemptLoadOfflineDBase(fingerprint);
 			if(outcome === "miss"){
@@ -4068,12 +4043,12 @@
 		let storeResponse;
 		// Select encrypted or regular offline database.
 		storeResponse = await storeOfflineDBase(fingerprint, encryptedData);
-		console.log("CMD Offline Store outcome: " + storeResponse);
+		//console.log("CMD Offline Store outcome: " + storeResponse);
 
 		// Check that data stored properly.
 		// Load data at fingerprint, should be the encrypted data block we just stored.
 		const loadResponse = await attemptLoadOfflineDBase(fingerprint);
-		console.log("loadResponse: " + loadResponse);
+		//console.log("loadResponse: " + loadResponse);
 		// Report store outcome.
 		if(encryptedData === loadResponse){
 			// Data successfully stored to memory. Still needs saved to disk which must happen 'manually' by user.
@@ -4095,10 +4070,10 @@
 		// Select encrypted or regular offline database.
 		storeResponse = await storeOfflineDBase(fingerprint, encryptedData);
 
-		console.log("Browser Offline Store outcome: " + storeResponse);
+		//console.log("Browser Offline Store outcome: " + storeResponse);
 		// Load data at fingerprint, should be the encrypted data block we just stored.
 		const loadResponse = await attemptLoadOfflineDBase(fingerprint);
-		console.log("loadResponse: " + loadResponse);
+		//console.log("loadResponse: " + loadResponse);
 		// Report store outcome.
 		if(encryptedData === loadResponse){
 			showPage('offlinestore_success');
@@ -4174,9 +4149,9 @@
 
 	async function decryptAndShowCleartextOffline(encryptedData){
 		//console.log("offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1000Pass]:" + offlineData['obf1000Pass'] + " offlineData[ctrPass]:" + offlineData['ctrPass'] + " offlineData[opensslpass]:" + offlineData['opensslpass']);;
-		console.log("encryptedData: " + encryptedData);
+		//console.log("encryptedData: " + encryptedData);
 		const decryptedData  = await decryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], encryptedData);
-		console.log("decryptedData: " + decryptedData);
+		//console.log("decryptedData: " + decryptedData);
 		// Reveal cleartext to user.
 		document.getElementById("offlineaccess_data_outputdisplay").value = decryptedData;
 	}
@@ -4728,7 +4703,7 @@
 	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 	// Output always packed into base64.
 	async function encryptAESCTR(cleartext, password, inputType='base64'){
-		console.log("encryptAESCTR called with inputType: " + inputType);
+		//console.log("encryptAESCTR called with inputType: " + inputType);
 		let cleartextUint8;
 		// Select input processing type based on function input parameter.
 		if(inputType === 'base64'){// Default usage.
@@ -4805,9 +4780,9 @@
 		const saltAndData = concatBuffer(randSalt, encryptedUint8);
 		// This function outputs base64.
 		const encrypted64 = saltAndData.toBase64();
-		console.log("ciphertext:" + encrypted64 + " password:" + password);
-		console.log("length:" + encrypted64.length);
-		console.log("salt: " + randSalt);
+		//console.log("ciphertext:" + encrypted64 + " password:" + password);
+		//console.log("length:" + encrypted64.length);
+		//console.log("salt: " + randSalt);
 		return encrypted64;
 	}//encryptAESCTR()
 
@@ -4822,9 +4797,9 @@
 		// Cast array returned by slice into a (usable) Uint8Array.
 		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
 
-		console.log("decryptAESCTR called with outputType: " + outputType);
-		console.log("ciphertext:" + saltAndCiphertext + " password:" + password);
-		console.log("salt: " + packedSalt);
+		//console.log("decryptAESCTR called with outputType: " + outputType);
+		//console.log("ciphertext:" + saltAndCiphertext + " password:" + password);
+		//console.log("salt: " + packedSalt);
 
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
