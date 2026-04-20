@@ -458,6 +458,11 @@
 				</div>
 			</div>
 
+			<!---------------------------Password Entry Error-----------------------!>
+			<div class="flow_pages" id="password_entry_error" style="display:none">
+				<h2>&#10060; PASSWORD 3 IS INCORRECT!</h2>
+			</div>
+
 			<!------------------Fingerprint Holder for Delete------------------------------!>
 			<input id="fingerprint_holder" autocomplete="off" value="" style="display:none">
 
@@ -1563,7 +1568,17 @@ console.log("UNENC offlinedbase length: " + offlineDatabase.length);
 
 	async function decryptAndShowCleartext(encryptedData){
 		const cleartextSet = await passlockDecryptSet();
-		const decryptedData  = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
+		//const decryptedData  = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
+
+		let decryptedData;
+		try {
+			decryptedData = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
+		}catch (error){
+			// Would it make sense to catch a specific error?
+			// Assume there was a password entry error.
+			showPage("password_entry_error");
+		}
+
 		// Reveal cleartext to user.
 		document.getElementById("access_data_outputdisplay").value = decryptedData;
 	}// decryptAndShowCleartext()
@@ -3124,6 +3139,11 @@ console.log("UNENC offlinedbase length: " + offlineDatabase.length);
 				</div>
 			</div>
 
+			<!---------------------------Password Entry Error-----------------------!>
+			<div class="flow_pages" id="password_entry_error" style="display:none">
+				<h2>&#10060; PASSWORD 3 IS INCORRECT!</h2>
+			</div>
+
 			<!----------------------------Fingerprint Holder for Delete------------------------------!>
 			<input id="offlinefingerprint_holder" autocomplete="off" value="" style="display:none">
 
@@ -3427,13 +3447,18 @@ console.log("UNENC offlinedbase length: " + offlineDatabase.length);
 				<input autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="resetOfflineData(); showPage('offline_home')">NO PASSWORD</button>
-					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="resetOfflineData(); extractInputDataOffline('set_offlineDBasePass_input'); verifyOfflineDBasePasswordLength() ">PASSWORD READY</button>
+					<!-- <button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="resetOfflineData(); extractInputDataOffline('set_offlineDBasePass_input'); verifyOfflineDBasePasswordLength() ">PASSWORD READY</button> -->
+					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="superCheckEncPassword()">PASSWORD READY</button>
+				</div>
+			</div>
+
+			<!---------------------------Offline Database Password Fail-----------------------!>
+			<div class="flow_pages" id="wrong_offlinedbase_password" style="display:none">
+				<h2>&#10060; OFFLINE DATABASE PASSWORD ENTERED INCORRECTLY!</h2>
 				</div>
 			</div>
 
 	</div> <!-------------------------------------------- Center HTML----------------------------------------------------!>
-	
-
 	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
 		<div id="savetodisk_warning" style="background-color:yellow; display:none; flex-direction:column;">
@@ -3973,14 +3998,41 @@ console.log("UNENC offlinedbase length: " + offlineDatabase.length);
 		offlineData = {};
 	}
 
-	function verifyOfflineDBasePasswordLength(){
+	async function superCheckEncPassword(){
+		resetOfflineData();
+		extractInputDataOffline('set_offlineDBasePass_input');
+		await verifyOfflineDBasePasswordLength();
+	}
+
+	async function verifyOfflineDBasePasswordLength(){
 		if(offlineData['offlineDBasePass'] === undefined || offlineData['offlineDBasePass'] === ''){
 			console.log('caught empty ENC password');
-			showPage('ask_for_dbase_pass');
+			//showPage('ask_for_dbase_pass');
 		}else{
 			console.log('ENC password has successfully been entered.');
-			showPage('offline_home');
+			//if(await checkEncPassword()){
+			const encPassCorrect = await checkEncPassword();
+			if(encPassCorrect){
+				// returned true, Enc password correct.
+				showPage('offline_home');
+			}else{
+				// returned false, Enc password incorrect.
+				showPage('wrong_offlinedbase_password');
+			}
 		}
+	}
+
+	// Try to decrypt pointer to check if Enc password is correct.
+	async function checkEncPassword(){
+		try{
+			// Will attempt decrypt of pointer.
+			await getOfflineDBasePointer();
+		}catch (error){
+			console.log("Looks like enc password entered incorrectly. error: ");
+			console.log(error);
+			return false;
+		}
+		return true;
 	}
 
 	// Use regex to extract keyword from input ID.
@@ -4139,7 +4191,17 @@ console.log("UNENC offlinedbase length: " + offlineDatabase.length);
 	async function decryptAndShowCleartextOffline(encryptedData){
 		//console.log("offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1000Pass]:" + offlineData['obf1000Pass'] + " offlineData[ctrPass]:" + offlineData['ctrPass'] + " offlineData[opensslpass]:" + offlineData['opensslpass']);;
 		//console.log("encryptedData: " + encryptedData);
-		const decryptedData  = await decryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], encryptedData);
+		//const decryptedData  = await decryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], encryptedData);
+
+		let decryptedData;
+		try {
+			decryptedData  = await decryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], encryptedData);
+		}catch (error){
+			// Would it make sense to catch a specific error?
+			// Assume there was a password entry error.
+			showPage("password_entry_error");
+		}
+
 		//console.log("decryptedData: " + decryptedData);
 		// Reveal cleartext to user.
 		document.getElementById("offlineaccess_data_outputdisplay").value = decryptedData;
@@ -4539,8 +4601,7 @@ console.log("UNENC offlinedbase length: " + offlineDatabase.length);
 	// Our implementation of OpenSSL's decrypt function.
 	// Inputs: ciphertext64 is base64. pass is plaintext.
 	// Output: decrypted plaintext.
-	//async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash=, digest_algorithm) {
-	async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
+	async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash="SHA-256", digest_algorithm="AES-CBC") {
 
 		// Convert input base 64 to binary.
 		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
