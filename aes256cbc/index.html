@@ -741,32 +741,9 @@
 <!---------------------------END Store--------------------------------------------------------------!>
 <!---------------------------END Online Flow--------------------------------------------------------!>
 
-<!---------------------------Offline Database--------------------------------------------------------!>
-			<!--------------------------USE ENCRYPTED POINTER?-----------------------!>
-<!--
-			<div class="flow_pages " id="ask_for_dbase_pass" style="display:none; ">
-				<h2>WOULD YOU LIKE TO SECURE YOUR OFFLINE DATABASE WITH AN ENCRYPTED POINTER?</h2>
-				<input autocomplete="off" type="password" value="" id="offlineDBasePass_input" style="display:none">
-				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='yes_button' style="flex-grow:1" onclick="typePointerPassword()">YES</button>
-					<button class="obf_button" id='no_button' style="flex-grow:1" onclick="createOfflineDBase('no')">NO</button>
-					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1; display:none" onclick="createOfflineDBase('yes')">PASSWORD READY</button>
-				</div>
-			</div>
-
--->
-			<!--------------------------Ask user for encrypted offline database password-----------------------!>
-			<div class="flow_pages" id="ask_for_dbase_pass" style="display:none; ">
-				<h2>TO ENCRYPT YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
-				<input autocomplete="off" type="password" value="" id="offlineDBasePass_input" style="">
-				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="createOfflineDBase('no'); showPage('home')">NO PASSWORD</button>
-					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="createOfflineDBase('yes'); showPage('home')">PASSWORD READY</button>
-				</div>
-			</div>
-
-			<!---------------Offline Database 3 Options-----------------------------------------------!>
-			<div class="flow_pages" id="offline_dbase_3options" style="display:none">
+<!---------------------------Offline Database Creation--------------------------------------------------------!>
+			<!---------------Offline Database 2 Options-----------------------------------------------!>
+			<div class="flow_pages" id="offline_dbase_2options" style="display:none">
 				<h2 style="align-self:center;">CHOOSE HOW TO CREATE YOUR OFFLINE DATABASE</h2>
 				<div class="" id="" style="display:flex;">
 					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
@@ -776,12 +753,22 @@
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('ask_for_dbase_pass')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('option2_encpass_or_no')">
 							<span class="coolpink" style="">FILL OFFLINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Option 2</span>
 						</button>
 						<label class="coolpink" style="align-self:center;">MOST Secure</label>
 					</div>
+				</div>
+			</div>
+
+			<!--------------------------FILL OFFLINE Use ENC Password Database?-----------------------!>
+			<div class="flow_pages" id="option2_encpass_or_no" style="display:none; ">
+				<h2>TO ENCRYPT YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
+				<input autocomplete="off" type="password" value="" id="offlineDBasePass_input" style="">
+				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="createOfflineDBase('no'); showPage('home')">NO PASSWORD</button>
+					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="createOfflineDBase('yes'); showPage('home')">PASSWORD READY</button>
 				</div>
 			</div>
 
@@ -795,7 +782,7 @@
 				<h2>ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="existingdata_codeword_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_dbase_3options')">BACK</button>-->
+					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_dbase_2options')">BACK</button>-->
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('existingdata_codeword_input');showPage('newofflinedatabase_existingdata_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
@@ -849,68 +836,33 @@
 				</div>
 			</div>
 
-
 			<!---------------------------EXISTING DATA Fail-----------------------!>
 			<div class="flow_pages" id="failed_to_access_for_new_offline_database_creation" style="display:none">
 				<h2>&#10060; FAILED TO ACCESS EXISTING DATA FOR OFFLINE DATABASE CREATION.</h2>
-				<button class="" id='' style="flex-grow:1;" onclick="clearNewOfflineDBaseData(); showPage('home')">I'M DONE WITH THIS</button>
+				<!--<button class="" id='' style="flex-grow:1;" onclick="clearNewOfflineDBaseData(); showPage('home')">I'M DONE WITH THIS</button>-->
 				<button class="" id='' style="flex-grow:1;" onclick="showPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
-			</div>
-
-
-
-
-
-			<!---------------Create New Offline DBase-----------------------------------------------!>
-			<div class="flow_pages" id="create_new_offline_dbase_div" style="display:none; ">
-				<h2 id="create_offline_dbase_label_h2">THIS WILL CREATE AN OFFLINE DATABASE OF PREVIOUSLY STORED DATA.</h2>
-				<h3 id="create_offline_dbase_label_h3">Please enter the following passwords to Access the data you wish to be stored in the offline database.</h3>
-				<div style="display:flex; flex-direction:column;">
-					<label id="">ENTER CODEWORD:</label>
-					<input autocomplete="off" type="password" value="" id="init_codeword_offdbase" style="">
-					<label id="">ENTER PASSWORD 1:</label>
-					<input autocomplete="off" type="password" value="" id="init_obf1000Pass_offdbase" style="">
-					<label id="">ENTER PASSWORD 2:</label>
-					<input autocomplete="off" type="password" value="" id="init_ctrPass_offdbase" style="">
-				</div>
-				<div style="display:flex; flex-direction:row;">
-					<button id="new_offline_dbase_access_data_button" style="flex-grow:1; " onclick="accessDataForOfflineDBaseCreation()">SUBMIT PASSWORDS</button>
-					<button id="new_offline_dbase_cancel_button" style="flex-grow:1; " onclick="cancelNewOfflineDBase()">CANCEL</button>
-					<button id="new_offline_dbase_completed_button" style="flex-grow:1; display:none;" onclick="doneNewOfflineDBase()">DONE</button>
-				</div>
-				<h3 id="init_offdbase_statuslabel" style="align-self:center; display:none; color:red;">placeholder</h3>
 			</div>
 
 	</div> <!--------------------------------------------Center HTML----------------------------------------------------!>
 
 	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
-			<!--<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_home')">SWITCH TO ISOLATED OFFLINE DBASE</button>--!>
-
-			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_dbase_3options');">CREATE OFFLINE DATABASE</button>
-	<!--
-			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="downloadStandalone();">DOWNLOAD STANDALONE.HTML</button>
-
-			<button id="create_dbase_button" style="display:inline; flex-grow:1" onclick="createNewOfflineDBaseFlow()">CREATE NEW OFFLINE DBASE</button>
-			<div style="display:flex">
-			<button id="download_offline_dbase_button" style="flex-grow:1" onclick="downloadStandalone()">DOWNLOAD STANDALONE.HTML</button>
-		</div>
-----------------!>
+			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_dbase_2options');">CREATE OFFLINE DATABASE</button>
 	</div>
-<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
+
 </body>
 <script>
 	//////////////////////////////////////////////////////////////
 	//		Global Flags & Page Load Function					//
 	//////////////////////////////////////////////////////////////
 
-	// Single Record (TOTAL_RECORD_LENGTH):
+	// Single Record (TOTAL_RECORD_LENGTH) in bytes:
 	//        43	       1024
 	// |--fingerprint--||--Data--|
 
 	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
-	const FINGERPRINT_BYTE_LENGTH = 32;
+	const FINGERPRINT_BYTE_LENGTH = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
 	const DATA_LENGTH = 1024;
 	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
 	const PASSLOCK_LENGTH = 36;
@@ -932,6 +884,10 @@
 	// Set Title to link to Home without dropping offline dbase.
 	document.getElementById("titletext").onclick = function(){
 		//location.href = "https://chat.dance/obf";
+		// Clear offline database temp list of records to be stored (Option 1).
+		clearNewOfflineDBaseData();
+		// Makes sense to reset passlock, timer when user clicks home?
+		resetPasslock();
 		showPage('home');
 	}
 
@@ -1146,11 +1102,82 @@
 		}
 	}// checkTextInputLength()
 
+
+	///////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
+	//                       Offline Database Creation                               //
+	///////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
+
+	// Object to gather set of records to be stored in a new offline database (Option 1).
+	let newOfflineDBase = {};
+	let newOfflineDBaseLength;
+	// Global for now. Rolling here isn't a security issue?
+	let offlineDatabasePointer = randInt(0,998);
+
+	function clearNewOfflineDBaseData(){
+		console.log("Clearing temp stack of records that were to be added to new offline database.");
+		newOfflineDBase = {};
+	}
+
+	async function getOnlineRecordForNewOfflineDBase(inputId){
+		// Gather ctrPass
+		await extractInputData(inputId);
+		console.log("inputID " +  inputId);
+		console.log(passlockedData);
+		// All user passwords should be ready at this point. Compute Fingerprint.
+		const fingerprint = await getFpForAccess();
+		const encryptedData = await serverLoad(fingerprint);
+		// Check that data is valid.
+		if(encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+			showPage('failed_to_access_for_new_offline_database_creation');
+			resetPasslock();
+		}else{
+			// Push fp, data to newOfflineDbase collector object.
+			newOfflineDBase[fingerprint] = encryptedData;
+			// Check if new offline database is full.
+			//if(Object.keys(newOfflineDBase).length >= 1000){
+			newOfflineDBaseLength = Object.keys(newOfflineDBase).length;
+			console.log("new offline database records length: " + newOfflineDBaseLength);
+
+			if(length >= 1000){
+				// No more room in offline dbase, no choice but to continue.
+				showPage('newofflinedatabase_existingdata_encpass_or_no');
+			}
+			// Let user decide to add more or continue with offline dbase creation.
+			showPage('newofflinedatabase_existingdata_record_added');
+		}
+	}
+
+	// Default pointer parameter. Without pointer input, will assume start at beginning of database.
+	function fillNewOfflineDBase(offlineDatabase, pointer=0){
+		console.log("filling new offline database.");
+		// While gather object not empty, fill 
+		for(const [fingerprint, data] of Object.entries(newOfflineDBase)){
+			console.log('Storing fingerprint: ' + fingerprint + '\n Storing data: ' + data);
+			offlineDatabase = storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, data, offlineDatabase);
+			pointer++;// Important to increment AFTER store.
+		}
+		let returnData = {};
+		returnData['pointer'] = pointer;
+		returnData['database'] = offlineDatabase;
+		return returnData;
+	}
+
+	function storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, encryptedData, offlineDatabase){
+		// Multiplying moves us to record at pointer.
+		const recordStart = pointer * TOTAL_RECORD_LENGTH;
+		const recordEnd = recordStart + TOTAL_RECORD_LENGTH;
+		// Compile replacement database. 
+		return offlineDatabase.substring(0, recordStart) + fingerprint + encryptedData + offlineDatabase.substring(recordEnd);
+	}
+
+	// Option 1
 	// For now same as createOfflineDBase
 	// except it fills chosen side with existing records from object just filled.
 	async function createAndFillOfflineDBase(chosenAnswer){
 		let offlineDatabase = '';
-		let offlineDatabasePointer = '';
+		//let offlineDatabasePointer = '';
 		let offlineDatabaseEnc = '';
 		let offlineDatabaseEncPointer = '';
 		// User can chose a password for the encrypted offline database.
@@ -1204,36 +1231,13 @@
 
 		showPage('home');
 	}//createAndFillNewOfflineDBase()
-	
-	// Default pointer parameter. Without pointer input, will assume start at beginning of database.
-	function fillNewOfflineDBase(offlineDatabase, pointer=0){
-		console.log("filling new offline database.");
-		// While gather object not empty, fill 
-		for(const [fingerprint, data] of Object.entries(newOfflineDBase)){
-			console.log('Storing fingerprint: ' + fingerprint + '\n Storing data: ' + data);
-			offlineDatabase = storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, data, offlineDatabase);
-			pointer++;// Important to increment AFTER store.
-		}
-		let returnData = {};
-		returnData['pointer'] = pointer;
-		returnData['database'] = offlineDatabase;
-		return returnData;
-	}
 
-	function storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, encryptedData, offlineDatabase){
-		// Multiplying moves us to record at pointer.
-		const recordStart = pointer * TOTAL_RECORD_LENGTH;
-		const recordEnd = recordStart + TOTAL_RECORD_LENGTH;
-		// Compile replacement database. 
-		return offlineDatabase.substring(0, recordStart) + fingerprint + encryptedData + offlineDatabase.substring(recordEnd);
-	}
-
-
-	// Create Encrypted and Unencrypted offline database stack if 1000 records worth of dummy base64 data.
+	// Option 2
+	// Create Encrypted and Unencrypted offline database stack of 1000 records worth of dummy base64 data.
 	// Also create record location pointers for those databases to function.
 	async function createOfflineDBase(chosenAnswer){
 		let offlineDatabase = '';
-		let offlineDatabasePointer = '';
+		//let offlineDatabasePointer = '';
 		let offlineDatabaseEnc = '';
 		let offlineDatabaseEncPointer = '';
 		// User can chose a password for the encrypted offline database.
@@ -1262,7 +1266,7 @@
 			console.log("NO selected, random data pointer result:" + offlineDatabaseEncPointer);
 		}
 		// Init random cleartext pointer.
-		offlineDatabasePointer = randInt(0,998);
+		//offlineDatabasePointer = randInt(0,998);
 		// Roll random data for both databases.
 		offlineDatabase = getRandDatabase();
 		console.log("ENC offlinedbase length: " + offlineDatabaseEnc.length);
@@ -1285,34 +1289,6 @@
 		return randarray.toBase64({omitPadding: true});
 	}// getRandFingerprint()
 
-/*
-	function getRandDatabase(){
-		let randDatabase = '';
-		let randFingerprint = '';
-		let rand7Byte;
-		let randData;
-		let randData64;
-
-		for(let i=0; i < 1024; i++){
-			// Roll random fingerprint.
-			randFingerprint = getRandFingerprint();
-			// Roll 7Byte set.
-			rand7Byte = roll7Byte();
-			// Roll 743 random bytes for random data. 
-			randData = window.crypto.getRandomValues(new Uint8Array(743));
-			// Concatenate 7Byte and random data.
-			randData = concatBuffer(rand7Byte, randData);
-			// Convert to base64
-			randData64 = randData.toBase64();
-			// Compile with running set of base64 chars.
-			randDatabase += randFingerprint;
-			randDatabase += randData64;
-		}
-
-		return randDatabase;
-	}
-*/
-
 	//Generate the random bytes composing our database.
 	function getRandDatabase(){
 		// Each record has 43 base64 chars for fingerprint and 1024 chars for the data.
@@ -1334,96 +1310,6 @@
 		//Now that we've generated all 800250 random raw bytes, convert them to 1,067,000 base64 characters.
 		return randBytes.toBase64();
 	}// getRandDatabase()
-
-
-
-
-
-	// Handles Create New Offline DBase UI while user is adding records.
-	// Takes the inputted passwords/codeword and queries the server for existing records in an attempt to add them to the offline dbase.
-	async function accessDataForOfflineDBaseCreation(){
-		// Don't need password 1 which is used for command line encryption or its browser backup.
-		const codeword = document.getElementById("init_codeword_offdbase").value;
-		const obf1000Pass = document.getElementById("init_obf1000Pass_offdbase").value;
-		const ctrPass = document.getElementById("init_ctrPass_offdbase").value;
-		// Clear used values.
-		document.getElementById("init_codeword_offdbase").value = "";
-		document.getElementById("init_obf1000Pass_offdbase").value = "";
-		document.getElementById("init_ctrPass_offdbase").value = "";
-		// Re-focus on first input for ease of use.
-		document.getElementById("init_codeword_offdbase").focus();
-
-		const fingerprint = await computeFingerprint(codeword, obf1000Pass, ctrPass);
-
-		console.log("offline dbase creation: Querying server...");
-		encryptedData = await serverLoad(fingerprint);
-		console.log("offline dbase creation: Access Server Response, data: " + encryptedData);
-
-		let result;
-		if(encryptedData !== "failed to load"){
-			// Select encrypted or not enc offline database.
-			result = await storeOfflineDBase(fingerprint, encryptedData);
-		}
-
-		if(result === "success"){
-			// Transform Cancel button into Done button.
-			hideCancelShowDone();
-			document.getElementById("init_offdbase_statuslabel").innerHTML = "SUCCESSFULLY ADDDED DATA TO OFFLINE DATABASE";
-			document.getElementById("init_offdbase_statuslabel").style.display = "flex";
-		}else{
-			document.getElementById("init_offdbase_statuslabel").innerHTML = "FAILED TO ADD DATA TO OFFLINE DATABASE";
-			document.getElementById("init_offdbase_statuslabel").style.display = "flex";
-		}
-	}// accessDataForOfflineDBaseCreation()
-
-	// Gather passwords in passlockedData
-	// retrieve encrypted data from online database
-	// if data valid, push to temp database. Use key-value object with fingerprint as key.
-	// 
-
-	// Object to gather set of records to be stored in a new offline database.
-	let newOfflineDBase = {};
-	let newOfflineDBaseLength;
-
-	function clearNewOfflineDBaseData(){
-		newOfflineDBase = {};
-	}
-
-	async function getOnlineRecordForNewOfflineDBase(inputId){
-		// Gather ctrPass
-		await extractInputData(inputId);
-console.log("inputID " +  inputId);
-console.log(passlockedData);
-		// All user passwords should be ready at this point. Compute Fingerprint.
-		const fingerprint = await getFpForAccess();
-		const encryptedData = await serverLoad(fingerprint);
-		// Check that data is valid.
-		if(encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
-			showPage('failed_to_access_for_new_offline_database_creation');
-			resetPasslock();
-		}else{
-			// Push fp, data to newOfflineDbase collector object.
-			newOfflineDBase[fingerprint] = encryptedData;
-			// Check if new offline database is full.
-			//if(Object.keys(newOfflineDBase).length >= 1000){
-			newOfflineDBaseLength = Object.keys(newOfflineDBase).length;
-			console.log("new offline database records length: " + newOfflineDBaseLength);
-
-			if(length >= 1000){
-				// No more room in offline dbase, no choice but to continue.
-				showPage('enc_password_for_new_offline_dbase_or_no');
-			}
-			// Let user decide to add more or continue with offline dbase creation.
-			showPage('newofflinedatabase_existingdata_record_added');
-		}
-	}
-
-
-
-
-
-
-
 
 	//Generate random integers from 0 to 4,294,967,296.
 	function randInt(min, max){
@@ -3609,7 +3495,7 @@ console.log("cleartext data: " + cleartextData);
 <!----------------------------END Offline Flow--------------------------------------------------------------!>
 
 			<!--------------------------Ask user for encrypted pointer password-----------------------!>
-			<div class="flow_pages" id="ask_for_dbase_pass" style="display:flex; ">
+			<div class="flow_pages" id="enter_offlinedbase_pass" style="display:flex; ">
 				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
 				<input autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
@@ -3682,7 +3568,7 @@ console.log("cleartext data: " + cleartextData);
 		// Clear storage object for security.
 		offlineData = {};
 		//showPage('offline_home');
-		showPage('ask_for_dbase_pass');
+		showPage('enter_offlinedbase_pass');
 	}
 
 	document.getElementById("dev_site_link").onclick = function(){
@@ -3796,7 +3682,7 @@ console.log("cleartext data: " + cleartextData);
 	}
 
 	// Keep track of the page we're on. Start on home page.
-	let currentPage = 'ask_for_dbase_pass';
+	let currentPage = 'enter_offlinedbase_pass';
 	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of a page for flowing the user through site.
 	function showPage(target){
@@ -4174,10 +4060,8 @@ console.log("cleartext data: " + cleartextData);
 	async function verifyOfflineDBasePasswordLength(){
 		if(offlineData['offlineDBasePass'] === undefined || offlineData['offlineDBasePass'] === ''){
 			console.log('caught empty ENC password');
-			//showPage('ask_for_dbase_pass');
 		}else{
 			console.log('ENC password has successfully been entered.');
-			//if(await checkEncPassword()){
 			const encPassCorrect = await checkEncPassword();
 			if(encPassCorrect){
 				// returned true, Enc password correct.
