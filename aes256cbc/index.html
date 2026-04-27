@@ -753,7 +753,7 @@
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('option2_encpass_or_no')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('offlineDatabase_pass_or_no')">
 							<span class="coolpink" style="">FILL OFFLINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Option 2</span>
 						</button>
@@ -763,14 +763,16 @@
 			</div>
 
 			<!--------------------------FILL OFFLINE Use ENC Password Database?-----------------------!>
-			<div class="flow_pages" id="option2_encpass_or_no" style="display:none; ">
+<!--
+			<div class="flow_pages" id="offlineDatabase_pass_or_no" style="display:none; ">
 				<h2>TO ENCRYPT YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
 				<input autocomplete="off" type="password" value="" id="offlineDBasePass_input" style="">
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="createOfflineDBase('no'); showPage('home')">NO PASSWORD</button>
-					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="createOfflineDBase('yes'); showPage('home')">PASSWORD READY</button>
+					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="createOfflineDBase('unencrypted'); showPage('home')">NO PASSWORD</button>
+					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="createOfflineDBase('encrypted'); showPage('home')">PASSWORD READY</button>
 				</div>
 			</div>
+-->
 
 			<!---------------------------EXISTING DATA Codeword-----------------------!>
 			<div class="flow_pages passlock" id="newofflinedatabase_exisitingdata_codeword" style="display:none">
@@ -821,18 +823,18 @@
 			<div class="flow_pages" id="newofflinedatabase_existingdata_record_added" style="display:none">
 				<h2>RECORD ADDED! YOU NOW HAVE X RECORDS READY TO ADD TO A NEW OFFLINE DATABASE.</h2>
 				<h2>ADD MORE RECORDS?</h2>
-				<button class="" id='' style="flex-grow:1;" onclick="showPage('newofflinedatabase_existingdata_encpass_or_no');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
+				<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineDatabase_pass_or_no');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
 				<button class="" id='' style="flex-grow:1;" onclick="showPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
 			</div>
 
 			<!--------------------------EXISTING DATA Use ENC Pass Database?-----------------------!>
-			<div class="flow_pages" id="newofflinedatabase_existingdata_encpass_or_no" style="display:none; ">
+			<div class="flow_pages" id="offlineDatabase_pass_or_no" style="display:none; ">
 				<h2>YOU HAVE COMPLETED FILLING YOUR SET OF EXISTING DATA THAT WILL SOON BE ADDED TO A NEW OFFLINE DATABASE.</h2>
 				<h2>WOULD YOU LIKE TO ENCRYPT YOUR OFFLINE DATABASE WITH A PASSWORD?</h2>
-				<input autocomplete="off" type="password" value="" id="existingdata_offlineDBasePass_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlineDBasePass_input" style="">
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='' style="flex-grow:1" onclick="createAndFillOfflineDBase('no');">NO PASSWORD</button>
-					<button class="obf_button activatable_by_enter" id='' style="flex-grow:1;" onclick="createAndFillOfflineDBase('yes');">PASSWORD READY</button>
+					<button class="obf_button" id='' style="flex-grow:1" onclick="createAndFillOfflineDBase('unencrypted');">NO PASSWORD</button>
+					<button class="obf_button activatable_by_enter" id='' style="flex-grow:1;" onclick="createAndFillOfflineDBase('encrypted');">PASSWORD READY</button>
 				</div>
 			</div>
 
@@ -1110,14 +1112,14 @@
 	///////////////////////////////////////////////////////////////////////////////////
 
 	// Object to gather set of records to be stored in a new offline database (Option 1).
-	let newOfflineDBase = {};
-	let newOfflineDBaseLength;
+	let recordListForNewOfflineDBase = {};
+	let recordListForNewOfflineDBaseLength;
 	// Global for now. Rolling here isn't a security issue?
-	let offlineDatabasePointer = randInt(0,998);
+	let offlineDatabasePointerGlobal = randInt(0,998);
 
 	function clearNewOfflineDBaseData(){
 		console.log("Clearing temp stack of records that were to be added to new offline database.");
-		newOfflineDBase = {};
+		recordListForNewOfflineDBase = {};
 	}
 
 	async function getOnlineRecordForNewOfflineDBase(inputId){
@@ -1133,27 +1135,28 @@
 			showPage('failed_to_access_for_new_offline_database_creation');
 			resetPasslock();
 		}else{
-			// Push fp, data to newOfflineDbase collector object.
-			newOfflineDBase[fingerprint] = encryptedData;
+			// Push fp, data to recordListForNewOfflineDBase collector object.
+			recordListForNewOfflineDBase[fingerprint] = encryptedData;
 			// Check if new offline database is full.
-			//if(Object.keys(newOfflineDBase).length >= 1000){
-			newOfflineDBaseLength = Object.keys(newOfflineDBase).length;
-			console.log("new offline database records length: " + newOfflineDBaseLength);
+			//if(Object.keys(recordListForNewOfflineDBase).length >= 1000){
+			recordListForNewOfflineDBaseLength = Object.keys(recordListForNewOfflineDBase).length;
+			console.log("new offline database records length: " + recordListForNewOfflineDBaseLength);
 
 			if(length >= 1000){
 				// No more room in offline dbase, no choice but to continue.
-				showPage('newofflinedatabase_existingdata_encpass_or_no');
+				showPage('offlineDatabase_pass_or_no');
 			}
 			// Let user decide to add more or continue with offline dbase creation.
 			showPage('newofflinedatabase_existingdata_record_added');
 		}
-	}
+	}// getOnlineRecordForNewOfflineDBase();
 
 	// Default pointer parameter. Without pointer input, will assume start at beginning of database.
+	// Function should work with empty recordListForNewOfflineDBase set?
 	function fillNewOfflineDBase(offlineDatabase, pointer=0){
 		console.log("filling new offline database.");
 		// While gather object not empty, fill 
-		for(const [fingerprint, data] of Object.entries(newOfflineDBase)){
+		for(const [fingerprint, data] of Object.entries(recordListForNewOfflineDBase)){
 			console.log('Storing fingerprint: ' + fingerprint + '\n Storing data: ' + data);
 			offlineDatabase = storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, data, offlineDatabase);
 			pointer++;// Important to increment AFTER store.
@@ -1162,7 +1165,7 @@
 		returnData['pointer'] = pointer;
 		returnData['database'] = offlineDatabase;
 		return returnData;
-	}
+	}// fillNewOfflineDBase()
 
 	function storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, encryptedData, offlineDatabase){
 		// Multiplying moves us to record at pointer.
@@ -1172,19 +1175,22 @@
 		return offlineDatabase.substring(0, recordStart) + fingerprint + encryptedData + offlineDatabase.substring(recordEnd);
 	}
 
+
+
+/*
 	// Option 1
 	// For now same as createOfflineDBase
 	// except it fills chosen side with existing records from object just filled.
-	async function createAndFillOfflineDBase(chosenAnswer){
+	async function createAndFillOfflineDBase(chosenDatabase){
 		let offlineDatabase = '';
 		//let offlineDatabasePointer = '';
 		let offlineDatabaseEnc = '';
 		let offlineDatabaseEncPointer = '';
 		// User can chose a password for the encrypted offline database.
-		if(chosenAnswer === 'yes'){
+		if(chosenDatabase === 'encrypted'){
 			// User entered a password to encrypt the offline database with.
-			const offlineDBasePass = document.getElementById("existingdata_offlineDBasePass_input").value;
-			document.getElementById("existingdata_offlineDBasePass_input").value = "";
+			const offlineDBasePass = document.getElementById("offlineDBasePass_input").value;
+			document.getElementById("offlineDBasePass_input").value = "";
 			console.log("Using offlineDBasePass to encrypt Offline Database: " + offlineDBasePass);
 			// Create and encrypt Offline Database.
 			const randomDatabase = getRandDatabase();
@@ -1231,17 +1237,61 @@
 
 		showPage('home');
 	}//createAndFillNewOfflineDBase()
+*/
 
+	// Generate 2 sets of 1,067,000 random base64 chars for each offline database side (ENC and UNENC).
+	// Set up these databases with pointers that point to the next 'empty' 'location' in the set of random data where the record data of the offline database is hidden.
+	async function createAndFillOfflineDBase(chosenDatabase){
+		let offlineDatabase = '';
+		//let offlineDatabasePointer = ''; // Set globally so we can set a limit on NOENC database before this function is reached.
+		let offlineDatabaseEnc = '';
+		let offlineDatabaseEncPointer = '';
+		// Start by filling both databases with random base64 chars.
+		offlineDatabase = getRandDatabase();
+		offlineDatabaseEnc = getRandDatabase();
+		// User can choose to encrypt their offline database with a password.
+		// This choice determines which database (ENC or UNENC) the set of pre-filled records is saved to.
+		if(chosenDatabase === 'encrypted'){
+			// Fill user chosen side with set of records they gathered.
+			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseEnc);
+			// Get ENC password.
+			const encPassword = extractCleartextData("offlineDBasePass_input");
+			// Set ENC side. 
+			offlineDatabaseEnc = await encryptAESCTR(filledOfflineDatabaseAndPointer['database'], encPassword);
+			offlineDatabaseEncPointer = await encryptTriple(encPassword, encPassword, encPassword, filledOfflineDatabaseAndPointer['pointer']);
+			// Set UNENC side.
+			// offlineDatabase no change from first generation above.
+			offlineDatabasePointer = offlineDatabasePointerGlobal;
+		}else{
+			// Fill user chosen side with set of records they gathered.
+			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabase, offlineDatabasePointerGlobal);
+			// Get ENC password.
+			const encPassword = getRandData();
+			// Set ENC side. 
+			offlineDatabaseEnc = await encryptAESCTR(offlineDatabaseEnc, encPassword);
+			offlineDatabaseEncPointer = getRandData();
+			// Set UNENC side.
+			offlineDatabase = filledOfflineDatabaseAndPointer['database'];
+			offlineDatabasePointer = filledOfflineDatabaseAndPointer['pointer'];
+		}
+		// Compile static standalone code with generated databases and push to user.
+		downloadStandalone(offlineDatabase, offlineDatabasePointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
+		// Delete offline database gather object now that it has been used.
+		clearNewOfflineDBaseData();
+		showPage('home');
+	}//createAndFillNewOfflineDBase()
+
+/*
 	// Option 2
 	// Create Encrypted and Unencrypted offline database stack of 1000 records worth of dummy base64 data.
 	// Also create record location pointers for those databases to function.
-	async function createOfflineDBase(chosenAnswer){
+	async function createOfflineDBase(chosenDatabase){
 		let offlineDatabase = '';
 		//let offlineDatabasePointer = '';
 		let offlineDatabaseEnc = '';
 		let offlineDatabaseEncPointer = '';
 		// User can chose a password for the encrypted offline database.
-		if(chosenAnswer === 'yes'){
+		if(chosenDatabase === 'encrypted'){
 			// User entered a password to encrypt the offline database with.
 			const offlineDBasePass = document.getElementById('offlineDBasePass_input').value;
 			document.getElementById("offlineDBasePass_input").value = "";
@@ -1275,6 +1325,7 @@
 		downloadStandalone(offlineDatabase, offlineDatabasePointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
 		showPage('home');
 	}// createOfflineDBase()
+*/
 
 	function getRandData(){
 		// Pick a value that will convert into 1024 base64 chars.
@@ -2345,7 +2396,7 @@ console.log("cleartext data: " + cleartextData);
 		}
 		// Convert password text into Uint8Array.
 		const passwordUint8 = new TextEncoder().encode(password);
-		// Compute a random salt that will be prepended to the data for use with decrypt.
+		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
 		// This increases our Triple Encrypted Data Record size to 1024.
 		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
@@ -2357,7 +2408,7 @@ console.log("cleartext data: " + cleartextData);
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
 			"PBKDF2",			// Key derivation algorithm to be used.
 			false,				// Is key data extractable from cryptoKey object or not.
-			["deriveBits"],		// allowed use of this key.
+			["deriveBits"],		// the allowed use of this key.
 		);
 
 		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
@@ -2365,7 +2416,7 @@ console.log("cleartext data: " + cleartextData);
 			{									// PBKDF2 parameters object
 				name: "PBKDF2",					// key derivation algorithm
 				//name: key_derivation_algo,
-				salt: randSalt,					// salt (at least 16 bytes for security;
+				salt: randSalt,					// salt (MDN suggests at least 16 bytes for security)
 				iterations: 10000,				// strength
 				hash: 'SHA-256',				// 
 			},
@@ -2402,7 +2453,6 @@ console.log("cleartext data: " + cleartextData);
 			false,					// extractable boolean 
 			['encrypt']				// keyUsages
 		);
-
 		// MDN syntax: encrypt(algorithm, key, data)
         const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
