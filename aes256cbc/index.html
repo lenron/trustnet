@@ -1120,7 +1120,7 @@
 	function clearNewOfflineDBaseData(){
 		console.log("Clearing temp stack of records that were to be added to new offline database.");
 		recordListForNewOfflineDBase = {};
-	}
+	}// clearNewOfflineDBaseData()
 
 	async function getOnlineRecordForNewOfflineDBase(inputId){
 		// Gather ctrPass
@@ -1173,73 +1173,11 @@
 		const recordEnd = recordStart + TOTAL_RECORD_LENGTH;
 		// Compile replacement database. 
 		return offlineDatabase.substring(0, recordStart) + fingerprint + encryptedData + offlineDatabase.substring(recordEnd);
-	}
+	}// storeFingerprintAndDataToOfflineDBase()
 
-
-
-/*
-	// Option 1
-	// For now same as createOfflineDBase
-	// except it fills chosen side with existing records from object just filled.
-	async function createAndFillOfflineDBase(chosenDatabase){
-		let offlineDatabase = '';
-		//let offlineDatabasePointer = '';
-		let offlineDatabaseEnc = '';
-		let offlineDatabaseEncPointer = '';
-		// User can chose a password for the encrypted offline database.
-		if(chosenDatabase === 'encrypted'){
-			// User entered a password to encrypt the offline database with.
-			const offlineDBasePass = document.getElementById("offlineDBasePass_input").value;
-			document.getElementById("offlineDBasePass_input").value = "";
-			console.log("Using offlineDBasePass to encrypt Offline Database: " + offlineDBasePass);
-			// Create and encrypt Offline Database.
-			const randomDatabase = getRandDatabase();
-			// Fill with user chosen records.
-			const returnedData = fillNewOfflineDBase(randomDatabase);
-			// Encrypt pointer and database.
-			offlineDatabaseEncPointer = await encryptTriple(offlineDBasePass, offlineDBasePass, offlineDBasePass, returnedData['pointer']);
-			offlineDatabaseEnc = await encryptAESCTR(returnedData['database'], offlineDBasePass);
-			//const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, 'the pointer starts at: 0');
-			console.log("YES selected, tripleEncrypted pointer result: " + offlineDatabaseEncPointer);
-			// Init random cleartext pointer.
-			offlineDatabasePointer = randInt(0,998);
-			// Roll random data for both databases.
-			offlineDatabase = getRandDatabase();
-		}else{
-			// User chose no password. Fill Encrypted offline database with dummy data.
-			console.log("No Password Chosen for offline database creation.");
-			// Roll random data for pointer. 1 of our 1024 char entries for a encryptTriple'd.
-			offlineDatabaseEncPointer = getRandData();
-
-			const randomEmptyDatabase = getRandDatabase();
-			const randomFingerprint = getRandFingerprint();
-
-			offlineDatabaseEnc = await encryptAESCTR(randomEmptyDatabase, randomFingerprint);
-			console.log("NO selected, random data pointer result:" + offlineDatabaseEncPointer);
-
-			const randomPointer = randInt(0,998);
-			const randomDatabase = getRandDatabase();
-
-			const returnedData = fillNewOfflineDBase(randomDatabase, randomPointer);
-			offlineDatabasePointer = returnedData['pointer'];
-			offlineDatabase = returnedData['database'];
-		}
-		// Init random cleartext pointer.
-		//offlineDatabasePointer = randInt(0,998);
-		// Roll random data for both databases.
-		//offlineDatabase = getRandDatabase();
-		console.log("ENC offlinedbase length: " + offlineDatabaseEnc.length);
-		console.log("UNENC offlinedbase length: " + offlineDatabase.length);
-		// Download offline database now that everything is ready.
-		downloadStandalone(offlineDatabase, offlineDatabasePointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
-		// Delete offline database gather object.
-		clearNewOfflineDBaseData();
-
-		showPage('home');
-	}//createAndFillNewOfflineDBase()
-*/
-
-	// Generate 2 sets of 1,067,000 random base64 chars for each offline database side (ENC and UNENC).
+	// Used for both Option 1 and 2
+	// Generate two sets of 1,067,000 random base64 chars for each offline database side (ENC and UNENC).
+	// ENC side will be 1,067,024 when encrypted to hold the prepended salt.
 	// Set up these databases with pointers that point to the next 'empty' 'location' in the set of random data where the record data of the offline database is hidden.
 	async function createAndFillOfflineDBase(chosenDatabase){
 		let offlineDatabase = '';
@@ -1252,7 +1190,7 @@
 		// User can choose to encrypt their offline database with a password.
 		// This choice determines which database (ENC or UNENC) the set of pre-filled records is saved to.
 		if(chosenDatabase === 'encrypted'){
-			// Fill user chosen side with set of records they gathered.
+			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
 			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseEnc);
 			// Get ENC password.
 			const encPassword = extractCleartextData("offlineDBasePass_input");
@@ -1263,7 +1201,7 @@
 			// offlineDatabase no change from first generation above.
 			offlineDatabasePointer = offlineDatabasePointerGlobal;
 		}else{
-			// Fill user chosen side with set of records they gathered.
+			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
 			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabase, offlineDatabasePointerGlobal);
 			// Get ENC password.
 			const encPassword = getRandData();
@@ -1279,53 +1217,7 @@
 		// Delete offline database gather object now that it has been used.
 		clearNewOfflineDBaseData();
 		showPage('home');
-	}//createAndFillNewOfflineDBase()
-
-/*
-	// Option 2
-	// Create Encrypted and Unencrypted offline database stack of 1000 records worth of dummy base64 data.
-	// Also create record location pointers for those databases to function.
-	async function createOfflineDBase(chosenDatabase){
-		let offlineDatabase = '';
-		//let offlineDatabasePointer = '';
-		let offlineDatabaseEnc = '';
-		let offlineDatabaseEncPointer = '';
-		// User can chose a password for the encrypted offline database.
-		if(chosenDatabase === 'encrypted'){
-			// User entered a password to encrypt the offline database with.
-			const offlineDBasePass = document.getElementById('offlineDBasePass_input').value;
-			document.getElementById("offlineDBasePass_input").value = "";
-			console.log("Using offlineDBasePass to encrypt Offline Database: " + offlineDBasePass);
-			// Encrypt pointer using possword. Initialized to 0.
-			offlineDatabaseEncPointer = await encryptTriple(offlineDBasePass, offlineDBasePass, offlineDBasePass, '0');
-			// Create and encrypt Offline Database.
-			const randomDatabase = getRandDatabase();
-			offlineDatabaseEnc = await encryptAESCTR(randomDatabase, offlineDBasePass);
-			//const offlineDatabaseEncPointer = await encryptTriple(pointerPassword, pointerPassword, pointerPassword, 'the pointer starts at: 0');
-			console.log("YES selected, tripleEncrypted pointer result: " + offlineDatabaseEncPointer);
-		}else{
-			// User chose no password. Fill Encrypted offline database with dummy data.
-			console.log("No Password Chosen for offline database creation.");
-			// Roll random data for pointer. 1 of our 1024 char entries for a encryptTriple'd.
-			offlineDatabaseEncPointer = getRandData();
-			// Create and encrypt Offline Database.
-			const randomDatabase = getRandDatabase();
-			// Use a randomly generated 43 char password.
-			const randomFingerprint = getRandFingerprint();
-			offlineDatabaseEnc = await encryptAESCTR(randomDatabase, randomFingerprint);
-			console.log("NO selected, random data pointer result:" + offlineDatabaseEncPointer);
-		}
-		// Init random cleartext pointer.
-		//offlineDatabasePointer = randInt(0,998);
-		// Roll random data for both databases.
-		offlineDatabase = getRandDatabase();
-		console.log("ENC offlinedbase length: " + offlineDatabaseEnc.length);
-		console.log("UNENC offlinedbase length: " + offlineDatabase.length);
-		// Download offline database now that everything is ready.
-		downloadStandalone(offlineDatabase, offlineDatabasePointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
-		showPage('home');
-	}// createOfflineDBase()
-*/
+	}// createAndFillNewOfflineDBase()
 
 	function getRandData(){
 		// Pick a value that will convert into 1024 base64 chars.
