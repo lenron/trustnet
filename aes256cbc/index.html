@@ -823,8 +823,8 @@
 			<div class="flow_pages" id="newofflinedatabase_existingdata_record_added" style="display:none">
 				<h2>RECORD ADDED! YOU NOW HAVE X RECORDS READY TO ADD TO A NEW OFFLINE DATABASE.</h2>
 				<h2>ADD MORE RECORDS?</h2>
-				<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineDatabase_pass_or_no');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
 				<button class="" id='' style="flex-grow:1;" onclick="showPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
+				<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineDatabase_pass_or_no');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
 			</div>
 
 			<!--------------------------EXISTING DATA Use ENC Pass Database?-----------------------!>
@@ -1036,9 +1036,9 @@
 		let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
 		// There is only 1 input or 1 textarea per div in our setup.
 		// If we found more than zero inputs in the array, focus the first and only one.
-		if( inputs_array.length > 0 ){
+		if(inputs_array.length > 0){
 			inputs_array[0].focus();
-		}else if( textareas_array.length > 0 ){
+		}else if(textareas_array.length > 0){
 		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
 			 textareas_array[0].focus();
 		}else{
@@ -1115,7 +1115,7 @@
 	let recordListForNewOfflineDBase = {};
 	let recordListForNewOfflineDBaseLength;
 	// Global for now. Rolling here isn't a security issue?
-	let offlineDatabasePointerGlobal = randInt(0,998);
+	let offlineDatabaseUnencPointerGlobal = randInt(0,998);
 
 	function clearNewOfflineDBaseData(){
 		console.log("Clearing temp stack of records that were to be added to new offline database.");
@@ -1141,6 +1141,12 @@
 			//if(Object.keys(recordListForNewOfflineDBase).length >= 1000){
 			recordListForNewOfflineDBaseLength = Object.keys(recordListForNewOfflineDBase).length;
 			console.log("new offline database records length: " + recordListForNewOfflineDBaseLength);
+
+console.log("wtf is this length: " + length);
+console.log(length);
+//let debugScope = {};
+//debugScope.length = length;
+//console.log(debugScope);
 
 			if(length >= 1000){
 				// No more room in offline dbase, no choice but to continue.
@@ -1180,12 +1186,12 @@
 	// ENC side will be 1,067,024 when encrypted to hold the prepended salt.
 	// Set up these databases with pointers that point to the next 'empty' 'location' in the set of random data where the record data of the offline database is hidden.
 	async function createAndFillOfflineDBase(chosenDatabase){
-		let offlineDatabase = '';
-		//let offlineDatabasePointer = ''; // Set globally so we can set a limit on NOENC database before this function is reached.
+		let offlineDatabaseUnenc = '';
+		let offlineDatabaseUnencPointer = ''; // Set globally so we can set a limit on NOENC database before this function is reached.
 		let offlineDatabaseEnc = '';
 		let offlineDatabaseEncPointer = '';
 		// Start by filling both databases with random base64 chars.
-		offlineDatabase = getRandDatabase();
+		offlineDatabaseUnenc = getRandDatabase();
 		offlineDatabaseEnc = getRandDatabase();
 		// User can choose to encrypt their offline database with a password.
 		// This choice determines which database (ENC or UNENC) the set of pre-filled records is saved to.
@@ -1198,22 +1204,22 @@
 			offlineDatabaseEnc = await encryptAESCTR(filledOfflineDatabaseAndPointer['database'], encPassword);
 			offlineDatabaseEncPointer = await encryptTriple(encPassword, encPassword, encPassword, filledOfflineDatabaseAndPointer['pointer']);
 			// Set UNENC side.
-			// offlineDatabase no change from first generation above.
-			offlineDatabasePointer = offlineDatabasePointerGlobal;
+			// offlineDatabaseUnenc no change from first generation above.
+			offlineDatabaseUnencPointer = offlineDatabaseUnencPointerGlobal;
 		}else{
 			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
-			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabase, offlineDatabasePointerGlobal);
+			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseUnenc, offlineDatabaseUnencPointerGlobal);
 			// Get ENC password.
 			const encPassword = getRandData();
 			// Set ENC side. 
 			offlineDatabaseEnc = await encryptAESCTR(offlineDatabaseEnc, encPassword);
 			offlineDatabaseEncPointer = getRandData();
 			// Set UNENC side.
-			offlineDatabase = filledOfflineDatabaseAndPointer['database'];
-			offlineDatabasePointer = filledOfflineDatabaseAndPointer['pointer'];
+			offlineDatabaseUnenc = filledOfflineDatabaseAndPointer['database'];
+			offlineDatabaseUnencPointer = filledOfflineDatabaseAndPointer['pointer'];
 		}
 		// Compile static standalone code with generated databases and push to user.
-		downloadStandalone(offlineDatabase, offlineDatabasePointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
+		downloadStandalone(offlineDatabaseUnenc, offlineDatabaseUnencPointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
 		// Delete offline database gather object now that it has been used.
 		clearNewOfflineDBaseData();
 		showPage('home');
@@ -1627,45 +1633,6 @@ console.log("cleartext data: " + cleartextData);
 	//			Server Communication Functions				    //
 	//////////////////////////////////////////////////////////////
 
-	// Whenever burst store succeeds, clear the update flag so it doesn't get auto-updated when coming back online.
-	function unsetUpdateFlag(){
-		console.log("Clearing pending Burst Store update flag.");
-		document.getElementById("offline_dbase_update_flag").innerHTML = "";
-	}// unsetUpdateFlag()
-
-	// If burst store fails because we're offline, set flag to try burst store next time we check.
-	function setUpdateFlag(){
-		console.log("Setting pending Burst Store update flag.");
-		document.getElementById("offline_dbase_update_flag").innerHTML = "pending";
-	}// setUpdateFlag()
-
-	// Check for pending offline dbase store and try to execute it.
-	async function checkForPendingStoreAndExecute(){
-		//console.log("Checking for pending Burst Store...");
-		const update_flag = document.getElementById("offline_dbase_update_flag").innerHTML;
-		if( update_flag !== ""){
-			console.log("Pending Burst Store found! Execute it.");
-			// If update_flag is NOT empty, we need to execute a burst store.
-			const burst_save_response = await sendOfflineDBaseToServer();
-			if( burst_save_response != null){
-				console.log("Result of pending Burst Store response: " + burst_save_response.response);
-				if( burst_save_response.response === "success"){
-					console.log("Pending Burst Store successfully executed!");
-					// On successful burst store, clear update_flag.
-					unsetUpdateFlag();
-				}else{
-					console.log("Pending Burst Store FAILED!");
-					// On unsuccessful burst store, set update_flag.
-					setUpdateFlag();
-				}
-			}else{
-				console.log("Pending Burst Store FAILED!");
-				// On unsuccessful burst store, set update_flag.
-				setUpdateFlag();
-			}
-		}
-	}// checkForPendingStoreAndExecute()
-
 	// Check if we're online or not and inform user.
 	async function updateOnlineStatus(){
 		document.getElementById("offline_label").innerHTML = "ONLINE STATUS PENDING...";
@@ -1675,7 +1642,6 @@ console.log("cleartext data: " + cleartextData);
 		//console.log("Updating Online Status...");
 		if( online_status === "online" ){
 			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
-			//await checkForPendingStoreAndExecute();
 		}else{
 			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
 		}
@@ -2214,17 +2180,14 @@ console.log("cleartext data: " + cleartextData);
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
 
-		// With conversion to base64, 750 bytes convert to 1000 base64 chars exactly.
-		const arrayLength = PREBASE64_1000DATA_BYTE_LENGTH;
-
 		// Prepare password side for XOR.
 		const passwordBytes = new TextEncoder().encode(password);
-		const shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
+		const shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
 
 		// Perform the XOR bitwise byte by byte.
 		let xorResult = new Array();
 		// XOR is a ^ in javascript
-		for (let i = 0; i < arrayLength; i++) {
+		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
 			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
 		}
 		// toBase64() works on Uint8Arrays
@@ -2239,18 +2202,16 @@ console.log("cleartext data: " + cleartextData);
 		// Convert base64 string to Uint8Array of bytes.
 		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
 
-		// Constant array length. 750 is the total bytes that will fit into 1000 base64 chars.
-		let arrayLength = PREBASE64_1000DATA_BYTE_LENGTH;
 		// Compute password for XOR.
 		const passwordBytes = new TextEncoder().encode(password);
-		let shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
+		let shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
 
 		// Inverse of XOR is XOR and is communicative.
 		// XOR password and output to get input.
 		// Regular Array needed for shift, pop.
 		let xorResult = new Array();
 		// XOR is typically the carrot char: ^ 
-		for (let i = 0; i < arrayLength; i++) {
+		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
 			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
 		}
 		// Slice off set of bytes that represent data lenght.
@@ -2631,7 +2592,7 @@ console.log("cleartext data: " + cleartextData);
 	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	// Inputs: pass is plaintext, length is an integer 
 	// Output: Uint8Array
-	async function getPassHash(passwordBytes, length) {
+	async function getPassHash(passwordBytes, outputLength) {
 		// Take initial SHA256.
 		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
 		let	sha_result;
@@ -2640,9 +2601,9 @@ console.log("cleartext data: " + cleartextData);
 			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
 			// Append SHA256 of Hash(n-1)
 			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
-		} while( sha_cumulative.length < length);
+		} while(sha_cumulative.length < outputLength);
 		// Truncate array to size <length>
-		sha_cumulative = sha_cumulative.slice(0, length);
+		sha_cumulative = sha_cumulative.slice(0, outputLength);
 		return sha_cumulative;
 	}// getPassHash()
 
@@ -2662,7 +2623,7 @@ console.log("cleartext data: " + cleartextData);
 	}// concatBuffer()
 
 	// Generates standalone html file from static code held in multiline string below:
-	function downloadStandalone(offlineDatabase, offlineDatabasePointer, offlineDatabaseEnc, offlineDatabaseEncPointer){
+	function downloadStandalone(offlineDatabaseUnenc, offlineDatabaseUnencPointer, offlineDatabaseEnc, offlineDatabaseEncPointer){
 // !@#$ = search for this spot (turn on/off syntax highlighting)
 
 		// standalone.html static code.
@@ -3464,13 +3425,6 @@ console.log("cleartext data: " + cleartextData);
 </div>
 <!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 
-	<!-- Offline Database Data --!>
-	<p id="offline_dbase_pointer" style="display:none">${offlineDatabasePointer}</p>
-	<p id="offline_dbase" style="display:none">${offlineDatabase}</p>
-	<p id="offline_dbase_enc_pointer" style="display:none">${offlineDatabaseEncPointer}</p>
-	<p id="offline_dbase_enc" style="display:none">${offlineDatabaseEnc}</p>
-	<!-- Offline Database flag that we need to do a burst store when we come back online --!>
-	<p id="offline_dbase_update_flag" style="display:none"></p>
 </body>
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <!----------------------------------JAVASCRIPT-------------------------------------!>
@@ -4213,51 +4167,11 @@ console.log("cleartext data: " + cleartextData);
 		}
 	}//attemptDeleteOffline()
 
-
 	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////
 	//			Server Communication Functions				    //
 	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////
-
-	// Whenever burst store succeeds, clear the update flag so it doesn't get auto-updated when coming back online.
-	function unsetUpdateFlag(){
-		console.log("Clearing pending Burst Store update flag.");
-		document.getElementById("offline_dbase_update_flag").innerHTML = "";
-	}
-
-	// If burst store fails because we're offline, set flag to try burst store next time we check.
-	function setUpdateFlag(){
-		console.log("Setting pending Burst Store update flag.");
-		document.getElementById("offline_dbase_update_flag").innerHTML = "pending";
-	}
-
-	// Check for pending offline dbase store and try to execute it.
-	async function checkForPendingStoreAndExecute(){
-		//console.log("Checking for pending Burst Store...");
-		const update_flag = document.getElementById("offline_dbase_update_flag").innerHTML;
-		if( update_flag !== ""){
-			console.log("Pending Burst Store found! Execute it.");
-			// If update_flag is NOT empty, we need to execute a burst store.
-			const burst_save_response = await sendOfflineDBaseToServer();
-			if( burst_save_response != null){
-				console.log("Result of pending Burst Store response: " + burst_save_response.response);
-				if( burst_save_response.response === "success"){
-					console.log("Pending Burst Store successfully executed!");
-					// On successful burst store, clear update_flag.
-					unsetUpdateFlag();
-				}else{
-					console.log("Pending Burst Store FAILED!");
-					// On unsuccessful burst store, set update_flag.
-					setUpdateFlag();
-				}
-			}else{
-				console.log("Pending Burst Store FAILED!");
-				// On unsuccessful burst store, set update_flag.
-				setUpdateFlag();
-			}
-		}
-	}
 
 	// Check if we're online or not and inform user.
 	async function updateOnlineStatus(){
@@ -4268,7 +4182,6 @@ console.log("cleartext data: " + cleartextData);
 		//console.log("Updating Online Status...");
 		if( online_status === "online" ){
 			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
-			await checkForPendingStoreAndExecute();
 		}else{
 			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
 		}
@@ -4682,17 +4595,14 @@ console.log("cleartext data: " + cleartextData);
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
 
-		// With conversion to base64, 750 bytes convert to 1000 base64 chars exactly.
-		const arrayLength = PREBASE64_1000DATA_BYTE_LENGTH;
-
 		// Prepare password side for XOR.
 		const passwordBytes = new TextEncoder().encode(password);
-		const shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
+		const shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
 
 		// Perform the XOR bitwise byte by byte.
 		let xorResult = new Array();
 		// XOR is a ^ in javascript
-		for (let i = 0; i < arrayLength; i++) {
+		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
 			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
 		}
 		// toBase64() works on Uint8Arrays
@@ -4708,18 +4618,16 @@ console.log("cleartext data: " + cleartextData);
 		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
 		// Devsite window functrion.
 
-		// Constant array length. 750 is the total bytes that will fit into 1000 base64 chars.
-		let arrayLength = PREBASE64_1000DATA_BYTE_LENGTH;
 		// Compute password for XOR.
 		const passwordBytes = new TextEncoder().encode(password);
-		let shaExtPasswordBytes = await getPassHash(passwordBytes, arrayLength);
+		let shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
 
 		// Inverse of XOR is XOR and is communicative.
 		// XOR password and output to get input.
 		// Regular Array needed for shift, pop.
 		let xorResult = new Array();
 		// XOR is typically the carrot char: ^ 
-		for (let i = 0; i < arrayLength; i++) {
+		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
 			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
 		}
 		// Slice off set of bytes that represent data lenght.
@@ -5096,7 +5004,7 @@ console.log("cleartext data: " + cleartextData);
 	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
 	// Inputs: pass is plaintext, length is an integer 
 	// Output: binary byte array (Uint8Array).
-	async function getPassHash(passwordBytes, length) {
+	async function getPassHash(passwordBytes, outputLength) {
 		// Take initial SHA256.
 		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
 		let	sha_result;
@@ -5105,9 +5013,9 @@ console.log("cleartext data: " + cleartextData);
 			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
 			// Append SHA256 of Hash(n-1)
 			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
-		} while( sha_cumulative.length < length);
-		// Truncate array to size <length>
-		sha_cumulative = sha_cumulative.slice(0, length);
+		} while(sha_cumulative.length < outputLength);
+		// Truncate array to size <outputLength>
+		sha_cumulative = sha_cumulative.slice(0, outputLength);
 		return sha_cumulative;
 	}//getPassHash()
 
@@ -5158,17 +5066,29 @@ console.log("cleartext data: " + cleartextData);
 
 </script>
 </body>
+	<!-- Offline Database Data --!>
+	<p id="offline_dbase_pointer" style="display:none">${offlineDatabaseUnencPointer}</p>
+	<p id="offline_dbase" style="display:none">${offlineDatabaseUnenc}</p>
+	<p id="offline_dbase_enc_pointer" style="display:none">${offlineDatabaseEncPointer}</p>
+	<p id="offline_dbase_enc" style="display:none">${offlineDatabaseEnc}</p>
 </html>
 
 		`;
 
+		// Create element then click it to force user download of code that was just compiled.
+		// Create HTML 'anchor' element, set to variable 'element'.
 		let element = document.createElement('a');
-		//element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(standaloneCode.raw[0]));
+		// Set 'href' attribute, creating a link that contains the giant static variable standaloneCode which contains standalone.html.
 		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(standaloneCode));
+		// Force the browser to download instead of navigating to link. Set the default filename to 'standalone.html'
 		element.setAttribute('download', 'standalone.html');
+		// Don't show the anchor element 'element'.
 		element.style.display = 'none';
+		// Attach anchor element 'element' to the HTML body.
 		document.body.appendChild(element);
+		// Click the anchor element 'element'.
 		element.click();
+		// Detach anchor element 'element' from the HTML body.
 		document.body.removeChild(element);
 	}//downloadStandalone()
 
