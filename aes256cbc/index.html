@@ -166,6 +166,32 @@
 		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 	}
 
+	/* Apply hover to div child elements which apply encrypt_hover class.*/
+	.encrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#encrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#encrypt_click_store:hover {
+		cursor: copy;
+	}
+
+	/* Apply hover to div child elements which apply encrypt_hover class.*/
+	.decrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_store:hover {
+		cursor: copy;
+	}
+
 	.openssl_encrypt_flowchart {
 		background-image: url('./svg_images/openssl_encrypt_flowchart.drawio.svg');
 	}
@@ -412,11 +438,20 @@
 				<div class="overlay_container" style="position:relative">
 					<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 					<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
-						<label>Encrypt:</label>
-						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
-						<br>
-						<label>Decrypt:</label>
-						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+						<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+							<div style="display:flex; justify-content:space-between;">
+								<label>Encrypt:</label>
+								<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+							</div>
+							<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+						</div>
+						<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+							<div style="display:flex; justify-content:space-between;">
+								<label>Decrypt:</label>
+								<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
+							</div>
+							<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+						</div>
 					</div>
 					<div class="deletecheck" id="overlay_delete_cmd" style="display:none">
 						<h2>Are you sure you want to delete this data?</h2> 
@@ -614,11 +649,20 @@
 				<br>
 				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 				<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
-					<label>Encrypt:</label>
-					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
-					<br>
-					<label>Decrypt:</label>
-					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+					<div class="encrypt_hover" id="encrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+						<div style="display:flex; justify-content:space-between;">
+							<label>Encrypt:</label>
+							<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+						</div>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+					</div>
+					<div class="decrypt_hover" id="decrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+						<div style="display:flex; justify-content:space-between;">
+							<label>Decrypt:</label>
+							<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
+						</div>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="width:250px;" onclick="showPage('store_ctrPass_cmdcheck')">BACK</button>
@@ -887,8 +931,10 @@
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
 	const MAX_POINTER_VALUE = 999;
-	const FIVE_MINUTES = 300000;
+	const FIVE_SECONDS = 5000;
+	const TEN_SECONDS = 10000;
 	const FOUR_MINUTES_THIRTY_SECONDS = 270000;
+	const FIVE_MINUTES = 300000;
 
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -980,6 +1026,74 @@
 		// event.target.value can also be used to set. This allows us to use a genral function in several places working independently.
 		event.target.value = userinput.toLowerCase();
 	}// codewordToLowerCase()
+
+	// Attach encrypt function listeners to access and store divs.
+	document.getElementById("encrypt_click_access").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
+	document.getElementById("encrypt_click_store").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
+	// Attach decrypt function listeners to access and store divs.
+	document.getElementById("decrypt_click_access").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
+	document.getElementById("decrypt_click_store").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
+
+	// Copy command line OpenSSL command to clipboard as user clicks div.
+	async function copyEncryptOpenSslCmdToClipboard(){
+		try {
+			// Copy command to clipboard.
+			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc");
+			console.log("OpenSSL encrypt command copied to clipboard.");
+			// Display message indicating command was copied to clipboard.
+			showAllCopiedEncryptCommandInform();
+			// Undisplay message in 5 seconds after showing it.
+			setTimeout(() => {
+				hideAllCopiedEncryptCommandInform();
+			}, FIVE_SECONDS); 
+		} catch (error){
+			console.error(error.message);
+		}
+	}
+
+	function showAllCopiedEncryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
+		}
+	}
+
+	function hideAllCopiedEncryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'none'; // Or 'inline', 'flex', etc.
+		}   
+	}
+
+	// Copy command line OpenSSL command to clipboard as user clicks div.
+	async function copyDecryptOpenSslCmdToClipboard(){
+		try {
+			// Copy command to clipboard.
+			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt");
+			console.log("OpenSSL decrypt command copied to clipboard.");
+			// Display message indicating command was copied to clipboard.
+			showAllCopiedDecryptCommandInform();
+			// Undisplay message in 5 seconds after showing it.
+			setTimeout(() => {
+				hideAllCopiedDecryptCommandInform();
+			}, FIVE_SECONDS); 
+		} catch (error){
+			console.error(error.message);
+		}
+	}
+
+	function showAllCopiedDecryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
+		}
+	}
+	function hideAllCopiedDecryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'none'; // Or 'inline', 'flex', etc.
+		}   
+	}
 
 	// Detect when user presses 'Enter' on their keyboard.
 	// Then on current page click button if it contains class 'activatable_by_enter'
@@ -1337,6 +1451,19 @@
 		}
 	}// checkDataIsValid()
 
+	function checkFingerprintAndData(fingerprint, encryptedData){
+		if(!checkFingerprintIsValid(fingerprint)){
+			throw new Error('Attempt to store failed! FINGERPRINT is invalid.');
+		}else{
+			console.log("FINGERPRINT IS VALID!");
+		}
+
+		if(!checkDataIsValid(encryptedData)){
+			throw new Error('Attempt to store failed! DATA is invalid.');
+		}else{
+			console.log("DATA IS VALID!");
+		}
+	}
 	//////////////////////////////////////////////////////////////
 	//                   Passlock Functions                     //
 	//////////////////////////////////////////////////////////////
@@ -1535,6 +1662,7 @@ console.log("cleartext data: " + cleartextData);
 
 	async function attemptCMDStore(){
 		const fingerprintAndData = await getFpAndDataForStore();
+		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 	}// attemptCMDStore()
 
@@ -1543,6 +1671,7 @@ console.log("cleartext data: " + cleartextData);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprintAndData = await getFpAndDataForStore();
+		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], inputId);
 	}// attemptBrowserStore()
 
@@ -1584,6 +1713,7 @@ console.log("cleartext data: " + cleartextData);
 	async function decryptAndDownloadFile(encryptedData){
 		// Get set of decrypted user passwords.
 		const cleartextSet = await passlockDecryptSet();
+		// Not adding try/catch here. I think it would be more helpful to know what failed instead as it would likely be not a password entry error since there was data to operate on (fingerprint loaded data).
 		const decryptedData  = await decryptDouble(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], encryptedData);
 
 			// bytes is Uint8Array
@@ -2118,7 +2248,7 @@ console.log("cleartext data: " + cleartextData);
 	async function encOpenSSL(plaintext, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
 		// Prepare plaintext for encryption.
 		// Encode plaintext in utf8 and store in Uint8Array inputbytes.
-		const inputbytes = new TextEncoder().encode( plaintext );
+		const inputbytes = new TextEncoder().encode(plaintext);
 
 		// Make the plaintext look like a file by adding a single newline char to the end of the string.
 		const single_newline = new Uint8Array(1);
@@ -2340,6 +2470,7 @@ console.log("cleartext data: " + cleartextData);
 		let cleartextUint8;
 		// Select input processing type based on function input parameter.
 		if(inputType === 'base64'){// Default usage.
+			
 			cleartextUint8 = Uint8Array.fromBase64(cleartext);
 		}else if(inputType === 'utf8'){
 			cleartextUint8 = new TextEncoder().encode(cleartext);
@@ -2905,6 +3036,32 @@ console.log("cleartext data: " + cleartextData);
 		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 	}
 
+	/* Apply hover to div child elements which apply encrypt_hover class.*/
+	.encrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#encrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#encrypt_click_store:hover {
+		cursor: copy;
+	}
+
+	/* Apply hover to div child elements which apply encrypt_hover class.*/
+	.decrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_store:hover {
+		cursor: copy;
+	}
+
 	.openssl_encrypt_flowchart {
 		background-image: url('./svg_images/openssl_encrypt_flowchart.drawio.svg');
 	}
@@ -3141,11 +3298,20 @@ console.log("cleartext data: " + cleartextData);
 				<div class="overlay_container" style="position:relative">
 					<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 					<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
-						<label>Encrypt:</label>
-						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
-						<br>
-						<label>Decrypt:</label>
-						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+						<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+							<div style="display:flex; justify-content:space-between;">
+								<label>Encrypt:</label>
+								<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+							</div>
+							<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+						</div>
+						<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+							<div style="display:flex; justify-content:space-between;">
+								<label>Decrypt:</label>
+								<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
+							</div>
+							<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+						</div>
 					</div>
 					<div class="deletecheck" id="offlineoverlay_delete_cmd" style="display:none">
 						<h2>Are you sure you want to delete this data?</h2> 
@@ -3355,11 +3521,20 @@ console.log("cleartext data: " + cleartextData);
 				<br>
 				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 				<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
-					<label>Encrypt:</label>
-					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
-					<br>
-					<label>Decrypt:</label>
-					<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+					<div class="encrypt_hover" id="encrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+						<div style="display:flex; justify-content:space-between;">
+							<label>Encrypt:</label>
+							<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+						</div>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+					</div>
+					<div class="decrypt_hover" id="decrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+						<div style="display:flex; justify-content:space-between;">
+							<label>Decrypt:</label>
+							<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
+						</div>
+						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="width:250px;" onclick="showPage('offlinestore_ctrPass_cmdcheck')">BACK</button>
@@ -3550,6 +3725,8 @@ console.log("cleartext data: " + cleartextData);
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
 	const MAX_POINTER_VALUE = 999;
+	const FIVE_SECONDS = 5000;
+	const TEN_SECONDS = 10000;
 
 	// Base 64 character map.
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -3636,6 +3813,75 @@ console.log("cleartext data: " + cleartextData);
 		// event.target.value can also be used to set. This allows us to use a genral function in several places working independently.
 		event.target.value = userinput.toLowerCase();
 	}// codewordToLowerCase()
+
+	// Attach encrypt function listeners to access and store divs.
+	document.getElementById("encrypt_click_access").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
+	document.getElementById("encrypt_click_store").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
+	// Attach decrypt function listeners to access and store divs.
+	document.getElementById("decrypt_click_access").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
+	document.getElementById("decrypt_click_store").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
+
+	// Copy command line OpenSSL command to clipboard as user clicks div.
+	async function copyEncryptOpenSslCmdToClipboard(){
+		try {
+			// Copy command to clipboard.
+			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc");
+			console.log("OpenSSL encrypt command copied to clipboard.");
+			// Display message indicating command was copied to clipboard.
+			showAllCopiedEncryptCommandInform();
+			// Undisplay message in 5 seconds after showing it.
+			setTimeout(() => {
+				hideAllCopiedEncryptCommandInform();
+			}, FIVE_SECONDS); 
+		} catch (error){
+			console.error(error.message);
+		}
+	}
+
+	function showAllCopiedEncryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
+		}
+	}
+
+	function hideAllCopiedEncryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'none'; // Or 'inline', 'flex', etc.
+		}   
+	}
+
+	// Copy command line OpenSSL command to clipboard as user clicks div.
+	async function copyDecryptOpenSslCmdToClipboard(){
+		try {
+			// Copy command to clipboard.
+			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt");
+			console.log("OpenSSL decrypt command copied to clipboard.");
+			// Display message indicating command was copied to clipboard.
+			showAllCopiedDecryptCommandInform();
+			// Undisplay message in 5 seconds after showing it.
+			setTimeout(() => {
+				hideAllCopiedDecryptCommandInform();
+			}, FIVE_SECONDS); 
+		} catch (error){
+			console.error(error.message);
+		}
+	}
+
+	function showAllCopiedDecryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
+		}
+	}
+
+	function hideAllCopiedDecryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'none'; // Or 'inline', 'flex', etc.
+		}   
+	}
 
 	// Catch Enter.
 	window.addEventListener("keydown", function(event){
@@ -3920,9 +4166,12 @@ console.log("cleartext data: " + cleartextData);
 
 	function checkFingerprintAndData(fingerprint, encryptedData){
 		if(!checkFingerprintIsValid(fingerprint)){
-			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.'); }else{
+			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.');
+		}else{
 			console.log("FINGERPRINT IS VALID!");
-		}if(!checkDataIsValid(encryptedData)){
+		}
+
+		if(!checkDataIsValid(encryptedData)){
 			throw new Error('Attempt to store to offline dbase failed! DATA is invalid.');
 		}else{
 			console.log("DATA IS VALID!");
@@ -4224,7 +4473,7 @@ console.log("pointer value: " + pointer);
 			let blob = new Blob([bytes]);
 			let a = document.createElement('a');
 			a.href = window.URL.createObjectURL(blob);
-			a.download = 'offlinefile.enc';
+			a.download = 'yourfile.enc';
 			a.click();
 	}
 
