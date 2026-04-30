@@ -286,6 +286,11 @@
 	<div id="offline_status_div" style="display:flex; justify-content:space-between; margin:10px;">
 		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
 	</div>
+	<!--------------------------Timeout Warning Overlay---------------------------!>
+	<div id="timeout_warning_overlay" style="display:none; justify-content:space-between; margin:10px;">
+		<h1 id="" style="color:red " >WARNING TIMEOUT WILL CLEAR YOUR DATA IN 30 SECONDS!.</h1>
+		<button class="obf_button" id='' style="flex-grow:1" onclick="resetTimeoutAndWarning()">RESET TIMEOUT TO 5 MINUTES</button>
+	</div>
 	<!--------------------------Offline Database Warning----------------------------!>
 	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
 		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS NOW FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
@@ -882,6 +887,8 @@
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
 	const MAX_POINTER_VALUE = 999;
+	const FIVE_MINUTES = 300000;
+	const FOUR_MINUTES_THIRTY_SECONDS = 270000;
 
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -1331,12 +1338,13 @@
 	}// checkDataIsValid()
 
 	//////////////////////////////////////////////////////////////
-	//			Passlock Functions							    //
+	//                   Passlock Functions                     //
 	//////////////////////////////////////////////////////////////
 	// Global browser_id variable to be used for accessing passlock, 
 	let browserId = null;
 	// Keep track of running timeout.
 	let timeoutId;
+	let warningTimeoutId;
 	// Create Object for passlocked passwords and data.
 	let passlockedData = {};
 	// Reset passlock global variables
@@ -1344,9 +1352,8 @@
 		//console.log("resetPasslock called! Passlock has been reset.");
 		// Always clear passlocked data for security.
 		passlockedData = {};
-		// Always clear timout?
-		clearTimeout(timeoutId);
-		timeoutId = '';
+		// Clear running timeouts.
+		clearTimeoutAndWarning();
 		// Don't cause error by sending null into serverDeletePasslock.
 		if(browserId !== null){
 			// Ask server to delete passlock.
@@ -1355,11 +1362,19 @@
 		}
 	}// resetPasslock()
 
+	// Clear running timeouts.
+	function clearTimeoutAndWarning(){
+		clearTimeout(timeoutId);
+		clearTimeout(warningTimeoutId);
+		timeoutId = '';
+		warningTimeoutId = '';
+	}// clearTimeoutAndWarning()
+
 	// Return passlock for encrypt/decrypt functions if not timed out.
 	// Only works on getting existing passlock that hasn't timed out.
 	async function getPasslock(){
 		// Check for timeout.
-		if( browserId === null ){
+		if(browserId === null){
 			showPage("timed_out_home");
 			// Nothing is supposed to call this function while brrowserId unset. 
 			throw Error("Passlock is timed out!");
@@ -1393,14 +1408,8 @@
 	async function initPasslockFlow(inputId){
 		// Reset browserId and encrypted user data, passwords.
 		await resetPasslock();
-		// Set timeout timer.
-		timeoutId = setTimeout(() => {
-			showPage('timed_out_home');
-			resetPasslock();
-			// Later add "ADD MORE TIME" overlay?
-		//}, 1000); // One second.
-		}, 300000); // Five minutes.
-		console.log("Starting passlock timeout! timeoutId: " + timeoutId);
+		// Set passlock reset timetout to 5 minutes and a warning timout to 30 seconds before that.
+		setTimeoutAndWarning();
 		// Reset old data and generate new passlock, browserId.
 		const passlock = await generatePasslock();
 		//console.log("new browser_id: " + browserId);
@@ -1414,6 +1423,36 @@
 		// OpenSSL encrypt user data and store in global Object. 
 		passlockedData[keyword] = await encOpenSSL(cleartextData, passlock);
 	}// initPasslockFlow()
+
+	// Set timeout timers.
+	function setTimeoutAndWarning(){
+		timeoutId = setTimeout(() => {
+			// Turn off warning.
+			document.getElementById("timeout_warning_overlay").style.display = "none";
+			showPage('timed_out_home');
+			resetPasslock();
+		}, FIVE_MINUTES); // Five minutes.
+		console.log("Starting passlock timeout! timeoutId: " + timeoutId);
+		// Set warning timeout to 30 seconds before hard timeout.
+		warningTimeoutId = setTimeout(() => {
+			// Show warning overlay.
+			document.getElementById("timeout_warning_overlay").style.display = "flex";
+		}, FOUR_MINUTES_THIRTY_SECONDS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
+		//}, 1999); // Fast debug timer.
+		console.log("Setting Timeout Warning timeout! warningTimeoutId: " + warningTimeoutId);
+	}// setTimeoutAndWarning()
+
+	// Cleear running timers then set them. Turn off warning.
+	function resetTimeoutAndWarning(){
+		// Turn off warning.
+		document.getElementById("timeout_warning_overlay").style.display = "none";
+		// Clear running timeouts.
+		clearTimeoutAndWarning();
+		// Start new timesrs.
+		setTimeoutAndWarning();
+		// Extend passlock server lease by setting record's timestamp to CURRENT_TIMESTAMP in MariaDB. 
+		serverExtendPasslock(browserId);
+	}// resetTimeoutAndWarning()
 
 	// Use regex to extract keyword from input ID.
 	function extractKeyword(inputId){
@@ -1843,6 +1882,45 @@ console.log("cleartext data: " + cleartextData);
 		}
 	}// serverDeletePasslock()
 
+	async function serverExtendPasslock(browser_id){
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exeextendpasslock;';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					browser_id: browser_id,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const response_obj = await fetchResponseObject.json();
+			//checkResponseObject(response_obj, "Message specific to serverExtendPasslock");
+			console.log("extend passlock response: ");
+			console.log(response_obj);
+			// Handle database query outcome.
+			if(response_obj.response != 1){ // there appears to be a problem.
+				throw Error("serverExtendPasslock() database store error!");
+			}else{
+				console.log("Passlock successfully extended.");
+				return;
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverExtendPasslock()
+
 	async function serverSetPasslock(browser_id, passlock) {
 		let SERVER_URL = getServerOrigin();
 		SERVER_URL += 'exesetpasslock;';
@@ -1871,7 +1949,7 @@ console.log("cleartext data: " + cleartextData);
 			console.log("set passlock response: ");
 			console.log(response_obj);
 			// Handle database query outcome.
-			if( response_obj.response != 1 ){ // there appears to be a problem.
+			if(response_obj.response != 1){ // there appears to be a problem.
 				throw Error("serverSetPasslock() database store error!");
 			}else{
 				console.log("New passlock successfully stored to database.");

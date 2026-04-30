@@ -8,5 +8,6 @@ RewriteEngine On
  RewriteRule ^exeburststore burst_store.pl
  RewriteRule ^exeonlinecheck online_check.pl
  RewriteRule ^exesetpasslock set_passlock.pl
+ RewriteRule ^exeextendpasslock extend_passlock.pl
  RewriteRule ^exegetpasslock get_passlock.pl
  RewriteRule ^exepasslockdelete delete_passlock.pl

@@ -7,9 +7,9 @@
 	#require valid-user
 #</Files>
 
-Header set Access-Control-Allow-Origin "*"
-Header set Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
-Header set Access-Control-Allow-Headers X-Requested-With
+#Header set Access-Control-Allow-Origin "*"
+#Header set Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
+#Header set Access-Control-Allow-Headers X-Requested-With
 
 
 RewriteEngine On
@@ -28,6 +28,7 @@ RewriteRule ^exedelete delete.pl
 RewriteRule ^exeburststore burst_store.pl
 RewriteRule ^exeonlinecheck online_check.pl
 RewriteRule ^exesetpasslock set_passlock.pl
+RewriteRule ^exeextendpasslock extend_passlock.pl
 RewriteRule ^exegetpasslock get_passlock.pl
 RewriteRule ^exepasslockdelete delete_passlock.pl
 
