@@ -323,7 +323,7 @@
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="access_codeword_input" style="">
+				<input autocomplete="off" type="password" value="" id="access_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');showPage('access_obf1000Pass')">CONTINUE</button>
@@ -490,7 +490,7 @@
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="store_codeword_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');showPage('store_obf1000Pass')">CONTINUE</button>
@@ -559,7 +559,7 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="store_codeword_cmdcheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_codeword_cmdcheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdcheckinput', 'store_obf1000Pass_cmdcheck')">CONTINUE</button>
@@ -647,7 +647,7 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="store_codeword_browsercheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_codeword_browsercheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_opensslpass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_browsercheckinput', 'store_obf1000Pass_browsercheck')">CONTINUE</button>
@@ -782,7 +782,7 @@
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="existingdata_codeword_input" style="">
+				<input autocomplete="off" type="password" value="" id="existingdata_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_dbase_2options')">BACK</button>-->
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('existingdata_codeword_input');showPage('newofflinedatabase_existingdata_obf1000Pass')">CONTINUE</button>
@@ -838,11 +838,17 @@
 				</div>
 			</div>
 
-			<!---------------------------EXISTING DATA Fail-----------------------!>
+			<!---------------------------EXISTING DATA Failed to Access-----------------------!>
 			<div class="flow_pages" id="failed_to_access_for_new_offline_database_creation" style="display:none">
 				<h2>&#10060; FAILED TO ACCESS EXISTING DATA FOR OFFLINE DATABASE CREATION.</h2>
 				<!--<button class="" id='' style="flex-grow:1;" onclick="clearNewOfflineDBaseData(); showPage('home')">I'M DONE WITH THIS</button>-->
 				<button class="" id='' style="flex-grow:1;" onclick="showPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
+			</div>
+
+			<!---------------------------EXISTING DATA Too many records-----------------------!>
+			<div class="flow_pages" id="too_many_records" style="display:none">
+				<h2>&#10060; MORE RECORDS ADDED THAN SPACE AVAILABLE IN AN OFFLINE DATABASE!</h2>
+				<h2>&#10060; THIS SHOULD NEVER RUN!</h2>
 			</div>
 
 	</div> <!--------------------------------------------Center HTML----------------------------------------------------!>
@@ -854,6 +860,7 @@
 
 </body>
 <script>
+
 	//////////////////////////////////////////////////////////////
 	//		Global Flags & Page Load Function					//
 	//////////////////////////////////////////////////////////////
@@ -874,6 +881,7 @@
 	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
+	const MAX_POINTER_VALUE = 999;
 
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -955,6 +963,16 @@
 			pass_check_elements[i].style.display = "none";
 		}
 	}// hidePassWarnings()
+
+	// Replaces all upper case letters with lower case as user types them into the frontend UI.
+	function codewordToLowerCase(event){
+		// .toLowerCase needs a string to run.
+		let userinput = '';
+		// event.target.value returns the value of whichever input the user is currently typing in.
+		userinput = event.target.value;
+		// event.target.value can also be used to set. This allows us to use a genral function in several places working independently.
+		event.target.value = userinput.toLowerCase();
+	}// codewordToLowerCase()
 
 	// Detect when user presses 'Enter' on their keyboard.
 	// Then on current page click button if it contains class 'activatable_by_enter'
@@ -1113,17 +1131,18 @@
 
 	// Object to gather set of records to be stored in a new offline database (Option 1).
 	let recordListForNewOfflineDBase = {};
-	let recordListForNewOfflineDBaseLength;
+	//let recordListForNewOfflineDBaseLength;
 	// Global for now. Rolling here isn't a security issue?
-	let offlineDatabaseUnencPointerGlobal = randInt(0,998);
+	//let offlineDatabaseUnencPointerGlobal = randInt(0,998);
 
 	function clearNewOfflineDBaseData(){
 		console.log("Clearing temp stack of records that were to be added to new offline database.");
 		recordListForNewOfflineDBase = {};
 	}// clearNewOfflineDBaseData()
 
+	//Getting offline records and storing them in global variable recordListForNewOfflineDBase for creation of offline database.
 	async function getOnlineRecordForNewOfflineDBase(inputId){
-		// Gather ctrPass
+		// Gather ctrPass from input box for the given html input ID and store in passlock object.
 		await extractInputData(inputId);
 		console.log("inputID " +  inputId);
 		console.log(passlockedData);
@@ -1138,22 +1157,17 @@
 			// Push fp, data to recordListForNewOfflineDBase collector object.
 			recordListForNewOfflineDBase[fingerprint] = encryptedData;
 			// Check if new offline database is full.
-			//if(Object.keys(recordListForNewOfflineDBase).length >= 1000){
-			recordListForNewOfflineDBaseLength = Object.keys(recordListForNewOfflineDBase).length;
-			console.log("new offline database records length: " + recordListForNewOfflineDBaseLength);
-
-console.log("wtf is this length: " + length);
-console.log(length);
-//let debugScope = {};
-//debugScope.length = length;
-//console.log(debugScope);
-
-			if(length >= 1000){
+			let recordListForNewOfflineDBaseLength = Object.keys(recordListForNewOfflineDBase).length;
+			//A given database only holds 1000 records so move on if we break that amount.
+			if(recordListForNewOfflineDBaseLength == 1000){
 				// No more room in offline dbase, no choice but to continue.
 				showPage('offlineDatabase_pass_or_no');
+			}else if(recordListForNewOfflineDBaseLength > 1000){
+				showPage('too_many_records');
+			}else{
+				// Let user decide to add more or continue with offline dbase creation.
+				showPage('newofflinedatabase_existingdata_record_added');
 			}
-			// Let user decide to add more or continue with offline dbase creation.
-			showPage('newofflinedatabase_existingdata_record_added');
 		}
 	}// getOnlineRecordForNewOfflineDBase();
 
@@ -1187,7 +1201,15 @@ console.log(length);
 	// Set up these databases with pointers that point to the next 'empty' 'location' in the set of random data where the record data of the offline database is hidden.
 	async function createAndFillOfflineDBase(chosenDatabase){
 		let offlineDatabaseUnenc = '';
-		let offlineDatabaseUnencPointer = ''; // Set globally so we can set a limit on NOENC database before this function is reached.
+		// Roll UNENC side pointer to a random number between 0 and 999 - number of records the user is adding to the offline database.
+		let recordListLength = Object.keys(recordListForNewOfflineDBase).length;
+		let offlineDatabaseUnencPointer;
+		//Set the pointer to 1000 if all 1000 records in the database are filled.
+		if(recordListLength > 999){
+			offlineDatabaseUnencPointer = 1000;
+		}else{
+			offlineDatabaseUnencPointer = randInt(recordListLength, MAX_POINTER_VALUE);
+		}
 		let offlineDatabaseEnc = '';
 		let offlineDatabaseEncPointer = '';
 		// Start by filling both databases with random base64 chars.
@@ -1204,11 +1226,10 @@ console.log(length);
 			offlineDatabaseEnc = await encryptAESCTR(filledOfflineDatabaseAndPointer['database'], encPassword);
 			offlineDatabaseEncPointer = await encryptTriple(encPassword, encPassword, encPassword, filledOfflineDatabaseAndPointer['pointer']);
 			// Set UNENC side.
-			// offlineDatabaseUnenc no change from first generation above.
-			offlineDatabaseUnencPointer = offlineDatabaseUnencPointerGlobal;
+			// Values already ready to go!
 		}else{
 			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
-			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseUnenc, offlineDatabaseUnencPointerGlobal);
+			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseUnenc, offlineDatabaseUnencPointer);
 			// Get ENC password.
 			const encPassword = getRandData();
 			// Set ENC side. 
@@ -2928,7 +2949,7 @@ console.log("cleartext data: " + cleartextData);
 	</div>
 	<!--------------------------Offline Database Warning----------------------------!>
 	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
-		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS NOW FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
+		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
 	</div>
 	<!--------------------------Div Housing for Flow Pages----------------------------!>
 	<div class="center_html" id="center_html" style="">
@@ -2953,7 +2974,7 @@ console.log("cleartext data: " + cleartextData);
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); showPage('offlineaccess_obf1000Pass')">CONTINUE</button>
@@ -3130,7 +3151,7 @@ console.log("cleartext data: " + cleartextData);
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');showPage('offlinestore_obf1000Pass')">CONTINUE</button>
@@ -3203,7 +3224,7 @@ console.log("cleartext data: " + cleartextData);
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdcheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdcheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdcheckinput', 'offlinestore_obf1000Pass_cmdcheck')">CONTINUE</button>
@@ -3296,7 +3317,7 @@ console.log("cleartext data: " + cleartextData);
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_browsercheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_browsercheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_opensslpass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_browsercheckinput', 'offlinestore_obf1000Pass_browsercheck')">CONTINUE</button>
@@ -3450,6 +3471,7 @@ console.log("cleartext data: " + cleartextData);
 	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
+	const MAX_POINTER_VALUE = 999;
 
 	// Base 64 character map.
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -3526,6 +3548,16 @@ console.log("cleartext data: " + cleartextData);
 			pass_check_elements[i].style.display = "none";
 		}
 	}
+
+	// Replaces all upper case letters with lower case as user types them into the frontend UI.
+	function codewordToLowerCase(event){
+		// .toLowerCase needs a string to run.
+		let userinput = '';
+		// event.target.value returns the value of whichever input the user is currently typing in.
+		userinput = event.target.value;
+		// event.target.value can also be used to set. This allows us to use a genral function in several places working independently.
+		event.target.value = userinput.toLowerCase();
+	}// codewordToLowerCase()
 
 	// Catch Enter.
 	window.addEventListener("keydown", function(event){
@@ -3810,8 +3842,7 @@ console.log("cleartext data: " + cleartextData);
 
 	function checkFingerprintAndData(fingerprint, encryptedData){
 		if(!checkFingerprintIsValid(fingerprint)){
-			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.');
-		}else{
+			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.'); }else{
 			console.log("FINGERPRINT IS VALID!");
 		}if(!checkDataIsValid(encryptedData)){
 			throw new Error('Attempt to store to offline dbase failed! DATA is invalid.');
@@ -3831,7 +3862,7 @@ console.log("cleartext data: " + cleartextData);
 
 	function checkIfOfflineDBaseIsFull(pointer){
 		// Check if offline database is full.
-		if(pointer > 999){//999 is ok because we should still be able to store to the last location in the 1000 record databaase. 
+		if(pointer > MAX_POINTER_VALUE){//999 is ok because we should still be able to store to the last location in the 1000 record databaase. 
 			// Inform user offline database is full.
 			document.getElementById("full_offline_dbase_warning").style.display = "inline";
 			return true;
@@ -3856,6 +3887,7 @@ console.log("cleartext data: " + cleartextData);
 		checkFingerprintAndData(fingerprint, encryptedData);
 		// Retrieve the database and pointer for the Flow we are in.
 		let pointer = await getOfflineDBasePointer();
+console.log("pointer value: " + pointer);
 		let offlineDatabase = await getOfflineDBase();
 		//Check if the offline database is full.
 		if(checkIfOfflineDBaseIsFull(pointer)){
