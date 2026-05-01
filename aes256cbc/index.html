@@ -166,11 +166,12 @@
 		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 	}
 
-	/* Apply hover to div child elements which apply encrypt_hover class.*/
+	/* Change cursor image to pointer with plus (identified by 'copy' indicator) */
+	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
 	.encrypt_hover:hover * {
 		cursor: copy;
 	}
-	/* Apply hover to specific div */
+	/* Apply hover to specific div id*/
 	#encrypt_click_access:hover {
 		cursor: copy;
 	}
@@ -179,7 +180,7 @@
 		cursor: copy;
 	}
 
-	/* Apply hover to div child elements which apply encrypt_hover class.*/
+	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
 	.decrypt_hover:hover * {
 		cursor: copy;
 	}
@@ -314,8 +315,8 @@
 	</div>
 	<!--------------------------Timeout Warning Overlay---------------------------!>
 	<div id="timeout_warning_overlay" style="display:none; justify-content:space-between; margin:10px;">
-		<h1 id="" style="color:red " >WARNING TIMEOUT WILL CLEAR YOUR DATA IN 30 SECONDS!.</h1>
-		<button class="obf_button" id='' style="flex-grow:1" onclick="resetTimeoutAndWarning()">RESET TIMEOUT TO 5 MINUTES</button>
+		<h1 id="" style="color:red " >YOUR DATA SESSION WILL EXPIRE IN 30 SECONDS.</h1>
+		<button class="obf_button" id='' style="flex-grow:1" onclick="resetTimeoutAndWarning()">EXTEND SESSION</button>
 	</div>
 	<!--------------------------Offline Database Warning----------------------------!>
 	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
@@ -1018,7 +1019,8 @@
 	}// hidePassWarnings()
 
 	// Replaces all upper case letters with lower case as user types them into the frontend UI.
-	function codewordToLowerCase(event){
+	// Runs on all user input to codeword inputs.
+	function codewordToLowerCase(events){
 		// .toLowerCase needs a string to run.
 		let userinput = '';
 		// event.target.value returns the value of whichever input the user is currently typing in.
@@ -1326,6 +1328,7 @@
 		let recordListLength = Object.keys(recordListForNewOfflineDBase).length;
 		let offlineDatabaseUnencPointer;
 		//Set the pointer to 1000 if all 1000 records in the database are filled.
+recordListLength = 1000;
 		if(recordListLength > 999){
 			offlineDatabaseUnencPointer = 1000;
 		}else{
@@ -1491,6 +1494,7 @@
 
 	// Clear running timeouts.
 	function clearTimeoutAndWarning(){
+		// clearTimeout is a native javascript function that will cancel the timeout for a given timeout id.
 		clearTimeout(timeoutId);
 		clearTimeout(warningTimeoutId);
 		timeoutId = '';
@@ -1553,19 +1557,26 @@
 
 	// Set timeout timers.
 	function setTimeoutAndWarning(){
+		// Set hard timeout timer that will reset passlock when fired.
+		// Also set the function to be run on that timeout.
 		timeoutId = setTimeout(() => {
-			// Turn off warning.
+			// Code to be run if/when timeout occurs.
+			// Perform 'Hard' timeout.
+			// Turn off warning, we've timed out.
 			document.getElementById("timeout_warning_overlay").style.display = "none";
+			// Show user thqat we've timed out.
 			showPage('timed_out_home');
+			// Delete passlock.
 			resetPasslock();
+			console.log("5 mintue Timeout elapsed! Data session expired!");
 		}, FIVE_MINUTES); // Five minutes.
 		console.log("Starting passlock timeout! timeoutId: " + timeoutId);
 		// Set warning timeout to 30 seconds before hard timeout.
 		warningTimeoutId = setTimeout(() => {
-			// Show warning overlay.
+			// Show warning overlay so user can click to extend timeout.
 			document.getElementById("timeout_warning_overlay").style.display = "flex";
-		}, FOUR_MINUTES_THIRTY_SECONDS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
-		//}, 1999); // Fast debug timer.
+		//}, FOUR_MINUTES_THIRTY_SECONDS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
+		}, 1000); // set for 1 second for debug.
 		console.log("Setting Timeout Warning timeout! warningTimeoutId: " + warningTimeoutId);
 	}// setTimeoutAndWarning()
 

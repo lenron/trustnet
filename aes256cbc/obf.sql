@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS passlock_table (id INT NOT NULL AUTO_INCREMENT, brows
 -- Enable event scheduler so events can be scheduled.
 SET GLOBAL event_scheduler = ON;   
 
--- Every 1 minute remove all passlocks more than 5 minutes old.
+-- Every 1 minute remove all passlocks more than 6 minutes old.
 CREATE EVENT remove_expired_passlocks ON SCHEDULE EVERY 1 MINUTE
-DO DELETE FROM passlock_table WHERE timestamp < CURRENT_TIMESTAMP() - INTERVAL 5 MINUTE;
+DO DELETE FROM passlock_table WHERE timestamp < CURRENT_TIMESTAMP() - INTERVAL 6 MINUTE;
 
