@@ -4,10 +4,23 @@
 USE chatriwe_obf;
 
 -- Create table for obfuscated data.
-CREATE TABLE IF NOT EXISTS obfuscation (id INT NOT NULL AUTO_INCREMENT, fingerprint VARCHAR(43), data VARCHAR(1024), ip VARCHAR(16), timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(id) );
+CREATE TABLE IF NOT EXISTS obfuscation (id INT NOT NULL AUTO_INCREMENT, fingerprint VARCHAR(43), data VARCHAR(1024), timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(id), UNIQUE(fingerprint));
 
 -- Create table for passlocks.
-CREATE TABLE IF NOT EXISTS passlock_table (id INT NOT NULL AUTO_INCREMENT, browser_id VARCHAR(64), passlock VARCHAR(64), timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(id) );
+CREATE TABLE IF NOT EXISTS passlock_table (id INT NOT NULL AUTO_INCREMENT, browser_id VARCHAR(64), passlock VARCHAR(64), timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(id));
+
+-- Security tables
+-- UNIQUE helps 'INSERT INTO...ON DUPLICATE KEY' work.
+-- #1 - Daily stores for given IP
+CREATE TABLE IF NOT EXISTS stores_today_per_ip (id INT NOT NULL AUTO_INCREMENT, ip VARCHAR(16), stores_today INT, PRIMARY KEY(id), UNIQUE(ip));
+-- #2 - Stores recorded on date
+CREATE TABLE IF NOT EXISTS stores_on_date (id INT NOT NULL AUTO_INCREMENT, date_stored DATE, stores_on_this_date INT, PRIMARY KEY(id), UNIQUE(date_stored));
+-- #3 - Daily access failures per IP 
+CREATE TABLE IF NOT EXISTS access_failures_today_per_ip (id INT NOT NULL AUTO_INCREMENT, ip VARCHAR(16), access_failures_today INT, PRIMARY KEY(id), UNIQUE(ip));
+-- #4 - Unique visitor count per date
+CREATE TABLE IF NOT EXISTS unique_visitors_on_date (id INT NOT NULL AUTO_INCREMENT, date_visited DATE, visitors_on_this_date INT, PRIMARY KEY(id), UNIQUE(date_visited));
+-- #5 - Daily unique visitor IPs - Not using UNIQUE here because I want a standard INSERT INTO to fail if ip exists (don't need response back).
+CREATE TABLE IF NOT EXISTS unique_visitor_ips_today (id INT NOT NULL AUTO_INCREMENT, ip VARCHAR(16), PRIMARY KEY(id));
 
 -- Enable event scheduler so events can be scheduled.
 SET GLOBAL event_scheduler = ON;   
@@ -16,3 +29,7 @@ SET GLOBAL event_scheduler = ON;
 CREATE EVENT remove_expired_passlocks ON SCHEDULE EVERY 1 MINUTE
 DO DELETE FROM passlock_table WHERE timestamp < CURRENT_TIMESTAMP() - INTERVAL 6 MINUTE;
 
+-- Clear daily tables every 24 hours at 2:30 AM.
+CREATE EVENT clear_stores_today_every_24_hours ON SCHEDULE EVERY 1 DAY STARTS CURRENT_DATE + INTERVAL '02:30:00' HOUR_SECOND DO TRUNCATE TABLE stores_today_per_ip;
+CREATE EVENT clear_access_failures_today_every_24_hours ON SCHEDULE EVERY 1 DAY STARTS CURRENT_DATE + INTERVAL '02:30:00' HOUR_SECOND DO TRUNCATE TABLE access_failures_today_per_ip;
+CREATE EVENT clear_unique_visitor_ips_every_24_hours ON SCHEDULE EVERY 1 DAY STARTS CURRENT_DATE + INTERVAL '02:30:00' HOUR_SECOND DO TRUNCATE TABLE unique_visitor_ips_today;

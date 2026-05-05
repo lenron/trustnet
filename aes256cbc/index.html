@@ -782,6 +782,12 @@
 				</div>
 			</div>
 
+			<!---------------------------Store Success-----------------------!>
+			<div class="flow_pages" id="stores_over_100" style="display:none">
+				<h2>&#10060; FAILED TO STORE</h2>
+				<h2>You've reached your limit of 100 stores today.</h2>
+			</div>
+
 			<!---------------------------Store Fail-----------------------!>
 			<div class="flow_pages" id="store_failed" style="display:none">
 				<h2>&#10060; FAILED TO STORE</h2>
@@ -1100,11 +1106,11 @@
 	// Detect when user presses 'Enter' on their keyboard.
 	// Then on current page click button if it contains class 'activatable_by_enter'
 	window.addEventListener("keydown", function(event){
-		if(event.key === "Enter"){
+		if (event.key === "Enter"){
 			// If focused element is an input, enter clicks the button with activatable_by_enter.
-			if(document.activeElement.tagName == "INPUT"){
+			if (document.activeElement.tagName == "INPUT"){
 				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-				if(buttonObj !== null){
+				if (buttonObj !== null){
 					buttonObj.click();
 				}else{
 					console.log("We hit a null page: " + currentPage);
@@ -1177,15 +1183,15 @@
 		let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
 		// There is only 1 input or 1 textarea per div in our setup.
 		// If we found more than zero inputs in the array, focus the first and only one.
-		if(inputs_array.length > 0){
+		if (inputs_array.length > 0){
 			inputs_array[0].focus();
-		}else if(textareas_array.length > 0){
+		}else if (textareas_array.length > 0){
 		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
 			 textareas_array[0].focus();
 		}else{
 			// If there's no input, focus the button with 'activatable_by_enter' class.
 			const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-			if(buttonObj !== null){
+			if (buttonObj !== null){
 				document.getElementById(buttonObj.id).focus();
 			}
 		}
@@ -1204,8 +1210,8 @@
 			let filedata = buffer_uint8a.toBase64();
 			//console.log("filedata: " + filedata);
 			// Input Data Length Check
-			//if( checkInputLength(buffer) ){
-			if( checkInputLengthUpload(buffer) ){
+			//if ( checkInputLength(buffer) ){
+			if ( checkInputLengthUpload(buffer) ){
 				passlockedData['data'] = await passlockEncrypt(filedata);
 				// Show button.
 				document.getElementById("store_upload_commit_button").style.display = "inline";
@@ -1232,7 +1238,7 @@
 	// Called on change of text area, checks length of that text area and shows warning if input data too long.
 	function checkTextInputLength(input_id){
 		let input = document.getElementById(input_id).value;
-		if(checkInputLength(input)){
+		if (checkInputLength(input)){
 			// Length OK, turn off warning
 			document.getElementById("text_input_warning").style.display = "none";
 			// display button
@@ -1273,7 +1279,7 @@
 		const fingerprint = await getFpForAccess();
 		const encryptedData = await serverLoad(fingerprint);
 		// Check that data is valid.
-		if(encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access_for_new_offline_database_creation');
 			resetPasslock();
 		}else{
@@ -1282,10 +1288,10 @@
 			// Check if new offline database is full.
 			let recordListForNewOfflineDBaseLength = Object.keys(recordListForNewOfflineDBase).length;
 			//A given database only holds 1000 records so move on if we break that amount.
-			if(recordListForNewOfflineDBaseLength == 1000){
+			if (recordListForNewOfflineDBaseLength == 1000){
 				// No more room in offline dbase, no choice but to continue.
 				showPage('offlineDatabase_pass_or_no');
-			}else if(recordListForNewOfflineDBaseLength > 1000){
+			}else if (recordListForNewOfflineDBaseLength > 1000){
 				showPage('too_many_records');
 			}else{
 				// Let user decide to add more or continue with offline dbase creation.
@@ -1329,7 +1335,7 @@
 		let offlineDatabaseUnencPointer;
 		//Set the pointer to 1000 if all 1000 records in the database are filled.
 recordListLength = 1000;
-		if(recordListLength > 999){
+		if (recordListLength > 999){
 			offlineDatabaseUnencPointer = 1000;
 		}else{
 			offlineDatabaseUnencPointer = randInt(recordListLength, MAX_POINTER_VALUE);
@@ -1341,7 +1347,7 @@ recordListLength = 1000;
 		offlineDatabaseEnc = getRandDatabase();
 		// User can choose to encrypt their offline database with a password.
 		// This choice determines which database (ENC or UNENC) the set of pre-filled records is saved to.
-		if(chosenDatabase === 'encrypted'){
+		if (chosenDatabase === 'encrypted'){
 			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
 			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseEnc);
 			// Get ENC password.
@@ -1393,7 +1399,7 @@ recordListLength = 1000;
 		//let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
 		let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
 		do{
-			if(bytesStillNeeded > 65536){
+			if (bytesStillNeeded > 65536){
 				randBytes = concatBuffer(randBytes, window.crypto.getRandomValues(new Uint8Array(65536)));
 				bytesStillNeeded -= 65536; // 65,536 is the max size of a Uint8Array that getRandomValues can fill.
 			}else{
@@ -1408,19 +1414,19 @@ recordListLength = 1000;
 	//Generate random integers from 0 to 4,294,967,296.
 	function randInt(min, max){
 		//Number safety checks.
-		if(!(Number.isSafeInteger(min) && Number.isSafeInteger(max))) {
+		if (!(Number.isSafeInteger(min) && Number.isSafeInteger(max))) {
 			throw Error("min and max must be safe integers");
 		}
-		if(min > max) {
+		if (min > max) {
 			throw Error("min must be less than or equal to max");
 		}
 		//Create array with proper integer size for the specified range (i.e. 8 bits = 0-255, 16 bits = 0-65535)
 		let randarray;
-		if(max < 256){
+		if (max < 256){
 			randarray = new Uint8Array(1);
-		}else if(max < 65536){
+		}else if (max < 65536){
 			randarray = new Uint16Array(1);
-		}else if(max < 4294967296){
+		}else if (max < 4294967296){
 			randarray = new Uint32Array(1);
 		}else{
 			throw new Error("Max number is too large for this function!");
@@ -1437,7 +1443,7 @@ recordListLength = 1000;
 	function checkFingerprintIsValid(fingerprint){
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
 		const regex = new RegExp(`^[A-Za-z0-9+/]{${FINGERPRINT_LENGTH}}$`);
-		if(regex.test(fingerprint)){
+		if (regex.test(fingerprint)){
 			return true;
 		}else{
 			return false;
@@ -1447,7 +1453,7 @@ recordListLength = 1000;
 	// Returns true if input has precisely DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
 		const regex = new RegExp(`^[A-Za-z0-9+/]{${DATA_LENGTH}}$`);
-		if(regex.test(data)){
+		if (regex.test(data)){
 			return true;
 		}else{
 			return false;
@@ -1455,13 +1461,13 @@ recordListLength = 1000;
 	}// checkDataIsValid()
 
 	function checkFingerprintAndData(fingerprint, encryptedData){
-		if(!checkFingerprintIsValid(fingerprint)){
+		if (!checkFingerprintIsValid(fingerprint)){
 			throw new Error('Attempt to store failed! FINGERPRINT is invalid.');
 		}else{
 			console.log("FINGERPRINT IS VALID!");
 		}
 
-		if(!checkDataIsValid(encryptedData)){
+		if (!checkDataIsValid(encryptedData)){
 			throw new Error('Attempt to store failed! DATA is invalid.');
 		}else{
 			console.log("DATA IS VALID!");
@@ -1485,7 +1491,7 @@ recordListLength = 1000;
 		// Clear running timeouts.
 		clearTimeoutAndWarning();
 		// Don't cause error by sending null into serverDeletePasslock.
-		if(browserId !== null){
+		if (browserId !== null){
 			// Ask server to delete passlock.
 			await serverDeletePasslock(browserId);
 			browserId = null;
@@ -1505,14 +1511,14 @@ recordListLength = 1000;
 	// Only works on getting existing passlock that hasn't timed out.
 	async function getPasslock(){
 		// Check for timeout.
-		if(browserId === null){
+		if (browserId === null){
 			showPage("timed_out_home");
 			// Nothing is supposed to call this function while brrowserId unset. 
 			throw Error("Passlock is timed out!");
 		}
 
 		const passlock = await serverGetPasslock(browserId);
-		if(passlock.length !== PASSLOCK_LENGTH || !checkUUIDChars(passlock)){ // Data doesn't look like a passlock.
+		if (passlock.length !== PASSLOCK_LENGTH || !checkUUIDChars(passlock)){ // Data doesn't look like a passlock.
 			//showPage("unable_to_retrieve_passlock");
 			throw Error("Unable to retrieve passlock!");
 		}else{
@@ -1575,8 +1581,8 @@ recordListLength = 1000;
 		warningTimeoutId = setTimeout(() => {
 			// Show warning overlay so user can click to extend timeout.
 			document.getElementById("timeout_warning_overlay").style.display = "flex";
-		//}, FOUR_MINUTES_THIRTY_SECONDS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
-		}, 1000); // set for 1 second for debug.
+		}, FOUR_MINUTES_THIRTY_SECONDS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
+		//}, 1000); // set for 1 second for debug.
 		console.log("Setting Timeout Warning timeout! warningTimeoutId: " + warningTimeoutId);
 	}// setTimeoutAndWarning()
 
@@ -1620,7 +1626,7 @@ console.log("cleartext data: " + cleartextData);
 		const keyword = extractKeyword(inputId);
 		const cleartextPass = extractCleartextData(inputId);
 		const decryptedPass = await passlockDecrypt(passlockedData[keyword]);
-		if(decryptedPass === cleartextPass){
+		if (decryptedPass === cleartextPass){
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
@@ -1662,7 +1668,7 @@ console.log("cleartext data: " + cleartextData);
 		const fingerprintAndData = {};
 		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1000Pass'], cleartextSet['ctrPass']);
 		//Check for existence of 'key' in js Object.
-		if('opensslpass' in passlockedData){
+		if ('opensslpass' in passlockedData){
 			//console.log("we found opensslpass in passlockedData");
 			fingerprintAndData['data'] = await encryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], cleartextSet['data']);
 		}else{
@@ -1710,7 +1716,7 @@ console.log("cleartext data: " + cleartextData);
 		const fingerprint = await getFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
 		const encryptedData = await serverLoad(fingerprint);
-		if(encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 			resetPasslock();
 		}else{
@@ -1745,7 +1751,7 @@ console.log("cleartext data: " + cleartextData);
 		const fingerprint = await getFpForAccess();
 		const encryptedData = await serverLoad(fingerprint);
 		// Report outcome of Access attempt.
-		if(encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 			resetPasslock();
 		}else{
@@ -1795,7 +1801,7 @@ console.log("cleartext data: " + cleartextData);
 		const fingerprint = getStoredFp();
 		const deleteResponse = await serverDelete(fingerprint);
 		// Report delete outcome.
-		if(deleteResponse === "success"){
+		if (deleteResponse === "success"){
 			// Server successfully stored data, report success.
 			showPage('delete_success');
 		}else{
@@ -1810,21 +1816,25 @@ console.log("cleartext data: " + cleartextData);
 		// Attempt to store a record to the server.
 		const storeResponse = await serverStore(fingerprint, encryptedData);
 		console.log("storeResponse: " + storeResponse);
-		// Load data at fingerprint, should be the encrypted data block we just stored.
-		const loadResponse = await serverLoad(fingerprint);
-		console.log("loadResponse: " + loadResponse);
-		// Report store outcome.
-		if(encryptedData === loadResponse){
-			// We succeeded.
-			if(inputId === 'access_data_outputdisplay'){
-				showPage('edit_success');
-			}else{
-				// Server successfully stored data, report success.
-				showPage('store_success');
-			}
+		if (storeResponse === 'STORES_OVER_100'){
+			showPage('stores_over_100');
 		}else{
-			// Doesn't look like server stored data properly, report fail.
-			showPage('store_failed');
+			// Load data at fingerprint, should be the encrypted data block we just stored.
+			const loadResponse = await serverLoad(fingerprint);
+			console.log("loadResponse: " + loadResponse);
+			// Report store outcome.
+			if (encryptedData === loadResponse){
+				// We succeeded.
+				if (inputId === 'access_data_outputdisplay'){
+					showPage('edit_success');
+				}else{
+					// Server successfully stored data, report success.
+					showPage('store_success');
+				}
+			}else{
+				// Doesn't look like server stored data properly, report fail.
+				showPage('store_failed');
+			}
 		}
 		await resetPasslock();
 	}// storeDataToServer()
@@ -1841,7 +1851,7 @@ console.log("cleartext data: " + cleartextData);
 		const online_status = await checkOnline();
 
 		//console.log("Updating Online Status...");
-		if( online_status === "online" ){
+		if ( online_status === "online" ){
 			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
 		}else{
 			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
@@ -1866,7 +1876,7 @@ console.log("cleartext data: " + cleartextData);
 			console.log("response FAILED");
 			return "offline";
 		});
-		if( fetchResponseObject.ok ){
+		if ( fetchResponseObject.ok ){
 			//console.log("Response from checkOnline() fetch() call = OK!");
 			return "online";
 		} else {
@@ -1884,7 +1894,7 @@ console.log("cleartext data: " + cleartextData);
 		let server_origin = '';
 		// If we're standalone, set address to chat.dance instead of a relative path.
 		const regex = new RegExp(/^file/);
-		if(regex.test(url_origin)){
+		if (regex.test(url_origin)){
 			//console.log("We're a standalone file!");
 			server_origin = 'https://chat.dance/obf/';
 		}else{
@@ -1923,7 +1933,7 @@ console.log("cleartext data: " + cleartextData);
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Load responseObj.data: " + responseObj.data);
-			if(responseObj.data.length === DATA_LENGTH && checkBase64Chars(responseObj.data)){ // Data looks good.
+			if (responseObj.data.length === DATA_LENGTH && checkBase64Chars(responseObj.data)){ // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.data;
 			}else{
@@ -1965,12 +1975,16 @@ console.log("cleartext data: " + cleartextData);
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Store responseObj.response: " + responseObj.response);
-			if( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
-				throw Error("serverStore Error! Maybe a database error?");
-				return "error";
-			}else{
+			//if ( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
+			if (responseObj.response === "SUCCESS"){
 				console.log("serverStore: Successfully stored encrypted data.");
 				return "success";
+			}else if (responseObj.response === "STORES_OVER_100"){
+				return "STORES_OVER_100";
+			}else if (responseObj.response === "STORE FAILED"){
+				throw Error("serverStore Error! Database failed to store data.");
+			}else{
+				throw Error("serverStore Error! Maybe a database error?");
 			}
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
 		// 500 Internal Server Errors will be caught here too.
@@ -2008,8 +2022,8 @@ console.log("cleartext data: " + cleartextData);
 			console.log(responseObj);
 			// Handle database query outcome.
 			//console.log("Store responseObj.response: " + responseObj.response);
-			//if( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
-			if(responseObj.response !== "passlock successfully deleted"){ // there appears to be a problem.
+			//if ( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
+			if (responseObj.response !== "passlock successfully deleted"){ // there appears to be a problem.
 				//console.log("Error Deleting. browser_id: " + browserId);
 				throw Error("serverDeletePasslock() Failed to delete passlock!");
 				return "error";
@@ -2050,7 +2064,7 @@ console.log("cleartext data: " + cleartextData);
 			console.log("extend passlock response: ");
 			console.log(response_obj);
 			// Handle database query outcome.
-			if(response_obj.response != 1){ // there appears to be a problem.
+			if (response_obj.response != 1){ // there appears to be a problem.
 				throw Error("serverExtendPasslock() database store error!");
 			}else{
 				console.log("Passlock successfully extended.");
@@ -2090,7 +2104,7 @@ console.log("cleartext data: " + cleartextData);
 			console.log("set passlock response: ");
 			console.log(response_obj);
 			// Handle database query outcome.
-			if(response_obj.response != 1){ // there appears to be a problem.
+			if (response_obj.response != 1){ // there appears to be a problem.
 				throw Error("serverSetPasslock() database store error!");
 			}else{
 				console.log("New passlock successfully stored to database.");
@@ -2129,7 +2143,7 @@ console.log("cleartext data: " + cleartextData);
 			//console.log(responseObj);
 			//console.log("responseObj.passlock: " + responseObj.passlock);
 			//console.log("responseObj.passlock.length: " + responseObj.passlock.length);
-			if(responseObj.passlock.length === PASSLOCK_LENGTH && checkUUIDChars(responseObj.passlock)){ // Data looks good.
+			if (responseObj.passlock.length === PASSLOCK_LENGTH && checkUUIDChars(responseObj.passlock)){ // Data looks good.
 				//console.log("serverGetPasslock: Successfully retrieved existing passlock.");
 				return responseObj.passlock;
 			}else{
@@ -2189,14 +2203,14 @@ console.log("cleartext data: " + cleartextData);
 		})
 		.catch((error) => {
 			console.log("Fetch Error on BURST Store (sendOfflineDBaseToServer)!~: " + error.message);
-			if( error.message == "Failed to fetch" ){
+			if ( error.message == "Failed to fetch" ){
 				console.log("CAUGHT THE DISCONNECTED ERROR IN BURST STORE!~");
 				// Set pending Burst Store update flag == we failed to run it so need to when we next come online.
 				setUpdateFlag();
 			}
 		});
-		if( fetchResponseObject ){
-			if( fetchResponseObject.ok ){
+		if ( fetchResponseObject ){
+			if ( fetchResponseObject.ok ){
 				console.log("Response from sendOfflineDBaseToServer() fetch() call = OK!");
 				return fetchResponseObject.json();
 			} else {
@@ -2235,7 +2249,7 @@ console.log("cleartext data: " + cleartextData);
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Store responseObj.response: " + responseObj.response);
-			if( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
+			if ( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
 				throw Error("serverDelete Error! Data not deleted!");
 				return "error";
 			}else{
@@ -2416,7 +2430,7 @@ console.log("cleartext data: " + cleartextData);
 		// Add our custom countstring to the data.
 		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext64);
 
-		if(!checkBase64Chars(plaintext64)){
+		if (!checkBase64Chars(plaintext64)){
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
 
@@ -2480,10 +2494,10 @@ console.log("cleartext data: " + cleartextData);
 		console.log("encryptAESCTR called with inputType: " + inputType);
 		let cleartextUint8;
 		// Select input processing type based on function input parameter.
-		if(inputType === 'base64'){// Default usage.
+		if (inputType === 'base64'){// Default usage.
 			
 			cleartextUint8 = Uint8Array.fromBase64(cleartext);
-		}else if(inputType === 'utf8'){
+		}else if (inputType === 'utf8'){
 			cleartextUint8 = new TextEncoder().encode(cleartext);
 		}else{
 			throw new Error("Invalid encryptAESCTR inputType parameter!");
@@ -2622,9 +2636,9 @@ console.log("cleartext data: " + cleartextData);
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
 		// Select output data type based on function parameter.
-		if(outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+		if (outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 			decryptedDecoded = decryptedUint8.toBase64();
-		}else if(outputType === 'utf8'){
+		}else if (outputType === 'utf8'){
 			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
 		}else{
 			throw new Error("Invalid decryptAESCTR outputType parameter!");
@@ -2697,7 +2711,7 @@ console.log("cleartext data: " + cleartextData);
 	// Return true if input only contains uuid chars which are used for passlock and browserID.
 	function checkUUIDChars(input){
 		const regex = new RegExp(/^[a-f0-9-]*$/);
-		if(regex.test(input)){
+		if (regex.test(input)){
 			return true;
 		}else{
 			return false;
@@ -2707,7 +2721,7 @@ console.log("cleartext data: " + cleartextData);
 	// Return true if input only contains base64 chars, including padding char: '='
 	function checkBase64Chars(input){
 		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
-		if(regex.test(input)){
+		if (regex.test(input)){
 			// Return true/valid
 			return true;
 		}else{
@@ -2726,7 +2740,7 @@ console.log("cleartext data: " + cleartextData);
 		let size_string = "Byte length remaining: " + difference;
 		//console.log("size_string: " + size_string);
 		document.getElementById("browserdata_length_label").innerHTML = size_string;
-		if(size > BROWSERINPUT_LENGTH_LIMIT){
+		if (size > BROWSERINPUT_LENGTH_LIMIT){
 			return false; // Length Check Failed.
 		}else{
 			return true; // Length Check Passed.
@@ -2743,7 +2757,7 @@ console.log("cleartext data: " + cleartextData);
 		let size_string = "Byte length remaining: " + difference;
 		//console.log("size_string: " + size_string);
 		document.getElementById("uploaddata_length_label").innerHTML = size_string;
-		if(size > CMDINPUT_LENGTH_LIMIT){
+		if (size > CMDINPUT_LENGTH_LIMIT){
 			return false; // Length Check Failed.
 		}else{
 			return true; // Length Check Passed.
@@ -2812,12 +2826,12 @@ console.log("cleartext data: " + cleartextData);
 		let mathExpression = "";
 		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
 		for(let i=0; i < 7; i++){
-			if(i % 2 === 0){
+			if (i % 2 === 0){
 				// Even index bytes -->  numbers
 				mathExpression += sevenByteUint8[i];
 			}else{
 				// Odd index bytes --> symbols
-				if(sevenByteUint8[i] % 2 === 0){
+				if (sevenByteUint8[i] % 2 === 0){
 					// Even bytes convert to (+)
 					mathExpression += "+";
 				}else{
@@ -3896,11 +3910,11 @@ console.log("cleartext data: " + cleartextData);
 
 	// Catch Enter.
 	window.addEventListener("keydown", function(event){
-		if(event.key === "Enter"){
+		if (event.key === "Enter"){
 			// If focused element is an input, enter clicks the button with activatable_by_enter.
-			if(document.activeElement.tagName == "INPUT"){
+			if (document.activeElement.tagName == "INPUT"){
 				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-				if(buttonObj !== null){
+				if (buttonObj !== null){
 					buttonObj.click();
 				}else{
 					console.log("We hit a null page: " + currentPage);
@@ -3973,15 +3987,15 @@ console.log("cleartext data: " + cleartextData);
 		let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
 		// There is only 1 input or 1 textarea per div in our setup.
 		// If we found more than zero inputs in the array, focus the first and only one.
-		if( inputs_array.length > 0 ){
+		if ( inputs_array.length > 0 ){
 			inputs_array[0].focus();
-		}else if( textareas_array.length > 0 ){
+		}else if ( textareas_array.length > 0 ){
 		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
 			 textareas_array[0].focus();
 		}else{
 			// If there's no input, focus the button with 'activatable_by_enter' class.
 			const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-			if(buttonObj !== null){
+			if (buttonObj !== null){
 				document.getElementById(buttonObj.id).focus();
 			}
 		}
@@ -4000,7 +4014,7 @@ console.log("cleartext data: " + cleartextData);
 			let filedata = buffer_uint8a.toBase64();
 			//console.log("filedata: " + filedata);
 			// Input Data Length Check
-			if(checkInputLengthUpload(buffer)){
+			if (checkInputLengthUpload(buffer)){
 				// Saving data without passlock encryption for Offline Flow usage.
 				offlineData['data'] = filedata;
 				// Show button.
@@ -4029,7 +4043,7 @@ console.log("cleartext data: " + cleartextData);
 	function checkTextInputLength(input_id){
 		//let input = document.getElementById("store_data").value;
 		let input = document.getElementById(input_id).value;
-		if( checkInputLength(input) ){
+		if ( checkInputLength(input) ){
 			// Length OK, turn off warning
 			document.getElementById("text_input_warning").style.display = "none";
 			// display button
@@ -4085,7 +4099,7 @@ console.log("cleartext data: " + cleartextData);
 	function checkFingerprintIsValid(fingerprint){
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
 		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${FINGERPRINT_LENGTH}}$\`);
-		if(regex.test(fingerprint)){
+		if (regex.test(fingerprint)){
 			return true;
 		}else{
 			return false;
@@ -4095,7 +4109,7 @@ console.log("cleartext data: " + cleartextData);
 	// Returns true if input has precisely DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
 		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${DATA_LENGTH}}$\`);
-		if(regex.test(data)){
+		if (regex.test(data)){
 			return true;
 		}else{
 			return false;
@@ -4134,7 +4148,7 @@ console.log("cleartext data: " + cleartextData);
 	// Selects either Unencrypted or Encrypted database pointer based on if user inputted an offline database password at the start of the Flow.
 	async function getOfflineDBasePointer(){
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
-		if(getOfflineDatabaseType() === 'unencrypted'){
+		if (getOfflineDatabaseType() === 'unencrypted'){
 			return document.getElementById("offline_dbase_pointer").innerHTML;
 		}else{
 			const encPointer = document.getElementById("offline_dbase_enc_pointer").innerHTML;
@@ -4145,7 +4159,7 @@ console.log("cleartext data: " + cleartextData);
 	// Returns either Unencrypted or Encrypted full offline database depending if user entered an offline database password.
 	async function getOfflineDBase(){
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
-		if(getOfflineDatabaseType() === 'unencrypted'){
+		if (getOfflineDatabaseType() === 'unencrypted'){
 			// User didn't enter password, return unencrypted as-is.
 			return document.getElementById("offline_dbase").innerHTML;
 		}else{
@@ -4158,7 +4172,7 @@ console.log("cleartext data: " + cleartextData);
 	// Saves pointer to memory-stored HTML.
 	async function setOfflineDBasePointer(pointer){
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
-		if(getOfflineDatabaseType() === 'unencrypted'){
+		if (getOfflineDatabaseType() === 'unencrypted'){
 			document.getElementById("offline_dbase_pointer").innerHTML = pointer;
 		}else{
 			document.getElementById("offline_dbase_enc_pointer").innerHTML = await encryptTriple(offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], pointer);
@@ -4168,7 +4182,7 @@ console.log("cleartext data: " + cleartextData);
 	// Saves full database to its home in html memory.
 	async function setOfflineDBase(dbase){
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
-		if(getOfflineDatabaseType() === 'unencrypted'){
+		if (getOfflineDatabaseType() === 'unencrypted'){
 			document.getElementById("offline_dbase").innerHTML = dbase;
 		}else{
 			document.getElementById("offline_dbase_enc").innerHTML = await encryptAESCTR(dbase, offlineData['offlineDBasePass']);
@@ -4176,13 +4190,13 @@ console.log("cleartext data: " + cleartextData);
 	}
 
 	function checkFingerprintAndData(fingerprint, encryptedData){
-		if(!checkFingerprintIsValid(fingerprint)){
+		if (!checkFingerprintIsValid(fingerprint)){
 			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.');
 		}else{
 			console.log("FINGERPRINT IS VALID!");
 		}
 
-		if(!checkDataIsValid(encryptedData)){
+		if (!checkDataIsValid(encryptedData)){
 			throw new Error('Attempt to store to offline dbase failed! DATA is invalid.');
 		}else{
 			console.log("DATA IS VALID!");
@@ -4191,7 +4205,7 @@ console.log("cleartext data: " + cleartextData);
 
 	function getOfflineDatabaseType(){
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
-		if(offlineData['offlineDBasePass'] === undefined){
+		if (offlineData['offlineDBasePass'] === undefined){
 			return "unencrypted";
 		}else{
 			return "encrypted";
@@ -4200,7 +4214,7 @@ console.log("cleartext data: " + cleartextData);
 
 	function checkIfOfflineDBaseIsFull(pointer){
 		// Check if offline database is full.
-		if(pointer > MAX_POINTER_VALUE){//999 is ok because we should still be able to store to the last location in the 1000 record databaase. 
+		if (pointer > MAX_POINTER_VALUE){//999 is ok because we should still be able to store to the last location in the 1000 record databaase. 
 			// Inform user offline database is full.
 			document.getElementById("full_offline_dbase_warning").style.display = "inline";
 			return true;
@@ -4212,7 +4226,7 @@ console.log("cleartext data: " + cleartextData);
 
 	function fingerprintExists(fingerprint, offlineDatabase){
 		// -1 will indicate that the fingerprint was not found.
-		if(offlineDatabase.indexOf(fingerprint) >= 0){
+		if (offlineDatabase.indexOf(fingerprint) >= 0){
 			return true;
 		}else{
 			return false;
@@ -4228,13 +4242,13 @@ console.log("cleartext data: " + cleartextData);
 console.log("pointer value: " + pointer);
 		let offlineDatabase = await getOfflineDBase();
 		//Check if the offline database is full.
-		if(checkIfOfflineDBaseIsFull(pointer)){
+		if (checkIfOfflineDBaseIsFull(pointer)){
 			return "full";
 		}
 		// Variable to hold the new database.
 		let replacement_offlineDatabase;
 		//Check if the fingerprint matches the database and replace the data.
-		if(fingerprintExists(fingerprint, offlineDatabase)){
+		if (fingerprintExists(fingerprint, offlineDatabase)){
 			replacement_offlineDatabase = replaceFingerprintAndData(fingerprint, offlineDatabase, encryptedData);
 		// If the fingerprint was not found, store a new value in the database.
 		}else{
@@ -4253,7 +4267,7 @@ console.log("pointer value: " + pointer);
 		let offlineDatabase = await getOfflineDBase();
 		// Search for fingerprint in offline dbase using regex.
 		// fingerprintStartIndex will be the index of the beginning of the matched fingerprint.
-		if(fingerprintExists(fingerprint, offlineDatabase)){
+		if (fingerprintExists(fingerprint, offlineDatabase)){
 			return getRecordOfflineDBase(fingerprint, offlineDatabase);
 		}else{
 			// Did  not find data on load attempt.
@@ -4271,7 +4285,7 @@ console.log("pointer value: " + pointer);
 	}
 
 	function checkFingerprint(fingerprint){
-		if(!checkFingerprintIsValid(fingerprint)){
+		if (!checkFingerprintIsValid(fingerprint)){
 			throw new Error('Attempt to DELETE single record in offline dbase failed! FINGERPRINT is invalid.');
 		}else{
 			console.log("Delete Offline Database record attempt: FINGERPRINT IS VALID!");
@@ -4285,14 +4299,14 @@ console.log("pointer value: " + pointer);
 		let offlineDatabase = await getOfflineDBase();
 		// Find record in offline dbase if it exists.
 		// If the record exists, delete the fingerprint and data at fingerprintStartIndex location by overwriting with randonly generated, decrementing pointer.
-		if(fingerprintExists(fingerprint, offlineDatabase)){
+		if (fingerprintExists(fingerprint, offlineDatabase)){
 			// Calling with empty third parameter indicates to replace with random data (deleting the record).
 			const replacement_offlineDatabase = replaceFingerprintAndData(fingerprint, offlineDatabase);
 
 			await setOfflineDBase(replacement_offlineDatabase);
 			// Check that it was in fact deleted. Fingerprint should be random chars now and therefore miss on a correctly exexuted delete.
 			const outcome = await attemptLoadOfflineDBase(fingerprint);
-			if(outcome === "miss"){
+			if (outcome === "miss"){
 				//console.log("Delete successful: returned miss from load attempt.");
 				return "success";
 			}else{
@@ -4324,12 +4338,12 @@ console.log("pointer value: " + pointer);
 	}
 
 	async function verifyOfflineDBasePasswordLength(){
-		if(offlineData['offlineDBasePass'] === undefined || offlineData['offlineDBasePass'] === ''){
+		if (offlineData['offlineDBasePass'] === undefined || offlineData['offlineDBasePass'] === ''){
 			console.log('caught empty ENC password');
 		}else{
 			console.log('ENC password has successfully been entered.');
 			const encPassCorrect = await checkEncPassword();
-			if(encPassCorrect){
+			if (encPassCorrect){
 				// returned true, Enc password correct.
 				showPage('offline_home');
 			}else{
@@ -4383,7 +4397,7 @@ console.log("pointer value: " + pointer);
 	function checkDataOffline(inputId, nextPageId){
 		const keyword = extractKeyword(inputId);
 		const cleartextPass = extractCleartextData(inputId);
-		if(offlineData[keyword] === cleartextPass){
+		if (offlineData[keyword] === cleartextPass){
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
@@ -4408,7 +4422,7 @@ console.log("pointer value: " + pointer);
 		const loadResponse = await attemptLoadOfflineDBase(fingerprint);
 		//console.log("loadResponse: " + loadResponse);
 		// Report store outcome.
-		if(encryptedData === loadResponse){
+		if (encryptedData === loadResponse){
 			// Data successfully stored to memory. Still needs saved to disk which must happen 'manually' by user.
 			setSaveToDiskReminder();
 			showPage('offlinestore_success');
@@ -4433,11 +4447,11 @@ console.log("pointer value: " + pointer);
 		const loadResponse = await attemptLoadOfflineDBase(fingerprint);
 		//console.log("loadResponse: " + loadResponse);
 		// Report store outcome.
-		if(encryptedData === loadResponse){
+		if (encryptedData === loadResponse){
 			showPage('offlinestore_success');
 			setSaveToDiskReminder();
 			// We succeeded.
-			if(inputId === 'offlineaccess_data_outputdisplay'){
+			if (inputId === 'offlineaccess_data_outputdisplay'){
 				showPage('offlineedit_success');
 			}else{
 				// Data successfully stored to memory. Still needs saved to disk which must happen 'manually' by user.
@@ -4467,7 +4481,7 @@ console.log("pointer value: " + pointer);
 		// Add additional parameter?
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 
-		if(encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_file');
@@ -4496,7 +4510,7 @@ console.log("pointer value: " + pointer);
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
-		if(encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_cleartext');
@@ -4527,7 +4541,7 @@ console.log("pointer value: " + pointer);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const deleteResponse = await deleteRecordOfflineDBase(fingerprint);
 		// Report delete outcome.
-		if(deleteResponse === "success"){
+		if (deleteResponse === "success"){
 			// Server successfully deleted data, report success.
 			showPage('offlinedelete_success');
 			setSaveToDiskReminder();
@@ -4550,7 +4564,7 @@ console.log("pointer value: " + pointer);
 		const online_status = await checkOnline();
 
 		//console.log("Updating Online Status...");
-		if( online_status === "online" ){
+		if ( online_status === "online" ){
 			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
 		}else{
 			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
@@ -4575,7 +4589,7 @@ console.log("pointer value: " + pointer);
 			console.log("response FAILED");
 			return "offline";
 		});
-		if( fetchResponseObject.ok ){
+		if ( fetchResponseObject.ok ){
 			//console.log("Response from checkOnline() fetch() call = OK!");
 			return "online";
 		} else {
@@ -4593,7 +4607,7 @@ console.log("pointer value: " + pointer);
 		let server_origin = '';
 		// If we're standalone, set address to chat.dance instead of a relative path.
 		const regex = new RegExp(/^file/);
-		if(regex.test(url_origin)){
+		if (regex.test(url_origin)){
 			//console.log("We're a standalone file!");
 			server_origin = 'https://chat.dance/obf/';
 		}else{
@@ -4632,7 +4646,7 @@ console.log("pointer value: " + pointer);
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Load responseObj.data: " + responseObj.data);
-			if(responseObj.data.length === DATA_LENGTH && checkBase64Chars(responseObj.data)){ // Data looks good.
+			if (responseObj.data.length === DATA_LENGTH && checkBase64Chars(responseObj.data)){ // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.data;
 			}else{
@@ -4673,7 +4687,7 @@ console.log("pointer value: " + pointer);
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Store responseObj.response: " + responseObj.response);
-			if( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
+			if ( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
 				throw Error("serverStore Error! Maybe a database error?");
 				return "error";
 			}else{
@@ -4733,14 +4747,14 @@ console.log("pointer value: " + pointer);
 		})
 		.catch((error) => {
 			console.log("Fetch Error on BURST Store (sendOfflineDBaseToServer)!~: " + error.message);
-			if( error.message == "Failed to fetch" ){
+			if ( error.message == "Failed to fetch" ){
 				console.log("CAUGHT THE DISCONNECTED ERROR IN BURST STORE!~");
 				// Set pending Burst Store update flag == we failed to run it so need to when we next come online.
 				setUpdateFlag();
 			}
 		});
-		if( fetchResponseObject ){
-			if( fetchResponseObject.ok ){
+		if ( fetchResponseObject ){
+			if ( fetchResponseObject.ok ){
 				console.log("Response from sendOfflineDBaseToServer() fetch() call = OK!");
 				return fetchResponseObject.json();
 			} else {
@@ -4779,7 +4793,7 @@ console.log("pointer value: " + pointer);
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Store responseObj.response: " + responseObj.response);
-			if( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
+			if ( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
 				throw Error("serverDelete Error! Data not deleted!");
 				return "error";
 			}else{
@@ -4961,7 +4975,7 @@ console.log("pointer value: " + pointer);
 		// Add our custom countstring to the data.
 		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext64);
 
-		if(!checkBase64Chars(plaintext64)){
+		if (!checkBase64Chars(plaintext64)){
 			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
 
@@ -5026,9 +5040,9 @@ console.log("pointer value: " + pointer);
 		//console.log("encryptAESCTR called with inputType: " + inputType);
 		let cleartextUint8;
 		// Select input processing type based on function input parameter.
-		if(inputType === 'base64'){// Default usage.
+		if (inputType === 'base64'){// Default usage.
 			cleartextUint8 = Uint8Array.fromBase64(cleartext);
-		}else if(inputType === 'utf8'){
+		}else if (inputType === 'utf8'){
 			cleartextUint8 = new TextEncoder().encode(cleartext);
 		}else{
 			throw new Error("Invalid encryptAESCTR inputType parameter!");
@@ -5168,9 +5182,9 @@ console.log("pointer value: " + pointer);
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
 		// Select output data type based on function parameter.
-		if(outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+		if (outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 			decryptedDecoded = decryptedUint8.toBase64();
-		}else if(outputType === 'utf8'){
+		}else if (outputType === 'utf8'){
 			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
 		}else{
 			throw new Error("Invalid decryptAESCTR outputType parameter!");
@@ -5242,7 +5256,7 @@ console.log("pointer value: " + pointer);
 	// Check uuid chars which are used for passlock and browserID.
 	function checkUUIDChars(input){
 		const regex = new RegExp(/^[a-f0-9-]*$/);
-		if(regex.test(input)){
+		if (regex.test(input)){
 			return true;
 		}else{
 			return false;
@@ -5254,7 +5268,7 @@ console.log("pointer value: " + pointer);
 	function checkBase64Chars(input){
 		// From the first char(^) to the last($), match base64 chars.
 		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
-		if(regex.test(input)){
+		if (regex.test(input)){
 			// Return true/valid
 			return true;
 		}else{
@@ -5273,7 +5287,7 @@ console.log("pointer value: " + pointer);
 		let size_string = "Byte length remaining: " + difference;
 		//console.log("size_string: " + size_string);
 		document.getElementById("offlinebrowserdata_length_label").innerHTML = size_string;
-		if(size > BROWSERINPUT_LENGTH_LIMIT){
+		if (size > BROWSERINPUT_LENGTH_LIMIT){
 			return false; // Length Check Failed.
 		}else{
 			return true; // Length Check Passed.
@@ -5290,7 +5304,7 @@ console.log("pointer value: " + pointer);
 		let size_string = "Byte length remaining: " + difference;
 		//console.log("size_string: " + size_string);
 		document.getElementById("offlineuploaddata_length_label").innerHTML = size_string;
-		if(size > CMDINPUT_LENGTH_LIMIT){
+		if (size > CMDINPUT_LENGTH_LIMIT){
 			return false; // Length Check Failed.
 		}else{
 			return true; // Length Check Passed.
@@ -5353,12 +5367,12 @@ console.log("pointer value: " + pointer);
 		let mathExpression = "";
 		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
 		for(let i=0; i < 7; i++){
-			if(i % 2 === 0){
+			if (i % 2 === 0){
 				// Even index bytes convert to numbers.
 				mathExpression += sevenByteUint8[i];
 			}else{
 				// Odd index bytes convert to symbols.
-				if(sevenByteUint8[i] % 2 === 0){
+				if (sevenByteUint8[i] % 2 === 0){
 					// Even bytes convert to (+)
 					mathExpression += "+";
 				}else{
