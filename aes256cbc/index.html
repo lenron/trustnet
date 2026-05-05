@@ -495,8 +495,12 @@
 			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
 			<div class="flow_pages" id="failed_to_access" style="display:none">
 				<h2>&#10060; FAILED TO ACCESS</h2>
-				<div class="button_pair" id="" style="display:flex">
-				</div>
+			</div>
+
+			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
+			<div class="flow_pages" id="too_many_access_failures" style="display:none">
+				<h2>&#10060; YOU'VE FAILED TO ACCESS TOO MANY TIMES TODAY.</h2>
+				<h2>You may attempt accessing data tomorrow.</h2>
 			</div>
 
 			<!---------------------------Password Entry Error-----------------------!>
@@ -510,15 +514,11 @@
 			<!----------------------------Successfully Deleted Data--------------------------------------------------------------!>
 			<div class="flow_pages" id="delete_success" style="display:none">
 				<h2>&#10004; SUCCESSFULLY DELETED DATA</h2>
-				<div class="button_pair" id="" style="display:flex">
-				</div>
 			</div>
 
 			<!----------------------------Failed to Delete--------------------------------------------------------------!>
 			<div class="flow_pages" id="delete_failed" style="display:none">
 				<h2>&#10060; FAILED TO DELETE</h2>
-				<div class="button_pair" id="" style="display:flex">
-				</div>
 			</div>
 <!----------------------------END Access--------------------------------------------------------------!>
 
@@ -778,21 +778,17 @@
 			<!---------------------------Store Success-----------------------!>
 			<div class="flow_pages" id="store_success" style="display:none">
 				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
-				<div class="button_pair" id="" style="display:flex;">
-				</div>
 			</div>
 
 			<!---------------------------Store Success-----------------------!>
 			<div class="flow_pages" id="stores_over_100" style="display:none">
-				<h2>&#10060; FAILED TO STORE</h2>
+				<h2>&#10060; STORE ERROR</h2>
 				<h2>You've reached your limit of 100 stores today.</h2>
 			</div>
 
 			<!---------------------------Store Fail-----------------------!>
 			<div class="flow_pages" id="store_failed" style="display:none">
-				<h2>&#10060; FAILED TO STORE</h2>
-				<div class="button_pair" id="" style="display:flex;">
-				</div>
+				<h2>&#10060; STORE ERROR</h2>
 			</div>
 <!---------------------------END Store--------------------------------------------------------------!>
 <!---------------------------END Online Flow--------------------------------------------------------!>
@@ -1279,10 +1275,11 @@
 		const fingerprint = await getFpForAccess();
 		const encryptedData = await serverLoad(fingerprint);
 		// Check that data is valid.
-		if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData === "TOO_MANY_ACCESS_FAILURES"){
+			showPage('too_many_access_failures');
+		} else if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access_for_new_offline_database_creation');
-			resetPasslock();
-		}else{
+		} else {
 			// Push fp, data to recordListForNewOfflineDBase collector object.
 			recordListForNewOfflineDBase[fingerprint] = encryptedData;
 			// Check if new offline database is full.
@@ -1291,13 +1288,14 @@
 			if (recordListForNewOfflineDBaseLength == 1000){
 				// No more room in offline dbase, no choice but to continue.
 				showPage('offlineDatabase_pass_or_no');
-			}else if (recordListForNewOfflineDBaseLength > 1000){
+			} else if (recordListForNewOfflineDBaseLength > 1000){
 				showPage('too_many_records');
-			}else{
+			} else {
 				// Let user decide to add more or continue with offline dbase creation.
 				showPage('newofflinedatabase_existingdata_record_added');
 			}
 		}
+		resetPasslock();
 	}// getOnlineRecordForNewOfflineDBase();
 
 	// Default pointer parameter. Without pointer input, will assume start at beginning of database.
@@ -1716,15 +1714,18 @@ console.log("cleartext data: " + cleartextData);
 		const fingerprint = await getFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
 		const encryptedData = await serverLoad(fingerprint);
-		if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData === "TOO_MANY_ACCESS_FAILURES"){
+			showPage('too_many_access_failures');
+		} else if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
-			resetPasslock();
 		}else{
 			showPage('access_file');
 			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
 			holdFpForDelete(fingerprint);
-			decryptAndDownloadFile(encryptedData);
+			await decryptAndDownloadFile(encryptedData);
 		}
+		// Delete passlock for secruity.
+		resetPasslock();
 	}// attemptCMDAccess()
 
 	async function decryptAndDownloadFile(encryptedData){
@@ -1741,8 +1742,6 @@ console.log("cleartext data: " + cleartextData);
 			a.href = window.URL.createObjectURL(blob);
 			a.download = 'yourfile.enc';
 			a.click();
-		// Delete passlock for secruity.
-		await resetPasslock();
 	}// decryptAndDownloadFile()
 
 	async function attemptBrowserAccess(inputId){
@@ -1751,7 +1750,10 @@ console.log("cleartext data: " + cleartextData);
 		const fingerprint = await getFpForAccess();
 		const encryptedData = await serverLoad(fingerprint);
 		// Report outcome of Access attempt.
-		if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData === "TOO_MANY_ACCESS_FAILURES"){
+			showPage('too_many_access_failures');
+			resetPasslock();
+		}else if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 			resetPasslock();
 		}else{
@@ -1778,7 +1780,6 @@ console.log("cleartext data: " + cleartextData);
 	async function decryptAndShowCleartext(encryptedData){
 		const cleartextSet = await passlockDecryptSet();
 		//const decryptedData  = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
-
 		let decryptedData;
 		try {
 			decryptedData = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
@@ -1787,7 +1788,6 @@ console.log("cleartext data: " + cleartextData);
 			// Assume there was a password entry error.
 			showPage("password_entry_error");
 		}
-
 		// Reveal cleartext to user.
 		document.getElementById("access_data_outputdisplay").value = decryptedData;
 	}// decryptAndShowCleartext()
@@ -1932,14 +1932,15 @@ console.log("cleartext data: " + cleartextData);
 			// Make a copy of the json extraction.
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
-			//console.log("Load responseObj.data: " + responseObj.data);
-			if (responseObj.data.length === DATA_LENGTH && checkBase64Chars(responseObj.data)){ // Data looks good.
+			//console.log("responseObj.access_response: " + responseObj.access_response);
+			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND"){
+				console.log("serverLoad Error: " + responseObj.access_response);
+				return responseObj.access_response;
+			} else if (responseObj.access_response.length === DATA_LENGTH && checkBase64Chars(responseObj.access_response)){ // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
-				return responseObj.data;
-			}else{
-				//throw Error("serverLoad: Load length NOT 1000 chars! Something went wrong!?");
-				console.log("serverLoad: Failed to load encrypted data.");
-				return "failed to load";
+				return responseObj.access_response;
+			} else {
+				console.log("serverLoad Error: " + responseObj.access_response);
 			}
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
 		} catch (error) { // Catch rejected promise.
@@ -1976,12 +1977,12 @@ console.log("cleartext data: " + cleartextData);
 			//console.log(responseObj);
 			//console.log("Store responseObj.response: " + responseObj.response);
 			//if ( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
-			if (responseObj.response === "SUCCESS"){
+			if (responseObj.store_response === "SUCCESS"){
 				console.log("serverStore: Successfully stored encrypted data.");
 				return "success";
-			}else if (responseObj.response === "STORES_OVER_100"){
+			}else if (responseObj.store_response === "STORES_OVER_100"){
 				return "STORES_OVER_100";
-			}else if (responseObj.response === "STORE FAILED"){
+			}else if (responseObj.store_response === "STORE FAILED"){
 				throw Error("serverStore Error! Database failed to store data.");
 			}else{
 				throw Error("serverStore Error! Maybe a database error?");

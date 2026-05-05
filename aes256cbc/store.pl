@@ -59,7 +59,7 @@ if ($q->param){
 	if (!($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/) || !($data =~ /^[a-zA-Z0-9\+\/]{1024}$/)){
 		print $q->header();
 		# qq{} is a standin for double quotes, used here so we can pass the dub quote char to print.
-		print qq{{"response":"0"}};
+		print qq{{"store_response":"FINGERPRINT_OR_DATA_INVALID"}};
 		exit 0;
 	}
 
@@ -72,7 +72,7 @@ if ($q->param){
 	if ($stores_today >= 100){
 		# Tell client ip can't store anymore. Don't store.
 		print $q->header();
-		print qq{{"response":"STORES_OVER_100"}};
+		print qq{{"store_response":"STORES_OVER_100"}};
 	}else{
 		# Run the store.
 		# Store new record into database at fingerprint or modify if fingerprint already exists.
@@ -87,12 +87,12 @@ if ($q->param){
 			$dbh->do("INSERT INTO $stores_today_per_ip_table (ip, stores_today) VALUES (?, 1) ON DUPLICATE KEY UPDATE stores_today = stores_today + 1;", undef, $ip);
 			# Report success to client.
 			print $q->header();
-			print qq{{"response":"SUCCESS"}};
+			print qq{{"store_response":"SUCCESS"}};
 		}else{
 			# Store failed.
 			print $fh "STORE FAILED!";
 			print $q->header();
-			print qq{{"response":"STORE FAILED"}};
+			print qq{{"store_response":"STORE FAILED"}};
 		}
 	}
 }
