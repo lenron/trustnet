@@ -31,6 +31,7 @@ RewriteRule ^exesetpasslock set_passlock.pl
 RewriteRule ^exeextendpasslock extend_passlock.pl
 RewriteRule ^exegetpasslock get_passlock.pl
 RewriteRule ^exepasslockdelete delete_passlock.pl
+RewriteRule ^execountuniquevisitors count_unique_visitors.pl
 
 # Redirects for Offline Database
 #RewriteRule ^exe_offline_set set_offline_dbase.pl

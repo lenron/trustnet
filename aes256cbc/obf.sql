@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS stores_on_date (id INT NOT NULL AUTO_INCREMENT, date_
 -- #3 - Daily access failures per IP 
 CREATE TABLE IF NOT EXISTS access_failures_today_per_ip (id INT NOT NULL AUTO_INCREMENT, ip VARCHAR(16), access_failures_today INT, PRIMARY KEY(id), UNIQUE(ip));
 -- #4 - Unique visitor count per date
-CREATE TABLE IF NOT EXISTS unique_visitors_on_date (id INT NOT NULL AUTO_INCREMENT, date_visited DATE, visitors_on_this_date INT, PRIMARY KEY(id), UNIQUE(date_visited));
+CREATE TABLE IF NOT EXISTS unique_visitors_on_date (id INT NOT NULL AUTO_INCREMENT, date_visited DATE, unique_visitors_on_this_date INT, PRIMARY KEY(id), UNIQUE(date_visited));
 -- #5 - Daily unique visitor IPs - Not using UNIQUE here because I want a standard INSERT INTO to fail if ip exists (don't need response back).
 CREATE TABLE IF NOT EXISTS unique_visitor_ips_today (id INT NOT NULL AUTO_INCREMENT, ip VARCHAR(16), PRIMARY KEY(id));
 

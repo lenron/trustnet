@@ -945,6 +945,7 @@
 	window.onload = async function() {
 		// Initial server online check.
 		await updateOnlineStatus();
+		serverCountUniqueVisitors();
 	}
 
 	// Set Title to link to Home without dropping offline dbase.
@@ -1903,6 +1904,44 @@ console.log("cleartext data: " + cleartextData);
 		}
 		return server_origin;
 	}// getServerOrigin()
+		
+	// 
+	async function serverCountUniqueVisitors(){
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'execountuniquevisitors;';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					token: 'token',// Don't need to send any information to server?
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			//console.log(responseObj);
+			if (responseObj.ip_query_response){
+				console.log("IP query response: " + responseObj.ip_query_response);
+			}else{
+				console.log("Unique Visitor Count return error.");
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverCountUniqueVisitors()
+
+
 
 	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
 	// This type of URI used instead of a direct link to the file for security.
@@ -2158,69 +2197,6 @@ console.log("cleartext data: " + cleartextData);
 		}
 	}// serverGetPasslock()
 
-	// Create a json string containing every record in the offline dbase from 0 to pointer.
-	function convertOfflineDBaseToJSONString(){
-		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
-		const offline_dbase_pointer = document.getElementById("offline_dbase_pointer").innerHTML;
-
-		// Compose the flat json string manually.
-		let offline_dbase_json_flat = '{"records":[';
-
-		let fp_start;
-		let fp_end;
-		let data_end;
-		for(let i=0; i < offline_dbase_pointer; i++ ){
-			fp_start = i * TOTAL_RECORD_LENGTH;
-			fp_end = fp_start + FINGERPRINT_LENGTH;
-			data_end = fp_end + DATA_LENGTH;
-
-			offline_dbase_json_flat += '{"fingerprint":"' + offline_dbase.substring(fp_start, fp_end) + '",';
-			offline_dbase_json_flat += '"data":"' + offline_dbase.substring(fp_end, data_end) + '"},';
-		}
-		// Remove last error causing comma , 
-		offline_dbase_json_flat = offline_dbase_json_flat.slice(0, -1);
-		offline_dbase_json_flat += ']}';
-
-		return offline_dbase_json_flat;
-	}// convertOfflineDBaseToJSONString()
-
-	// Inputs: none but pulls data from offline dbase object.
-	// Output: sends a json string representation of the offline dbase 
-	// 		to server where it will be decoded and saved.
-	async function sendOfflineDBaseToServer(){
-		// Need a JSon object -- records: [ fp: fp, data: data ]
-		// Make the string in a separate function.
-		let offline_dbase_json_string = convertOfflineDBaseToJSONString();
-		console.log("manually composed json string: " + offline_dbase_json_string);
-
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exeburststore;';
-		const fetchResponseObject = await fetch(SERVER_URL, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'text/plain',
-			},
-			body: offline_dbase_json_string,
-		})
-		.catch((error) => {
-			console.log("Fetch Error on BURST Store (sendOfflineDBaseToServer)!~: " + error.message);
-			if ( error.message == "Failed to fetch" ){
-				console.log("CAUGHT THE DISCONNECTED ERROR IN BURST STORE!~");
-				// Set pending Burst Store update flag == we failed to run it so need to when we next come online.
-				setUpdateFlag();
-			}
-		});
-		if ( fetchResponseObject ){
-			if ( fetchResponseObject.ok ){
-				console.log("Response from sendOfflineDBaseToServer() fetch() call = OK!");
-				return fetchResponseObject.json();
-			} else {
-				console.log("HTTP error. Status: " + fetchResponseObject.status);
-				return fetchResponseObject.json();
-			}
-		}
-		return;
-	}// sendOfflineDBaseToServer()
 
 	// Endpoint /obf/exedelete will attempt to delete.
 	// Input: fingerprint is hexadecimal.
