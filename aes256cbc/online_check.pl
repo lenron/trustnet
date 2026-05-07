@@ -13,24 +13,26 @@ use JSON;
 my $q = CGI->new;
 my $json = JSON->new;
 
-	# Get user ip.
-	my $ip = $ENV{REMOTE_ADDR};
-	#my $ip = "1.1.1.1";
+# Get user ip.
+my $ip = $ENV{REMOTE_ADDR};
+#my $ip = "1.1.1.1";
 
-	# Get current time for log.
-	my $t = localtime;
-	my $time = $t->strftime();
-	# If log exists, we know q->param caught data.
-	my $filename = './logs/online_check_log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $fh, '>>', $filename); # or die;
-	print $fh "\n\nONLINE CHECK\n";
-	print $fh "$time\n";
-	print $fh "$ip\n";
+# Get current time for log.
+my $t = localtime;
+# Make time format human readable.
+my $time = $t->strftime();
+# If log exists, we know q->param caught data.
+my $filename = './logs/online_check_log.txt';
+# Append to existing file if it exists, create new otherwise.
+open(my $fh, '>>', $filename); # or die;
+print $fh "\nONLINE CHECK\n";
+print $fh "$time\n";
+print $fh "$ip\n";
 
-	my $response = "success";
-	print $q->header();
-	print qq{{"response":"$response"}};
+my $response = "success";
+# HTTP POST response requires a header.
+print $q->header();
+print qq{{"response":"$response"}};
 
 
 

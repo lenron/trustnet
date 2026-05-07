@@ -20,12 +20,14 @@ my $db_pw = 'Vuu_fQY1#qH,';
 my $db_name = 'chatriwe_obf';
 my $access_failures_today_table = 'access_failures_today_per_ip';
 
+# Did CGI catch an HTTP Request object ($q->param)?
 if ($q->param){
 
-	# Decode to hash ref to extract fingerprint and data
-	my $hash_ref = $json->decode(scalar $q->param('POSTDATA'));
+	# CGI term POSTDATA is used to get the entire raw body content (in JSON object form).
+	my $posted_data_in_json_object_form = $q->param('POSTDATA');
+	# Decode json object into hash.
+	my $hash_ref = $json->decode($posted_data_in_json_object_form);
 	my $fingerprint = $hash_ref->{fingerprint};
-	#my $fingerprint = "de81a20f681e29f6f6cbbe2bb583f37a5e7c76ff446a7dad43204d54bcac9345";
 
 	# Get user ip.
 	my $ip = $ENV{REMOTE_ADDR};
@@ -33,24 +35,27 @@ if ($q->param){
 
 	# Get current time for log.
 	my $t = localtime;
+	# Make time format human readable.
 	my $time = $t->strftime();
 	# If log exists, we know q->param caught data.
 	my $filename = './logs/log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
-	print $fh "LOAD\n";
+	print $fh "\nLOAD\n";
 	print $fh "$time\n";
 	print $fh "$ip\n";
 	print $fh "fingerprint: $fingerprint\n";
 
-	# Match exactly 43 hex chars.
+	# Match exactly 43 base64 chars.
 	if (!($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/)){
 		# Return fail if data isn't in the proper form.
 		print $q->header();
+		# qq{} is a standin for double quotes, used here so we can pass the double quote char to print.
 		print qq{{"access_response":"FINGERPRINT_INVALID"}};
 		exit 0;
 	}
 
+	# Connect to database. Functionality is handled by the database handle $dbh.
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	# First check if we need to disallow the Access attempt.
 	my $access_fails_today = get_access_fails_today($dbh, $ip);
@@ -75,19 +80,16 @@ if ($q->param){
 }
 
 
-# Get the data stored at fingerprint location.
-# Will return NOT_FOUND if record doesn't exist.
+# Get access failures recorded today.
 sub get_access_fails_today {
 	my $dbh = shift;
 	my $ip = shift;
-	my $query = "SELECT access_failures_today FROM $access_failures_today_table WHERE ip = ?";
-	my $sth = $dbh->prepare($query);
-	$sth->execute($ip);
-	# If data isn't found at $fingerprint, this variable won't get overwritten.
-	my $access_fails = 'FAILED_TO_GET_COUNT_FOR_ACCESS_FAILURES';
-	while (my $row = $sth->fetchrow_hashref){
-		$access_fails = $row->{access_failures_today};
-	}   
+	# DBI command for returning a single value with SELECT.
+	my $access_fails = $dbh->selectrow_array("SELECT access_failures_today FROM $access_failures_today_table WHERE ip = ?", undef, $ip);
+	# Empty retun indicates record doesn't exist yet ==> no recorded access failures today for this ip.
+	if ($access_fails eq '') {
+		$access_fails = 0;
+	}
 	return $access_fails;
 } 
 
@@ -96,13 +98,11 @@ sub get_access_fails_today {
 sub get_data_at_fingerprint {
 	my $dbh = shift;
 	my $fingerprint = shift;
-	my $query = "SELECT data FROM $db_table WHERE fingerprint = ?";
-	my $sth = $dbh->prepare($query);
-	$sth->execute($fingerprint);
-	my $data = 'NOT_FOUND';
-	while (my $row = $sth->fetchrow_hashref){
-		$data = $row->{data};
-	}   
+	# DBI command for returning a single value with SELECT.
+	my $data = $dbh->selectrow_array("SELECT data FROM $db_table WHERE fingerprint = ?", undef, $fingerprint);
+	if ($data eq '') {
+		$data = "NOT_FOUND";
+	}
 	return $data;
 } 
 
