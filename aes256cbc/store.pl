@@ -38,7 +38,7 @@ if ($q->param){
 	my $filename = './logs/log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
-	print $fh "\n\nSTORE\n";
+	print $fh "\nSTORE\n";
 	print $fh "$time\n";
 	print $fh "$ip\n";
 
