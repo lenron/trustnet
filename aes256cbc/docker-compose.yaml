@@ -4,8 +4,8 @@ services:
     restart: always
     # Comment port off if using Traefik.
     # Uncomment port on if accessing through localhost.
-    #ports:
-      #- "80:80"
+    ports:
+      - "80:80"
     volumes:
       - type: bind
         source: .
@@ -68,4 +68,4 @@ networks:
   proxy:
     # Uncomment external:true on if proxy network already created and existing.
     # Comment external:true off if that doesn't make sense to you.
-    external: true
+    #external: true
