@@ -64,10 +64,19 @@ if ($q->param){
 
 	# Get database handler $dbh by successfully connecting to database.
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
+	# Check hard limit for total stores today.
+	my $total_stores_today = get_total_stores_today($dbh, $ip);
+	print $fh "Total stores today: $total_stores_today\n";
+	if ($total_stores_today >= 50000) {
+		# Lock out.
+		print $q->header();
+		print qq{{"store_response":"TOTAL_STORES_OVER_50000"}};
+		exit(0);
+	}
+
 	# First check if we need to disallow the store and ban the ip.
-	my $stores_today = get_stores_today($dbh, $ip);
-	print $fh "CHECKING FOR #STORES TODAY stores_today: $stores_today\n";
-	# Report back to client.
+	my $stores_today = get_stores_today_for_ip($dbh, $ip);
+	print $fh "Stores today for ip:$ip - stores_today: $stores_today\n";
 	if ($stores_today >= 100) {
 		# Tell client ip can't store anymore. Don't store.
 		print $q->header();
@@ -95,10 +104,26 @@ if ($q->param){
 			print qq{{"store_response":"STORE FAILED"}};
 		}
 	}
+} else {
+			print $q->header();
+			print "DONT TRY TO HACK ME";
 }
 
 # Get number of stores today for a given ip.
-sub get_stores_today {
+sub get_total_stores_today {
+	my $dbh = shift;
+	my $ip = shift;
+	# DBI command for returning a single value with SELECT.
+	my $total_stores_today = $dbh->selectrow_array("SELECT stores_on_this_date FROM $stores_on_date_table WHERE date_stored = CURRENT_DATE", undef);
+	# Empty retun indicates record doesn't exist yet ==> nothing yet stored today.
+	if ($total_stores_today eq '') {
+		$total_stores_today = 0;
+	}
+	return $total_stores_today;
+}
+
+# Get number of stores today for a given ip.
+sub get_stores_today_for_ip {
 	my $dbh = shift;
 	my $ip = shift;
 	# DBI command for returning a single value with SELECT.

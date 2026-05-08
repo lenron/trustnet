@@ -790,6 +790,13 @@
 			<div class="flow_pages" id="store_failed" style="display:none">
 				<h2>&#10060; STORE ERROR</h2>
 			</div>
+
+			<!---------------------------Over 50000 Store Fail-----------------------!>
+			<div class="flow_pages home" id="lockedout_50000" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
+				<h2>SECRETWORD IS LOCKEDOUT!</h2>
+				<h2>OVER 50,000 STORES REACHED!</h2>
+			</div>
+			</div>
 <!---------------------------END Store--------------------------------------------------------------!>
 <!---------------------------END Online Flow--------------------------------------------------------!>
 
@@ -2014,21 +2021,30 @@ console.log("cleartext data: " + cleartextData);
 			// Make a copy of the json extraction.
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
-			//console.log("Store responseObj.response: " + responseObj.response);
+			console.log("Store responseObj.response: " + responseObj.store_response);
 			//if ( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
-			if (responseObj.store_response === "SUCCESS"){
+			if (responseObj.store_response === "TOTAL_STORES_OVER_50000"){
+				showPage("lockedout_50000"); // Shown for a split second before page reload.
+				window.location.reload(true);
+				throw new Error("TOTAL_STORES_OVER_50000");
+			} else if (responseObj.store_response === "SUCCESS"){
 				console.log("serverStore: Successfully stored encrypted data.");
 				return "success";
-			}else if (responseObj.store_response === "STORES_OVER_100"){
+			} else if (responseObj.store_response === "STORES_OVER_100"){
 				return "STORES_OVER_100";
-			}else if (responseObj.store_response === "STORE FAILED"){
+			} else if (responseObj.store_response === "STORE FAILED"){
 				throw Error("serverStore Error! Database failed to store data.");
-			}else{
+			} else {
 				throw Error("serverStore Error! Maybe a database error?");
 			}
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
 		// 500 Internal Server Errors will be caught here too.
 		}catch(error){ // Catch rejected promise.
+			//if (error instanceof TypeError){ // === "TOTAL_STORES_OVER_50000") {
+				//showPage("lockedout_50000");
+				//window.location.reload(true);
+				//throw new Error("CRITICAL ERROR: TOTAL_STORES_OVER_50000");
+			//}
 			console.error(error.message);
 		}
 	}// serverStore()

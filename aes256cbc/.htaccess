@@ -1,16 +1,13 @@
+DirectoryIndex filter.pl
 
-# This works for whole site. Authorization function.
-#<Files get_offline_dbase.pl>
-	#AuthType Basic
-	#AuthName "restricted area"
-	#AuthUserFile "/home/chatriwe/.htpasswds/public_html/vidcaps/passwd"
-	#require valid-user
-#</Files>
+# Deny access to all html files in current directory.
+<Files "*.html">
+    Require all denied
+</Files>
 
 #Header set Access-Control-Allow-Origin "*"
 #Header set Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
 #Header set Access-Control-Allow-Headers X-Requested-With
-
 
 RewriteEngine On
 RewriteBase /
@@ -22,21 +19,24 @@ RewriteBase /
 
 # Redirect calls from e.g. /obf/exestore to /obf/store.pl
 # These RewriteRules use regex in what appears to be a greedy way. ^exedelete was catching and sending to delete.pl while ^exedeletepasslock, delete_passlock.pl was the intended redirect.
-RewriteRule ^exestore store.pl
-RewriteRule ^exeload load.pl
-RewriteRule ^exedelete delete.pl
-RewriteRule ^exeburststore burst_store.pl
-RewriteRule ^exeonlinecheck online_check.pl
-RewriteRule ^exesetpasslock set_passlock.pl
-RewriteRule ^exeextendpasslock extend_passlock.pl
-RewriteRule ^exegetpasslock get_passlock.pl
-RewriteRule ^exepasslockdelete delete_passlock.pl
-RewriteRule ^execountuniquevisitors count_unique_visitors.pl
+RewriteRule ^exestore$ store.pl
+RewriteRule ^exeload$ load.pl
+RewriteRule ^exedelete$ delete.pl
+RewriteRule ^exeburststore$ burst_store.pl
+RewriteRule ^exeonlinecheck$ online_check.pl
+RewriteRule ^exesetpasslock$ set_passlock.pl
+RewriteRule ^exeextendpasslock$ extend_passlock.pl
+RewriteRule ^exegetpasslock$ get_passlock.pl
+RewriteRule ^exepasslockdelete$ delete_passlock.pl
+RewriteRule ^execountuniquevisitors$ count_unique_visitors.pl
 
 # Redirects for Offline Database
 #RewriteRule ^exe_offline_set set_offline_dbase.pl
 #RewriteRule ^exe_offline_get get_offline_dbase.pl
 
+#<Directory "/usr/local/apache2/htdocs/logs">
+    #Require all denied
+#</Directory>
 
 <Files "log.txt">  
   Require all denied
