@@ -33,3 +33,7 @@ DO DELETE FROM passlock_table WHERE timestamp < CURRENT_TIMESTAMP() - INTERVAL 6
 CREATE EVENT clear_stores_today_every_24_hours ON SCHEDULE EVERY 1 DAY STARTS CURRENT_DATE + INTERVAL '02:30:00' HOUR_SECOND DO TRUNCATE TABLE stores_today_per_ip;
 CREATE EVENT clear_access_failures_today_every_24_hours ON SCHEDULE EVERY 1 DAY STARTS CURRENT_DATE + INTERVAL '02:30:00' HOUR_SECOND DO TRUNCATE TABLE access_failures_today_per_ip;
 CREATE EVENT clear_unique_visitor_ips_every_24_hours ON SCHEDULE EVERY 1 DAY STARTS CURRENT_DATE + INTERVAL '02:30:00' HOUR_SECOND DO TRUNCATE TABLE unique_visitor_ips_today;
+
+-- grant privileges for mariadb-backup. (GRANT ALL doesn't work for these I guess.)
+--GRANT RELOAD, PROCESS ON *.* TO 'chatriwe_admin'@'%';   
+

@@ -1,5 +1,6 @@
 services:
-  obf:
+  pgo:
+    container_name: pgo-apache2
     image: mkrlenron/lenron-obf:0.1
     restart: always
     # Comment port off if using Traefik.
@@ -18,10 +19,10 @@ services:
         source: /tmp/mysqld
         target: /run/mysqld
     depends_on:
-      - dbase
+      - mariadb-database
+      #- mariadb-backuper
     networks:
       - proxy
-    # Needed to hook into edge router Traefik.
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
@@ -39,7 +40,8 @@ services:
       - "traefik.http.routers.obf-secure.service=obf"
       - "traefik.http.services.obf.loadbalancer.server.port=80"
 
-  dbase:
+  mariadb-database:
+    container_name: pgo-mariadb
     image: mariadb:12.0.2
     restart: always
     environment:
@@ -56,6 +58,9 @@ services:
       - ./my.cnf:/etc/mysql/conf.d/my.cnf
       # Persist this volume which contains the database data.
       - mariadb_data:/var/lib/mysql
+      # Persist backup volume.
+      #- mariadb_backup:/backup
+      - ./mariadb_backup:/backup
       # This is the socket connection between apache and mariadb.
       - /tmp/mysqld:/var/run/mysqld
     networks:
@@ -63,9 +68,13 @@ services:
 
 volumes: # This volume which contains the database data will persist.
   mariadb_data:
+    name: mariadb_data
+  #mariadb_backup:
+    #name: mariadb_backup
 
 networks:
   proxy:
+    name: proxy
     # Uncomment external:true on if proxy network already created and existing.
     # Comment external:true off if that doesn't make sense to you.
-    #external: true
+    external: true

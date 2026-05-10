@@ -4,5 +4,12 @@ services:
     image: cloudflare/cloudflared
     restart: unless-stopped
     command: tunnel run
+    networks:
+      - proxy
     environment:
-      - TUNNEL_TOKEN=<ENTER TUNNEL TOKEN HERE>
+      - TUNNEL_TOKEN=<TUNNEL TOKEN HERE>
+
+networks:
+  proxy:
+    name: proxy
+    external: true
