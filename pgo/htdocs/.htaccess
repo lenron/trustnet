@@ -1,0 +1,60 @@
+DirectoryIndex ingress_filter.pl
+
+# Deny access to all html files in current directory.
+<Files "*.html">
+    Require all denied
+</Files>
+
+#Header set Access-Control-Allow-Origin "*"
+#Header set Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
+#Header set Access-Control-Allow-Headers X-Requested-With
+
+RewriteEngine On
+RewriteBase /
+#RewriteBase /backend-perl-scripts/
+#RewriteRule ^store obfuscate.pl?id=store
+#RewriteRule ^load obfuscate.pl?id=load
+#RewriteRule ^delete obfuscate.pl?id=delete
+#RewriteRule ^faq obfuscate.pl?id=faq
+#RewriteRule ^how obfuscate.pl?id=how
+
+# Redirect calls from e.g. /cgi-bin/exestore to /obf/store.pl
+# These RewriteRules use regex in what appears to be a greedy way. ^exedelete was catching and sending to delete.pl while ^exedeletepasslock, delete_passlock.pl was the intended redirect.
+RewriteRule ^exestore$ backend-perl-scripts/store.pl
+RewriteRule ^exeload$ backend-perl-scripts/load.pl
+RewriteRule ^exedelete$ backend-perl-scripts/delete.pl
+RewriteRule ^exeburststore$ backend-perl-scripts/burst_store.pl
+RewriteRule ^exeonlinecheck$ backend-perl-scripts/online_check.pl
+RewriteRule ^exesetpasslock$ backend-perl-scripts/set_passlock.pl
+RewriteRule ^exeextendpasslock$ backend-perl-scripts/extend_passlock.pl
+RewriteRule ^exegetpasslock$ backend-perl-scripts/get_passlock.pl
+RewriteRule ^exepasslockdelete$ backend-perl-scripts/delete_passlock.pl
+RewriteRule ^execountuniquevisitors$ backend-perl-scripts/count_unique_visitors.pl
+#RewriteRule ^execountuniquevisitors$ count_unique_visitors.pl
+
+# Redirects for Offline Database
+#RewriteRule ^exe_offline_set set_offline_dbase.pl
+#RewriteRule ^exe_offline_get get_offline_dbase.pl
+
+#<Directory "/usr/local/apache2/htdocs/logs">
+    #Require all denied
+#</Directory>
+
+<Files "log.txt">  
+  Require all denied
+</Files>
+
+# Allow CORS
+#<IfModule mod_headers.c>
+  #Header add Access-Control-Allow-Origin "*"
+  #Header add Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
+  #Header set Access-Control-Allow-Headers X-Requested-With
+#</IfModule>
+
+# Service Workers shouldn't be cached for very long
+<FilesMatch "serviceworker.js">
+  ExpiresDefault "now"
+</FilesMatch>
+
+
+

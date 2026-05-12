@@ -1,0 +1,38 @@
+526 + newline = 527, 1 less than 528 (divisible by 16) giving room for padding in the last unfull block for AES-CBC encryption.
+	newline is always 1 byte, uint8array(1)
+	need 1 block for AES-CBC padding
+
+528 + 8 Salted__ + 8 random salt bytes = 544
+	Salted__ is always the same 8 bytes
+	random salt is always uint8array(8)
+
+544 bytes will by definition convert to 728 base64 chars, needing 2 padding chars using bytesToBase64()
+	544 bytes * 8 bits = 4352 bits
+	4352 bits mod 24 = 8 bits remaining
+		these 8 bits will convert to 2 chars followed by 2 =, which is what we see in testing.
+	So, by RFC 4648 definition, 544 bytes will always convert to 728 base64 chars.
+		The first 543 bytes will convert into 4/3 base64 chars, then 2 chars, then 2 padding chars, ==
+		543*4/3 + 2 + 2 = 724 + 2 + 2 = 728
+	Note:
+		This is using bytesToBase64(). Options exist to e.g. not include padding with other functions.
+
+728 + 4 bytes of countstring = 732 
+	4 bytes of countstring will always be 4 bytes:
+		3 digits and a colon gets encoded by utf8
+			colon is a single byte, 0x3A or 58 in decimal
+			single digit base 10 numbers are just below decimal in utf8 mapping, they use 1 byte
+
+732 bytes *should* always fit into 1000 base58 chars
+	Given the max value representable in a number system of base B with length digits x is B^x - 1
+	And we’re trying to find the number we can encode in base C with digit length y,
+	Then we are trying to find the number y that makes C^Y - 1 at least as big as B^x - 1 giving us:
+
+	B^x - 1 <= C^y - 1
+	B^x <= C^y
+	x * log(B) <= y * log(C)
+	x * (log(B)/log(C)) <= y
+	x * log(58) / log(256) <= y	 Now setting y to 732,
+	x <= 999.661....
+
+
+

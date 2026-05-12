@@ -1,0 +1,26 @@
+(185 is current limit):
+jfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniouriogaiojfiverojnviorenviuorniourirfe3
+
+
+MAX TESTED CHARACTERS (711-185):
+htyehtrdhgfʫʫʫʫʫcxbvxcgtrhyterjytjeyt😒😥💀😬🤚🦹<200d>♂️🧑<200d>🦯<200d>➡️🧍<200d>♀️ʫ🐿️>🕊️ʫ🪼🐋℘ʫ
+έ   ὴ   ή   ὶ   ί   ὸ   ό   ὺ   ύ   ὼ   ώ           
+U+1F8x  ᾀ   ᾁ   ᾂ   ᾃ   ᾄ   ᾅ   
+😒😥💀😬🤚🦹<200d>♂️🧑<200d>🦯<200d>➡️🧍<200d>♀️🐿️d🕊️♀️🪼🐋℘ 
+έ   ὴ   ή   ὶ   ί   ὸ   ό   ὺ   ύ   ὼ   ώ    
+U+1F8x  ᾀ   ᾁ   ᾂ   ᾃ   ᾄ   ᾅ   
+hello motoέ ὴ   ή 1234
+
+
+
+
+711 CHARACTERS (as reported by blob.size):
+htyehtrdhgfʫʫʫʫʫcxbvxcgtrhyterjytjeyt😒😥💀😬🤚🦹<200d>♂️🧑<200d>🦯<200d>➡️🧍<200d>♀️ʫ🐿️>🕊️ʫ🪼🐋℘ʫ
+έ   ὴ   ή   ὶ   ί   ὸ   ό   ὺ   ύ   ὼ   ώ           
+U+1F8x  ᾀ   ᾁ   ᾂ   ᾃ   ᾄ   ᾅ   
+😒😥💀😬🤚🦹<200d>♂️🧑<200d>🦯<200d>➡️🧍<200d>♀️🐿️d🕊️♀️🪼🐋℘ 
+έ   ὴ   ή   ὶ   ί   ὸ   ό   ὺ   ύ   ὼ   ώ    
+U+1F8x  ᾀ   ᾁ   ᾂ   ᾃ   ᾄ   ᾅ   
+hello motoέ ὴ   ή   ὶ   ί   ὸ   ό   ὺ   ύ   ὼ   ώ    
+U+1F8x  ᾀ   ᾁ   ᾂ   ᾃ   ᾄ   ᾅ   έ   ὴ   ή   ὶ   ί   ὸ   ό   ὺ   ύ   ὼ   ώ    
+U+1F8x  ᾀ12345678900000
