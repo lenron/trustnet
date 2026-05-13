@@ -32,6 +32,7 @@ mkdir -p htdocs/logs
 sudo chown -R www-data htdocs/logs
 
 # Add cronjob for daily backup to main server.
+sudo apt-get install cron -y
 # Capture existing cronjobs to a bash variable.
 #EXISTING_CRON=$(crontab -l)
 # Main site job to add.
@@ -96,6 +97,39 @@ echo -e "$INSTRUCTIONS\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
 #RESTORE_JOB="10 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/restore_mariadb.sh"
 # Set the entirety of the crontab contents (crontab -) to an echoed variable that consists of the captured existing file, a newline (must use -e), the new job in that order.
 #echo -e "$EXISTING_CRON\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
+INSTRUCTIONS="
+# Edit this file to introduce tasks to be run by cron.
+# 
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+# 
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').
+# 
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+# 
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command"
+GET_BACKUP="
+# every 5th minute of the 10th hour every day
+5 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh"
+RESTORE_JOB="
+# every 10th minute of the 10th hour every day
+10 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/restore_mariadb.sh"
+# Set the entirety of the crontab contents (crontab -) to an echoed variable that consists of the captured existing file, a newline (must use -e), the new job in that order.
+#echo -e "$EXISTING_CRON\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
+echo -e "$INSTRUCTIONS\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
 
 # Keep index.html 
 #mv index.html main_index.html
