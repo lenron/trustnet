@@ -1,5 +1,6 @@
 DirectoryIndex ingress_filter.pl
 
+
 # Deny access to all html files in current directory.
 <Files "*.html">
     Require all denied
@@ -10,6 +11,7 @@ DirectoryIndex ingress_filter.pl
 #Header set Access-Control-Allow-Headers X-Requested-With
 
 RewriteEngine On
+
 RewriteBase /
 #RewriteBase /backend-perl-scripts/
 #RewriteRule ^store obfuscate.pl?id=store
