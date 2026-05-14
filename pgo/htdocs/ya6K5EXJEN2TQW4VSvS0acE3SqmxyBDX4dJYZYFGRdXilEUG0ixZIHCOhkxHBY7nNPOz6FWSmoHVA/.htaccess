@@ -1,1 +1,7 @@
-#Options +Indexes
+AuthType Basic
+AuthName "restricted area"
+AuthUserFile "/usr/local/apache2/htdocs/.htpasswd"
+require valid-user
+
+
+Options +Indexes
