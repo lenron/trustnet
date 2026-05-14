@@ -796,7 +796,6 @@
 				<h2>SECRETWORD IS LOCKEDOUT!</h2>
 				<h2>OVER 50,000 STORES REACHED!</h2>
 			</div>
-			</div>
 <!---------------------------END Store--------------------------------------------------------------!>
 <!---------------------------END Online Flow--------------------------------------------------------!>
 
@@ -908,6 +907,11 @@
 			<div class="flow_pages" id="too_many_records" style="display:none">
 				<h2>&#10060; MORE RECORDS ADDED THAN SPACE AVAILABLE IN AN OFFLINE DATABASE!</h2>
 				<h2>&#10060; THIS SHOULD NEVER RUN!</h2>
+			</div>
+
+			<!---------------------------PASSLOCK ERROR: DENIED-----------------------!>
+			<div class="flow_pages" id="passlock_error_deny" style="display:none">
+				<h2>&#10060; PASSLOCK ERROR: DENIED.</h2>
 			</div>
 
 	</div> <!--------------------------------------------Center HTML----------------------------------------------------!>
@@ -1620,11 +1624,17 @@ recordListLength = 1000;
 
 	// Extract, encrypt, and store data at inputId to global passlockedData Object.
 	async function extractInputData(inputId){
-		const keyword = extractKeyword(inputId);
+		const pgoPasswordType = extractKeyword(inputId);
 		const cleartextData = extractCleartextData(inputId);
 console.log("cleartext data: " + cleartextData);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
-		passlockedData[keyword] = await passlockEncrypt(cleartextData);
+		try {
+			passlockedData[pgoPasswordType] = await passlockEncrypt(cleartextData);
+		} catch (error) {
+			showPage('passlock_error_deny');
+			//resetPasslock();
+			throw Error("PASSLOCK ERROR: Cannot proceed without working passlock.");
+		}
 	}// extractInputData()
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
@@ -1816,6 +1826,7 @@ console.log("cleartext data: " + cleartextData);
 			// Doesn't look like server stored data properly, report fail.
 			showPage('delete_failed');
 		}
+		await resetPasslock();
 	}// attemptDelete()
 
 	// Return either pass or fail to show outcome of store, pass or fail to user.
