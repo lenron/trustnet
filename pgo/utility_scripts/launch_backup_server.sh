@@ -88,7 +88,16 @@ else
 	echo -e "$INSTRUCTIONS\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
 fi
 
-
+# If readonly_index.html exists, run the moves to make this backup server host a read only version of PGO.
+if [ -e "htdocs/readonly_index.html" ]; then
+    #mv "" "destination.txt"
+    echo "Moving index.html to main_index.html"
+    mv "htdocs/index.html" "htdocs/main_index.html"
+    echo "Moving readonly_index.html to index.html"
+    mv "htdocs/readonly_index.html" "htdocs/index.html"
+else
+    echo "Source file not found, don't move anything."
+fi
 
 
 
