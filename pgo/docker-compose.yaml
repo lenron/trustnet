@@ -80,4 +80,4 @@ networks:
     name: proxy
     # Uncomment external:true on if proxy network already created and existing.
     # Comment external:true off if that doesn't make sense to you.
-    external: true
+    #external: true
