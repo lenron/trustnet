@@ -99,6 +99,10 @@ else
     echo "Source file not found, don't move anything."
 fi
 
+# Create directory where logical backups from main will be kept.
+# wget script won't run without this directory already existing.
+mkdir -p $HOME/trustnet/pgo/mariadb_restores
+
 # Get copy of database and restore it to this backup site.
 bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh
 bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh
