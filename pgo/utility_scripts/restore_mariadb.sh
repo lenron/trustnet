@@ -5,8 +5,8 @@
 # Needs to be on for logs/last updated to report truthfully.
 set -e
 
-ENCRYPTED_FILE="/home/maker/trustnet/pgo/mariadb_restores/mariadb_backup_$(date +%F).sql.gz.enc"
-DECRYPTED_FILE="/home/maker/trustnet/pgo/mariadb_restores/mariadb_backup_$(date +%F).sql.gz"
+ENCRYPTED_FILE="$HOME/trustnet/pgo/mariadb_restores/mariadb_backup_$(date +%F).sql.gz.enc"
+DECRYPTED_FILE="$HOME/trustnet/pgo/mariadb_restores/mariadb_backup_$(date +%F).sql.gz"
 SHARED_PASSWORD="0WolcMhmnlGm+qhEBKqKRDrDL5uEC1+fna1usK3+Vj8L8KGjb2vbV1CiTXLLJvq6rr3xAviZnSuI"
 
 # Decrypt using openssl.
@@ -18,5 +18,5 @@ gunzip -c $DECRYPTED_FILE | sudo docker exec -i pgo-mariadb mariadb -u root -p'p
 
 # Create log of date last updated. 
 TIMESTAMP=$(date +"%Y-%m-%d_%H:%M:%S")
-LOG_LOCATION="$HOME/trustnet/pgo/mariadb_restores/update_log.txt"
+LOG_LOCATION="$HOME/trustnet/pgo/mariadb_restores/auto_update_log.txt"
 echo -e "Last updated: $TIMESTAMP" >> $LOG_LOCATION

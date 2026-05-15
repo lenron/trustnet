@@ -28,7 +28,7 @@ sudo docker compose up -d
 #mkdir -p htdocs/ya6K5EXJEN2TQW4VSvS0acE3SqmxyBDX4dJYZYFGRdXilEUG0ixZIHCOhkxHBY7nNPOz6FWSmoHVA
 
 # Create logs folder.
-mkdir -p htdocs/logs
+mkdir -p $HOME/trustnet/pgo/htdocs/logs
 # Make logs work by giving ownership of logs directory to apache.
 sudo chown -R www-data htdocs/logs
 
@@ -63,15 +63,15 @@ INSTRUCTIONS="
 # Cronjob for main site.
 MAIN_JOB="
 # every 10th hour on the hour every day run backup_mariadb
-0 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/backup_mariadb.sh"
+0 10 * * * bash $HOME/trustnet/pgo/utility_scripts/backup_mariadb.sh"
 # Wget cronjob for backup sites.
 GET_BACKUP="
 # every 30th minute of the 10th hour every day run wget_mariadb_backup
-30 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh"
+30 10 * * * bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh"
 # Mariadb restore cronjob for backup sites.
 RESTORE_JOB="
 # every 0th minute of the 11th hour every day run restore_mariadb
-0 11 * * * sh /home/maker/trustnet/pgo/utility_scripts/restore_mariadb.sh"
+0 11 * * * bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh"
 
 # Capture existing cronjobs to a bash variable (unused). Error indicates no existing cronjobs which should be caught by $? below.
 EXISTING_CRON=$(crontab -l)
@@ -89,15 +89,17 @@ else
 fi
 
 # If readonly_index.html exists, run the moves to make this backup server host a read only version of PGO.
-if [ -e "htdocs/readonly_index.html" ]; then
+if [ -e "$HOME/trustnet/pgo/htdocs/readonly_index.html" ]; then
     #mv "" "destination.txt"
     echo "Moving index.html to main_index.html"
-    mv "htdocs/index.html" "htdocs/main_index.html"
+    mv "$HOME/trustnet/pgo/htdocs/index.html" "$HOME/trustnet/pgo/htdocs/main_index.html"
     echo "Moving readonly_index.html to index.html"
-    mv "htdocs/readonly_index.html" "htdocs/index.html"
+    mv "$HOME/trustnet/pgo/htdocs/readonly_index.html" "$HOME/trustnet/pgo/htdocs/index.html"
 else
     echo "Source file not found, don't move anything."
 fi
 
-
+# Get copy of database and restore it to this backup site.
+bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh
+bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh
 

@@ -24,12 +24,12 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo docker compose up -d
 
 # Create mariadb auto backup/restore folders.
-mkdir -p htdocs/ya6K5EXJEN2TQW4VSvS0acE3SqmxyBDX4dJYZYFGRdXilEUG0ixZIHCOhkxHBY7nNPOz6FWSmoHVA
+mkdir -p $HOME/trustnet/pgo/htdocs/ya6K5EXJEN2TQW4VSvS0acE3SqmxyBDX4dJYZYFGRdXilEUG0ixZIHCOhkxHBY7nNPOz6FWSmoHVA
 
 # Create logs folder.
-mkdir -p htdocs/logs
+mkdir -p $HOME/trustnet/pgo/htdocs/logs
 # Make logs work by giving ownership of logs directory to apache.
-sudo chown -R www-data htdocs/logs
+sudo chown -R www-data $HOME/trustnet/pgo/htdocs/logs
 
 # Install cronjob functionality.
 sudo apt-get install cron -y
@@ -62,15 +62,15 @@ INSTRUCTIONS="
 # Cronjob for main site.
 MAIN_JOB="
 # every 10th hour on the hour every day run backup_mariadb
-0 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/backup_mariadb.sh"
+0 10 * * * bash $HOME/trustnet/pgo/utility_scripts/backup_mariadb.sh"
 # Wget cronjob for backup sites.
 GET_BACKUP="
 # every 30th minute of the 10th hour every day run wget_mariadb_backup
-30 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh"
+30 10 * * * bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh"
 # Mariadb restore cronjob for backup sites.
 RESTORE_JOB="
 # every 0th minute of the 11th hour every day run restore_mariadb
-0 11 * * * sh /home/maker/trustnet/pgo/utility_scripts/restore_mariadb.sh"
+0 11 * * * bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh"
 
 # Capture existing cronjobs to a bash variable (unused). Error indicates no existing cronjobs which should be caught by $? below.
 EXISTING_CRON=$(crontab -l)
@@ -83,7 +83,7 @@ if [[ $? -eq 0 ]]; then
 	#crontab -l | grep 'restore_mariadb' || (crontab -l; echo -e "$GET_BACKUP\n$RESTORE_JOB") | crontab -
 	crontab -l | grep 'backup_mariadb' || (crontab -l; echo -e "$MAIN_JOB") | crontab -
 else
-	echo "Found no existing crontabs, creating one with default instructions and our backup job."
+	echo "Found no existing crontabs, creating one with default instructions and our main job."
 	# Create new crontab by piping echo with variable replacement (-e) into crontab - which clobbers any existing crontabs.
 	#echo -e "$INSTRUCTIONS\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
 	echo -e "$INSTRUCTIONS\n$MAIN_JOB" | crontab -
