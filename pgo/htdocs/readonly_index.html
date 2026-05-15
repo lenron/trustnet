@@ -15,7 +15,7 @@
 		font-optical-sizing: auto;
 		font-weight: 600;
 		font-style: normal;
-		color: #54c597;
+		color: #4491d5;
 	}
 
 	html, body {
@@ -36,7 +36,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		color: #54c597;
+		color: #4491d5;
 		padding: 4px;
 		padding-right: 10px;
 		padding-left: 10px;
@@ -71,7 +71,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center; 
-		color: #54c597;
+		color: #4491d5;
 	}
 
 	/* default button styling. HTML style="" will override. */
@@ -84,8 +84,8 @@
 		margin: 8px;
 		padding-right: 10px;
 		padding-left: 10px;
-		color: #54c597;
-		border-color: #54c597;
+		color: #4491d5;
+		border-color: #4491d5;
 		font-size: 17px;
 		border-radius: 15px;
 	}
@@ -97,8 +97,8 @@
 		border: 2px solid;
 		padding: 8px;
 		margin: 8px;
-		border-color: #54c597;
-		color: #54c597;
+		border-color: #4491d5;
+		color: #4491d5;
 		font-size: 25px;
 		border-radius: 20px;
 	}
@@ -123,8 +123,8 @@
 		border: 2px solid;
 		padding: 12px;
 		margin: 8px;
-		border-color: #54c597;
-		color: #54c597;
+		border-color: #4491d5;
+		color: #4491d5;
 		font-size: 25px;
 		border-radius: 30px;
 	}
@@ -292,7 +292,7 @@
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
-				<a id="titletext" style="font-size:30px; text-decoration:underline;" >SECRETWORD</a>
+				<a id="titletext" style="font-size:30px; text-decoration:underline;" >READ-ONLY WORD</a>
 				<!--<a id="titletext" style="font-size:30px" href="/obf">SECRETWORD</a>--!>
 			</div>
 		</div>
@@ -309,6 +309,15 @@
 		</div>
 	</div>
 
+	<!--------------------------Last Synced Status---------------------------!>
+	<div id='read_only_div' style="display:flex; justify-content:space-between; flex-direction: row;">
+		<div id="main_site_link" style="display:flex; justify-content:space-between; margin:10px;">
+			<a href="https://obf.mkrsvr.org"style="color:#54c597">Main Site: obf.mkrsvr.org</a>   
+		</div>
+		<div id="last_synced_div" style="display:flex; justify-content:space-between; margin:10px;">
+			<label id="last_synced_label" style="" >Last synced with main: date_data_placeholder</label>
+		</div>
+	</div>
 	<!--------------------------Online Status---------------------------!>
 	<div id="offline_status_div" style="display:flex; justify-content:space-between; margin:10px;">
 		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
@@ -328,18 +337,20 @@
 
 <!------------------------------------Online Flow--------------------------------------------------------------------------!>
 			<!--------------------------HOME----------------------------!>
-			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#54c597">
+			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#4491d5">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 
 			<!--------------------------TIMED OUT HOME----------------------------!>
-			<div class="flow_pages home" id="timed_out_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
+			<div class="flow_pages home" id="timed_out_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#4491d5">
 				<h3 style="color:red;">TIMED OUT!</h3>
 				<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
@@ -790,10 +801,9 @@
 			</div>
 
 			<!---------------------------Over 50000 Store Fail-----------------------!>
-			<div class="flow_pages home" id="lockedout_50000" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
-				<h2>SECRETWORD IS LOCKEDOUT!</h2>
+			<div class="flow_pages home" id="lockedout_50000" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#4491d5">
+				<h2>READ-ONLY WORD IS LOCKEDOUT!</h2>
 				<h2>OVER 50,000 STORES REACHED!</h2>
-			</div>
 			</div>
 <!---------------------------END Store--------------------------------------------------------------!>
 <!---------------------------END Online Flow--------------------------------------------------------!>
@@ -908,6 +918,11 @@
 				<h2>&#10060; THIS SHOULD NEVER RUN!</h2>
 			</div>
 
+			<!---------------------------PASSLOCK ERROR: DENIED-----------------------!>
+			<div class="flow_pages" id="passlock_error_deny" style="display:none">
+				<h2>&#10060; PASSLOCK ERROR: DENIED.</h2>
+			</div>
+
 	</div> <!--------------------------------------------Center HTML----------------------------------------------------!>
 
 	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
@@ -986,7 +1001,7 @@
 	// Change text colors when editing record.
 	function showEnabledColors(){
 		document.getElementById('access_data_outputdisplay').disabled = false;
-		document.getElementById('access_data_outputdisplay').style.color = '#54c597'; // Our 'normal' green.
+		document.getElementById('access_data_outputdisplay').style.color = '#4491d5'; // Our 'normal' green.
 		document.getElementById('access_data_outputdisplay').style.backgroundColor = '#272727'; // Normal background
 	}// showEnabledColors()
 
@@ -1618,11 +1633,17 @@ recordListLength = 1000;
 
 	// Extract, encrypt, and store data at inputId to global passlockedData Object.
 	async function extractInputData(inputId){
-		const keyword = extractKeyword(inputId);
+		const pgoPasswordType = extractKeyword(inputId);
 		const cleartextData = extractCleartextData(inputId);
 console.log("cleartext data: " + cleartextData);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
-		passlockedData[keyword] = await passlockEncrypt(cleartextData);
+		try {
+			passlockedData[pgoPasswordType] = await passlockEncrypt(cleartextData);
+		} catch (error) {
+			showPage('passlock_error_deny');
+			//resetPasslock();
+			throw Error("PASSLOCK ERROR: Cannot proceed without working passlock.");
+		}
 	}// extractInputData()
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
@@ -1814,6 +1835,7 @@ console.log("cleartext data: " + cleartextData);
 			// Doesn't look like server stored data properly, report fail.
 			showPage('delete_failed');
 		}
+		await resetPasslock();
 	}// attemptDelete()
 
 	// Return either pass or fail to show outcome of store, pass or fail to user.
@@ -1857,7 +1879,7 @@ console.log("cleartext data: " + cleartextData);
 		const online_status = await checkOnline();
 
 		//console.log("Updating Online Status...");
-		if ( online_status === "online" ){
+		if (online_status === "online") {
 			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
 		}else{
 			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
@@ -1905,15 +1927,17 @@ console.log("cleartext data: " + cleartextData);
 			server_origin = 'https://chat.dance/obf/';
 		}else{
 			//console.log("We're NOT a standalone file!");
-			server_origin = '/obf/';
+			//server_origin = '/obf/';
+			//server_origin = '/';
+			server_origin = '';
 		}
 		return server_origin;
 	}// getServerOrigin()
-		
+
 	// 
 	async function serverCountUniqueVisitors(){
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'execountuniquevisitors;';
+		SERVER_URL += 'execountuniquevisitors';
 
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
@@ -1996,7 +2020,7 @@ console.log("cleartext data: " + cleartextData);
 	// Returns "success" or "error".
 	async function serverStore(fingerprint, data){
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exestore;';
+		SERVER_URL += 'exestore';
 		
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
@@ -2050,7 +2074,7 @@ console.log("cleartext data: " + cleartextData);
 	// Runs after Store or Access call completes as a security measure to ensure user passlocks exist only as long as necessary.
 	async function serverDeletePasslock(passedBrowserId) {
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exepasslockdelete;';
+		SERVER_URL += 'exepasslockdelete';
 
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
@@ -2093,7 +2117,7 @@ console.log("cleartext data: " + cleartextData);
 
 	async function serverExtendPasslock(browser_id){
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exeextendpasslock;';
+		SERVER_URL += 'exeextendpasslock';
 
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
@@ -2132,7 +2156,7 @@ console.log("cleartext data: " + cleartextData);
 
 	async function serverSetPasslock(browser_id, passlock) {
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exesetpasslock;';
+		SERVER_URL += 'exesetpasslock';
 
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
@@ -2173,7 +2197,7 @@ console.log("cleartext data: " + cleartextData);
 	// 
 	async function serverGetPasslock(browserId){
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exegetpasslock;';
+		SERVER_URL += 'exegetpasslock';
 
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
@@ -2217,7 +2241,7 @@ console.log("cleartext data: " + cleartextData);
 	// Output: POST message to server script that will attempt to Delete.
 	async function serverDelete(fingerprint){
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exedelete;';
+		SERVER_URL += 'exedelete';
 		
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
@@ -4654,7 +4678,7 @@ console.log("pointer value: " + pointer);
 	// Returns "success" or "error".
 	async function serverStore(fingerprint, data){
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exestore;';
+		SERVER_URL += 'exestore';
 		
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
@@ -4728,7 +4752,7 @@ console.log("pointer value: " + pointer);
 		console.log("manually composed json string: " + offline_dbase_json_string);
 
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exeburststore;';
+		SERVER_URL += 'exeburststore';
 		const fetchResponseObject = await fetch(SERVER_URL, {
 			method: 'POST',
 			headers: {
@@ -4761,7 +4785,7 @@ console.log("pointer value: " + pointer);
 	// Output: POST message to server script that will attempt to Delete.
 	async function serverDelete(fingerprint){
 		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exedelete;';
+		SERVER_URL += 'exedelete';
 		
 		try { // Catch a rejected promise so we can operate on it.
 			// Execute HTTP request to SERVER_URL with the following options.
