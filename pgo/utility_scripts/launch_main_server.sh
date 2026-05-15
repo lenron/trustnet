@@ -65,12 +65,12 @@ MAIN_JOB="
 0 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/backup_mariadb.sh"
 # Wget cronjob for backup sites.
 GET_BACKUP="
-# every 5th minute of the 10th hour every day run wget_mariadb_backup
-5 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh"
+# every 30th minute of the 10th hour every day run wget_mariadb_backup
+30 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh"
 # Mariadb restore cronjob for backup sites.
 RESTORE_JOB="
-# every 10th minute of the 10th hour every day run restore_mariadb
-10 10 * * * sh /home/maker/trustnet/pgo/utility_scripts/restore_mariadb.sh"
+# every 0th minute of the 11th hour every day run restore_mariadb
+0 11 * * * sh /home/maker/trustnet/pgo/utility_scripts/restore_mariadb.sh"
 
 # Capture existing cronjobs to a bash variable (unused). Error indicates no existing cronjobs which should be caught by $? below.
 EXISTING_CRON=$(crontab -l)
