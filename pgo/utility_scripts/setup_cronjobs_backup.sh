@@ -3,11 +3,6 @@
 # Don't exit on error; script operates on if crontab -l fails (hasn't been set up yet).
 set -e
 
-# Create logs folder.
-mkdir -p $HOME/trustnet/pgo/htdocs/logs
-# Make logs work by giving ownership of logs directory to apache.
-sudo chown -R www-data $HOME/trustnet/pgo/htdocs/logs
-
 # Install cronjob functionality.
 sudo apt-get install cron -y
 # Crontab default instructions to be used if crontab doesn't yet exist.

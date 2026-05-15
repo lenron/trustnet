@@ -3,11 +3,6 @@
 # Don't exit on error; script operates on if crontab -l fails (hasn't been set up yet).
 set -e
 
-# Create logs folder.
-mkdir -p $HOME/trustnet/pgo/htdocs/logs
-# Make logs work by giving ownership of logs directory to apache.
-sudo chown -R www-data $HOME/trustnet/pgo/htdocs/logs
-
 # Install cronjob functionality.
 sudo apt-get install cron -y
 # Crontab default instructions to be used if crontab doesn't yet exist.
@@ -57,9 +52,11 @@ if [[ $? -eq 0 ]]; then
 	echo "Found existing crontab. Running oneliner which will append our jobs if they have not yet been added."
 	# if restore_mariadb is found in the existing crontab, || will exit this command.
 	# if not found, append our jobs to existing.
-	crontab -l | grep 'restore_mariadb' || (crontab -l; echo -e "$GET_BACKUP\n$RESTORE_JOB") | crontab -
+	#crontab -l | grep 'restore_mariadb' || (crontab -l; echo -e "$GET_BACKUP\n$RESTORE_JOB") | crontab -
+	crontab -l | grep 'backup_mariadb' || (crontab -l; echo -e "$MAIN_JOB") | crontab -
 else
 	echo "Found no existing crontabs, creating one with default instructions and our wget, restore jobs."
 	# Create new crontab by piping echo with variable replacement (-e) into crontab - which clobbers any existing crontabs.
-	echo -e "$INSTRUCTIONS\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
+	#echo -e "$INSTRUCTIONS\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
+	echo -e "$INSTRUCTIONS\n$MAIN_JOB" | crontab -
 fi
