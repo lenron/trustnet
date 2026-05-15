@@ -1,31 +1,7 @@
 #!/bin/bash
 
 # Don't exit on error; script operates on if crontab -l fails (hasn't been set up yet).
-#set -e
-
-# Install docker.
-for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
-
-# Add Docker's official GPG key:
-sudo apt-get update
-sudo apt-get install ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-# Add the repository to Apt sources:
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-# Install docker.
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-# Run docker compose file docker-compose.yaml. This fill will download images and run the httpd (apache) and MariaDB containers in the background.
-sudo docker compose up -d
-
-# Create folder where mariadb backups reside. Keeping this in backup script but commented for visibility.
-#mkdir -p htdocs/ya6K5EXJEN2TQW4VSvS0acE3SqmxyBDX4dJYZYFGRdXilEUG0ixZIHCOhkxHBY7nNPOz6FWSmoHVA
+set -e
 
 # Create logs folder.
 mkdir -p $HOME/trustnet/pgo/htdocs/logs
@@ -87,19 +63,3 @@ else
 	# Create new crontab by piping echo with variable replacement (-e) into crontab - which clobbers any existing crontabs.
 	echo -e "$INSTRUCTIONS\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
 fi
-
-# If readonly_index.html exists, run the moves to make this backup server host a read only version of PGO.
-if [ -e "$HOME/trustnet/pgo/htdocs/readonly_index.html" ]; then
-    #mv "" "destination.txt"
-    echo "Moving index.html to main_index.html"
-    mv "$HOME/trustnet/pgo/htdocs/index.html" "$HOME/trustnet/pgo/htdocs/main_index.html"
-    echo "Moving readonly_index.html to index.html"
-    mv "$HOME/trustnet/pgo/htdocs/readonly_index.html" "$HOME/trustnet/pgo/htdocs/index.html"
-else
-    echo "Source file not found, don't move anything."
-fi
-
-# Get copy of database and restore it to this backup site.
-bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh
-bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh
-
