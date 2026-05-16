@@ -24,12 +24,17 @@ my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 my $total_stores_today = $dbh->selectrow_array("SELECT stores_on_this_date FROM $stores_on_date_table WHERE date_stored = CURRENT_DATE", undef);
 
 # Main site (green) or read only site (blue) color template variables.
+my $main_page_type_color = "#54c597"; # Greenish
+my $readonly_page_type_color = "#4491d5"; # Blueish
+
+# Titletext template variables. 
 my $main_titletext = "PGO-SECRETWORD"; #
 my $readonly_titletext = "PGO-READONLY WORD"; #
 
-# Main site (green) or read only site (blue) color template variables.
-my $main_page_type_color = "#54c597"; # Greenish
-my $readonly_page_type_color = "#4491d5"; # Blueish
+# Show STORE button or hide it (is that enough removed functionality?).
+my $main_store_button = "<button class=\"obf_button\" id='' style=\"flex-grow:1\" onclick=\"showPage('store_codeword')\">STORE SECRET DATA</button>"; #
+my $readonly_store_button = ""; #
+
 
 # Last updated on: template variables.
 # Read in htdocs/auto_log 
@@ -67,12 +72,14 @@ if ($total_stores_today < 50000) {
 		#print "Readonly file exists, this is a readonly site.\n";
 		$template->param(page_type_color => $readonly_page_type_color);
 		$template->param(titletext => $readonly_titletext);
+		$template->param(store_button_or_hidden=> $readonly_store_button);
 		#$template->param(last_updated => $readonly_last_updated);
 		$template->param(readonly_html_lastupdated_status => $readonly_html_lastupdated_status);
 	} else {
 		#print "Readonly file DOES NOT exist, this is the main site.\n";
 		$template->param(page_type_color => $main_page_type_color);
 		$template->param(titletext => $main_titletext);
+		$template->param(store_button_or_hidden=> $main_store_button);
 		#$template->param(last_updated => $main_last_updated);
 		$template->param(readonly_html_lastupdated_status => $main_html_lastupdated_status);
 	}

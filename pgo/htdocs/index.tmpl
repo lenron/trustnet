@@ -332,7 +332,8 @@
 			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:<TMPL_VAR NAME=page_type_color>">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
+					<!--<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>-->
+					<TMPL_VAR NAME=store_button_or_hidden>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
@@ -342,7 +343,8 @@
 				<h3 style="color:red;">TIMED OUT!</h3>
 				<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
+					<!--<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>-->
+					<TMPL_VAR NAME=store_button_or_hidden>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
