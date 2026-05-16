@@ -38,19 +38,20 @@ my $main_store_button = qq{<button class="obf_button" id='' style="flex-grow:1" 
 
 
 # CMD Flow edit or delete buttons
-my $readonly_cmd_store_delete_buttons = ""; #
-my $main_cmd_store_delete_buttons = qq{
-<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
-<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
-};
-my $readonly_cmd_store_delete_buttons = ""; #
+#my $main_cmd_store_delete_buttons = qq{
+#<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
+#<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
+#};
+my $readonly_cmd_store_delete_buttons = "display:none;"; #
+my $main_cmd_store_delete_buttons = ""; #
 
 # Browser Flow edit or delete buttons
-my $readonly_browser_edit_delete_buttons = ""; #
-my $main_browser_edit_delete_buttons = qq{
-	<button class="" id='editdata_button' style="flex-grow:1" onclick="editData()">EDIT DATA</button>
-	<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
-};
+my $readonly_browser_edit_delete_buttons = "display:none;"; #
+my $main_browser_edit_delete_buttons = ""; 
+#my $main_browser_edit_delete_buttons = qq{
+	#<button class="" id='editdata_button' style="flex-grow:1" onclick="editData()">EDIT DATA</button>
+	#<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
+#};
 
 # Last updated on: template variables.
 # Read in htdocs/auto_log 
