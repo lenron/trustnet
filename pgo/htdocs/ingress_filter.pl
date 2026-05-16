@@ -33,25 +33,15 @@ my $main_titletext = "PGO-SECRETWORD"; #
 
 # Show STORE button or hide it (is that enough removed functionality?).
 my $readonly_store_button = ""; #
-#my $main_store_button = "<button class=\"obf_button\" id='' style=\"flex-grow:1\" onclick=\"showPage('store_codeword')\">STORE SECRET DATA</button>"; #
 my $main_store_button = qq{<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>};
 
-
 # CMD Flow edit or delete buttons
-#my $main_cmd_store_delete_buttons = qq{
-#<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
-#<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
-#};
 my $readonly_cmd_store_delete_buttons = "display:none;"; #
 my $main_cmd_store_delete_buttons = ""; #
 
 # Browser Flow edit or delete buttons
 my $readonly_browser_edit_delete_buttons = "display:none;"; #
 my $main_browser_edit_delete_buttons = ""; 
-#my $main_browser_edit_delete_buttons = qq{
-	#<button class="" id='editdata_button' style="flex-grow:1" onclick="editData()">EDIT DATA</button>
-	#<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
-#};
 
 # Edit button javascript switch.
 my $readonly_edit_button_js = "none"; #
@@ -60,7 +50,6 @@ my $main_edit_button_js = "inline"; #
 # Delete button javascript switch.
 my $readonly_delete_button_js = "none"; 
 my $main_delete_button_js = "inline"; 
-
 
 # Last updated on: template variables.
 # Read in htdocs/auto_log 
@@ -96,6 +85,7 @@ if ($total_stores_today < 50000) {
 	# -e checks for existence of file.
 	if (-e $readonly_file_location) {
 		#print "Readonly file exists, this is a readonly site.\n";
+		# Set Readonly site variables.
 		$template->param(page_type_color => $readonly_page_type_color);
 		$template->param(titletext => $readonly_titletext);
 		$template->param(store_button_or_hidden=> $readonly_store_button);
@@ -103,10 +93,10 @@ if ($total_stores_today < 50000) {
 		$template->param(browser_edit_delete_buttons=> $readonly_browser_edit_delete_buttons);
 		$template->param(edit_button_js => $readonly_edit_button_js);
 		$template->param(delete_button_js => $readonly_delete_button_js);
-		#$template->param(last_updated => $readonly_last_updated);
 		$template->param(readonly_html_lastupdated_status => $readonly_html_lastupdated_status);
 	} else {
 		#print "Readonly file DOES NOT exist, this is the main site.\n";
+		# Set Main site variables.
 		$template->param(page_type_color => $main_page_type_color);
 		$template->param(titletext => $main_titletext);
 		$template->param(store_button_or_hidden=> $main_store_button);
@@ -114,16 +104,17 @@ if ($total_stores_today < 50000) {
 		$template->param(browser_edit_delete_buttons=> $main_browser_edit_delete_buttons);
 		$template->param(edit_button_js => $main_edit_button_js);
 		$template->param(delete_button_js => $main_delete_button_js);
-		#$template->param(last_updated => $main_last_updated);
 		$template->param(readonly_html_lastupdated_status => $main_html_lastupdated_status);
 	}
 
-	# Print header.
+	# HTTP Response requires proper header to work.
 	print $cgi->header('text/html');
-	# Print populated template.
+	# Print populated template to HTML Response.
 	print $template->output;
-} else { # Else clause should catch error (like if SQL doesn't work) for security.
+} else {
+	# Else clause should catch error (like if SQL doesn't work) for security.
 	print $cgi->header('text/html');
+	# Read in static error file unless we have stored less than 50,000 times today.
 	open my $fh, '<', 'over50000_index.html';
 	print while <$fh>;
 	close $fh;   
