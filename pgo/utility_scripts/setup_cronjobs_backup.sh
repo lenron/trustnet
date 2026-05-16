@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Don't exit on error; script operates on if crontab -l fails (hasn't been set up yet).
-set -e
+#set -e
 
 # Install cronjob functionality.
 sudo apt-get install cron -y
