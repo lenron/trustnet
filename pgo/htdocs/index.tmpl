@@ -783,7 +783,7 @@
 				<h2>&#10004; SECRET DATA SUCCESSFULLY STORED AND ENCRYPTED</h2>
 			</div>
 
-			<!---------------------------Store Success-----------------------!>
+			<!---------------------------Stores Over 100 Fail-----------------------!>
 			<div class="flow_pages" id="stores_over_100" style="display:none">
 				<h2>&#10060; STORE ERROR</h2>
 				<h2>You've reached your limit of 100 stores today.</h2>
@@ -1349,7 +1349,6 @@
 		let recordListLength = Object.keys(recordListForNewOfflineDBase).length;
 		let offlineDatabaseUnencPointer;
 		//Set the pointer to 1000 if all 1000 records in the database are filled.
-recordListLength = 1000;
 		if (recordListLength > 999){
 			offlineDatabaseUnencPointer = 1000;
 		}else{
@@ -1920,7 +1919,8 @@ console.log("cleartext data: " + cleartextData);
 		const regex = new RegExp(/^file/);
 		if (regex.test(url_origin)){
 			//console.log("We're a standalone file!");
-			server_origin = 'https://chat.dance/obf/';
+			//server_origin = 'https://chat.dance/obf/';
+			server_origin = 'https://obf.mkrsvr.org/';
 		}else{
 			//console.log("We're NOT a standalone file!");
 			//server_origin = '/obf/';
@@ -3232,6 +3232,56 @@ console.log("cleartext data: " + cleartextData);
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="showPage('offlinestore_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="showPage('offlineaccess_codeword')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_offlinesync_flow' style="flex-grow:1" onclick="showPage('offlinesync_codeword')">SYNC STORED DATA TO ONLINE DATABASE</button>
+				</div>
+			</div>
+
+<!----------------------------Offline SYNC TO ONLINE--------------------------------------------------------------!>
+			<!---------------------------SYNC TO ONLINE Codeword-----------------------!>
+			<div class="flow_pages passlock" id="offlinesync_codeword" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+				<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>SYNC FLOW</label>
+					<label>CODEWORD</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER CODEWORD</h2>
+				<input autocomplete="off" type="password" value="" id="offlinesync_codeword_input" style="" oninput="codewordToLowerCase(event)">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_codeword_input'); showPage('offlinesync_obf1000Pass')">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------SYNC TO ONLINE obf1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinesync_obf1000Pass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>SYNC FLOW</label>
+					<label>PASS 1</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER PASSWORD 1</h2>
+				<input autocomplete="off" type="password" value="" id="offlinesync_obf1000Pass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinesync_codeword')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_obf1000Pass_input'); showPage('offlinesync_ctrPass');">CONTINUE</button>
+				</div>
+			</div>
+
+			<!---------------------------SYNC TO ONLINE ctrPass-----------------------!>
+			<div class="flow_pages passlock" id="offlinesync_ctrPass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>SYNC FLOW</label>
+					<label>PASS 2</label>
+					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				</div>
+				<h2>ENTER PASSWORD 2</h2>
+				<input autocomplete="off" type="password" value="" id="offlinesync_ctrPass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinesync_obf1000Pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptSyncToOnline('offlinesync_ctrPass_input')">SYNC TO ONLINE</button>
 				</div>
 			</div>
 
@@ -3703,6 +3753,22 @@ console.log("cleartext data: " + cleartextData);
 				<h2>&#10060; FAILED TO STORE</h2>
 				<div class="button_pair" id="" style="display:flex;">
 				</div>
+			</div>
+
+			<!---------------------------Store Success-----------------------!>
+			<div class="flow_pages" id="sync_success" style="display:none">
+				<h2>&#10004; SECRET DATA SUCCESSFULLY SYNCED TO ONLINE SERVER</h2>
+			</div>
+
+			<!---------------------------Stores Over 100 Fail-----------------------!>
+			<div class="flow_pages" id="stores_over_100" style="display:none">
+				<h2>&#10060; SYNC ERROR</h2>
+				<h2>You've reached your limit of 100 stores today.</h2>
+			</div>
+
+			<!---------------------------Store Fail-----------------------!>
+			<div class="flow_pages" id="sync_failed" style="display:none">
+				<h2>&#10060; SYNC ERROR</h2>
 			</div>
 <!----------------------------END Store--------------------------------------------------------------!>
 <!----------------------------END Offline Flow--------------------------------------------------------------!>
@@ -4501,6 +4567,48 @@ console.log("pointer value: " + pointer);
 		}
 	}
 
+	async function attemptSyncToOnline(inputId){
+		// Get ctrPass - pass2.
+		extractInputDataOffline(inputId);
+		// First load encrypted data from offline database.
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
+
+		if (encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+			showPage('offlinefailed_to_access'); // Access fail is valid here?
+		}else{
+			//showPage('offlineaccess_file');
+			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
+			//decryptAndDownloadFileOffline(encryptedData);
+			//syncEncDataToServer(encryptedData);
+			storeDataToServer(fingerprint, encryptedData);
+		}
+	}
+
+	// Return either pass or fail to show outcome of store, pass or fail to user.
+	// Legacy code probably needs full rewrite.
+	async function storeDataToServer(fingerprint, encryptedData){
+		// Attempt to store a record to the server.
+		const storeResponse = await serverStore(fingerprint, encryptedData);
+		console.log("syncing data to server: storeResponse: " + storeResponse);
+		if (storeResponse === 'STORES_OVER_100') {
+			showPage('stores_over_100');
+		}else{
+			// Load data at fingerprint, should be the encrypted data block we just stored.
+			const loadResponse = await serverLoad(fingerprint);
+			console.log("syncing data to server: loadResponse: " + loadResponse);
+			// Report store outcome.
+			if (encryptedData === loadResponse){
+				// We succeeded.
+				showPage('sync_success');
+			}else{
+				// Doesn't look like server stored data properly, report fail.
+				showPage('sync_failed');
+			}
+		}
+	}// syncDataToServer()
+
+
 	async function decryptAndDownloadFileOffline(encryptedData){
 		const decryptedData  = await decryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], encryptedData);
 			// bytes is Uint8Array
@@ -4620,7 +4728,8 @@ console.log("pointer value: " + pointer);
 		const regex = new RegExp(/^file/);
 		if (regex.test(url_origin)){
 			//console.log("We're a standalone file!");
-			server_origin = 'https://chat.dance/obf/';
+			//server_origin = 'https://chat.dance/obf/';
+			server_origin = 'https://obf.mkrsvr.org/';
 		}else{
 			//console.log("We're NOT a standalone file!");
 			server_origin = '/obf/';
@@ -4628,6 +4737,109 @@ console.log("pointer value: " + pointer);
 		return server_origin;
 	}
 
+	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
+	// This type of URI used instead of a direct link to the file for security.
+	// Input: fingerprint is hexadecimal.
+	// Output: POST message to server script which will attempt to load encrypted data from server database.
+	async function serverLoad(fingerprint){
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exeload';
+		console.log("Loading from offline database. SERVER_URL: " + SERVER_URL);
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					fingerprint: fingerprint,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(\`Response status: \${fetchResponseObject.status}\`);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			//console.log(responseObj);
+			//console.log("responseObj.access_response: " + responseObj.access_response);
+			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND"){
+				console.log("serverLoad Error: " + responseObj.access_response);
+				return responseObj.access_response;
+			} else if (responseObj.access_response.length === DATA_LENGTH && checkBase64Chars(responseObj.access_response)){ // Data looks good.
+				console.log("serverLoad: Successfully loaded encrypted data.");
+				return responseObj.access_response;
+			} else {
+				console.log("serverLoad Error: " + responseObj.access_response);
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverLoad()
+
+	// Stores data to fingerprint location.
+	// Returns "success" or "error".
+	async function serverStore(fingerprint, data){
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exestore';
+		console.log("Storing (Syncing) from offline database. SERVER_URL: " + SERVER_URL);
+		
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					fingerprint: fingerprint,
+					data: data,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(\`Response status: \${fetchResponseObject.status}\`);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			//console.log(responseObj);
+			console.log("Store responseObj.response: " + responseObj.store_response);
+			//if ( Number(responseObj.response) !== 1 ){ // there appears to be a problem.
+			if (responseObj.store_response === "TOTAL_STORES_OVER_50000"){
+				showPage("lockedout_50000"); // Shown for a split second before page reload.
+				window.location.reload(true);
+				throw new Error("TOTAL_STORES_OVER_50000");
+			} else if (responseObj.store_response === "SUCCESS"){
+				console.log("serverStore: Successfully stored encrypted data.");
+				return "success";
+			} else if (responseObj.store_response === "STORES_OVER_100"){
+				return "STORES_OVER_100";
+			} else if (responseObj.store_response === "STORE FAILED"){
+				throw Error("serverStore Error! Database failed to store data.");
+			} else {
+				throw Error("serverStore Error! Maybe a database error?");
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		// 500 Internal Server Errors will be caught here too.
+		}catch(error){ // Catch rejected promise.
+			//if (error instanceof TypeError){ // === "TOTAL_STORES_OVER_50000") {
+				//showPage("lockedout_50000");
+				//window.location.reload(true);
+				//throw new Error("CRITICAL ERROR: TOTAL_STORES_OVER_50000");
+			//}
+			console.error(error.message);
+		}
+	}// serverStore()
+
+
+/*
 	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
 	// This type of URI used instead of a direct link to the file for security.
 	// Input: fingerprint is hexadecimal.
@@ -4711,7 +4923,7 @@ console.log("pointer value: " + pointer);
 			console.error(error.message);
 		}
 	}//serverStore()
-
+*/
 	// Create a json string containing every record in the offline dbase from 0 to pointer.
 	function convertOfflineDBaseToJSONString(){
 		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
