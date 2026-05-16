@@ -53,6 +53,15 @@ my $main_browser_edit_delete_buttons = "";
 	#<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
 #};
 
+# Edit button javascript switch.
+my $readonly_edit_button_js = "none"; #
+my $main_edit_button_js = "inline"; #
+
+# Delete button javascript switch.
+my $readonly_delete_button_js = "none"; 
+my $main_delete_button_js = "inline"; 
+
+
 # Last updated on: template variables.
 # Read in htdocs/auto_log 
 # Get last line in file
@@ -92,6 +101,8 @@ if ($total_stores_today < 50000) {
 		$template->param(store_button_or_hidden=> $readonly_store_button);
 		$template->param(cmd_store_delete_buttons=> $readonly_cmd_store_delete_buttons);
 		$template->param(browser_edit_delete_buttons=> $readonly_browser_edit_delete_buttons);
+		$template->param(edit_button_js => $readonly_edit_button_js);
+		$template->param(delete_button_js => $readonly_delete_button_js);
 		#$template->param(last_updated => $readonly_last_updated);
 		$template->param(readonly_html_lastupdated_status => $readonly_html_lastupdated_status);
 	} else {
@@ -101,6 +112,8 @@ if ($total_stores_today < 50000) {
 		$template->param(store_button_or_hidden=> $main_store_button);
 		$template->param(cmd_store_delete_buttons=> $main_cmd_store_delete_buttons);
 		$template->param(browser_edit_delete_buttons=> $main_browser_edit_delete_buttons);
+		$template->param(edit_button_js => $main_edit_button_js);
+		$template->param(delete_button_js => $main_delete_button_js);
 		#$template->param(last_updated => $main_last_updated);
 		$template->param(readonly_html_lastupdated_status => $main_html_lastupdated_status);
 	}
