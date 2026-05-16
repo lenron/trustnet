@@ -466,9 +466,10 @@
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
+					<!--<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>-->
+					 <TMPL_VAR NAME=cmd_store_delete_buttons>
 				</div>
 			</div>
 			<!---------------------------END CMD LINE Access Flow-----------------------!>
@@ -489,8 +490,9 @@
 				</div>
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStore('access_data_outputdisplay')">SAVE DATA</button>
-					<button class="" id='editdata_button' style="flex-grow:1" onclick="editData()">EDIT DATA</button>
-					<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
+					<!--<button class="" id='editdata_button' style="flex-grow:1" onclick="editData()">EDIT DATA</button>
+					<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>-->
+					 <TMPL_VAR NAME=browser_edit_delete_buttons>
 				</div>
 			</div>
 			<!---------------------------END BROWSER Access Flow-----------------------!>

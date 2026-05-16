@@ -24,17 +24,33 @@ my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 my $total_stores_today = $dbh->selectrow_array("SELECT stores_on_this_date FROM $stores_on_date_table WHERE date_stored = CURRENT_DATE", undef);
 
 # Main site (green) or read only site (blue) color template variables.
-my $main_page_type_color = "#54c597"; # Greenish
 my $readonly_page_type_color = "#4491d5"; # Blueish
+my $main_page_type_color = "#54c597"; # Greenish
 
 # Titletext template variables. 
-my $main_titletext = "PGO-SECRETWORD"; #
 my $readonly_titletext = "PGO-READONLY WORD"; #
+my $main_titletext = "PGO-SECRETWORD"; #
 
 # Show STORE button or hide it (is that enough removed functionality?).
-my $main_store_button = "<button class=\"obf_button\" id='' style=\"flex-grow:1\" onclick=\"showPage('store_codeword')\">STORE SECRET DATA</button>"; #
 my $readonly_store_button = ""; #
+#my $main_store_button = "<button class=\"obf_button\" id='' style=\"flex-grow:1\" onclick=\"showPage('store_codeword')\">STORE SECRET DATA</button>"; #
+my $main_store_button = qq{<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>};
 
+
+# CMD Flow edit or delete buttons
+my $readonly_cmd_store_delete_buttons = ""; #
+my $main_cmd_store_delete_buttons = qq{
+<button class="" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE DATA</button>
+<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
+};
+my $readonly_cmd_store_delete_buttons = ""; #
+
+# Browser Flow edit or delete buttons
+my $readonly_browser_edit_delete_buttons = ""; #
+my $main_browser_edit_delete_buttons = qq{
+	<button class="" id='editdata_button' style="flex-grow:1" onclick="editData()">EDIT DATA</button>
+	<button class="" id='delete_button' style="flex-grow:1" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
+};
 
 # Last updated on: template variables.
 # Read in htdocs/auto_log 
@@ -73,6 +89,8 @@ if ($total_stores_today < 50000) {
 		$template->param(page_type_color => $readonly_page_type_color);
 		$template->param(titletext => $readonly_titletext);
 		$template->param(store_button_or_hidden=> $readonly_store_button);
+		$template->param(cmd_store_delete_buttons=> $readonly_cmd_store_delete_buttons);
+		$template->param(browser_edit_delete_buttons=> $readonly_browser_edit_delete_buttons);
 		#$template->param(last_updated => $readonly_last_updated);
 		$template->param(readonly_html_lastupdated_status => $readonly_html_lastupdated_status);
 	} else {
@@ -80,6 +98,8 @@ if ($total_stores_today < 50000) {
 		$template->param(page_type_color => $main_page_type_color);
 		$template->param(titletext => $main_titletext);
 		$template->param(store_button_or_hidden=> $main_store_button);
+		$template->param(cmd_store_delete_buttons=> $main_cmd_store_delete_buttons);
+		$template->param(browser_edit_delete_buttons=> $main_browser_edit_delete_buttons);
 		#$template->param(last_updated => $main_last_updated);
 		$template->param(readonly_html_lastupdated_status => $main_html_lastupdated_status);
 	}
