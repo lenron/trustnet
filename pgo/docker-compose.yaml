@@ -1,7 +1,7 @@
 services:
   pgo:
     container_name: pgo-apache2
-    image: mkrlenron/lenron-obf:0.1
+    image: mkrlenron/lenron-pgo:0.2
     restart: always
     # Comment port off if using Traefik.
     # Uncomment port on if accessing through localhost, which includes the simple cloudflare tunnel -> pgo setup.
@@ -79,5 +79,5 @@ networks:
   proxy:
     name: proxy
     # Uncomment external:true on if proxy network already created and existing.
-    # Comment external:true off if that doesn't make sense to you.
-    #external: true
+	# If using cloudflare tunel with launch scripts that do everything, it should already exist.
+    external: true
