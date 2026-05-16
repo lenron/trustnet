@@ -28,7 +28,7 @@ my $readonly_page_type_color = "#4491d5"; # Blueish
 my $main_page_type_color = "#54c597"; # Greenish
 
 # Titletext template variables. 
-my $readonly_titletext = "PGO-READONLY WORD"; #
+my $readonly_titletext = "PGO-READONLYWORD"; #
 my $main_titletext = "PGO-SECRETWORD"; #
 
 # Show STORE button or hide it (is that enough removed functionality?).
