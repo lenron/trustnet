@@ -88,16 +88,8 @@ else
 	echo -e "$INSTRUCTIONS\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
 fi
 
-# If readonly_index.html exists, run the moves to make this backup server host a read only version of PGO.
-if [ -e "$HOME/trustnet/pgo/htdocs/readonly_index.html" ]; then
-    #mv "" "destination.txt"
-    echo "Moving index.html to main_index.html"
-    mv "$HOME/trustnet/pgo/htdocs/index.html" "$HOME/trustnet/pgo/htdocs/main_index.html"
-    echo "Moving readonly_index.html to index.html"
-    mv "$HOME/trustnet/pgo/htdocs/readonly_index.html" "$HOME/trustnet/pgo/htdocs/index.html"
-else
-    echo "Source file not found, don't move anything."
-fi
+# Indicate to ingress_filter.pl the type of server (main or readonly) to compile, respond to request with (file exist means readonly site).
+touch $HOME/trustnet/pgo/readonly.txt
 
 # Create directory where logical backups from main will be kept.
 # wget script won't run without this directory already existing.
