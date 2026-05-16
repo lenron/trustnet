@@ -27,6 +27,13 @@ my $total_stores_today = $dbh->selectrow_array("SELECT stores_on_this_date FROM 
 my $main_page_type_color = "#54c597"; # Greenish
 my $readonly_page_type_color = "#4491d5"; # Blueish
 
+# Last updated on:
+my $main_last_updated = ""; # Empty. Main site provides the update.
+# Read in htdocs/auto_log 
+# Get last line in file
+# set that to readonly_last_updated
+my $readonly_last_updated = "#4491d5"; # Blueish
+
 # Only produce functional file if filter condition met (else clause error is better security).
 if ($total_stores_today < 50000) {
 	# Read in base template that will be populated with variables below.
@@ -41,18 +48,11 @@ if ($total_stores_today < 50000) {
 		#print "Readonly file DOES NOT exist, this is the main site.\n";
 		$template->param(page_type_color => $main_page_type_color);
 	}
+
 	# Print header.
 	print $cgi->header('text/html');
-	# Populate template.
+	# Print populated template.
 	print $template->output;
-
-	#print "Content-Type: text/html\n\n", $template->output;
-
-	# HTML Response requires proper header to work.
-	#print $cgi->header('text/html');
-	#open my $fh, '<', 'index.html';
-	#print while <$fh>;
-	#close $fh;   
 } else { # Else clause should catch error (like if SQL doesn't work) for security.
 	print $cgi->header('text/html');
 	open my $fh, '<', 'over50000_index.html';
@@ -63,51 +63,6 @@ if ($total_stores_today < 50000) {
 
 exit(0);
 
-
-
-=pod
-
-# Read in base template that will be populated with variables below.
-#my $template = HTML::Template->new(filename => 'index.tmpl');
-
-# Determine if readonly or main, have an empty file called 'readonly' if this is a backup site (to be created by launch_backup_server.sh I suppose.
-my $home = $ENV{'HOME'};
-my $readonly_file_location = "$home/trustnet/pgo/readonly.txt";
-
-if (-e $readonly_file_location) {
-    print "Readonly file exists, this is a readonly site.\n";
-} else {
-    print "Readonly file DOES NOT exist, this is the main site.\n";
-}   
-
-my $online_page_type_color = "#54c597";
-my $readonly_page_type_color = "#4491d5";
-# Populate template inserts with this form: <TMPL_VAR NAME=page_type_color>, where this label is our 'perl template variable': page_type_color
-$template->param(page_type_color => $online_page_type_color);
-$template->param(page_type_color => $readonly_page_type_color);
-
-
-
-my $main = qq{
-};
-
-if($id eq 'how'){
-	$template->param(htmlblock => $how);
-}elsif( $id eq 'faq'){
-	$template->param(htmlblock => $faq);
-}elsif( $id eq 'delete'){
-	$template->param(htmlblock => $delete);
-}else{
-	$template->param(htmlblock => $main);
-}
-
-# send the obligatory Content-Type and print the template output
-print "Content-Type: text/html\n\n", $template->output;
-
-
-exit 0;
-
-=cut
 
 
 
