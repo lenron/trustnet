@@ -89,7 +89,7 @@ else
 fi
 
 # Indicate to ingress_filter.pl the type of server (main or readonly) to compile, respond to request with (file exist means readonly site).
-touch $HOME/trustnet/pgo/readonly.txt
+touch $HOME/trustnet/pgo/htdocs/readonly.txt
 
 # Create directory where logical backups from main will be kept.
 # wget script won't run without this directory already existing.

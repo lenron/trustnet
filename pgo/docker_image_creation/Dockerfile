@@ -15,5 +15,6 @@ RUN cpanm CGI
 RUN cpanm Time::Piece
 RUN cpanm URI::Escape
 RUN cpanm JSON
+RUN cpanm HTML::Template
 # Enable perl module. This might be enablable in conf file.
 CMD httpd-foreground -c "LoadModule cgid_module modules/mod_cgid.so"
