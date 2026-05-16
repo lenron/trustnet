@@ -18,5 +18,5 @@ gunzip -c $DECRYPTED_FILE | sudo docker exec -i pgo-mariadb mariadb -u root -p'p
 
 # Create log of date last updated. 
 TIMESTAMP=$(date +"%Y-%m-%d_%H:%M:%S")
-LOG_LOCATION="$HOME/trustnet/pgo/mariadb_restores/auto_update_log.txt"
+LOG_LOCATION="$HOME/trustnet/pgo/htdocs/auto_update_log.txt"
 echo -e "Last updated: $TIMESTAMP" >> $LOG_LOCATION
