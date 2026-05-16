@@ -23,16 +23,34 @@ my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 # DBI command for returning a single value with SELECT.
 my $total_stores_today = $dbh->selectrow_array("SELECT stores_on_this_date FROM $stores_on_date_table WHERE date_stored = CURRENT_DATE", undef);
 
-# Main site (green) or read only site (blue) color.
+# Main site (green) or read only site (blue) color template variables.
 my $main_page_type_color = "#54c597"; # Greenish
 my $readonly_page_type_color = "#4491d5"; # Blueish
 
-# Last updated on:
-my $main_last_updated = ""; # Empty. Main site provides the update.
+# Last updated on: template variables.
 # Read in htdocs/auto_log 
 # Get last line in file
 # set that to readonly_last_updated
-my $readonly_last_updated = "#4491d5"; # Blueish
+open my $fh, '<', '/usr/local/apache2/htdocs/auto_update_log.txt'; # or die "Cannot open file: $!";
+# Read into array from filehandle.
+my @lines = <$fh>;
+# Get the last line in array.
+my $readonly_last_updated = $lines[-1];
+close $fh;
+
+# Compile HTML readonly_html_lastupdated_status
+my $main_html_lastupdated_status = ""; # Empty. Don't add HTML block showing readonly status on main page.
+my $readonly_html_lastupdated_status = qq{
+	<!--------------------------Last Synced Status---------------------------!>
+	<div id='read_only_div' style="display:flex; justify-content:space-between; flex-direction: row;">
+		<div id="main_site_link" style="display:flex; justify-content:space-between; margin:10px;">
+			<a href="https://obf.mkrsvr.org"style="color:#54c597">Main Site: obf.mkrsvr.org</a>   
+		</div>
+		<div id="last_synced_div" style="display:flex; justify-content:space-between; margin:10px;">
+			<label id="last_synced_label" style="" >$readonly_last_updated</label>
+		</div>
+	</div>
+};
 
 # Only produce functional file if filter condition met (else clause error is better security).
 if ($total_stores_today < 50000) {
@@ -44,9 +62,13 @@ if ($total_stores_today < 50000) {
 	if (-e $readonly_file_location) {
 		#print "Readonly file exists, this is a readonly site.\n";
 		$template->param(page_type_color => $readonly_page_type_color);
+		#$template->param(last_updated => $readonly_last_updated);
+		$template->param(readonly_html_lastupdated_status => $readonly_html_lastupdated_status);
 	} else {
 		#print "Readonly file DOES NOT exist, this is the main site.\n";
 		$template->param(page_type_color => $main_page_type_color);
+		#$template->param(last_updated => $main_last_updated);
+		$template->param(readonly_html_lastupdated_status => $main_html_lastupdated_status);
 	}
 
 	# Print header.
