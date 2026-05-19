@@ -65,13 +65,13 @@ if ($total_stores_today < 50000) {
 		#print "Readonly file exists, this is a readonly site.\n";
 		# Set Readonly site variables.
 		foreach my $template_variable (keys %template_data) {
-			$template->param($template_variable => $template_data{$template_variable}{'readonly'});
+			$template->param( $template_variable => $template_data{$template_variable}{'readonly'} );
 		}
 	} else {
 		#print "Readonly file DOES NOT exist, this is the main site.\n";
 		# Set Main site variables.
 		foreach my $template_variable (keys %template_data) {
-			$template->param($template_variable => $template_data{$template_variable}{'main'});
+			$template->param( $template_variable => $template_data{$template_variable}{'main'} );
 		}
 	}
 
