@@ -1,7 +1,9 @@
+# Activate Basic Auth (with username/password)
 AuthType Basic
 AuthName "restricted area"
 AuthUserFile "/usr/local/apache2/htdocs/.htpasswd"
 require valid-user
 
-
+# Make this directory visible to public web.
 Options +Indexes
+
