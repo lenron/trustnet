@@ -6,6 +6,11 @@ DirectoryIndex ingress_filter.pl
     Require all denied
 </Files>
 
+# Deny access to all html files in current directory.
+<Files "*.tmpl">
+    Require all denied
+</Files>
+
 Header set Access-Control-Allow-Origin "*"
 Header set Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
 Header set Access-Control-Allow-Headers X-Requested-With

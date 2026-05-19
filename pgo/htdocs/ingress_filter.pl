@@ -23,88 +23,56 @@ my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 # DBI command for returning a single value with SELECT.
 my $total_stores_today = $dbh->selectrow_array("SELECT stores_on_this_date FROM $stores_on_date_table WHERE date_stored = CURRENT_DATE", undef);
 
-# Main site (green) or read only site (blue) color template variables.
-my $readonly_page_type_color = "#4491d5"; # Blueish
-my $main_page_type_color = "#54c597"; # Greenish
-
-# Titletext template variables. 
-my $readonly_titletext = "PGO-READONLYWORD"; #
-my $main_titletext = "PGO-SECRETWORD"; #
-
-# Show STORE button or hide it (is that enough removed functionality?).
-my $readonly_store_button = ""; #
-my $main_store_button = qq{<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>};
-
-# CMD Flow edit or delete buttons
-my $readonly_cmd_store_delete_buttons = "display:none;"; #
-my $main_cmd_store_delete_buttons = ""; #
-
-# Browser Flow edit or delete buttons
-my $readonly_browser_edit_delete_buttons = "display:none;"; #
-my $main_browser_edit_delete_buttons = ""; 
-
-# Edit button javascript switch.
-my $readonly_edit_button_js = "none"; #
-my $main_edit_button_js = "inline"; #
-
-# Delete button javascript switch.
-my $readonly_delete_button_js = "none"; 
-my $main_delete_button_js = "inline"; 
-
 # Last updated on: template variables.
 # Read in htdocs/auto_log 
 # Get last line in file
 # set that to readonly_last_updated
 open my $fh, '<', '/usr/local/apache2/htdocs/auto_update_log.txt'; # or die "Cannot open file: $!";
-# Read into array from filehandle.
+# Read entire file into array.
 my @lines = <$fh>;
 # Get the last line in array.
-my $readonly_last_updated = $lines[-1];
+my $last_updated_status = $lines[-1];
 close $fh;
 
-# Compile HTML readonly_html_lastupdated_status
-my $main_html_lastupdated_status = ""; # Empty. Don't add HTML block showing readonly status on main page.
-my $readonly_html_lastupdated_status = qq{
-	<!--------------------------Last Synced Status---------------------------!>
-	<div id='read_only_div' style="display:flex; justify-content:space-between; flex-direction: row;">
-		<div id="main_site_link" style="display:flex; justify-content:space-between; margin:10px;">
-			<a href="https://obf.mkrsvr.org"style="color:#54c597">Main Site: obf.mkrsvr.org</a>   
-		</div>
-		<div id="last_synced_div" style="display:flex; justify-content:space-between; margin:10px;">
-			<label id="last_synced_label" style="" >$readonly_last_updated</label>
-		</div>
-	</div>
-};
+# Define human readable hash which will contain anon hashes for our 2-deep hash.
+my %template_data;
+# Read in custom config file. Looks like:
+# variable_name:mainsite_value,readonly_site_value
+open my $cfh, '<', '/usr/local/apache2/htdocs/index_template_vars.txt'; # or die "Cannot open file: $!";
+# Iterate over each line in file.
+while (my $line = <$cfh>) {
+	next if $line =~ /^#.*$/; # Don't read in commented lines (starting with # like this comment).
+	chomp $line; # Remove newline.
+	# First split variable name from the 2 pieces of data that will need another split.
+	my @variable_then_data = split(/:/, $line);
+	# Then split main data values from readonly data values.
+	my @main_then_readonly = split(/,/, $variable_then_data[1]);
+	# Finally populate 2 deep hash with our 2 split arrays.
+	$template_data{ $variable_then_data[0] } = { 'main' => $main_then_readonly[0], 'readonly' => $main_then_readonly[1] };
+}
+close $cfh;
 
 # Only produce functional file if filter condition met (else clause error is better security).
 if ($total_stores_today < 50000) {
 	# Read in base template that will be populated with variables below.
 	my $template = HTML::Template->new(filename => 'index.tmpl');
+	# I think always populate as it will be hidden (display:none) in HTML on main site.
+	$template->param(last_updated_status => $last_updated_status);
 	# Determine if readonly or main, have an empty file called 'readonly' if this is a backup site (to be created by launch_backup_server.sh I suppose.
 	my $readonly_file_location = "/usr/local/apache2/htdocs/readonly.txt";
 	# -e checks for existence of file.
 	if (-e $readonly_file_location) {
 		#print "Readonly file exists, this is a readonly site.\n";
 		# Set Readonly site variables.
-		$template->param(page_type_color => $readonly_page_type_color);
-		$template->param(titletext => $readonly_titletext);
-		$template->param(store_button_or_hidden=> $readonly_store_button);
-		$template->param(cmd_store_delete_buttons=> $readonly_cmd_store_delete_buttons);
-		$template->param(browser_edit_delete_buttons=> $readonly_browser_edit_delete_buttons);
-		$template->param(edit_button_js => $readonly_edit_button_js);
-		$template->param(delete_button_js => $readonly_delete_button_js);
-		$template->param(readonly_html_lastupdated_status => $readonly_html_lastupdated_status);
+		foreach my $template_variable (keys %template_data) {
+			$template->param($template_variable => $template_data{$template_variable}{'readonly'});
+		}
 	} else {
 		#print "Readonly file DOES NOT exist, this is the main site.\n";
 		# Set Main site variables.
-		$template->param(page_type_color => $main_page_type_color);
-		$template->param(titletext => $main_titletext);
-		$template->param(store_button_or_hidden=> $main_store_button);
-		$template->param(cmd_store_delete_buttons=> $main_cmd_store_delete_buttons);
-		$template->param(browser_edit_delete_buttons=> $main_browser_edit_delete_buttons);
-		$template->param(edit_button_js => $main_edit_button_js);
-		$template->param(delete_button_js => $main_delete_button_js);
-		$template->param(readonly_html_lastupdated_status => $main_html_lastupdated_status);
+		foreach my $template_variable (keys %template_data) {
+			$template->param($template_variable => $template_data{$template_variable}{'main'});
+		}
 	}
 
 	# HTTP Response requires proper header to work.

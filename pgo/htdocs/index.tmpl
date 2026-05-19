@@ -15,7 +15,7 @@
 		font-optical-sizing: auto;
 		font-weight: 600;
 		font-style: normal;
-		color: <TMPL_VAR NAME=page_type_color>;
+		color: #<TMPL_VAR NAME=page_type_color>;
 	}
 
 	html, body {
@@ -36,7 +36,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		color: <TMPL_VAR NAME=page_type_color>;
+		color: #<TMPL_VAR NAME=page_type_color>;
 		padding: 4px;
 		padding-right: 10px;
 		padding-left: 10px;
@@ -71,7 +71,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center; 
-		color: <TMPL_VAR NAME=page_type_color>;
+		color: #<TMPL_VAR NAME=page_type_color>;
 	}
 
 	/* default button styling. HTML style="" will override. */
@@ -84,8 +84,8 @@
 		margin: 8px;
 		padding-right: 10px;
 		padding-left: 10px;
-		color: <TMPL_VAR NAME=page_type_color>;
-		border-color: <TMPL_VAR NAME=page_type_color>;
+		color: #<TMPL_VAR NAME=page_type_color>;
+		border-color: #<TMPL_VAR NAME=page_type_color>;
 		font-size: 17px;
 		border-radius: 15px;
 	}
@@ -97,8 +97,8 @@
 		border: 2px solid;
 		padding: 8px;
 		margin: 8px;
-		border-color: <TMPL_VAR NAME=page_type_color>;
-		color: <TMPL_VAR NAME=page_type_color>;
+		border-color: #<TMPL_VAR NAME=page_type_color>;
+		color: #<TMPL_VAR NAME=page_type_color>;
 		font-size: 25px;
 		border-radius: 20px;
 	}
@@ -123,8 +123,8 @@
 		border: 2px solid;
 		padding: 12px;
 		margin: 8px;
-		border-color: <TMPL_VAR NAME=page_type_color>;
-		color: <TMPL_VAR NAME=page_type_color>;
+		border-color: #<TMPL_VAR NAME=page_type_color>;
+		color: #<TMPL_VAR NAME=page_type_color>;
 		font-size: 25px;
 		border-radius: 30px;
 	}
@@ -292,7 +292,7 @@
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
-				<a id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>
+				<a id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-<TMPL_VAR NAME=titletext></a>
 				<!--<a id="titletext" style="font-size:30px" href="/obf">SECRETWORD</a>--!>
 			</div>
 		</div>
@@ -309,7 +309,15 @@
 		</div>
 	</div>
 
-	<TMPL_VAR NAME=readonly_html_lastupdated_status>
+	<!--------------------------Last Synced Status---------------------------!>
+	<div id='read_only_div' style="display:<TMPL_VAR NAME=show_last_updated>; justify-content:space-between; flex-direction: row;">
+		<div id="main_site_link" style="display:flex; justify-content:space-between; margin:10px;">
+			<a href="https://obf.mkrsvr.org"style="color:#54c597">Main Site: obf.mkrsvr.org</a>   
+		</div>
+		<div id="last_synced_div" style="display:flex; justify-content:space-between; margin:10px;">
+			<label id="last_synced_label" style="" ><TMPL_VAR NAME=last_updated_status></label>
+		</div>
+	</div>
 	<!--------------------------Online Status---------------------------!>
 	<div id="offline_status_div" style="display:flex; justify-content:space-between; margin:10px;">
 		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
@@ -329,22 +337,20 @@
 
 <!------------------------------------Online Flow--------------------------------------------------------------------------!>
 			<!--------------------------HOME----------------------------!>
-			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:<TMPL_VAR NAME=page_type_color>">
+			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#<TMPL_VAR NAME=page_type_color>">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<!--<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>-->
-					<TMPL_VAR NAME=store_button_or_hidden>
+					<button class="obf_button" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 
 			<!--------------------------TIMED OUT HOME----------------------------!>
-			<div class="flow_pages home" id="timed_out_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:<TMPL_VAR NAME=page_type_color>">
+			<div class="flow_pages home" id="timed_out_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#<TMPL_VAR NAME=page_type_color>">
 				<h3 style="color:red;">TIMED OUT!</h3>
 				<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<!--<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('store_codeword')">STORE SECRET DATA</button>-->
-					<TMPL_VAR NAME=store_button_or_hidden>
+					<button class="obf_button" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
@@ -467,8 +473,8 @@
 				</div>
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1; <TMPL_VAR NAME=cmd_store_delete_buttons>" onclick="showPage('store_codeword')">STORE DATA</button>
-					<button class="" id='' style="flex-grow:1; <TMPL_VAR NAME=cmd_store_delete_buttons>" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
+					<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showPage('store_codeword')">STORE DATA</button>
+					<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
 			<!---------------------------END CMD LINE Access Flow-----------------------!>
@@ -489,8 +495,8 @@
 				</div>
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStore('access_data_outputdisplay')">SAVE DATA</button>
-					<button class="" id='editdata_button' style="flex-grow:1; <TMPL_VAR NAME=browser_edit_delete_buttons>" onclick="editData()">EDIT DATA</button>
-					<button class="" id='delete_button' style="flex-grow:1; <TMPL_VAR NAME=browser_edit_delete_buttons>" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
+					<button class="" id='editdata_button' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="editData()">EDIT DATA</button>
+					<button class="" id='delete_button' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
 				</div>
 			</div>
 			<!---------------------------END BROWSER Access Flow-----------------------!>
@@ -795,7 +801,7 @@
 			</div>
 
 			<!---------------------------Over 50000 Store Fail-----------------------!>
-			<div class="flow_pages home" id="lockedout_50000" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:<TMPL_VAR NAME=page_type_color>">
+			<div class="flow_pages home" id="lockedout_50000" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#<TMPL_VAR NAME=page_type_color>">
 				<h2>SECRETWORD IS LOCKEDOUT!</h2>
 				<h2>OVER 50,000 STORES REACHED!</h2>
 			</div>
@@ -995,7 +1001,7 @@
 	// Change text colors when editing record.
 	function showEnabledColors(){
 		document.getElementById('access_data_outputdisplay').disabled = false;
-		document.getElementById('access_data_outputdisplay').style.color = '<TMPL_VAR NAME=page_type_color>'; // Our 'normal' green.
+		document.getElementById('access_data_outputdisplay').style.color = '#<TMPL_VAR NAME=page_type_color>'; // Our 'normal' green.
 		document.getElementById('access_data_outputdisplay').style.backgroundColor = '#272727'; // Normal background
 	}// showEnabledColors()
 
@@ -1140,8 +1146,8 @@
 		// Reset Browser Access edit buttons.
 		//document.getElementById("editdata_button").style.display = "inline";
 		//document.getElementById("delete_button").style.display = "inline";
-		document.getElementById("editdata_button").style.display = "<TMPL_VAR NAME=edit_button_js>";
-		document.getElementById("delete_button").style.display = "<TMPL_VAR NAME=delete_button_js>";
+		document.getElementById("editdata_button").style.display = "<TMPL_VAR NAME=hide_readonly_store_buttons>";
+		document.getElementById("delete_button").style.display = "<TMPL_VAR NAME=hide_readonly_store_buttons>";
 		document.getElementById("save_button").style.display = "none";
 		// Keep access cleartext display disabled.
 		showDisabledColors();
@@ -3197,7 +3203,7 @@ console.log("cleartext data: " + cleartextData);
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
-				<a id="titletext" style="font-size:30px; text-decoration:underline;" >SECRETWORD</a>
+				<a id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-OFFLINEWORD</a>
 				<!--<a id="titletext" style="font-size:30px" href="/obf">SECRETWORD</a>--!>
 			</div>
 		</div>
