@@ -17,7 +17,6 @@ openssl enc -aes-256-cbc -d -pbkdf2 -in $ENCRYPTED_FILE -out $DECRYPTED_FILE -pa
 gunzip -c $DECRYPTED_FILE | sudo docker exec -i pgo-mariadb mariadb -u root -p'pwd' chatriwe_obf 
 
 # Create log of date last updated. 
-#TIMESTAMP=$(date +"%Y-%m-%d_%H:%M:%S")
-TIMESTAMP=$(date +"%H:%M on %A, %B %d, %Y")
+TIMESTAMP=$(date +"%H:%M on %A, %B %d, %Y UTC")
 LOG_LOCATION="$HOME/trustnet/pgo/htdocs/auto_update_log.txt"
 echo -e "Last updated: $TIMESTAMP" >> $LOG_LOCATION
