@@ -58,23 +58,26 @@ if ($total_stores_today < 50000) {
 	my $template = HTML::Template->new(filename => 'index.tmpl');
 	# I think always populate as it will be hidden (display:none) in HTML on main site.
 	$template->param(last_updated_status => $last_updated_status);
-	# Determine if readonly or main, have an empty file called 'readonly' if this is a backup site (to be created by launch_backup_server.sh I suppose.
-	my $readonly_file_location = "/usr/local/apache2/htdocs/readonly.txt";
-	# -e checks for existence of file.
-	if (-e $readonly_file_location) {
-		#print "Readonly file exists, this is a readonly site.\n";
+	# Read in server type.
+	my $file_type_location = "/usr/local/apache2/htdocs/this_server_type.txt";
+	open my $type_fh, '<', $file_type_location or die "Cannot read server type from file: $!";
+	# Read in first line. Should only be 1 line in this file.
+	my $server_type = <$type_fh>;
+	close $type_fh;
+	chomp($server_type); # Remove newline.
+	if ($server_type eq "readonly") {
 		# Set Readonly site variables.
 		foreach my $template_variable (keys %template_data) {
 			$template->param( $template_variable => $template_data{$template_variable}{'readonly'} );
 		}
-	} else {
-		#print "Readonly file DOES NOT exist, this is the main site.\n";
+	} elsif ($server_type eq "main") {
 		# Set Main site variables.
 		foreach my $template_variable (keys %template_data) {
 			$template->param( $template_variable => $template_data{$template_variable}{'main'} );
 		}
+	} else {
+		die "Cannot read server type from file!";
 	}
-
 	# HTTP Response requires proper header to work.
 	print $cgi->header('text/html');
 	# Print populated template to HTML Response.
