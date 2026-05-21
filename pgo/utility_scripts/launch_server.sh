@@ -16,40 +16,14 @@ elif [[ "$1" != "main" && "$1" != "backup" ]]; then # Require that single parame
     exit 1
 fi
 
-# Cronjob for main site.
-MAIN_JOB="
-# every 10th hour on the hour every day run backup_mariadb
-0 10 * * * bash $HOME/trustnet/pgo/utility_scripts/backup_mariadb.sh"
-# Wget cronjob for backup sites.
-BACKUP_JOB="
-# every 30th minute of the 10th hour every day run wget_mariadb_backup
-30 10 * * * bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh
-# every 0th minute of the 11th hour every day run restore_mariadb
-0 11 * * * bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh"
-
-# Main or backup conditional.
-if [[ "$1" == "main" ]]; then
-	# Set up proper cronjob.
-	CRONJOB="$MAIN_JOB"
-	# Make sure long random directory exists for main backup -> readonly restore functionality.
-elif [[ "$1" == "backup" ]]; then
-	# Set up proper cronjob.
-	CRONJOB="$BACKUP_JOB"
-else
-	echo "Invalid parameter somehow! This should never run. Exiting..."
-	exit 1 # Exit on generic error status.
-fi
-
-# Create folder where mariadb backups reside. Keeping this in backup script but commented for visibility.
-#mkdir -p htdocs/ya6K5EXJEN2TQW4VSvS0acE3SqmxyBDX4dJYZYFGRdXilEUG0ixZIHCOhkxHBY7nNPOz6FWSmoHVA
-
 # Create logs folder.
 mkdir -p $HOME/trustnet/pgo/htdocs/logs
 # Make logs work by giving ownership of logs directory to apache.
 sudo chown -R www-data $HOME/trustnet/pgo/htdocs/logs
 
-# Install cronjob functionality.
-sudo apt-get install cron -y
+#####################
+#   Crontab Setup   #
+#####################
 # Crontab default instructions to be used if crontab doesn't yet exist.
 INSTRUCTIONS="
 # Edit this file to introduce tasks to be run by cron.
@@ -75,73 +49,122 @@ INSTRUCTIONS="
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command"
-
 # Cronjob for main site.
 MAIN_JOB="
 # every 10th hour on the hour every day run backup_mariadb
 0 10 * * * bash $HOME/trustnet/pgo/utility_scripts/backup_mariadb.sh"
 # Wget cronjob for backup sites.
-GET_BACKUP="
+BACKUP_JOB="
 # every 30th minute of the 10th hour every day run wget_mariadb_backup
-30 10 * * * bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh"
-# Mariadb restore cronjob for backup sites.
-RESTORE_JOB="
+30 10 * * * bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh
 # every 0th minute of the 11th hour every day run restore_mariadb
 0 11 * * * bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh"
 
-# Capture existing cronjobs to a bash variable (unused). Error indicates no existing cronjobs which should be caught by $? below.
-EXISTING_CRON=$(crontab -l)
-# $? returns exist status of most recent foreground process: 1 on error, 0 otherwise. Here we are checking if crontab -l returned error status.
-# If crontab -l returned error, we need to create a new one.
-if [[ $? -eq 0 ]]; then
+# Main or backup conditional.
+if [[ "$1" == "main" ]]; then
+	# Indicate to ingress_filter.pl this server will be main. Single > should clobber pre-existing file.
+	echo -e "main" > $SERVER_TYPE_FILE
+	# Set up proper cronjob.
+	CRONJOB="$MAIN_JOB"
+elif [[ "$1" == "backup" ]]; then
+	# Indicate to ingress_filter.pl this server will be backup.
+	echo -e "backup" > $SERVER_TYPE_FILE
+	# Set up proper cronjob.
+	CRONJOB="$BACKUP_JOB"
+	# Create directory where logical backups from main will be kept.
+	# wget script won't run without this directory already existing. Single > should clobber pre-existing file.
+	mkdir -p $HOME/trustnet/pgo/mariadb_restores
+else
+	echo "Invalid parameter somehow! This should never run. Exiting..."
+	exit 1 # Exit on generic error status.
+fi
+
+# Install cronjob functionality.
+sudo apt-get install cron -y
+# Check if crontab exists while catching error exit status which would trigger set -e.
+if [[ crontab -l > /dev/null 2>&1 ]]; then
 	echo "Found existing crontab. Running oneliner which will append our jobs if they have not yet been added."
 	# if restore_mariadb is found in the existing crontab, || will exit this command.
 	# if not found, append our jobs to existing.
-	crontab -l | grep 'restore_mariadb' || (crontab -l; echo -e "$GET_BACKUP\n$RESTORE_JOB") | crontab -
+	crontab -l | grep 'restore_mariadb' || (crontab -l; echo -e "$CRONJOB") | crontab -
 else
 	echo "Found no existing crontabs, creating one with default instructions and our wget, restore jobs."
 	# Create new crontab by piping echo with variable replacement (-e) into crontab - which clobbers any existing crontabs.
-	echo -e "$INSTRUCTIONS\n$GET_BACKUP\n$RESTORE_JOB" | crontab -
+	echo -e "$INSTRUCTIONS\n$CRONJOB" | crontab -
 fi
 
-# Indicate to ingress_filter.pl the type of server (main or readonly) to compile, respond to request with (file exist means readonly site).
-touch $HOME/trustnet/pgo/htdocs/readonly.txt
-
-# Create directory where logical backups from main will be kept.
-# wget script won't run without this directory already existing.
-mkdir -p $HOME/trustnet/pgo/mariadb_restores
-
-
-
-
+########################################
+#  MAKE SURE WE'RE BEHIND TLS SOMEHOW  #
+########################################
 
 #####################
-#   Docker setup    #
+#   Docker Setup    #
 #####################
 # Uninstall any docker-ish packages that could interfere with how docker runs.
-for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
-
+sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)
 # Add Docker's official GPG key:
 sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
+# Add the repository to Apt sources:
+#echo \
+  #"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  #$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  #sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Add the repository to Apt sources:
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
 sudo apt-get update
 # Install docker.
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 # Run docker compose file docker-compose.yaml. This fill will download images and run the httpd (apache) and MariaDB containers in the background.
 sudo docker compose up -d
 
-# Check if server web accessible somehow?
+#########################################
+#     CHECK IF SERVER IS NOW UP?		#
+#########################################
 
-# Get copy of database and restore it to this backup site.
-bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh
-bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh
+if [[ "$1" == "backup" ]]; then
+	# Get copy of database and restore it to this backup site.
+	bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh
+	bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh
+fi
+
+
+
+# Check if everything is set up now?
+
+# Check if file, contents got created for this_server_type, report. Should match input parameter.
+# Check if crontab is set up to run, report.
+# Check containers are running, report.
+# Check 
+
+echo "Setup completed successfully."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
