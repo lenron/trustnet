@@ -123,6 +123,8 @@ EOF
 sudo apt-get update
 # Install docker.
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# Create docker network proxy (if not already existing) for contianer communication here so 'external:proxy' doesn't need to be changed ever.
+sudo docker network inspect proxy >/dev/null 2>&1 || sudo docker network create proxy
 # Run docker compose file docker-compose.yaml. This fill will download images and run the httpd (apache) and MariaDB containers in the background.
 sudo docker compose up -d # Not sure of exit status here. I think it will exit 1 on error?
 
@@ -130,7 +132,7 @@ sudo docker compose up -d # Not sure of exit status here. I think it will exit 1
 # When we have a clearer picture of VPS / Prod Server, do an additional check here to make sure pgo is accessible on the open internet. #
 #########################################################################################################################################
 
-# If we're a backup, looks like everything is ready so pull data from main server.
+# If we're a backup pull data from main server.
 if [[ "$1" == "backup" ]]; then
 	# Get copy of database and restore it to this backup site.
 	bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh
@@ -139,8 +141,10 @@ if [[ "$1" == "backup" ]]; then
 fi
 
 # Check if everything is set up. Report to user how it's going. 
-echo "RUNNING TEST: Checking logs directory setup..."
+echo -e "\n\nEverything should now be set up! RUNNING TEST SUITE..."
+
 # Check if log directory was successfully created and owner is www-data. Catch exit status so this script doesn't stop running.
+echo -e "\nRUNNING TEST: Checking logs directory setup..."
 if [ LOG_OWNER=$(stat -c '%U' "$LOG_DIRECTORY") > /dev/null 2>&1 ]; then
 	LOG_OWNER=$(stat -c '%U' "$LOG_DIRECTORY")
 	if [[ "$LOG_OWNER" == "www-data" ]]; then
@@ -152,8 +156,8 @@ else
 	echo "FAIL: Logs directory DOES NOT EXIST! (It should have pulled with repo?)"
 fi
 
-echo "RUNNING TEST: Checking if server 'type' file (indicating main or backup) is set up correctly."
 # Check if file, contents got created for this_server_type.txt, report. Should match input parameter.
+echo -e "\nRUNNING TEST: Checking if server 'type' file (indicating main or backup) is set up correctly."
 if [ -e "$SERVER_TYPE_FILE" ]; then
 	FILE_TYPE_CONTENTS=$(cat $SERVER_TYPE_FILE)
 	if [[ "$FILE_TYPE_CONTENTS" == "$1" ]]; then
@@ -166,6 +170,7 @@ else
 fi
 
 # Check if crontab is set up to run, report.
+echo -e "\nRUNNING TEST: Checking if Cronjobs are set up properly."
 if [[ "$1" == "main" ]]; then
 	# Run test for main.
 	MAIN_JOB_TEST="0 10 * * * bash $HOME/trustnet/pgo/utility_scripts/backup_mariadb.sh"
@@ -192,6 +197,7 @@ else
 fi
 
 # Check status of pgo-apache2 container.
+echo -e "\nRUNNING TEST: Checking if Apache, MariaDB containers are running."
 if [[ "$(sudo docker inspect -f '{{.State.Status}}' "pgo-apache2")" == "running" ]]; then
     echo "PASS: pgo-apache2 container is running"
 else
@@ -205,7 +211,7 @@ else
     echo "FAIL: pgo-mariadb container is NOT running"
 fi
 
-echo "Launch script completed."
+echo -e "\nLaunch script completed."
 
 
 
