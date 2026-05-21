@@ -8,3 +8,4 @@ docker-compose.yaml
 auto_backup_log.txt
 htdocs/ya6K5EXJEN2TQW4VSvS0acE3SqmxyBDX4dJYZYFGRdXilEUG0ixZIHCOhkxHBY7nNPOz6FWSmoHVA/mariadb_backup*
 htdocs/auto_update_log.txt
+htdocs/this_server_type.txt
