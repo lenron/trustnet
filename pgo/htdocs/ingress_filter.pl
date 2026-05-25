@@ -65,7 +65,7 @@ if ($total_stores_today < 50000) {
 	my $server_type = <$type_fh>;
 	close $type_fh;
 	chomp($server_type); # Remove newline.
-	if ($server_type eq "readonly") {
+	if ($server_type eq "backup") {
 		# Set Readonly site variables.
 		foreach my $template_variable (keys %template_data) {
 			$template->param( $template_variable => $template_data{$template_variable}{'readonly'} );
