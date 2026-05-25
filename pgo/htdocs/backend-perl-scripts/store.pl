@@ -35,7 +35,7 @@ if ($q->param){
 	# Make time format human readable.
 	my $time = $t->strftime();
 	# If log exists, we know q->param caught data.
-	my $filename = '../logs/log.txt';
+	my $filename = '/usr/local/apache2/htdocs/logs/log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "\nSTORE\n";
@@ -53,8 +53,24 @@ if ($q->param){
 	print $fh "fingerprint: $fingerprint\n";
 	print $fh "data: $data\n";
 
+	# Store functionality only valid from main site.
+	my $server_type_location = "/usr/local/apache2/htdocs/this_server_type.txt";
+	open my $type_fh, '<', $server_type_location or die "Cannot read server type from file: $!";
+	# Read in first line. Should only be 1 line in this file.
+	my $server_type = <$type_fh>;
+	close $type_fh;
+	chomp($server_type); # Remove newline.
+	# Deny entry unless this is a main server. Don't send a HTTP response.
+	if ($server_type ne "main") {
+		# Log denial due to this not being a 'main' server.
+		print $fh "ERROR: STORE DENIED: THIS SERVER ISN'T MAIN!\n";
+		exit 0;
+	}
+
 	# Match exactly 43 base64 chars.      Match exactly 1024 base64 chars.
 	if (!($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/) || !($data =~ /^[a-zA-Z0-9\+\/]{1024}$/)){
+		# Log denial due to incorrect data format.
+		print $fh "ERROR: STORE DENIED due to incorrect data format.\n";
 		# Return fail if data isn't in the proper form.
 		print $q->header();
 		# qq{} is a standin for double quotes, used here so we can pass the double quote char to print.
