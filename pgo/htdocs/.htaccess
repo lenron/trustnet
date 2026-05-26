@@ -49,6 +49,7 @@ RewriteRule ^exeextendpasslock$ backend-perl-scripts/extend_passlock.pl
 RewriteRule ^exegetpasslock$ backend-perl-scripts/get_passlock.pl
 RewriteRule ^exepasslockdelete$ backend-perl-scripts/delete_passlock.pl
 RewriteRule ^execountuniquevisitors$ backend-perl-scripts/count_unique_visitors.pl
+RewriteRule ^exesendcontactmessage$ backend-perl-scripts/save_contact_message.pl
 #RewriteRule ^execountuniquevisitors$ count_unique_visitors.pl
 
 # Redirects for Offline Database

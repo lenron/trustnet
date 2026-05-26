@@ -90,7 +90,8 @@
 		border-radius: 15px;
 	}
 
-	input[type="password"] {
+	/*input[type="password"] {*/
+	input {
 		height: 80px;
 		width: 95%;
 		background-color: #272727;
@@ -301,10 +302,10 @@
 				<label id="dev_site_link">DEV SITE</label>
 			</div>
 			<div class="header_label" style="">
-				<label id="howworks">HOW IT WORKS</label>
+				<label id="faq">FAQ</label>
 			</div>
 			<div class="header_label" style="">
-				<label id="faq">FAQ</label>
+				<label id="contact">CONTACT</label>
 			</div>
 		</div>
 	</div>
@@ -335,7 +336,40 @@
 	<!--------------------------Div Housing for Flow Pages----------------------------!>
 	<div class="center_html" id="center_html" style="">
 
-<!------------------------------------Online Flow--------------------------------------------------------------------------!>
+<!------------------------------------HEADER PAGES--------------------------------------------------------------------------!>
+			<!--------------------------CONTACT PAGE - CAPTCHA----------------------------!>
+			<div class="flow_pages " id="contact_page_captcha" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>CONTACT PAGE</label>
+				</div>
+				<h2>THE COLOR OF THE SKY IS?</h2>
+				<input autocomplete="off" type="" value="" id="captcha_input" style="" >
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkCaptcha()">CONTINUE</button>
+				</div>
+			</div>
+
+			<!--------------------------CONTACT PAGE----------------------------!>
+			<div class="flow_pages " id="contact_page" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>CONTACT PAGE</label>
+				</div>
+				<h2>Please leave us a message:</h2>
+				<textarea value="" id="contact_textarea" style="color:gray" rows="8" cols="50"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="submitContactMessage()">CONTINUE</button>
+				</div>
+			</div>
+
+			<!--------------------------CONTACT THANKS----------------------------!>
+			<div class="flow_pages " id="contact_thanks" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>CONTACT PAGE</label>
+				</div>
+				<h2>THANK YOU FOR YOUR MESSAGE!</h2>
+			</div>
+
+<!------------------------------------ONLINE FLOW--------------------------------------------------------------------------!>
 			<!--------------------------HOME----------------------------!>
 			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#<TMPL_VAR NAME=page_type_color>">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
@@ -937,10 +971,11 @@
 	//		Global Flags & Page Load Function					//
 	//////////////////////////////////////////////////////////////
 
+	// Base 64 encoding as standardized in RFC 4648: https://datatracker.ietf.org/doc/html/rfc4648#section-4
+	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	// Single Record (TOTAL_RECORD_LENGTH) in bytes:
 	//        43	       1024
 	// |--fingerprint--||--Data--|
-
 	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
 	const FINGERPRINT_BYTE_LENGTH = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
@@ -959,8 +994,6 @@
 	const FOUR_MINUTES_THIRTY_SECONDS = 270000;
 	const FIVE_MINUTES = 300000;
 
-	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
 	// Automatically run this function on page load.
 	window.onload = async function() {
 		// Initial server online check.
@@ -978,22 +1011,40 @@
 		showPage('home');
 	}
 
+	// Header link to dev site.
 	document.getElementById("dev_site_link").onclick = function(){
-		//showPage('dev_site');
 		location.href = "https://obf.mkrsvr.org/dev_site.html";
 	}
-/*
-	// later
-	document.getElementById("howworks").onclick = function() {
-		location.href = "/obf/how";
-		// howworks();
+
+	// Header link to contact page captcha.
+	document.getElementById("contact").onclick = function() {
+		showPage('contact_page_captcha');
 	}
-*/
+
+	// Header link to FAQ page.
 	document.getElementById("faq").onclick = function() {
 		location.href = "https://obf.mkrsvr.org/faq.html";
-		// location.href = "/obf/faq";
-		// faq();
 	}
+
+	//////////////////////////////////////////////////////////////
+	//                Captcha Functions                         //
+	//////////////////////////////////////////////////////////////
+
+	// Perform simple captcha check.
+	function checkCaptcha(){
+		const enteredCaptchaValue = document.getElementById('captcha_input').value;
+		if (enteredCaptchaValue === 'blue') {
+			showPage('contact_page');
+		}
+	}
+
+	// Submit user message to site owners.
+	function submitContactMessage(){
+		const contactMessage = document.getElementById('contact_textarea').value;
+		serverSendContactMessage(contactMessage);
+		showPage('contact_thanks');
+	}
+
 	//////////////////////////////////////////////////////////////
 	//		UI & flowwalker Handler Functions					//
 	//////////////////////////////////////////////////////////////
@@ -1972,6 +2023,41 @@ console.log("cleartext data: " + cleartextData);
 		}
 	}// serverCountUniqueVisitors()
 
+	// Email owners with user contact message.
+	async function serverSendContactMessage(contactMessage){
+		let SERVER_URL = getServerOrigin();
+		SERVER_URL += 'exesendcontactmessage';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					message: contactMessage,// Don't need to send any information to server?
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			//console.log(responseObj);
+			if (responseObj.response){
+				console.log("Contact message response: " + responseObj.response);
+			}else{
+				console.log("Contact message return error.");
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverSendContactMessage()
 
 
 	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
