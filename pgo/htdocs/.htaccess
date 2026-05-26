@@ -2,8 +2,20 @@ DirectoryIndex ingress_filter.pl
 
 
 # Deny access to all html files in current directory.
-<Files "*.html">
-    Require all denied
+#<Files "*.html">
+    #Require all denied
+#</Files>
+
+# uncomment to deny all but this will take out ingress_filter.pl
+#Deny from all
+
+# Allow FAQ section.
+<Files "faq.html">
+    Allow from all
+</Files>
+
+<Files "ingress_filter.pl">
+    Allow from all
 </Files>
 
 # Deny access to all html files in current directory.

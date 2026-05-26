@@ -1,0 +1,471 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/plain;charset=utf-8" http-equiv="Content-Type" />
+<meta content="utf-8" http-equiv="encoding" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+</head>
+<style>
+
+	* {
+		font-family: "Orbitron", serif;
+		font-optical-sizing: auto;
+		font-weight: 600;
+		font-style: normal;
+		color: #54c597;
+	}
+
+	html, body {
+		background-color: #272727;
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		margin: 0;
+		padding: 0;
+	}
+
+	.main_site {
+		height: 100%;
+	}
+
+	.header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		color: #54c597;
+		padding: 4px;
+		padding-right: 10px;
+		padding-left: 10px;
+	}
+
+	.header_content {
+		display: flex;
+	}
+
+	.header_title:hover {
+		cursor: pointer;
+	}
+
+	.header_label {
+		padding: 8px;
+	}
+
+	.center_html {
+		width: 100%;
+		min-height: 100%;
+		background-color: #272727;
+		flex: 1 auto;
+		display: flex;
+		justify-content: center;
+	}
+
+	/* Single (pages) shown to user as they (flow) through site. */
+	.flow_pages {
+		width: 700px;
+		margin: 10px;
+		align-self: center;
+		display: flex;
+		flex-direction: column;
+		justify-content: center; 
+		color: #54c597;
+	}
+
+	/* default button styling. HTML style="" will override. */
+	button {
+		/*width: 400px;*/
+		height: 65px;
+		background-color: #434343;
+		border: 2px solid;
+		padding: 2px;
+		margin: 8px;
+		padding-right: 10px;
+		padding-left: 10px;
+		color: #54c597;
+		border-color: #54c597;
+		font-size: 17px;
+		border-radius: 15px;
+	}
+
+	input[type="password"] {
+		height: 80px;
+		width: 95%;
+		background-color: #272727;
+		border: 2px solid;
+		padding: 8px;
+		margin: 8px;
+		border-color: #54c597;
+		color: #54c597;
+		font-size: 25px;
+		border-radius: 20px;
+	}
+
+	a {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: blue;
+	}
+
+	p {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: black;
+	}
+
+	/* Change the textareas inside divs with 'flow_pages' class to the following: */
+	.flow_pages textarea {
+		width: 95%;
+		height: 150px;
+		background-color: #272727;
+		border: 2px solid;
+		padding: 12px;
+		margin: 8px;
+		border-color: #54c597;
+		color: #54c597;
+		font-size: 25px;
+		border-radius: 30px;
+	}
+
+	/* 'Are you sure?' overlay */
+	.deletecheck {
+		justify-content:center;
+		align-items:center;
+		z-index:10;
+		position:absolute;
+		width:100%;
+		height:215%;
+		background-color:gray;
+		padding:8px;
+		margin-left:0;
+		margin-top:-40%;
+		flex-direction: column;
+		border:2px solid;
+		border-color:red; 
+		border-radius:30px;
+	}
+
+	.devsite_inputs {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: black;
+		background-color: grey;
+	}
+
+	.tooltip {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: black;
+	}
+
+	/* Add this class to a span or label (and other types?) to make it a cool looking pink */
+	.coolpink {
+		color:#ff00ff;
+		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	}
+
+	/* Change cursor image to pointer with plus (identified by 'copy' indicator) */
+	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
+	.encrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div id*/
+	#encrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#encrypt_click_store:hover {
+		cursor: copy;
+	}
+
+	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
+	.decrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_store:hover {
+		cursor: copy;
+	}
+
+	.openssl_encrypt_flowchart {
+		background-image: url('./svg_images/openssl_encrypt_flowchart.drawio.svg');
+	}
+
+	.openssl_decrypt_flowchart {
+		background-image: url('./svg_images/openssl_decrypt_flowchart.drawio.svg');
+	}
+
+	/* Makes the background color blend from orange to #AEE850 */
+	.glossy_button {
+		background: linear-gradient(orange, #aee850);
+		border: 1px solid #1d6511;
+		color: black;
+		font-size: 12px;
+		height: 30px;
+		cursor: pointer;
+	}
+
+	/* Makes the text blend from orange to #AEE850 */
+	/* background-clip: text creates a 'cut-out' of the background where the text exists, creating text with a linear gradient.*/
+	.glossy_icon {
+		background-image: linear-gradient(orange, #aee850);
+		color: transparent;
+		background-clip: text;
+	}
+
+	/* Set minimum page Width to */
+	@media screen and (max-width: 340px){ html,body {min-width: 340px} }
+
+	/* Set minimum page Height to 400 */
+	@media screen and (max-height: 400px){ html,body {min-height: 400px} }	
+
+	/* Responsive Design: When the viewport is fewer than 700px wide, activate the following CSS. */
+	@media screen and (max-width:700px) {
+
+		input[type="password"] {
+			width: 90%;
+		}
+
+		textarea {
+			width: 90%;
+		}
+
+		.header {
+			flex-direction: column;
+		}
+
+		.home button {
+			width: 200px;
+			/*border-color: black;*/
+		}
+
+		.home_buttons {
+			/*flex-direction: column;*/
+		}
+
+		.choose button {
+			font-size: 14px;
+		}
+
+		.upload input {
+			font-size: 16px;
+		}
+
+		.deletecheck {
+			margin-top: -50%;
+			height: 220%;
+		}
+		
+	}
+	@media screen and (max-width:500px) {
+/*
+		input {
+			width: 400px;
+		}
+
+		textarea {
+			width: 400px;
+		}
+*/
+		.home button {
+			width: 150px;
+			font-size: 14px;
+			/*border-color: black;*/
+		}
+
+		.deletecheck {
+			width: 95%;
+			margin-top: -75%;
+			height:250%;
+		}
+	}
+
+</style>
+<body>
+	<!--------------------------HEADER----------------------------!>
+	<div class="header" id="header">
+		<div class="header_content" id="header_left">
+			<div class="header_title">
+				<a id="titletext" style="font-size:30px; text-decoration:underline;" >SECRETWORD</a>
+				<!--<a id="titletext" style="font-size:30px" href="/obf">SECRETWORD</a>--!>
+			</div>
+		</div>
+		<div class="header_content" id="header_right">
+			<div class="header_label" style="">
+				<label id="dev_site_link">DEV SITE</label>
+			</div>
+			<div class="header_label" style="">
+				<label id="howworks">HOW IT WORKS</label>
+			</div>
+			<div class="header_label" style="">
+				<label id="faq">FAQ</label>
+			</div>
+		</div>
+	</div>
+
+	<!--------------------------Online Status---------------------------!>
+	<div id="offline_status_div" style="display:flex; justify-content:space-between; margin:10px;">
+		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
+	</div>
+	<!--------------------------Timeout Warning Overlay---------------------------!>
+	<div id="timeout_warning_overlay" style="display:none; justify-content:space-between; margin:10px;">
+		<h1 id="" style="color:red " >YOUR DATA SESSION WILL EXPIRE IN 30 SECONDS.</h1>
+		<button class="obf_button" id='' style="flex-grow:1" onclick="resetTimeoutAndWarning()">EXTEND SESSION</button>
+	</div>
+	<!--------------------------Offline Database Warning----------------------------!>
+	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
+		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS NOW FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
+	</div>
+
+	<!-------------------------FAQ-------------------------------!>
+	<div class="" id="faq_section" style="">
+		<h1>FAX</h1>
+
+		<h2 id="section1">FAQ SECTION 1</h2>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+
+		<h2 id="section2">FAQ SECTION 2</h2>
+		<p>Here is some placeholder text</p>
+
+		<h2 id="section3">FAQ SECTION 3</h2>
+		<p>Here is some placeholder text</p>
+
+		<h2 id="section4">FAQ SECTION 4</h2>
+		<p>Here is some placeholder text</p>
+
+		<h2 id="section5">FAQ SECTION 5</h2>
+		<p>Here is some placeholder text</p>
+
+		<h2 id="section6">FAQ SECTION 6</h2>
+		<p>Here is some placeholder text</p>
+
+		<h2 id="section7">FAQ SECTION 7</h2>
+		<p>Here is some placeholder text</p>
+
+		<h2 id="section8">FAQ SECTION 8</h2>
+		<p>Here is some placeholder text</p>
+
+		<h2 id="section9">FAQ SECTION 9</h2>
+		<p>Here is some placeholder text</p>
+
+		<h2 id="section0">FAQ SECTION 10</h2>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+		<p>Here is some placeholder text</p>
+
+	</div> <!--------------------------------------------FAQ----------------------------------------------------!>
+
+</body>
+<script>
+
+</script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

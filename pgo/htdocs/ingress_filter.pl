@@ -38,7 +38,7 @@ close $fh;
 my %template_data;
 # Read in custom config file. Looks like:
 # variable_name:mainsite_value,readonly_site_value
-open my $cfh, '<', '/usr/local/apache2/htdocs/index_template_vars.txt'; # or die "Cannot open file: $!";
+open my $cfh, '<', '/usr/local/apache2/htdocs/template_vars.txt'; # or die "Cannot open file: $!";
 # Iterate over each line in file.
 while (my $line = <$cfh>) {
 	next if $line =~ /^#.*$/; # Don't read in commented lines (starting with # like this comment).
