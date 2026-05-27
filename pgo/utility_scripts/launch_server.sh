@@ -17,11 +17,11 @@ elif [[ "$1" != "main" && "$1" != "backup" ]]; then # Require that single parame
 fi
 
 # Set logs directory.
-LOG_DIRECTORY="$HOME/trustnet/pgo/htdocs/logs"
+LOG_DIRECTORY="$HOME/trustnet/pgo/logs"
 # Create logs folder if it doesn't already exist.
 mkdir -p $LOG_DIRECTORY
 # Apache runs the process that runs the backend scripts that create logs. If Apache doesn't have ownership of the directory or something similar, logs won't get created.
-sudo chown -R www-data $HOME/trustnet/pgo/htdocs/logs
+sudo chown -R www-data $HOME/trustnet/pgo/logs
 
 #####################
 #   Crontab Setup   #

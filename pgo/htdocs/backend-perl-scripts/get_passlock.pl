@@ -39,7 +39,7 @@ if ($q->param){
 	# Make time format human readable.
 	my $time = $t->strftime();
 	# If log exists, we know q->param caught data.
-	my $filename = '/usr/local/apache2/htdocs/logs/passlock_log.txt';
+	my $filename = '/usr/local/apache2/logs/passlock_log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "\nGET\n";

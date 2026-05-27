@@ -1,44 +1,31 @@
+# Send all base origin requests to this file.
 DirectoryIndex ingress_filter.pl
 
-
-# Deny access to all html files in current directory.
-#<Files "*.html">
-    #Require all denied
-#</Files>
-
-# uncomment to deny all but this will take out ingress_filter.pl
-#Deny from all
-
-# Allow FAQ section.
-<Files "faq.html">
-    Allow from all
+# Deny access to all text files in htdocs.
+<Files "*.txt">
+    Require all denied
 </Files>
 
-<Files "ingress_filter.pl">
-    Allow from all
-</Files>
-
-# Deny access to all html files in current directory.
+# Deny access to perl template files.
 <Files "*.tmpl">
     Require all denied
 </Files>
 
+# Service Workers shouldn't be cached for very long
+<FilesMatch "serviceworker.js">
+  ExpiresDefault "now"
+</FilesMatch>
+
+# Allow Cross Origin Resource Sharing (CORS).
+# We are accepting the risk as minimal considering the other security in use. We are not worried about auth-token stealing which is what I understand is the primary CORS risk here.
 Header set Access-Control-Allow-Origin "*"
 Header set Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
 Header set Access-Control-Allow-Headers X-Requested-With
 
 RewriteEngine On
-
 RewriteBase /
-#RewriteBase /backend-perl-scripts/
-#RewriteRule ^store obfuscate.pl?id=store
-#RewriteRule ^load obfuscate.pl?id=load
-#RewriteRule ^delete obfuscate.pl?id=delete
-#RewriteRule ^faq obfuscate.pl?id=faq
-#RewriteRule ^how obfuscate.pl?id=how
 
-# Redirect calls from e.g. /cgi-bin/exestore to /obf/store.pl
-# These RewriteRules use regex in what appears to be a greedy way. ^exedelete was catching and sending to delete.pl while ^exedeletepasslock, delete_passlock.pl was the intended redirect.
+# Redirect calls e.g. from /exestore to /backend-perl-scripts/store.pl
 RewriteRule ^exestore$ backend-perl-scripts/store.pl
 RewriteRule ^exeload$ backend-perl-scripts/load.pl
 RewriteRule ^exedelete$ backend-perl-scripts/delete.pl
@@ -51,30 +38,6 @@ RewriteRule ^exepasslockdelete$ backend-perl-scripts/delete_passlock.pl
 RewriteRule ^execountuniquevisitors$ backend-perl-scripts/count_unique_visitors.pl
 RewriteRule ^exesendcontactmessage$ backend-perl-scripts/save_contact_message.pl
 #RewriteRule ^execountuniquevisitors$ count_unique_visitors.pl
-
-# Redirects for Offline Database
-#RewriteRule ^exe_offline_set set_offline_dbase.pl
-#RewriteRule ^exe_offline_get get_offline_dbase.pl
-
-#<Directory "/usr/local/apache2/htdocs/logs">
-    #Require all denied
-#</Directory>
-
-<Files "log.txt">  
-  Require all denied
-</Files>
-
-# Allow CORS
-#<IfModule mod_headers.c>
-  #Header add Access-Control-Allow-Origin "*"
-  #Header add Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
-  #Header set Access-Control-Allow-Headers X-Requested-With
-#</IfModule>
-
-# Service Workers shouldn't be cached for very long
-<FilesMatch "serviceworker.js">
-  ExpiresDefault "now"
-</FilesMatch>
 
 
 

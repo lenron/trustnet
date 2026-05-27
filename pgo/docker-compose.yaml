@@ -12,6 +12,9 @@ services:
         source: ./htdocs
         target: /usr/local/apache2/htdocs
       - type: bind
+        source: ./logs
+        target: /usr/local/apache2/logs
+      - type: bind
         source: ./.htpasswd
         target: /usr/local/apache2/.htpasswd
       #- type: bind

@@ -31,7 +31,7 @@ if ($q->param){
 	# Make time format human readable.
 	my $time = $t->strftime();
 	# If log exists, we know q->param caught some data.
-	my $filename = '/usr/local/apache2/htdocs/logs/log.txt';
+	my $filename = '/usr/local/apache2/logs/log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "\nSAVING A CONTACT MESSAGE\n";
