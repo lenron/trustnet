@@ -81,6 +81,4 @@ volumes: # This volume which contains the database data will persist.
 networks:
   proxy:
     name: proxy
-    # Uncomment external:true on if proxy network already created and existing.
-	# If using cloudflare tunel with launch scripts that do everything, it should already exist.
-    external: true
+    external: true # Setting up main, backup servers so that this never needs to be commented in this file.
