@@ -25,6 +25,10 @@ Header set Access-Control-Allow-Headers X-Requested-With
 RewriteEngine On
 RewriteBase /
 
+# Add rules for /faq /contact
+RewriteRule ^faq$ ingress_filter.pl?link_id=faq
+RewriteRule ^contact$ ingress_filter.pl?link_id=contact
+
 # Redirect calls e.g. from /exestore to /backend-perl-scripts/store.pl
 RewriteRule ^exestore$ backend-perl-scripts/store.pl
 RewriteRule ^exeload$ backend-perl-scripts/load.pl

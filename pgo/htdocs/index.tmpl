@@ -293,19 +293,20 @@
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
-				<a id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-<TMPL_VAR NAME=titletext></a>
-				<!--<a id="titletext" style="font-size:30px" href="/obf">SECRETWORD</a>--!>
+				<a href="https://<TMPL_VAR NAME=origin>" id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-<TMPL_VAR NAME=titletext></a>
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
-			<div class="header_label" style="">
+			<!--<div class="header_label" style="">
 				<label id="dev_site_link">DEV SITE</label>
-			</div>
-			<div class="header_label" style="">
 				<label id="faq">FAQ</label>
+				<label id="contact">CONTACT</label>
+			</div>-->
+			<div class="header_label" style="">
+				<a href="/faq">FAQ</a>
 			</div>
 			<div class="header_label" style="">
-				<label id="contact">CONTACT</label>
+				<a href="/contact">CONTACT</a>
 			</div>
 		</div>
 	</div>
@@ -1001,6 +1002,7 @@
 		serverCountUniqueVisitors();
 	}
 
+/*
 	// Set Title to link to Home without dropping offline dbase.
 	document.getElementById("titletext").onclick = function(){
 		//location.href = "https://chat.dance/obf";
@@ -1010,7 +1012,6 @@
 		resetPasslock();
 		showPage('home');
 	}
-
 	// Header link to dev site.
 	document.getElementById("dev_site_link").onclick = function(){
 		location.href = "https://obf.mkrsvr.org/dev_site.html";
@@ -1018,14 +1019,17 @@
 
 	// Header link to contact page captcha.
 	document.getElementById("contact").onclick = function() {
-		showPage('contact_page_captcha');
+		//showPage('contact_page_captcha');
+		location.href = "/contact";
 	}
 
 	// Header link to FAQ page.
 	document.getElementById("faq").onclick = function() {
-		location.href = "https://obf.mkrsvr.org/faq.html";
+		//location.href = "https://obf.mkrsvr.org/faq.html";
+		location.href = "/faq";
 	}
 
+*/
 	//////////////////////////////////////////////////////////////
 	//                Captcha Functions                         //
 	//////////////////////////////////////////////////////////////
@@ -3295,12 +3299,6 @@ console.log("cleartext data: " + cleartextData);
 		</div>
 		<div class="header_content" id="header_right">
 			<div class="header_label" style="">
-				<label id="dev_site_link">DEV SITE</label>
-			</div>
-			<div class="header_label" style="">
-				<label id="howworks">HOW IT WORKS</label>
-			</div>
-			<div class="header_label" style="">
 				<label id="faq">FAQ</label>
 			</div>
 		</div>
@@ -3938,15 +3936,7 @@ console.log("cleartext data: " + cleartextData);
 		showPage('enter_offlinedbase_pass');
 	}
 
-	document.getElementById("dev_site_link").onclick = function(){
-		showPage('dev_site');
-	}
 /*
-	// later
-	document.getElementById("howworks").onclick = function() {
-		location.href = "/obf/how";
-		// howworks();
-	}
 	// later
 	document.getElementById("faq").onclick = function() {
 		location.href = "/obf/faq";

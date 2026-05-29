@@ -4,3 +4,4 @@ page_type_color:54c597,4491d5
 titletext:SECRETWORD,READONLYWORD
 hide_readonly_store_buttons:inline,none
 show_last_updated:none,flex
+origin:obf.mkrsvr.org,backup.mkrsvr.org
