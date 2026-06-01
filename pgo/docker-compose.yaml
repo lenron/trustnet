@@ -1,7 +1,7 @@
 services:
   pgo:
     container_name: pgo-apache2
-    image: mkrlenron/lenron-pgo:0.2
+    image: mkrlenron/lenron-pgo:0.4
     restart: always
     # Comment port off if using Traefik.
     # Uncomment port on if accessing through localhost, which includes the simple cloudflare tunnel -> pgo setup.

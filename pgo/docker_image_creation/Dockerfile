@@ -5,8 +5,13 @@ COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
 # Create link to perl inside container 
 RUN mkdir -p /home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin
 RUN ln -s /usr/bin/perl /home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin/perl5.10.1
-# Install perl modules. Prefer apt-get for scripts.
+# Get updated list of apt-get programs.
 RUN apt-get update
+# Add ssmtp for email function.
+RUN apt-get install -y ssmtp
+COPY ./ssmtp.conf /etc/ssmtp/ssmtp.conf
+RUN chown root:mail /etc/ssmtp/ssmtp.conf
+# Install perl modules. Prefer apt-get for scripts.
 RUN apt-get install -y make gcc cpanminus
 RUN apt-get install -y libmariadb-dev
 RUN cpanm DBI

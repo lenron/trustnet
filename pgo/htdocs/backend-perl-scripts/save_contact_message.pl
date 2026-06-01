@@ -36,8 +36,7 @@ if ($q->param){
 	open(my $fh, '>>', $filename); # or die;
 	print $fh "\nSAVING A CONTACT MESSAGE\n";
 	print $fh "$time\n";
-	print $fh "$ip\n\n";
-	close $fh;
+	print $fh "$ip\n";
 
 	# CGI term POSTDATA is used to get the entire raw body content (in JSON object form).
 	my $posted_data_in_json_object_form = $q->param('POSTDATA');
@@ -49,6 +48,12 @@ if ($q->param){
 	# Get database handler $dbh by successfully connecting to database.
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	my $response = $dbh->do("INSERT INTO $db_contact_messages_table (ip, message) VALUES (?, ?)", undef, $ip, $contact_message);
+	
+	# Send email to owners.
+	my $admin_email = 'aaronbreault@gmail.com';
+	my $std_output_a = `echo -e "Subject: PGO Message Received.\n\n$contact_message" | ssmtp -F"pgo-auto" $admin_email`;
+	print $fh "Email attempt: $std_output_a\n";
+	close $fh;
 
 	# HTTP POST response requires a header.
 	print $q->header();
