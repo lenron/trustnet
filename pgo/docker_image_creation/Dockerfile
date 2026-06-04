@@ -7,10 +7,8 @@ RUN mkdir -p /home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin
 RUN ln -s /usr/bin/perl /home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin/perl5.10.1
 # Get updated list of apt-get programs.
 RUN apt-get update
-# Add ssmtp for email function.
-RUN apt-get install -y ssmtp
-COPY ./ssmtp.conf /etc/ssmtp/ssmtp.conf
-RUN chown root:mail /etc/ssmtp/ssmtp.conf
+# Add swaks for email function.
+RUN apt-get install -y swaks 
 # Install perl modules. Prefer apt-get for scripts.
 RUN apt-get install -y make gcc cpanminus
 RUN apt-get install -y libmariadb-dev

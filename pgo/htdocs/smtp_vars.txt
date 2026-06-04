@@ -1,0 +1,5 @@
+# Variables for swaks email functionality. 
+username:pgo-automatic@mkrsvr.org
+password:LFMDQ3H4AJCP8BGX
+server:smtp.protonmail.ch
+port:587

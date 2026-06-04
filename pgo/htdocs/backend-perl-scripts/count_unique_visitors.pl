@@ -23,23 +23,11 @@ my $unique_visitor_ips_today_table = 'unique_visitor_ips_today';
 
 # Get user ip.
 my $ip = $ENV{REMOTE_ADDR};
-#my $ip = "1.1.1.1";
 
-# Get current time for log.
-my $t = localtime;
-# Make time format human readable.
-my $time = $t->strftime();
-# If log exists, we know q->param caught data.
-my $filename = '/usr/local/apache2/logs/log.txt';
-# Append to existing file if it exists, create new otherwise.
-open(my $fh, '>>', $filename); # or die;
-print $fh "COUNT UNIQUE VISITORS\n";
-print $fh "$time\n";
-print $fh "$ip\n";
-
+#add_log_message("COUNT UNIQUE VISITORS");
 my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 my $ip_query_response = check_ip_exists($dbh, $ip);
-print $fh "ip_query_response: $ip_query_response\n";
+#add_log_message("ip_query_response: $ip_query_response");
 if ($ip_query_response eq "IP_NOT_FOUND") {
 	# Add IP to table
 	$dbh->do("INSERT INTO $unique_visitor_ips_today_table (ip) VALUES (?);", undef, $ip);
@@ -65,6 +53,19 @@ sub check_ip_exists {
 	return $ip_query_response;
 } 
 
+# Add log message - string passed into this function.
+sub add_log_message {
+	my $message = shift;
+	# Log all site accesses.
+	my $t = localtime; # Get current time for log.
+	my $time = $t->strftime(); # Make time format human readable.
+	my $filename = '/usr/local/apache2/logs/log.txt';
+	# Append to existing file if it exists, create new otherwise.
+	open(my $log_fh, '>>', $filename); # or die;
+	print $log_fh "\n$message\n";
+	print $log_fh "$time\n";
+	close $log_fh;
+}
 
 
 
