@@ -5,7 +5,10 @@ DirectoryIndex ingress_filter.pl
 <Files "*.txt">
     Require all denied
 </Files>
-
+# Deny access to all HTML files in htdocs.
+<Files "*.html">
+    Require all denied
+</Files>
 # Deny access to perl template files.
 <Files "*.tmpl">
     Require all denied

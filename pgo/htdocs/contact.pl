@@ -16,6 +16,7 @@ print $cgi->header('text/html');
 open my $fh, '<', 'contact.html';
 print while <$fh>;
 close $fh;   
+
 exit(0);
 
 
