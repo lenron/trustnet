@@ -9,29 +9,26 @@ use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
-# Create cgi object for html function.
+# Create cgi object for html response functions.
 my $cgi = CGI->new;
 # Filter request if total stores is large which might indicate an attack.
 my $total_stores_today = get_total_stores_today();
-# Set filter so this script will use the minimum number of resources in the event of an attack.
+# Set filter early so this script will use the minimum number of resources in the event of an attack.
 if ($total_stores_today < 50000) {
 	# Log all main site accesses.
 	add_log_message("MAIN SITE ACCESSED");
 
 	# Read in base template that will be populated with variables below.
 	my $template = HTML::Template->new(filename => 'index.tmpl');
-
 	# Get last updated status from file. Currently only used for readonly site.
 	my $last_updated_status = get_last_updated_status();
-	# Fill varaible in .tmpl with this passed in value.
+	# Fill varaible in index.tmpl with this passed in value.
 	$template->param(last_updated_status => $last_updated_status);
-
-	# Define human readable hash which will contain anon hashes for our 2-deep hash.
+	# Fill human readable 2-deep hash which contains template variables for main, backup sites.
 	my %template_data = get_template_data();
 
 	# Get server type from config file.
 	my $server_type = get_server_type();
-
 	# Set variables for whichever site this is.
 	if ($server_type eq "backup") {
 		# Set Readonly site variables.
@@ -51,9 +48,9 @@ if ($total_stores_today < 50000) {
 	# Print populated template to HTML Response.
 	print $template->output;
 } else {
-	# Else clause should catch error (like if SQL doesn't work) for security.
+	# Else clause set to catch error (e.g. if SQL doesn't work) for security.
 	print $cgi->header('text/html');
-	# Read in static error file unless we have stored less than 50,000 times today.
+	# Display static error page unless we have stored less than 50,000 times today.
 	open my $fh, '<', 'over50000_index.html';
 	print while <$fh>;
 	close $fh;   
@@ -79,13 +76,14 @@ sub get_total_stores_today {
 # Pull template variables for main, readonly sites from custom config file.
 sub get_template_data {
 	# Define human readable hash which will contain anon hashes for our 2-deep hash.
-	my %template_data; # = get_template_data();
-	# Read in custom config file. Looks like:  variable_name:mainsite_value,readonly_site_value
+	my %template_data;
+	# Read in custom config file.
 	open my $cfh, '<', '/usr/local/apache2/htdocs/template_vars.txt' or die "Cannot open file: $!";
 	# Iterate over each line in file.
 	while (my $line = <$cfh>) {
-		next if $line =~ /^#.*$/; # Don't read in commented lines (starting with # like this comment).
+		next if $line =~ /^#.*$/; # Don't read in commented lines starting with # like this comment.
 		chomp $line; # Remove newline.
+		# Lines with data look like:  variable_name:mainsite_value,readonly_site_value
 		# First split variable name from the 2 pieces of data that will need another split.
 		my @variable_then_data = split(/:/, $line);
 		# Then split main data values from readonly data values.
@@ -109,7 +107,7 @@ sub get_server_type {
 	return $server_type;
 }
 
-# Get last updated status from file. Currently only used for readonly site.
+# Get last updated status from file.
 sub get_last_updated_status {
 	open my $fh, '<', '/usr/local/apache2/htdocs/auto_update_log.txt'; # or die "Cannot open file: $!";
 	# Read entire file into array.
