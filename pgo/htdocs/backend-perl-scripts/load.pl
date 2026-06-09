@@ -15,9 +15,9 @@ my $json = JSON->new;
 
 # Set SQL variables
 my $db_table = 'obfuscation';
-my $db_username = 'chatriwe_admin';
-my $db_pw = 'Vuu_fQY1#qH,';
 my $db_name = 'chatriwe_obf';
+my $db_username = get_first_line('/run/secrets/mariadb_login');
+my $db_pw = get_first_line('/run/secrets/mariadb_pw');
 my $access_failures_today_table = 'access_failures_today_per_ip';
 
 # Did CGI catch an HTTP Request object ($q->param)?
@@ -107,6 +107,15 @@ sub get_data_at_fingerprint {
 } 
 
 
+sub get_first_line{
+	my $location = shift;
+	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
+	# Read in first line. Should only be 1 line in this file.
+	my $first_line= <$first_line_fh>;
+	close $first_line_fh;
+	chomp($first_line); # Remove newline.
+	return $first_line;
+}
 
 
 

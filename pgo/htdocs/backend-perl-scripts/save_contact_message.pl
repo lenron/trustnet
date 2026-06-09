@@ -16,10 +16,10 @@ my $json = JSON->new;
 
 # Set SQL variables
 my $db_table = 'passlock_table';
-my $db_username = 'chatriwe_admin';
-my $db_pw = 'Vuu_fQY1#qH,';
 my $db_name = 'chatriwe_obf';
 my $db_contact_messages_table = 'contact_messages';
+my $db_username = get_first_line('/run/secrets/mariadb_login');
+my $db_pw = get_first_line('/run/secrets/mariadb_pw');
 
 # Did CGI catch an HTTP Request object ($q->param)?
 if ($q->param){
@@ -63,7 +63,8 @@ sub get_email_vars {
 	# Hash for readability.
 	my %email_data;
 	# Read in custom config file. Looks like:  variable_name:mainsite_value,readonly_site_value
-	open my $cfh, '<', '/usr/local/apache2/htdocs/smtp_vars.txt' or die "Cannot open file: $!";
+	#open my $cfh, '<', '/usr/local/apache2/htdocs/smtp_vars.txt' or die "Cannot open file: $!";
+	open my $cfh, '<', '/run/secrets/email_creds' or die "Cannot open file: $!";
 	# Iterate over each line in file.
 	while (my $line = <$cfh>) {
 		next if $line =~ /^#.*$/; # Don't read in commented lines (starting with # like this comment).
@@ -91,8 +92,15 @@ sub add_log_message {
 	close $log_fh;
 }
 
-
-
+sub get_first_line{
+	my $location = shift;
+	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
+	# Read in first line. Should only be 1 line in this file.
+	my $first_line= <$first_line_fh>;
+	close $first_line_fh;
+	chomp($first_line); # Remove newline.
+	return $first_line;
+}
 
 
 

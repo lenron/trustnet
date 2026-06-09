@@ -28,7 +28,7 @@ if ($total_stores_today < 50000) {
 	my %template_data = get_template_data();
 
 	# Get server type from config file.
-	my $server_type = get_server_type();
+	my $server_type = get_first_line("/usr/local/apache2/htdocs/this_server_type.txt");
 	# Set variables for whichever site this is.
 	if ($server_type eq "backup") {
 		# Set Readonly site variables.
@@ -61,8 +61,10 @@ exit(0);
 # Check total stores today by accessing MariaDB.
 sub get_total_stores_today {
 	# Set SQL variables
-	my $db_username = 'chatriwe_admin';
-	my $db_pw = 'Vuu_fQY1#qH,';
+	#my $db_username = 'login';
+	#my $db_pw = 'password';
+	my $db_username = get_first_line('/run/secrets/mariadb_login');
+	my $db_pw = get_first_line('/run/secrets/mariadb_pw');
 	my $db_name = 'chatriwe_obf';
 	my $stores_on_date_table = 'stores_on_date';
 	# Get database handler $dbh by successfully connecting to database.
@@ -95,16 +97,14 @@ sub get_template_data {
 	return %template_data;
 }
 
-# Get server type (main or backup) from file.
-sub get_server_type {
-	# Read in server type.
-	my $file_type_location = "/usr/local/apache2/htdocs/this_server_type.txt";
-	open my $type_fh, '<', $file_type_location or die "Cannot read server type from file: $!";
+sub get_first_line{
+	my $location = shift;
+	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
 	# Read in first line. Should only be 1 line in this file.
-	my $server_type = <$type_fh>;
-	close $type_fh;
-	chomp($server_type); # Remove newline.
-	return $server_type;
+	my $first_line= <$first_line_fh>;
+	close $first_line_fh;
+	chomp($first_line); # Remove newline.
+	return $first_line;
 }
 
 # Get last updated status from file.

@@ -7,3 +7,5 @@ htdocs/ya6K5EXJEN2TQW4VSvS0acE3SqmxyBDX4dJYZYFGRdXilEUG0ixZIHCOhkxHBY7nNPOz6FWSm
 htdocs/auto_update_log.txt
 htdocs/this_server_type.txt
 .env
+secrets/
+.htpasswd

@@ -3,7 +3,11 @@ services:
     container_name: pgo-apache2
     image: mkrlenron/lenron-pgo:0.5
     restart: always
-    # Comment port off if using Traefik.
+    secrets:
+      - email_creds
+      - mariadb_root_pw
+      - mariadb_login
+      - mariadb_pw
     # Uncomment port on if accessing through localhost, which includes the simple cloudflare tunnel -> pgo setup.
     #ports:
       #- "80:80"
@@ -17,45 +21,28 @@ services:
       - type: bind
         source: ./.htpasswd
         target: /usr/local/apache2/.htpasswd
-      #- type: bind
-        #source: ./obf
-        #target: /usr/local/apache2/htdocs/obf
-      # This is the socket connection between apache and mariadb
+      # This is the unix socket connection between apache and mariadb
       - type: bind
         source: /tmp/mysqld
         target: /run/mysqld
     depends_on:
       - mariadb-database
-      #- mariadb-backuper
     networks:
       - proxy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-      - "traefik.http.routers.obf.entrypoints=http"
-      - "traefik.http.routers.obf.rule=Host(`obf.mkrsvr.org`)"
-      - "traefik.http.middlewares.obf-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.routers.obf.middlewares=obf-https-redirect"
-      - "traefik.http.routers.obf-secure.entrypoints=https"
-      - "traefik.http.routers.obf-secure.rule=Host(`obf.mkrsvr.org`)"
-      - "traefik.http.routers.obf-secure.tls=true"
-      - "traefik.http.routers.obf-secure.tls.certresolver=cloudflare"
-      - "traefik.http.routers.obf-secure.tls.domains[0].main=mkrsvr.org"
-      - "traefik.http.routers.obf-secure.tls.domains[0].sans=*.mkrsvr.org"
-      - "traefik.http.routers.obf-secure.service=obf"
-      - "traefik.http.services.obf.loadbalancer.server.port=80"
 
   mariadb-database:
     container_name: pgo-mariadb
     image: mariadb:12.0.2
     restart: always
+    secrets:
+      - mariadb_root_pw
+      - mariadb_login
+      - mariadb_pw
     environment:
-      MARIADB_ROOT_PASSWORD: pwd
-      MARIADB_USER: chatriwe_admin
-      MARIADB_PASSWORD: Vuu_fQY1#qH,
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_pw
+      MARIADB_USER_FILE: /run/secrets/mariadb_login
+      MARIADB_PASSWORD_FILE: /run/secrets/mariadb_pw
       MARIADB_DATABASE: chatriwe_obf
-      #MARIADB_TCP_PORT: 3306 # On by default I think.
     volumes:
       # .sql script that runs at container creation: creates SQL tables, events, etc.
       # Won't run if there is an existing mariadb_data volume.
@@ -64,9 +51,6 @@ services:
       - ./mariadb_setup_files/my.cnf:/etc/mysql/conf.d/my.cnf
       # Persist this volume which contains the database data.
       - mariadb_data:/var/lib/mysql
-      # Persist backup volume.
-      #- mariadb_backup:/backup
-      #- ./mariadb_backup:/backup
       # This is the socket connection between apache and mariadb.
       - /tmp/mysqld:/var/run/mysqld
     networks:
@@ -75,10 +59,18 @@ services:
 volumes: # This volume which contains the database data will persist.
   mariadb_data:
     name: mariadb_data
-  #mariadb_backup:
-    #name: mariadb_backup
 
 networks:
   proxy:
     name: proxy
     external: true # Setting up main, backup servers so that this never needs to be commented in this file.
+
+secrets:
+  mariadb_root_pw:
+    file: ./secrets/mariadb_root_pw
+  mariadb_login:
+    file: ./secrets/mariadb_login
+  mariadb_pw:
+    file: ./secrets/mariadb_pw
+  email_creds:
+    file: ./secrets/email_creds

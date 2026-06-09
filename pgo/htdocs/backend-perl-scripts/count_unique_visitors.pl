@@ -15,11 +15,11 @@ my $json = JSON->new;
 
 # Set SQL variables
 my $db_table = 'obfuscation';
-my $db_username = 'chatriwe_admin';
-my $db_pw = 'Vuu_fQY1#qH,';
 my $db_name = 'chatriwe_obf';
 my $unique_visitors_on_date_table = 'unique_visitors_on_date';
 my $unique_visitor_ips_today_table = 'unique_visitor_ips_today';
+my $db_username = get_first_line('/run/secrets/mariadb_login');
+my $db_pw = get_first_line('/run/secrets/mariadb_pw');
 
 # Get user ip.
 my $ip = $ENV{REMOTE_ADDR};
@@ -68,4 +68,13 @@ sub add_log_message {
 }
 
 
+sub get_first_line{
+	my $location = shift;
+	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
+	# Read in first line. Should only be 1 line in this file.
+	my $first_line= <$first_line_fh>;
+	close $first_line_fh;
+	chomp($first_line); # Remove newline.
+	return $first_line;
+}
 

@@ -14,10 +14,10 @@ my $q = CGI->new;
 my $json = JSON->new;
 
 # Set SQL variables
-my $db_table = 'passlock_table';
-my $db_username = 'chatriwe_admin';
-my $db_pw = 'Vuu_fQY1#qH,';
+my $db_username = get_first_line('/run/secrets/mariadb_login');
+my $db_pw = get_first_line('/run/secrets/mariadb_pw');
 my $db_name = 'chatriwe_obf';
+my $db_table = 'passlock_table';
 
 # Did CGI catch an HTTP Request object ($q->param)?
 if ($q->param){
@@ -54,5 +54,14 @@ if ($q->param){
 	print qq{{"response":"$response"}};
 }
 
+sub get_first_line{
+	my $location = shift;
+	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
+	# Read in first line. Should only be 1 line in this file.
+	my $first_line= <$first_line_fh>;
+	close $first_line_fh;
+	chomp($first_line); # Remove newline.
+	return $first_line;
+}
 
 
