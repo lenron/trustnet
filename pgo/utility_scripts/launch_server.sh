@@ -16,6 +16,62 @@ elif [[ "$1" != "main" && "$1" != "backup" ]]; then # Require that single parame
     exit 1
 fi
 
+SECRETS_DIRECTORY="$HOME/trustnet/pgo/secrets"
+# If we're a backup, probably don't create secrets directory or gen keys.
+if [[ $1 == "main" ]]; then
+	# Check for existence of /secrets and create if not 
+	if [ -d $SECRETS_DIRECTORY ]; then
+		echo "Found secrets directory."
+	else
+		echo "Did not find secrets directory. Creating..."
+		mkdir -p $SECRETS_DIRECTORY
+	fi
+
+	# Create mariadb files if not exist.
+	MARIADB_LOGIN_LOCATION="$SECRETS_DIRECTORY/mariadb_login"
+	MARIADB_PASSWORD_LOCATION="$SECRETS_DIRECTORY/mariadb_pw"
+	MARIADB_ROOT_PASSWORD_LOCATION="$SECRETS_DIRECTORY/mariadb_root_pw"
+
+	# Check if file exists and is not empty.
+	if [ -s "$MARIADB_LOGIN_LOCATION" ]; then
+		echo "MariaDB login file looks good."
+	else
+		# If it doesn't look good just make new one.
+		# Create a file with 16 alphanumeric chars and save to file mariadb_login (clobber).
+		echo "Generating MariaDB login file."
+		tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32 > $MARIADB_LOGIN_LOCATION
+	fi
+
+	# Check if file exists and is not empty.
+	if [ -s "$MARIADB_PASSWORD_LOCATION" ]; then
+		echo "MariaDB password file looks good."
+	else
+		# If it doesn't look good just make new one.
+		# Create a file with 16 alphanumeric chars and save to file mariadb_login (clobber).
+		echo "Generating MariaDB password file."
+		tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32 > $MARIADB_PASSWORD_LOCATION
+	fi
+
+	# Check if file exists and is not empty.
+	if [ -s "$MARIADB_ROOT_PASSWORD_LOCATION" ]; then
+		echo "MariaDB root password file looks good."
+	else
+		# If it doesn't look good just make new one.
+		# Create a file with 16 alphanumeric chars and save to file mariadb_login (clobber).
+		echo "Generating MariaDB root password file."
+		tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32 > $MARIADB_ROOT_PASSWORD_LOCATION
+	fi
+else # Don't gen secrets directory, keys if we're a backup.
+	if [ ! -d $SECRETS_DIRECTORY ]; then
+		# Maybe check all files too?
+		# Inform user they need secrets directory from main.
+		echo -e "Secrets directory not found! This server was specified as backup; please copy secrets directory and containing keys from main server into $SECRETS_DIRECTORY"
+	fi
+fi
+
+exit 0
+
+
 # Set logs directory.
 LOG_DIRECTORY="$HOME/trustnet/pgo/logs"
 # Create logs folder if it doesn't already exist.

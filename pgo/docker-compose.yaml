@@ -3,7 +3,7 @@ services:
     container_name: pgo-apache2
     image: mkrlenron/lenron-pgo:0.5
     restart: always
-    secrets:
+    secrets: # Give access to these particular secrets to this container. This will mount the files to /run/secrets
       - email_creds
       - mariadb_root_pw
       - mariadb_login
@@ -34,11 +34,12 @@ services:
     container_name: pgo-mariadb
     image: mariadb:12.0.2
     restart: always
-    secrets:
+    secrets: # Give access to these particular secrets to this container. This will mount the files to /run/secrets
       - mariadb_root_pw
       - mariadb_login
       - mariadb_pw
     environment:
+      # By appending file, tell docker to set 
       MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_pw
       MARIADB_USER_FILE: /run/secrets/mariadb_login
       MARIADB_PASSWORD_FILE: /run/secrets/mariadb_pw
@@ -65,7 +66,7 @@ networks:
     name: proxy
     external: true # Setting up main, backup servers so that this never needs to be commented in this file.
 
-secrets:
+secrets: # Declare files to be treated as secrets.
   mariadb_root_pw:
     file: ./secrets/mariadb_root_pw
   mariadb_login:
@@ -74,3 +75,10 @@ secrets:
     file: ./secrets/mariadb_pw
   email_creds:
     file: ./secrets/email_creds
+
+
+
+
+
+
+
