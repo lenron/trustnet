@@ -9,7 +9,7 @@ ENCRYPTED_FILE="$HOME/trustnet/pgo/mariadb_restores/mariadb_backup_$(date +%F).s
 DECRYPTED_FILE="$HOME/trustnet/pgo/mariadb_restores/mariadb_backup_$(date +%F).sql.gz"
 
 # Decrypt using openssl.
-openssl enc -aes-256-cbc -d -pbkdf2 -in $ENCRYPTED_FILE -out $DECRYPTED_FILE -pass pass:$SHARED_PASSWORD
+openssl enc -aes-256-cbc -d -pbkdf2 -in $ENCRYPTED_FILE -out $DECRYPTED_FILE -pass pass:$SHARED_OPENSSL_PASSWORD
 
 # pipe unzipped logical backup into mariadb instance running in pgo-mariadb docker container.
 # -c sends output to standard out, allowing piping into mariadb container in this case.

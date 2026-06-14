@@ -10,4 +10,4 @@ SAVE_LOCATION="$HOME/trustnet/pgo/mariadb_restores/mariadb_backup_$(date +%F).sq
 #PASSWORD="42huHwCM4x9udYICC9rWFPBMer9LDadZQHWMRUwlExr56tGmVj5w4XUU5eRhxen+7GIYaMP2XW1x"
 
 # -O saves to specific file location (overwriting older existing file).
-wget --user $USERNAME --password $PASSWORD -O $SAVE_LOCATION $URL_LOCATION
+wget --user $USERNAME_DIR_ACCESS --password $PASSWORD_DIR_ACCESS -O $SAVE_LOCATION $URL_LOCATION

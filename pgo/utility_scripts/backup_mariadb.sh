@@ -11,7 +11,7 @@ ENCRYPTED_DUMP="$HOME/trustnet/pgo/htdocs/$LONG_DIRECTORY/mariadb_backup_$(date 
 sudo docker exec -i pgo-mariadb mariadb-dump -u root -p"$MARIADB_ROOT_PW" --single-transaction --all-databases | gzip > $MARIADB_DUMP
 
 # Encrypt using openssl and shared key.
-openssl enc -aes-256-cbc -e -pbkdf2 -in $MARIADB_DUMP -out $ENCRYPTED_DUMP -pass pass:$SHARED_PASSWORD
+openssl enc -aes-256-cbc -e -pbkdf2 -in $MARIADB_DUMP -out $ENCRYPTED_DUMP -pass pass:$SHARED_OPENSSL_PASSWORD
 
 # Cleanup backup file.
 rm $MARIADB_DUMP

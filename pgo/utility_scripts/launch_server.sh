@@ -3,6 +3,12 @@
 # Stop running this script if any command returns exit status -- necessary for accurate reporting.
 set -e
 
+function generate_key {
+	# Trim (tr) all non-alphanumeric chars (-dc), keeping 'a-zA-Z0-9' produced by /dev/urandom, stop once we have 32 chars.
+	tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
+}
+
+
 # Require exactly 1 command line argument that is either 'main' or 'backup'.
 # Double brackets are bash specific, 'generally safer to use', and better with regex using =~ operator:
 # https://stackoverflow.com/questions/669452/are-double-square-brackets-preferable-over-single-square-brackets-in-b
@@ -16,50 +22,99 @@ elif [[ "$1" != "main" && "$1" != "backup" ]]; then # Require that single parame
     exit 1
 fi
 
+# Check if each file exists and build if it doesn't or is empty.
 SECRETS_DIRECTORY="$HOME/trustnet/pgo/secrets"
-# If we're a backup, probably don't create secrets directory or gen keys.
 if [[ $1 == "main" ]]; then
 	# Check for existence of /secrets and create if not 
 	if [ -d $SECRETS_DIRECTORY ]; then
-		echo "Found secrets directory."
+		echo "Found secrets directory. To rebuild from scratch, delete secrets directory before running this script."
 	else
 		echo "Did not find secrets directory. Creating..."
 		mkdir -p $SECRETS_DIRECTORY
 	fi
 
-	# Create mariadb files if not exist.
+	# List of files in secrets directory.
 	MARIADB_LOGIN_LOCATION="$SECRETS_DIRECTORY/mariadb_login"
 	MARIADB_PASSWORD_LOCATION="$SECRETS_DIRECTORY/mariadb_pw"
 	MARIADB_ROOT_PASSWORD_LOCATION="$SECRETS_DIRECTORY/mariadb_root_pw"
+	SMTP_CREDS_LOCATION="$SECRETS_DIRECTORY/email_creds"
+	ENV_LOCATION="$SECRETS_DIRECTORY/utility_scripts.env"
+
+	if [ -s "$SMTP_CREDS_LOCATION" ]; then
+		echo "SMTP credentials file looks OK."
+	else
+		# Fill email_creds with input generated from user.
+		echo "Now setting up SMTP for automatic email functionality."
+		read -p "Please enter SMTP server: " SMTP_SERVER
+		read -p "Please enter SMTP username: " SMTP_USERNAME
+		read -p "Please enter SMTP password/token: " SMTP_PASSWORD
+		read -p "Please enter SMTP port (probably 587): " SMTP_PORT
+		cat <<- EOF > $SMTP_CREDS_LOCATION
+			# Variables for swaks email functionality. 
+			username:$SMTP_USERNAME
+			password:$SMTP_PASSWORD
+			server:$SMTP_SERVER
+			port:$SMTP_PORT
+		EOF
+	fi
+
+	# Create and fill utility_scripts.env
+	if [ -s "$ENV_LOCATION" ]; then
+		echo "Utility scripts's .env file looks OK."
+	else
+		# Generate keys, add to utility_scripts.env file.
+		username_dir_access=$(generate_key)
+		password_dir_access=$(generate_key)
+		long_directory=$(generate_key)
+		shared_openssl_password=$(generate_key)
+		mariadb_root_pw=$(generate_key)
+		cat <<- EOF > $ENV_LOCATION
+			USERNAME_DIR_ACCESS=$username_dir_access
+			PASSWORD_DIR_ACCESS=$password_dir_access
+			LONG_DIRECTORY=$long_directory
+			SHARED_OPENSSL_PASSWORD=$shared_openssl_password
+			MARIADB_ROOT_PW=$mariadb_root_pw
+		EOF
+		# Generate .htpasswd with generated keys.
+		HTPASSWD_LOCATION="$HOME/trustnet/pgo/.htpasswd"
+		htpasswd -cb -B $HTPASSWD_LOCATION $username_dir_access $password_dir_access
+		sudo chmod 644 $HTPASSWD_LOCATION
+		# Generate new long directory
+		mkdir $HOME/trustnet/pgo/htdocs/$long_directory
+		# Place .htaccess inside it that points to .htpasswd location
+		cat <<- EOF > $HOME/trustnet/pgo/htdocs/$long_directory/.htaccess
+			# Activate Basic Auth (with username/password)
+			AuthType Basic
+			AuthName "restricted area"
+			AuthUserFile "/usr/local/apache2/.htpasswd"
+			require valid-user
+
+			# Make this directory visible to public web.
+			Options +Indexes
+		EOF
+	fi
 
 	# Check if file exists and is not empty.
 	if [ -s "$MARIADB_LOGIN_LOCATION" ]; then
-		echo "MariaDB login file looks good."
+		echo "MariaDB login file looks OK."
 	else
-		# If it doesn't look good just make new one.
-		# Create a file with 16 alphanumeric chars and save to file mariadb_login (clobber).
+		# If it doesn't look OK just make new one.
 		echo "Generating MariaDB login file."
-		tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32 > $MARIADB_LOGIN_LOCATION
+		generate_key > $MARIADB_LOGIN_LOCATION
 	fi
 
-	# Check if file exists and is not empty.
 	if [ -s "$MARIADB_PASSWORD_LOCATION" ]; then
-		echo "MariaDB password file looks good."
+		echo "MariaDB password file looks OK."
 	else
-		# If it doesn't look good just make new one.
-		# Create a file with 16 alphanumeric chars and save to file mariadb_login (clobber).
 		echo "Generating MariaDB password file."
-		tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32 > $MARIADB_PASSWORD_LOCATION
+		generate_key > $MARIADB_PASSWORD_LOCATION
 	fi
 
-	# Check if file exists and is not empty.
 	if [ -s "$MARIADB_ROOT_PASSWORD_LOCATION" ]; then
-		echo "MariaDB root password file looks good."
+		echo "MariaDB root password file looks OK."
 	else
-		# If it doesn't look good just make new one.
-		# Create a file with 16 alphanumeric chars and save to file mariadb_login (clobber).
-		echo "Generating MariaDB root password file."
-		tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32 > $MARIADB_ROOT_PASSWORD_LOCATION
+		echo "Copying MariaDB root password file."
+		echo $mariadb_root_pw > $MARIADB_ROOT_PASSWORD_LOCATION
 	fi
 else # Don't gen secrets directory, keys if we're a backup.
 	if [ ! -d $SECRETS_DIRECTORY ]; then
@@ -69,7 +124,12 @@ else # Don't gen secrets directory, keys if we're a backup.
 	fi
 fi
 
-exit 0
+
+
+
+# Under construction.
+#echo "end"
+#exit 0
 
 
 # Set logs directory.
