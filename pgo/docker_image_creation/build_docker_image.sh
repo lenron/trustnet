@@ -2,7 +2,7 @@
 set -e
 
 #IMAGE=${IMAGE:-"pgo"}
-IMAGE=${IMAGE:-"mkrlenron/lenron-pgo:0.5"}
+IMAGE=${IMAGE:-"mkrlenron/lenron-pgo:0.6"}
 # make a function to build the image
 build_image() {
   IMAGE_NAME=$1

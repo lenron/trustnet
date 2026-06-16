@@ -1,4 +1,4 @@
-#!/home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin/perl5.10.1
+#!/usr/bin/perl
 use strict;
 use warnings;
 #use cPanelUserConfig;

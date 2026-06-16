@@ -1,7 +1,7 @@
 services:
   pgo:
     container_name: pgo-apache2
-    image: mkrlenron/lenron-pgo:0.5
+    image: mkrlenron/lenron-pgo:0.6
     restart: always
     secrets: # Give access to these particular secrets to this container. This will mount the files to /run/secrets
       - email_creds

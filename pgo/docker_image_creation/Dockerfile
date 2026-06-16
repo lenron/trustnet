@@ -2,9 +2,6 @@
 FROM httpd:2.4
 # Copy in conf to enable perl cgi, .htaccess, etc.
 COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
-# Create link to perl inside container 
-RUN mkdir -p /home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin
-RUN ln -s /usr/bin/perl /home/chatriwe/perl5/perlbrew/perls/perl-5.10.1/bin/perl5.10.1
 # Get updated list of apt-get programs.
 RUN apt-get update
 # Add swaks for email function.
