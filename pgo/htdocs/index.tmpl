@@ -1036,7 +1036,9 @@
 
 	// Perform simple captcha check.
 	function checkCaptcha(){
-		const enteredCaptchaValue = document.getElementById('captcha_input').value;
+		let enteredCaptchaValue = document.getElementById('captcha_input').value;
+		// Accept case insensitive.
+		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
 		if (enteredCaptchaValue === 'blue') {
 			showPage('contact_page');
 		}

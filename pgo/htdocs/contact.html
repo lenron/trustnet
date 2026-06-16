@@ -340,6 +340,13 @@
 			</div>
 			<h2>THANK YOU FOR YOUR MESSAGE!</h2>
 		</div>
+		<!--------------------------CONTACT ERROR----------------------------!>
+		<div class="flow_pages " id="contact_error" style="display:none">
+			<div style="display:flex; flex-direction:row; justify-content:space-between;">
+				<label>CONTACT PAGE</label>
+			</div>
+			<h2>CONTACT ERROR!</h2>
+		</div>
 	</div><!----------------CENTER HTML---------------->
 
 <script>
@@ -347,7 +354,9 @@
 
 	// Perform simple captcha check.
 	function checkCaptcha(){
-		const enteredCaptchaValue = document.getElementById('captcha_input').value;
+		let enteredCaptchaValue = document.getElementById('captcha_input').value;
+		// Accept case insensitive.
+		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
 		if (enteredCaptchaValue === 'blue') {
 			showPage('contact_page');
 		}
@@ -357,7 +366,7 @@
 	function submitContactMessage(){
 		const contactMessage = document.getElementById('contact_textarea').value;
 		serverSendContactMessage(contactMessage);
-		showPage('contact_thanks');
+		//showPage('contact_thanks');
 	}
 
 	// Detect when user presses 'Enter' on their keyboard.
@@ -449,10 +458,12 @@
 			// Make a copy of the json extraction.
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
-			if (responseObj.response){
-				console.log("Contact message response: " + responseObj.response);
+			if (responseObj.contact_response === "SUCCESS"){
+				console.log("Contact message response: " + responseObj.contact_response);
+				showPage('contact_thanks');
 			}else{
 				console.log("Contact message return error.");
+				showPage('contact_error');
 			}
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
 		} catch (error) { // Catch rejected promise.
