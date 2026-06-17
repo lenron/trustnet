@@ -26,7 +26,7 @@ if ($q->param){
 	my $hash_ref = $json->decode($posted_data_in_json_object_form);
 	my $fingerprint = $hash_ref->{fingerprint};
 
-	add_log_message_with_time_and_ip("LOAD");
+	add_log_message_with_time_and_ip("\nLOAD");
 	add_log_message("fingerprint: $fingerprint");
 
 	# Match exactly 43 base64 chars.

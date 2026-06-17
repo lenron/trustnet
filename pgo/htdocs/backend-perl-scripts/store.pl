@@ -32,7 +32,7 @@ if ($q->param){
 	my $fingerprint = $hash_ref->{fingerprint};
 	my $data = $hash_ref->{data};
 
-	add_log_message_with_time_and_ip("STORE");
+	add_log_message_with_time_and_ip("\nSTORE");
 	add_log_message("json input:\n$posted_data_in_json_object_form");
 	add_log_message("fingerprint: $fingerprint");
 	add_log_message("data: $data");

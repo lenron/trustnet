@@ -4,6 +4,7 @@ use warnings;
 
 use Time::Piece;
 
+# Get first line of a file.
 sub get_first_line{
 	my $location = shift;
 	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
@@ -53,7 +54,7 @@ sub add_log_message_with_time_and_ip {
 	# Append to existing file if it exists, create new otherwise.
 	open(my $log_fh, '>>', $filename); # or die;
 	print $log_fh "$message\n";
-	print $log_fh "$time\n$ip\n";
+	print $log_fh "$ip  @  $time\n";
 	close $log_fh
 }
 

@@ -26,7 +26,7 @@ if ($q->param){
 	my $hash_ref = $json->decode($posted_data_in_json_object_form);
 	my $fingerprint = $hash_ref->{fingerprint};
 
-	add_log_message_with_time_and_ip("DELETE");
+	add_log_message_with_time_and_ip("\nDELETE");
 	add_log_message("fingerprint: $fingerprint");
 
 	# Connect to database. Functionality is handled by the database handle $dbh.
