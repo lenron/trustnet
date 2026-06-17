@@ -1,18 +1,16 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-#use cPanelUserConfig;
 
-use Time::Piece;
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.
 my $q = CGI->new;
 my $json = JSON->new;
-
 # Set SQL variables
 my $db_table = 'obfuscation';
 my $db_name = 'chatriwe_obf';
@@ -27,16 +25,7 @@ if ($q->param){
 	# Get user ip.
 	my $ip = $ENV{REMOTE_ADDR};
 
-	# Get current time for log.
-	my $t = localtime;
-	my $time = $t->strftime();
-	# If log exists, we know q->param caught data.
-	my $filename = '/usr/local/apache2/logs/burst_log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $fh, '>>', $filename); # or die;
-	print $fh "STORE BURST\n";
-	print $fh "$time\n";
-	print $fh "$ip\n";
+	add_log_message_with_time_and_ip("BURST STORE");
 
 	# Gather data for a report that isn't gigantic.
 	my $num_dummy_data = 0;
@@ -53,20 +42,20 @@ if ($q->param){
 		if( $go_flag == 1 ){
 			# Now we can try inserting first. Will return empty if the record already exists.
 			#$response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $record->{fingerprint}, $record->{data}, $ip);
-			print $fh "checking fingerprint after edge found: $record->{fingerprint}\n";
+			#print $fh "checking fingerprint after edge found: $record->{fingerprint}\n";
 			my $try_response = $dbh->do("SELECT * FROM obfuscation WHERE fingerprint=?", undef, $record->{fingerprint});
-			print $fh "try_response: $try_response\n";
+			#print $fh "try_response: $try_response\n";
 			if( $try_response == 1){
-				print $fh "Record exists update it!  ";
+				#print $fh "Record exists update it!  ";
 				# Record exists, update it.
 				my $response = $dbh->do("UPDATE $db_table SET data=?, ip=? WHERE fingerprint=?", undef, $record->{data}, $ip, $record->{fingerprint}) or die $dbh->errstr;
-				print $fh "response: $response\n";
+				#print $fh "response: $response\n";
 				$num_updated_records++;
 			}else{
-				print $fh "Record NO exists INSERT it!  ";
+				#print $fh "Record NO exists INSERT it!  ";
 				# Record didn't exist, increment count.
 				my $response = $dbh->do("INSERT INTO $db_table (fingerprint, data, ip) VALUES (?, ?, ?)", undef, $record->{fingerprint}, $record->{data}, $ip);
-				print $fh "response: $response\n";
+				#print $fh "response: $response\n";
 				$num_new_records++;
 			}
 		# Loop through dummy data until we find a valid fingerprint.
@@ -97,11 +86,6 @@ if ($q->param){
 	}
 
 	$dbh->disconnect();
-	print $fh "total_records: $total_records\n";
-	print $fh "num_records, counted: $num_records\n";
-	print $fh "num_updated_records: $num_updated_records\n";
-	print $fh "num_dummy_data: $num_dummy_data\n";
-	print $fh "num_new_records: $num_new_records\n\n";
 	# Notify of success or failure
 	print $q->header();
 	print qq{{"response":"success"}};
@@ -113,14 +97,5 @@ if ($q->param){
 
 
 
-sub get_first_line{
-	my $location = shift;
-	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
-	# Read in first line. Should only be 1 line in this file.
-	my $first_line= <$first_line_fh>;
-	close $first_line_fh;
-	chomp($first_line); # Remove newline.
-	return $first_line;
-}
 
 

@@ -2,13 +2,13 @@
 use strict;
 use warnings;
 
-use Time::Piece;
 use CGI qw(:standard escapeHTML);
+require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create cgi object for html function.
 my $cgi = CGI->new;
 
-add_log_message("FAQ SITE ACCESSED");
+add_log_message_with_time_and_ip("FAQ SITE ACCESSED");
 
 # HTTP Response requires proper header to work.
 print $cgi->header('text/html');
@@ -18,24 +18,6 @@ print while <$fh>;
 close $fh;   
 
 exit(0);
-
-
-# Add log message - string passed into this function.
-sub add_log_message {
-	my $message = shift;
-	# Log all site accesses.
-	my $t = localtime; # Get current time for log.
-	my $time = $t->strftime(); # Make time format human readable.
-	my $filename = '/usr/local/apache2/logs/log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $log_fh, '>>', $filename); # or die;
-	print $log_fh "\n$message\n";
-	print $log_fh "$time\n";
-	close $log_fh;
-}
-
-
-
 
 
 

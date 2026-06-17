@@ -1,25 +1,22 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-#use cPanelUserConfig;
 
-use Time::Piece;
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.
 my $q = CGI->new;
 my $json = JSON->new;
-
 # Set SQL variables
 my $db_table = 'obfuscation';
 my $db_name = 'chatriwe_obf';
 my $db_username = get_first_line('/run/secrets/mariadb_login');
 my $db_pw = get_first_line('/run/secrets/mariadb_pw');
 my $access_failures_today_table = 'access_failures_today_per_ip';
-
 # Did CGI catch an HTTP Request object ($q->param)?
 if ($q->param){
 
@@ -29,22 +26,8 @@ if ($q->param){
 	my $hash_ref = $json->decode($posted_data_in_json_object_form);
 	my $fingerprint = $hash_ref->{fingerprint};
 
-	# Get user ip.
-	my $ip = $ENV{REMOTE_ADDR};
-	#my $ip = "1.1.1.1";
-
-	# Get current time for log.
-	my $t = localtime;
-	# Make time format human readable.
-	my $time = $t->strftime();
-	# If log exists, we know q->param caught data.
-	my $filename = '/usr/local/apache2/logs/log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $fh, '>>', $filename); # or die;
-	print $fh "\nLOAD\n";
-	print $fh "$time\n";
-	print $fh "$ip\n";
-	print $fh "fingerprint: $fingerprint\n";
+	add_log_message_with_time_and_ip("LOAD");
+	add_log_message("fingerprint: $fingerprint");
 
 	# Match exactly 43 base64 chars.
 	if (!($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/)){
@@ -55,11 +38,14 @@ if ($q->param){
 		exit 0;
 	}
 
+	# Get user ip.
+	my $ip = $ENV{REMOTE_ADDR};
+	#my $ip = "1.1.1.1";
 	# Connect to database. Functionality is handled by the database handle $dbh.
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	# First check if we need to disallow the Access attempt.
 	my $access_fails_today = get_access_fails_today($dbh, $ip);
-	print $fh "access_fails_today: $access_fails_today\n";
+	add_log_message("access_fails_today: $access_fails_today");
 	if ($access_fails_today >= 100){
 		# Continue to record failures.
 		$dbh->do("INSERT INTO $access_failures_today_table (ip, access_failures_today) VALUES (?, 1) ON DUPLICATE KEY UPDATE access_failures_today = access_failures_today + 1;", undef, $ip);
@@ -67,7 +53,6 @@ if ($q->param){
 		print qq{{"access_response":"TOO_MANY_ACCESS_FAILURES"}};
 	} else {
 		my $access_response = get_data_at_fingerprint($dbh, $fingerprint);
-		print $fh "get_data_at_fingerprint response: $access_response\n";
 		# Increment failure count on fail.
 		if ($access_response eq "NOT_FOUND"){
 			# Store new ip or increment failure count for existing.
@@ -106,16 +91,6 @@ sub get_data_at_fingerprint {
 	return $data;
 } 
 
-
-sub get_first_line{
-	my $location = shift;
-	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
-	# Read in first line. Should only be 1 line in this file.
-	my $first_line= <$first_line_fh>;
-	close $first_line_fh;
-	chomp($first_line); # Remove newline.
-	return $first_line;
-}
 
 
 

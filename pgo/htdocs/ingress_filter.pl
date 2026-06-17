@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-#use cPanelUserConfig;
 
 use HTML::Template;
-use Time::Piece;
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
+
 # Create cgi object for html response functions.
 my $cgi = CGI->new;
 # Filter request if total stores is large which might indicate an attack.
@@ -16,8 +16,7 @@ my $total_stores_today = get_total_stores_today();
 # Set filter early so this script will use the minimum number of resources in the event of an attack.
 if ($total_stores_today < 50000) {
 	# Log all main site accesses.
-	add_log_message("MAIN SITE ACCESSED");
-
+	add_log_message_with_time_and_ip("MAIN SITE ACCESSED");
 	# Read in base template that will be populated with variables below.
 	my $template = HTML::Template->new(filename => 'index.tmpl');
 	# Get last updated status from file. Currently only used for readonly site.
@@ -61,8 +60,6 @@ exit(0);
 # Check total stores today by accessing MariaDB.
 sub get_total_stores_today {
 	# Set SQL variables
-	#my $db_username = 'login';
-	#my $db_pw = 'password';
 	my $db_username = get_first_line('/run/secrets/mariadb_login');
 	my $db_pw = get_first_line('/run/secrets/mariadb_pw');
 	my $db_name = 'chatriwe_obf';
@@ -97,16 +94,6 @@ sub get_template_data {
 	return %template_data;
 }
 
-sub get_first_line{
-	my $location = shift;
-	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
-	# Read in first line. Should only be 1 line in this file.
-	my $first_line= <$first_line_fh>;
-	close $first_line_fh;
-	chomp($first_line); # Remove newline.
-	return $first_line;
-}
-
 # Get last updated status from file.
 sub get_last_updated_status {
 	open my $fh, '<', '/usr/local/apache2/htdocs/auto_update_log.txt'; # or die "Cannot open file: $!";
@@ -117,22 +104,6 @@ sub get_last_updated_status {
 	close $fh;
 	return $last_updated_status;
 }
-
-# Add log message - string passed into this function.
-sub add_log_message {
-	my $message = shift;
-	# Log all site accesses.
-	my $t = localtime; # Get current time for log.
-	my $time = $t->strftime(); # Make time format human readable.
-	my $filename = '/usr/local/apache2/logs/log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $log_fh, '>>', $filename); # or die;
-	print $log_fh "\n$message\n";
-	print $log_fh "$time\n";
-	close $log_fh;
-}
-
-
 
 
 

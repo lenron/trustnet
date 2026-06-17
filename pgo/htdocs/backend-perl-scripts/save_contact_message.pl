@@ -1,14 +1,13 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-#use cPanelUserConfig;
 
-use Time::Piece;
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
 use HTML::Entities;
+require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.
 my $q = CGI->new;
@@ -25,8 +24,6 @@ my $contacts_on_date_table = 'contacts_on_date';
 
 # Did CGI catch an HTTP Request object ($q->param)?
 if ($q->param){
-	# Get user IP.
-	my $ip = $ENV{REMOTE_ADDR};
 	# CGI term POSTDATA is used to get the entire raw body content (in JSON object form).
 	my $posted_data_in_json_object_form = $q->param('POSTDATA');
 	# Decode json object into hash.
@@ -35,10 +32,11 @@ if ($q->param){
 	my $contact_message = $hash_ref->{message};
 	# Sanitize inputs for security.
 	my $sanitized = encode_entities($contact_message);
-
+	add_log_message_with_time_and_ip("SAVING CONTACT MESSAGE");
 	# Get database handler $dbh by successfully connecting to database.
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	# Check hard limit for total contacts today.
+	my $ip =  $ENV{REMOTE_ADDR};
 	my $total_contacts_today = get_total_contacts_today($dbh, $ip);
 	add_log_message("Total contacts today: $total_contacts_today");
 	if ($total_contacts_today >= 1000) {
@@ -50,7 +48,7 @@ if ($q->param){
 
 	# First check if we need to disallow the contact and ban the ip.
 	my $contacts_today = get_contacts_today_for_ip($dbh, $ip);
-	add_log_message("Contacts today for ip: $ip - $contacts_today");
+	add_log_message("Contacts today:$contacts_today for IP:$ip");
 	if ($contacts_today >= 5) { # Nikki limit.
 		# Tell client ip they are contacting too much and are banned for 1 day.
 		print $q->header();
@@ -60,7 +58,7 @@ if ($q->param){
 		# Save message to contact message table.
 		my $save_contact_response = $dbh->do("INSERT INTO $db_contact_messages_table (ip, message) VALUES (?, ?)", undef, $ip, $sanitized);
 		# Send email to admin.
-		send_email('aaronbreault@gmail.com', $sanitized, $ip);
+		send_email('aaronbreault@gmail.com', $sanitized);
 		if ($save_contact_response == 1) {
 			# Run increment command for contacts_on_date (more logic to be added later when we set up site-wide shutdown).
 			$dbh->do("INSERT INTO $contacts_on_date_table (date_contacted, contacts_on_this_date) VALUES (CURRENT_DATE, 1) ON DUPLICATE KEY UPDATE contacts_on_this_date = contacts_on_this_date + 1;", undef);
@@ -82,12 +80,12 @@ if ($q->param){
 sub send_email {
 	my $admin_email = shift; #'aaronbreault@gmail.com';
 	my $sanitized_message = shift;
-	my $ip = shift;
 	# Read in swaks/proton variables from conf file.
 	my %email_vars = get_email_vars();
 	# Run swaks command from command line. This will run from inside the container.
 	my $std_output_a = `swaks --from $email_vars{username} --to $admin_email --server $email_vars{server} --port $email_vars{port} --auth plain --tls --auth-user '$email_vars{username}' --auth-password '$email_vars{password}' --header 'Subject: PGO Contact Message Received' --body "$sanitized_message"`;
-	add_log_message("SAVING CONTACT MESSAGE\nIP: $ip\nEmail attempt std_out: $std_output_a");
+	# Long output for email report.
+	add_log_message("\nEmail attempt std_out:\n$std_output_a");
 }
 
 # Read in SMTP settings from config file.
@@ -108,30 +106,6 @@ sub get_email_vars {
 	close $cfh;
 	# Return populated data.
 	return %email_data;
-}
-
-# Add log message - string passed into this function.
-sub add_log_message {
-	my $message = shift;
-	# Log all site accesses.
-	my $t = localtime; # Get current time for log.
-	my $time = $t->strftime(); # Make time format human readable.
-	my $filename = '/usr/local/apache2/logs/log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $log_fh, '>>', $filename); # or die;
-	print $log_fh "\n$message\n";
-	print $log_fh "$time\n";
-	close $log_fh;
-}
-
-sub get_first_line{
-	my $location = shift;
-	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
-	# Read in first line. Should only be 1 line in this file.
-	my $first_line= <$first_line_fh>;
-	close $first_line_fh;
-	chomp($first_line); # Remove newline.
-	return $first_line;
 }
 
 # Get number of contacts today for a given ip.

@@ -1,18 +1,16 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-#use cPanelUserConfig;
 
-use Time::Piece;
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.
 my $q = CGI->new;
 my $json = JSON->new;
-
 # Set SQL variables
 my $db_table = 'obfuscation';
 my $db_name = 'chatriwe_obf';
@@ -53,28 +51,4 @@ sub check_ip_exists {
 	return $ip_query_response;
 } 
 
-# Add log message - string passed into this function.
-sub add_log_message {
-	my $message = shift;
-	# Log all site accesses.
-	my $t = localtime; # Get current time for log.
-	my $time = $t->strftime(); # Make time format human readable.
-	my $filename = '/usr/local/apache2/logs/log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $log_fh, '>>', $filename); # or die;
-	print $log_fh "\n$message\n";
-	print $log_fh "$time\n";
-	close $log_fh;
-}
-
-
-sub get_first_line{
-	my $location = shift;
-	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
-	# Read in first line. Should only be 1 line in this file.
-	my $first_line= <$first_line_fh>;
-	close $first_line_fh;
-	chomp($first_line); # Remove newline.
-	return $first_line;
-}
 

@@ -1,13 +1,12 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-#use cPanelUserConfig;
 
-use Time::Piece;
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.
 my $q = CGI->new;
@@ -34,32 +33,14 @@ if ($q->param){
 	my $dbh = DBI->connect("dbi:MariaDB:$db_name", $db_username, $db_pw);
 	my $passlock = $dbh->selectrow_array("SELECT passlock FROM $db_table WHERE browser_id = ?", undef, $browser_id);
 
-	# Get current time for log.
-	my $t = localtime;
-	# Make time format human readable.
-	my $time = $t->strftime();
-	# If log exists, we know q->param caught data.
-	my $filename = '/usr/local/apache2/logs/passlock_log.txt';
-	# Append to existing file if it exists, create new otherwise.
-	open(my $fh, '>>', $filename); # or die;
-	print $fh "\nGET\n";
-	print $fh "$time\n";
-	print $fh "passlock: $passlock\n";
+	add_passlock_log_with_time_and_ip("GET");
+	add_passlock_log("passlock: $passlock");
+
 	# HTTP POST response requires a header.
 	print $q->header();
 	print qq{{"passlock":"$passlock"}};
 }
 
-
-sub get_first_line{
-	my $location = shift;
-	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
-	# Read in first line. Should only be 1 line in this file.
-	my $first_line= <$first_line_fh>;
-	close $first_line_fh;
-	chomp($first_line); # Remove newline.
-	return $first_line;
-}
 
 
 
