@@ -25,6 +25,7 @@ fi
 
 # Check if each file exists and build if it doesn't or is empty.
 SECRETS_DIRECTORY="$HOME/trustnet/pgo/secrets"
+SMTP_CREDS_LOCATION="$SECRETS_DIRECTORY/email_creds"
 if [[ $1 == "main" ]]; then
 	# Check for existence of /secrets and create if not 
 	if [ -d $SECRETS_DIRECTORY ]; then
@@ -38,7 +39,6 @@ if [[ $1 == "main" ]]; then
 	MARIADB_LOGIN_LOCATION="$SECRETS_DIRECTORY/mariadb_login"
 	MARIADB_PASSWORD_LOCATION="$SECRETS_DIRECTORY/mariadb_pw"
 	MARIADB_ROOT_PASSWORD_LOCATION="$SECRETS_DIRECTORY/mariadb_root_pw"
-	SMTP_CREDS_LOCATION="$SECRETS_DIRECTORY/email_creds"
 	ENV_LOCATION="$SECRETS_DIRECTORY/utility_scripts.env"
 
 	if [ -s "$SMTP_CREDS_LOCATION" ]; then
@@ -124,6 +124,9 @@ else # Don't gen secrets directory, keys if we're a backup.
 		# Maybe check all files too?
 		# Inform user they need secrets directory from main.
 		echo -e "Secrets directory not found! This server was specified as backup; please copy secrets directory and containing keys from main server into $SECRETS_DIRECTORY"
+	else
+		# If we're a backup and secrets directory exists, make sure email_creds is empty. All email set up to send from main server (contact.html not accessible on backup).
+		touch $SMTP_CREDS_LOCATION
 	fi
 fi
 
@@ -252,6 +255,9 @@ sudo docker compose up -d # Not sure of exit status here. I think it will exit 1
 
 # If we're a backup pull data from main server.
 if [[ "$1" == "backup" ]]; then
+	echo "Waiting 5 seconds for mysqld socket and mariadb database setup..."
+	sleep 5
+	echo "Done waiting, now pulling database from main server"
 	# Get copy of database and restore it to this backup site.
 	bash $HOME/trustnet/pgo/utility_scripts/wget_mariadb_backup.sh
 	bash $HOME/trustnet/pgo/utility_scripts/restore_mariadb.sh
