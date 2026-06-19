@@ -8,7 +8,8 @@ function generate_key {
 	tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
 }
 
-
+# Update the list of available programs in apt repo.
+sudo apt-get update -y && sudo apt-get upgrade -y
 # Require exactly 1 command line argument that is either 'main' or 'backup'.
 # Double brackets are bash specific, 'generally safer to use', and better with regex using =~ operator:
 # https://stackoverflow.com/questions/669452/are-double-square-brackets-preferable-over-single-square-brackets-in-b
@@ -75,6 +76,8 @@ if [[ $1 == "main" ]]; then
 			SHARED_OPENSSL_PASSWORD=$shared_openssl_password
 			MARIADB_ROOT_PW=$mariadb_root_pw
 		EOF
+		# Install htpasswd creator
+		sudo apt-get install apache2-utils -y
 		# Generate .htpasswd with generated keys.
 		HTPASSWD_LOCATION="$HOME/trustnet/pgo/.htpasswd"
 		htpasswd -cb -B $HTPASSWD_LOCATION $username_dir_access $password_dir_access
@@ -222,7 +225,6 @@ fi
 sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)
 # First check if /etc/apt/keyrings/docker.asc has proper permissions, if it does, assume this block already ran.
 # Add Docker's official GPG key:
-sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc

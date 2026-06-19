@@ -19,7 +19,7 @@ sub get_first_line{
 sub add_log_message {
 	my $message = shift;
 	# Log all site accesses.
-	my $filename = '/usr/local/apache2/logs/log.txt';
+	my $filename = '/usr/local/apache2/pgo-logs/log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $log_fh, '>>', $filename); # or die;
 	print $log_fh "$message\n";
@@ -34,7 +34,7 @@ sub add_onlinecheck_log_message {
 	# Log all site accesses.
 	my $t = localtime; # Get current time for log.
 	my $time = $t->strftime(); # Make time format human readable.
-	my $filename = '/usr/local/apache2/logs/online_check_log.txt';
+	my $filename = '/usr/local/apache2/pgo-logs/online_check_log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $log_fh, '>>', $filename); # or die;
 	print $log_fh "$message\n";
@@ -50,7 +50,7 @@ sub add_log_message_with_time_and_ip {
 	# Log all site accesses.
 	my $t = localtime; # Get current time for log.
 	my $time = $t->strftime(); # Make time format human readable.
-	my $filename = '/usr/local/apache2/logs/log.txt';
+	my $filename = '/usr/local/apache2/pgo-logs/log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $log_fh, '>>', $filename); # or die;
 	print $log_fh "$message\n";
@@ -62,7 +62,7 @@ sub add_log_message_with_time_and_ip {
 sub add_passlock_log {
 	my $message = shift;
 	# Log all site accesses.
-	my $filename = '/usr/local/apache2/logs/passlock_log.txt';
+	my $filename = '/usr/local/apache2/pgo-logs/passlock_log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $log_fh, '>>', $filename); # or die;
 	print $log_fh "$message\n";
@@ -77,7 +77,7 @@ sub add_passlock_log_with_time_and_ip {
 	# Log all site accesses.
 	my $t = localtime; # Get current time for log.
 	my $time = $t->strftime(); # Make time format human readable.
-	my $filename = '/usr/local/apache2/logs/passlock_log.txt';
+	my $filename = '/usr/local/apache2/pgo-logs/passlock_log.txt';
 	# Append to existing file if it exists, create new otherwise.
 	open(my $log_fh, '>>', $filename); # or die;
 	print $log_fh "$message\n";

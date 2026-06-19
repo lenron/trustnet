@@ -17,14 +17,14 @@ services:
         target: /usr/local/apache2/htdocs
       - type: bind
         source: ./logs
-        target: /usr/local/apache2/logs
+        target: /usr/local/apache2/pgo-logs
       - type: bind
         source: ./.htpasswd
         target: /usr/local/apache2/.htpasswd
-      # This is the unix socket connection between apache and mariadb
-      - type: bind
-        source: /tmp/mysqld
-        target: /run/mysqld
+      # Set up a unix socket 'relay' on the host OS that will live in the named volume: mysqld_socket
+      # As service pgo depends on mariadb-database, the named volume mysqld_socket should already be created below.
+      # Link the unix socket location /run/mysqld from inside the apache container to existing named volume.
+      - mysqld_socket:/run/mysqld
     depends_on:
       - mariadb-database
     networks:
@@ -52,14 +52,18 @@ services:
       - ./mariadb_setup_files/my.cnf:/etc/mysql/conf.d/my.cnf
       # Persist this volume which contains the database data.
       - mariadb_data:/var/lib/mysql
-      # This is the socket connection between apache and mariadb.
-      - /tmp/mysqld:/var/run/mysqld
+      # Set up a unix socket 'relay' on the host OS that will live in the named volume: mysqld_socket
+      # This will link the unix socket from inside the mariadb container to the named volume, readying
+      # for apache socket above.
+      - mysqld_socket:/run/mysqld
     networks:
       - proxy
 
 volumes: # This volume which contains the database data will persist.
   mariadb_data:
     name: mariadb_data
+  mysqld_socket:
+    name: mysqld_socket
 
 networks:
   proxy:
