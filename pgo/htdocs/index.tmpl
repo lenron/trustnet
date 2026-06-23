@@ -1199,6 +1199,7 @@
 		}
 	});// Listener for Enter
 
+	// Reset state variables, etc. that could be security concern.
 	function securityReset(){
 		// Reset Browser Access edit buttons.
 		//document.getElementById("editdata_button").style.display = "inline";
@@ -1230,28 +1231,36 @@
 		deleteCheckHide('overlay_delete_browser');
 	}// securityReset()
 
+	// Listen for the popstate event which should be fired by user activating browser back button.
+	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
 	window.addEventListener('popstate', (event) => {
-		//event.preventDefault();
+		console.log("Current history stack", window.history);
 		console.log('Navigated!', event.state); 
 		console.log('current_page:', event.state.page); 
 		// Use event.state or window.location to update content
-		//currentPage = event.state.page;
 		showPage(event.state.page);
 	});
 
+	// Save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
 	function saveCurrentStateToHistorySoBackWillWork(){
+		console.log("Current history stack", window.history);
 		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
 		// I think we might only need the current page? Might need to store passlockedData tho?
 		const state = { page: currentPage };
 		//const state['page'] = target;
-		// window.location should be url of current page?
 		console.log("pushing state:", state['page']);
 		// Not sure yet why 2 state change solution is working. maybe we are replacing the current state with the state we want to save... and pushing an empty state that we know will be popped into the nothing?
-		history.replaceState(state, "", window.location);
+		// state is js object that can contain more data than just the page if needed. Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
+		// window.location should be url of current page.
+		// Replace the current history entry with additional state data that we will use to return to with custom function.
+		history.replaceState(state, '', window.location);
+		// My current theory is under the hood function isn't expecting a manual removal of a state so we have to work around their garbage collection?
+		// Create new (empty) entry in the history stack.
 		history.pushState({}, '', '');
 	}
 
+	// Need to save the state whenever user chooses to go to a new page.
 	function saveThenShowPage(target){
 		saveCurrentStateToHistorySoBackWillWork();
 		showPage(target);
@@ -1262,11 +1271,10 @@
 	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of a page for flowing the user through site.
 	function showPage(target){
-
+		// This global variable keeps track of the page the user is currently on. Needed for activatable-by-enter and harnessing browser back.
 		currentPage = target;
 		// Security Reset.
 		securityReset();
-		// Set global variable. Currently used for only Enter keydown catch.
 		// Hide all password warnings.
 		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
 		for (let i = 0; i < pass_warn_elements.length; i++) {
