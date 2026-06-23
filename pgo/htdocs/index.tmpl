@@ -375,8 +375,8 @@
 			<div class="flow_pages home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center; color:#<TMPL_VAR NAME=page_type_color>">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 
@@ -385,8 +385,8 @@
 				<h3 style="color:red;">TIMED OUT!</h3>
 				<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showPage('store_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
 
@@ -401,8 +401,8 @@
 				<h2>ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="access_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');showPage('access_obf1000Pass')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('home')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');saveThenShowPage('access_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -416,8 +416,8 @@
 				<h2>ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="access_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_obf1000Pass_input');showPage('access_ctrPass');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_codeword')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_obf1000Pass_input');saveThenShowPage('access_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -431,8 +431,8 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="access_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_obf1000Pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_ctrPass_input');showPage('access_choose');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_obf1000Pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_ctrPass_input');saveThenShowPage('access_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -441,9 +441,9 @@
 				<label>ACCESS DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('access_ctrPass')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('access_ctrPass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="activatable_by_enter" id='access_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('access_opensslpass')">
+						<button class="activatable_by_enter" id='access_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="saveThenShowPage('access_opensslpass')">
 							<span style="">BROWSER</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
 						</button>
@@ -469,7 +469,7 @@
 				<h2>ENTER PASSWORD 3</h2>
 				<input autocomplete="off" type="password" value="" id="access_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('access_choose')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptBrowserAccess('access_opensslpass_input');">ACCESS DATA</button>
 				</div>
 			</div>
@@ -507,8 +507,8 @@
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('access_codeword')">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showPage('store_codeword')">STORE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="saveThenShowPage('store_codeword')">STORE DATA</button>
 					<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
@@ -577,8 +577,8 @@
 				<h2>ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="store_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');showPage('store_obf1000Pass')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('home')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');saveThenShowPage('store_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -592,8 +592,8 @@
 				<h2>ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="store_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_obf1000Pass_input');showPage('store_ctrPass');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_codeword')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_obf1000Pass_input');saveThenShowPage('store_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -607,8 +607,8 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="store_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1000Pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_ctrPass_input');showPage('store_choose');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_obf1000Pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_ctrPass_input');saveThenShowPage('store_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -617,15 +617,15 @@
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('store_ctrPass')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('store_ctrPass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="activatable_by_enter" id='store_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('store_opensslpass')">
+						<button class="activatable_by_enter" id='store_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="saveThenShowPage('store_opensslpass')">
 							<span style="">BROWSER</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('store_codeword_cmdcheck')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="saveThenShowPage('store_codeword_cmdcheck')">
 							<span class="coolpink" style="">COMMAND LINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
 						</button>
@@ -646,7 +646,7 @@
 				<h2>RE-ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="store_codeword_cmdcheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdcheckinput', 'store_obf1000Pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -662,7 +662,7 @@
 				<h2>RE-ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="store_obf1000Pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_cmdcheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_codeword_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1000Pass_cmdcheckinput', 'store_ctrPass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -678,7 +678,7 @@
 				<h2>RE-ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="store_ctrPass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1000Pass_cmdcheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_obf1000Pass_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_ctrPass_cmdcheckinput', 'store_upload')">CONTINUE</button>
 				</div>
 			</div>
@@ -710,7 +710,7 @@
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="width:250px;" onclick="showPage('store_ctrPass_cmdcheck')">BACK</button>
+					<button class="" id='' style="width:250px;" onclick="saveThenShowPage('store_ctrPass_cmdcheck')">BACK</button>
 					<button class="" id='store_upload_commit_button' style="flex-grow:1;display:none;color:orange" onclick="attemptCMDStore()">COMMIT DATA TO SERVER</button>
 				</div>
 			</div>
@@ -727,8 +727,8 @@
 				<h2>ENTER PASSWORD 3</h2>
 				<input autocomplete="off" type="password" value="" id="store_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_choose')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_opensslpass_input');showPage('store_codeword_browsercheck');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_choose')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_opensslpass_input');saveThenShowPage('store_codeword_browsercheck');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -743,7 +743,7 @@
 				<h2>RE-ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="store_codeword_browsercheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_opensslpass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_opensslpass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_browsercheckinput', 'store_obf1000Pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -759,7 +759,7 @@
 				<h2>RE-ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="store_obf1000Pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_codeword_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_codeword_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1000Pass_browsercheckinput', 'store_ctrPass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -775,7 +775,7 @@
 				<h2>RE-ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="store_ctrPass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_obf1000Pass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_obf1000Pass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_ctrPass_browsercheckinput', 'store_opensslpass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -791,7 +791,7 @@
 				<h2>RE-ENTER PASSWORD 3</h2>
 				<input autocomplete="off" type="password" value="" id="store_opensslpass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('store_ctrPass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_ctrPass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_opensslpass_browsercheckinput', 'store_data')">CONTINUE</button>
 				</div>
 			</div>
@@ -805,7 +805,7 @@
 				</div>
 				<textarea class="browser_input" id="store_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('store_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('store_opensslpass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('store_opensslpass_browsercheck')">BACK</button>
 					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStore('store_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
 					<div id='text_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
@@ -849,13 +849,13 @@
 				<h2 style="align-self:center;">CHOOSE HOW TO CREATE YOUR OFFLINE DATABASE</h2>
 				<div class="" id="" style="display:flex;">
 					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('newofflinedatabase_exisitingdata_codeword')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">
 							<span style="">FILL WITH EXISTING DATA</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Option 1</span>
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('offlineDatabase_pass_or_no')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="saveThenShowPage('offlineDatabase_pass_or_no')">
 							<span class="coolpink" style="">FILL OFFLINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Option 2</span>
 						</button>
@@ -887,7 +887,7 @@
 				<input autocomplete="off" type="password" value="" id="existingdata_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_dbase_2options')">BACK</button>-->
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('existingdata_codeword_input');showPage('newofflinedatabase_existingdata_obf1000Pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('existingdata_codeword_input');saveThenShowPage('newofflinedatabase_existingdata_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -901,8 +901,8 @@
 				<h2>ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="existingdata_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('newofflinedatabase_exisitingdata_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('existingdata_obf1000Pass_input');showPage('newofflinedatabase_existingdata_ctrPass');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('existingdata_obf1000Pass_input');saveThenShowPage('newofflinedatabase_existingdata_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -916,7 +916,7 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="existingdata_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('newofflinedatabase_existingdata_obf1000Pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_existingdata_obf1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="getOnlineRecordForNewOfflineDBase('existingdata_ctrPass_input');">CONTINUE</button>
 				</div>
 			</div>
@@ -925,8 +925,8 @@
 			<div class="flow_pages" id="newofflinedatabase_existingdata_record_added" style="display:none">
 				<h2>RECORD ADDED! YOU NOW HAVE X RECORDS READY TO ADD TO A NEW OFFLINE DATABASE.</h2>
 				<h2>ADD MORE RECORDS?</h2>
-				<button class="" id='' style="flex-grow:1;" onclick="showPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
-				<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineDatabase_pass_or_no');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
+				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
+				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineDatabase_pass_or_no');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
 			</div>
 
 			<!--------------------------EXISTING DATA Use ENC Pass Database?-----------------------!>
@@ -944,7 +944,7 @@
 			<div class="flow_pages" id="failed_to_access_for_new_offline_database_creation" style="display:none">
 				<h2>&#10060; FAILED TO ACCESS EXISTING DATA FOR OFFLINE DATABASE CREATION.</h2>
 				<!--<button class="" id='' style="flex-grow:1;" onclick="clearNewOfflineDBaseData(); showPage('home')">I'M DONE WITH THIS</button>-->
-				<button class="" id='' style="flex-grow:1;" onclick="showPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
+				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
 			</div>
 
 			<!---------------------------EXISTING DATA Too many records-----------------------!>
@@ -962,7 +962,7 @@
 
 	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
-			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="showPage('offline_dbase_2options');">CREATE OFFLINE DATABASE</button>
+			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="saveThenShowPage('offline_dbase_2options');">CREATE OFFLINE DATABASE</button>
 	</div>
 
 </body>
@@ -1230,15 +1230,43 @@
 		deleteCheckHide('overlay_delete_browser');
 	}// securityReset()
 
+	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
+	window.addEventListener('popstate', (event) => {
+		//event.preventDefault();
+		console.log('Navigated!', event.state); 
+		console.log('current_page:', event.state.page); 
+		// Use event.state or window.location to update content
+		//currentPage = event.state.page;
+		showPage(event.state.page);
+	});
+
+	function saveCurrentStateToHistorySoBackWillWork(){
+		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
+		// I think we might only need the current page? Might need to store passlockedData tho?
+		const state = { page: currentPage };
+		//const state['page'] = target;
+		// window.location should be url of current page?
+		console.log("pushing state:", state['page']);
+		// Not sure yet why 2 state change solution is working. maybe we are replacing the current state with the state we want to save... and pushing an empty state that we know will be popped into the nothing?
+		history.replaceState(state, "", window.location);
+		history.pushState({}, '', '');
+	}
+
+	function saveThenShowPage(target){
+		saveCurrentStateToHistorySoBackWillWork();
+		showPage(target);
+	}
+
 	// Keep track of the page we're on. Start on home page.
 	let currentPage = 'home';
 	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of a page for flowing the user through site.
 	function showPage(target){
+
+		currentPage = target;
 		// Security Reset.
 		securityReset();
 		// Set global variable. Currently used for only Enter keydown catch.
-		currentPage = target;
 		// Hide all password warnings.
 		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
 		for (let i = 0; i < pass_warn_elements.length; i++) {
@@ -3662,7 +3690,7 @@ console.log("cleartext data: " + cleartextData);
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
-				<h2>RE-ENTER PASSWORD 1</h2>
+				<h2>RE-ENTER PASSWORD 1</h2>c
 				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_cmdcheck')">BACK</button>

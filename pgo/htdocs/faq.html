@@ -121,7 +121,11 @@
 						</ul>
 					</li>
 				</ul>
-			</nav>
+			</nav>const onBackButtonEvent = (e) => {
+
+e.preventDefault();var currentLocation = window.location.pathname;
+
+history.push(`${currentLocation}/mypage/new`)};
 			<section id="cryptography">
 				<h2><a href="#cryptography">Cryptography</a></h2>
 				<article id="openssl">
