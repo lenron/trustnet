@@ -1040,6 +1040,7 @@
 		// Accept case insensitive.
 		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
 		if (enteredCaptchaValue === 'blue') {
+			saveCurrentStateToHistorySoBackWillWork();
 			showPage('contact_page');
 		}
 	}
@@ -1235,16 +1236,16 @@
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
 	window.addEventListener('popstate', (event) => {
-		console.log("Current history stack", window.history);
-		console.log('Navigated!', event.state); 
-		console.log('current_page:', event.state.page); 
+		//console.log("Current history stack", window.history);
+		//console.log('Navigated!', event.state); 
+		console.log('popstate! going to page saved in state object:', event.state.page); 
 		// Use event.state or window.location to update content
 		showPage(event.state.page);
 	});
 
 	// Save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
 	function saveCurrentStateToHistorySoBackWillWork(){
-		console.log("Current history stack", window.history);
+		//console.log("Current history stack", window.history);
 		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
 		// I think we might only need the current page? Might need to store passlockedData tho?
 		const state = { page: currentPage };
@@ -1383,6 +1384,7 @@
 
 	//Getting offline records and storing them in global variable recordListForNewOfflineDBase for creation of offline database.
 	async function getOnlineRecordForNewOfflineDBase(inputId){
+		saveCurrentStateToHistorySoBackWillWork();
 		// Gather ctrPass from input box for the given html input ID and store in passlock object.
 		await extractInputData(inputId);
 		console.log("inputID " +  inputId);
@@ -1443,6 +1445,7 @@
 	// ENC side will be 1,067,024 when encrypted to hold the prepended salt.
 	// Set up these databases with pointers that point to the next 'empty' 'location' in the set of random data where the record data of the offline database is hidden.
 	async function createAndFillOfflineDBase(chosenDatabase){
+		saveCurrentStateToHistorySoBackWillWork();
 		let offlineDatabaseUnenc = '';
 		// Roll UNENC side pointer to a random number between 0 and 999 - number of records the user is adding to the offline database.
 		let recordListLength = Object.keys(recordListForNewOfflineDBase).length;
@@ -1687,16 +1690,16 @@
 			showPage('timed_out_home');
 			// Delete passlock.
 			resetPasslock();
-			console.log("5 mintue Timeout elapsed! Data session expired!");
+			//console.log("5 mintue Timeout elapsed! Data session expired!");
 		}, FIVE_MINUTES); // Five minutes.
-		console.log("Starting passlock timeout! timeoutId: " + timeoutId);
+		//console.log("Starting passlock timeout! timeoutId: " + timeoutId);
 		// Set warning timeout to 30 seconds before hard timeout.
 		warningTimeoutId = setTimeout(() => {
 			// Show warning overlay so user can click to extend timeout.
 			document.getElementById("timeout_warning_overlay").style.display = "flex";
 		}, FOUR_MINUTES_THIRTY_SECONDS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
 		//}, 1000); // set for 1 second for debug.
-		console.log("Setting Timeout Warning timeout! warningTimeoutId: " + warningTimeoutId);
+		//console.log("Setting Timeout Warning timeout! warningTimeoutId: " + warningTimeoutId);
 	}// setTimeoutAndWarning()
 
 	// Cleear running timers then set them. Turn off warning.
@@ -1729,7 +1732,6 @@
 	async function extractInputData(inputId){
 		const pgoPasswordType = extractKeyword(inputId);
 		const cleartextData = extractCleartextData(inputId);
-console.log("cleartext data: " + cleartextData);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
 		try {
 			passlockedData[pgoPasswordType] = await passlockEncrypt(cleartextData);
@@ -1742,6 +1744,7 @@ console.log("cleartext data: " + cleartextData);
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
 	async function checkPasslock(inputId, nextPageId){
+		saveCurrentStateToHistorySoBackWillWork();
 		const keyword = extractKeyword(inputId);
 		const cleartextPass = extractCleartextData(inputId);
 		const decryptedPass = await passlockDecrypt(passlockedData[keyword]);
@@ -1797,6 +1800,7 @@ console.log("cleartext data: " + cleartextData);
 	}// getFpAndDataForStore()
 
 	async function attemptCMDStore(){
+		saveCurrentStateToHistorySoBackWillWork();
 		const fingerprintAndData = await getFpAndDataForStore();
 		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
@@ -1804,6 +1808,7 @@ console.log("cleartext data: " + cleartextData);
 
 	// storeDataToServer() can be used for both Store Flows because the fail/pass outcome is the same for both Browser and CMD.
 	async function attemptBrowserStore(inputId){
+		saveCurrentStateToHistorySoBackWillWork();
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprintAndData = await getFpAndDataForStore();
@@ -1832,6 +1837,7 @@ console.log("cleartext data: " + cleartextData);
 	}// getFpForAccess()
 
 	async function attemptCMDAccess(){
+		saveCurrentStateToHistorySoBackWillWork();
 		const fingerprint = await getFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
 		const encryptedData = await serverLoad(fingerprint);
@@ -1866,6 +1872,7 @@ console.log("cleartext data: " + cleartextData);
 	}// decryptAndDownloadFile()
 
 	async function attemptBrowserAccess(inputId){
+		saveCurrentStateToHistorySoBackWillWork();
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprint = await getFpForAccess();
@@ -1918,6 +1925,7 @@ console.log("cleartext data: " + cleartextData);
 	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
 	// Output: functionality.
 	async function attemptDelete(){
+		saveCurrentStateToHistorySoBackWillWork();
 		// Load from server
 		const fingerprint = getStoredFp();
 		const deleteResponse = await serverDelete(fingerprint);
@@ -2309,13 +2317,13 @@ console.log("cleartext data: " + cleartextData);
 			// Make a copy of the json extraction.
 			const response_obj = await fetchResponseObject.json();
 			//checkResponseObject(response_obj, "Message specific to serverSetPasslock");
-			console.log("set passlock response: ");
-			console.log(response_obj);
+			//console.log("set passlock response: ");
+			//console.log(response_obj);
 			// Handle database query outcome.
 			if (response_obj.response != 1){ // there appears to be a problem.
 				throw Error("serverSetPasslock() database store error!");
 			}else{
-				console.log("New passlock successfully stored to database.");
+				//console.log("New passlock successfully stored to database.");
 				return;
 			}
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
