@@ -1236,7 +1236,7 @@
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
 	window.addEventListener('popstate', (event) => {
-		//console.log("Current history stack", window.history);
+		console.log("popstate history stack", window.history);
 		//console.log('Navigated!', event.state); 
 		console.log('popstate! going to page saved in state object:', event.state.page); 
 		// Use event.state or window.location to update content
@@ -1261,10 +1261,25 @@
 		history.pushState({}, '', '');
 	}
 
-	// Need to save the state whenever user chooses to go to a new page.
+	// Need to save the state whenever user is on their way to a new page.
+	// Create record in history before moving to new page. This enables history's back function to return to the page.
+	// So, manually create a history record of the page we're currently on before moving to new target page.
 	function saveThenShowPage(target){
 		saveCurrentStateToHistorySoBackWillWork();
 		showPage(target);
+	}
+
+	// Go back X then create a new record in history which should clear 'future' history to that point.
+	//function goBackThenCreateNewHistory(numPlaces, flowStartPage){
+	function goBackThenCreateNewHistory(numPlaces){
+		//console.log('going back X places:', numPlaces);
+		//console.log("Current history stack", window.history);
+		history.go(-numPlaces);
+		//console.log("history statck after history.go(-numplaces)", window.history);
+		//saveCurrentStateToHistorySoBackWillWork();
+		//history.pushState( {page:flowStartPage}, '', window.location);
+		//console.log("history statck after saveCurrent", window.history);
+		//history.pushState({}, '', '');
 	}
 
 	// Keep track of the page we're on. Start on home page.
@@ -1272,6 +1287,7 @@
 	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of a page for flowing the user through site.
 	function showPage(target){
+		console.log("showpage history stack", window.history);
 		// This global variable keeps track of the page the user is currently on. Needed for activatable-by-enter and harnessing browser back.
 		currentPage = target;
 		// Security Reset.
@@ -1800,7 +1816,9 @@
 	}// getFpAndDataForStore()
 
 	async function attemptCMDStore(){
-		saveCurrentStateToHistorySoBackWillWork();
+		//goBackThenCreateNewHistory(7, 'home');
+		goBackThenCreateNewHistory(7);
+		//saveCurrentStateToHistorySoBackWillWork();
 		const fingerprintAndData = await getFpAndDataForStore();
 		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
@@ -1808,7 +1826,9 @@
 
 	// storeDataToServer() can be used for both Store Flows because the fail/pass outcome is the same for both Browser and CMD.
 	async function attemptBrowserStore(inputId){
-		saveCurrentStateToHistorySoBackWillWork();
+		//goBackThenCreateNewHistory(9, 'home');
+		goBackThenCreateNewHistory(9);
+		//saveCurrentStateToHistorySoBackWillWork();
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprintAndData = await getFpAndDataForStore();
@@ -1837,7 +1857,8 @@
 	}// getFpForAccess()
 
 	async function attemptCMDAccess(){
-		saveCurrentStateToHistorySoBackWillWork();
+		//goBackThenCreateNewHistory(3, 'home');
+		goBackThenCreateNewHistory(3);
 		const fingerprint = await getFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
 		const encryptedData = await serverLoad(fingerprint);
@@ -1872,7 +1893,8 @@
 	}// decryptAndDownloadFile()
 
 	async function attemptBrowserAccess(inputId){
-		saveCurrentStateToHistorySoBackWillWork();
+		//goBackThenCreateNewHistory(4, 'home');
+		goBackThenCreateNewHistory(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprint = await getFpForAccess();
@@ -1925,7 +1947,7 @@
 	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
 	// Output: functionality.
 	async function attemptDelete(){
-		saveCurrentStateToHistorySoBackWillWork();
+		goBackThenCreateNewHistory(4);
 		// Load from server
 		const fingerprint = getStoredFp();
 		const deleteResponse = await serverDelete(fingerprint);
