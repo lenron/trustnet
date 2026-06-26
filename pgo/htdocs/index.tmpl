@@ -849,7 +849,8 @@
 				<h2 style="align-self:center;">CHOOSE HOW TO CREATE YOUR OFFLINE DATABASE</h2>
 				<div class="" id="" style="display:flex;">
 					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">
+						<!--<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">-->
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="clearNewOfflineDBaseList('newofflinedatabase_exisitingdata_codeword')">
 							<span style="">FILL WITH EXISTING DATA</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Option 1</span>
 						</button>
@@ -1402,6 +1403,10 @@
 	//let recordListForNewOfflineDBaseLength;
 	// Global for now. Rolling here isn't a security issue?
 	//let offlineDatabaseUnencPointerGlobal = randInt(0,998);
+	function clearNewOfflineDBaseList(inputId){
+		clearNewOfflineDBaseData();
+		saveThenShowPage(inputId);
+	}
 
 	function clearNewOfflineDBaseData(){
 		console.log("Clearing temp stack of records that were to be added to new offline database.");
