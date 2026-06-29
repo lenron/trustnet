@@ -923,7 +923,7 @@
 			</div>
 			<!--------------------------EXISTING DATA Record Added-----------------------!>
 			<div class="flow_pages" id="newofflinedatabase_existingdata_record_added" style="display:none">
-				<h2>RECORD ADDED! YOU NOW HAVE <span id="numRecordsAdded" style="color:red; "></span> RECORDS READY TO ADD TO A NEW OFFLINE DATABASE.</h2>
+				<h2>RECORD ADDED! YOU NOW HAVE <span id="numRecordsAdded" style="color:magenta; "></span> READY TO ADD TO A NEW OFFLINE DATABASE.</h2>
 				<h2>ADD MORE RECORDS?</h2>
 				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
 				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineDatabase_pass_or_no_filled');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
@@ -942,7 +942,7 @@
 
 			<!--------------------------EXISTING DATA Use ENC Pass Database?-----------------------!>
 			<div class="flow_pages" id="offlineDatabase_pass_or_no_empty" style="display:none; ">
-				<h2>YOU HAVE COMPLETED FILLING YOUR SET OF EXISTING DATA THAT WILL SOON BE ADDED TO A NEW OFFLINE DATABASE.</h2>
+				<h2><span style="color:magenta; ">MOST SECURE</span> OPTION CHOSEN - GENERATE AN EMPTY OFFLINE DATABASE.</h2>
 				<h2>WOULD YOU LIKE TO ENCRYPT YOUR OFFLINE DATABASE WITH A PASSWORD?</h2>
 				<input autocomplete="off" type="password" value="" id="offlineDBasePass_input_empty" style="">
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
@@ -1243,13 +1243,17 @@
 		deleteCheckHide('overlay_delete_browser');
 	}// securityReset()
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//							Back functionality															  //
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	// Listen for the popstate event which should be fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
 	window.addEventListener('popstate', (event) => {
-		console.log("popstate history stack", window.history);
+		//console.log("popstate history stack", window.history);
 		//console.log('Navigated!', event.state); 
-		console.log('popstate! going to page saved in state object:', event.state.page); 
+		//console.log('popstate! going to page saved in state object:', event.state.page); 
 		// Use event.state or window.location to update content
 		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
 			showPage(event.state.page);
@@ -1265,7 +1269,7 @@
 		//console.log("Current history stack", window.history);
 		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
 		const state = { page: currentPage };
-		console.log("pushing state:", state['page']);
+		//console.log("pushing state:", state['page']);
 		// First, state is js object that can contain more data than just the page if needed.
 		// Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
 		// Last, window.location should be url of current page.
@@ -1284,8 +1288,8 @@
 		showPage(target);
 	}
 
+	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
 	let showPageFlag = 'true';
-	//function goBackProgrammaticallyXandDontTriggerPopstateShowPage(numPlaces, flowStartPage){
 	function goBackProgrammaticallyXandDontTriggerPopstateShowPage(numPlaces){
 		showPageFlag = 'false';
 		//console.log('going back X places:', numPlaces);
@@ -1298,7 +1302,6 @@
 	// Hide all other pages, then show target page. 
 	// Input: Target is the element ID of a page for flowing the user through site.
 	function showPage(target){
-		console.log("showpage history stack", window.history);
 		// This global variable keeps track of the page the user is currently on. Needed for activatable-by-enter and harnessing browser back.
 		currentPage = target;
 		// Security Reset.
@@ -1435,7 +1438,13 @@
 			recordListForNewOfflineDBase[fingerprint] = encryptedData;
 			// Check if new offline database is full.
 			const recordListForNewOfflineDBaseLength = Object.keys(recordListForNewOfflineDBase).length;
-			document.getElementById("numRecordsAdded").innerHTML = recordListForNewOfflineDBaseLength;
+			let numberAndRecordContent;
+			if (recordListForNewOfflineDBaseLength === 1){
+				numberAndRecordContent = '1 RECORD';
+			} else {
+				numberAndRecordContent = recordListForNewOfflineDBaseLength + ' RECORDS';
+			}
+			document.getElementById("numRecordsAdded").innerHTML = numberAndRecordContent;
 			//A given database only holds 1000 records so move on if we break that amount.
 			if (recordListForNewOfflineDBaseLength == 1000){
 				// No more room in offline dbase, no choice but to continue.
@@ -1836,9 +1845,7 @@
 	}// getFpAndDataForStore()
 
 	async function attemptCMDStore(){
-		//goBackProgrammaticallyXandDontTriggerPopstateShowPage(7, 'home');
 		goBackProgrammaticallyXandDontTriggerPopstateShowPage(7);
-		//saveCurrentStateToHistorySoBackWillWork();
 		const fingerprintAndData = await getFpAndDataForStore();
 		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
@@ -1846,9 +1853,7 @@
 
 	// storeDataToServer() can be used for both Store Flows because the fail/pass outcome is the same for both Browser and CMD.
 	async function attemptBrowserStore(inputId){
-		//goBackProgrammaticallyXandDontTriggerPopstateShowPage(9, 'home');
 		goBackProgrammaticallyXandDontTriggerPopstateShowPage(9);
-		//saveCurrentStateToHistorySoBackWillWork();
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprintAndData = await getFpAndDataForStore();
@@ -1877,7 +1882,6 @@
 	}// getFpForAccess()
 
 	async function attemptCMDAccess(){
-		//goBackProgrammaticallyXandDontTriggerPopstateShowPage(3, 'home');
 		goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
 		const fingerprint = await getFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
@@ -1913,7 +1917,6 @@
 	}// decryptAndDownloadFile()
 
 	async function attemptBrowserAccess(inputId){
-		//goBackProgrammaticallyXandDontTriggerPopstateShowPage(4, 'home');
 		goBackProgrammaticallyXandDontTriggerPopstateShowPage(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
@@ -3408,9 +3411,9 @@
 			<div class="flow_pages home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
 				<h2 style="color:red">OFFLINE HOME</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="showPage('offlinestore_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="showPage('offlineaccess_codeword')">ACCESS SECRET DATA</button>
-					<button class="obf_button" id='go_offlinesync_flow' style="flex-grow:1" onclick="showPage('offlinesync_codeword')">SYNC STORED DATA TO ONLINE DATABASE</button>
+					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_codeword')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_offlinesync_flow' style="flex-grow:1" onclick="saveThenShowPage('offlinesync_codeword')">SYNC STORED DATA TO ONLINE DATABASE</button>
 				</div>
 			</div>
 
@@ -3426,8 +3429,8 @@
 				<h2>ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="offlinesync_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_codeword_input'); showPage('offlinesync_obf1000Pass')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_codeword_input'); saveThenShowPage('offlinesync_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3442,8 +3445,8 @@
 				<h2>ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="offlinesync_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinesync_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_obf1000Pass_input'); showPage('offlinesync_ctrPass');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_codeword')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_obf1000Pass_input'); saveThenShowPage('offlinesync_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3458,7 +3461,7 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlinesync_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinesync_obf1000Pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_obf1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptSyncToOnline('offlinesync_ctrPass_input')">SYNC TO ONLINE</button>
 				</div>
 			</div>
@@ -3475,8 +3478,8 @@
 				<h2>ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); showPage('offlineaccess_obf1000Pass')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); saveThenShowPage('offlineaccess_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3491,8 +3494,8 @@
 				<h2>ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="offlineaccess_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineaccess_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf1000Pass_input');showPage('offlineaccess_ctrPass');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_codeword')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf1000Pass_input');saveThenShowPage('offlineaccess_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3507,8 +3510,8 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlineaccess_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineaccess_obf1000Pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_ctrPass_input');showPage('offlineaccess_choose');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_obf1000Pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_ctrPass_input');saveThenShowPage('offlineaccess_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3518,9 +3521,9 @@
 				<label>ACCESS DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('offlineaccess_ctrPass')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_ctrPass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="activatable_by_enter" id='offlineaccess_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('offlineaccess_opensslpass')">
+						<button class="activatable_by_enter" id='offlineaccess_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="saveThenShowPage('offlineaccess_opensslpass')">
 							<span style="">BROWSER</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
 						</button>
@@ -3547,7 +3550,7 @@
 				<h2>ENTER PASSWORD 3</h2>
 				<input autocomplete="off" type="password" value="" id="offlineaccess_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlineaccess_choose')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptBrowserAccessOffline('offlineaccess_opensslpass_input');">ACCESS DATA</button>
 				</div>
 			</div>
@@ -3586,8 +3589,8 @@
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_codeword')">STORE DATA</button>
-					<button class="" id='' style="flex-grow:1" onclick="showPage('offlineaccess_codeword')">ACCESS DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_codeword')">STORE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_codeword')">ACCESS DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('offlineoverlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
@@ -3661,8 +3664,8 @@
 				<h2>ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');showPage('offlinestore_obf1000Pass')">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');saveThenShowPage('offlinestore_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3677,8 +3680,8 @@
 				<h2>ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf1000Pass_input');showPage('offlinestore_ctrPass');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf1000Pass_input');saveThenShowPage('offlinestore_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3693,8 +3696,8 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1000Pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_ctrPass_input');showPage('offlinestore_choose');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_obf1000Pass')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_ctrPass_input');saveThenShowPage('offlinestore_choose');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3704,15 +3707,15 @@
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_ctrPass')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_ctrPass')">BACK</button>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="activatable_by_enter" id='offlinestore_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="showPage('offlinestore_opensslpass')">
+						<button class="activatable_by_enter" id='offlinestore_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="saveThenShowPage('offlinestore_opensslpass')">
 							<span style="">BROWSER</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
 						</button>
 					</div>
 					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="showPage('offlinestore_codeword_cmdcheck')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="saveThenShowPage('offlinestore_codeword_cmdcheck')">
 							<span class="coolpink" style="">COMMAND LINE</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
 						</button>
@@ -3734,7 +3737,7 @@
 				<h2>RE-ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdcheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_choose')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdcheckinput', 'offlinestore_obf1000Pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -3751,7 +3754,7 @@
 				<h2>RE-ENTER PASSWORD 1</h2>c
 				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_cmdcheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1000Pass_cmdcheckinput', 'offlinestore_ctrPass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -3768,7 +3771,7 @@
 				<h2>RE-ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1000Pass_cmdcheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_obf1000Pass_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_ctrPass_cmdcheckinput', 'offlinestore_upload')">CONTINUE</button>
 				</div>
 			</div>
@@ -3801,7 +3804,7 @@
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="width:250px;" onclick="showPage('offlinestore_ctrPass_cmdcheck')">BACK</button>
+					<button class="" id='' style="width:250px;" onclick="saveThenShowPage('offlinestore_ctrPass_cmdcheck')">BACK</button>
 					<button class="" id='offlinestore_upload_commit_button' style="flex-grow:1;display:none;color:orange" onclick="attemptCMDStoreOffline()">COMMIT DATA TO SERVER</button>
 				</div>
 			</div>
@@ -3819,8 +3822,8 @@
 				<h2>ENTER PASSWORD 3</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_choose')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_opensslpass_input');showPage('offlinestore_codeword_browsercheck');">CONTINUE</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_choose')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_opensslpass_input');saveThenShowPage('offlinestore_codeword_browsercheck');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3836,7 +3839,7 @@
 				<h2>RE-ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_browsercheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_opensslpass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_opensslpass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_browsercheckinput', 'offlinestore_obf1000Pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -3853,7 +3856,7 @@
 				<h2>RE-ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_codeword_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1000Pass_browsercheckinput', 'offlinestore_ctrPass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -3870,7 +3873,7 @@
 				<h2>RE-ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_obf1000Pass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_obf1000Pass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_ctrPass_browsercheckinput', 'offlinestore_opensslpass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -3887,7 +3890,7 @@
 				<h2>RE-ENTER PASSWORD 3</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="showPage('offlinestore_ctrPass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_ctrPass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_opensslpass_browsercheckinput', 'offlinestore_data')">CONTINUE</button>
 				</div>
 			</div>
@@ -3902,7 +3905,7 @@
 				</div>
 				<textarea class="browser_input" id="offlinestore_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('offlinestore_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="showPage('offlinestore_opensslpass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_opensslpass_browsercheck')">BACK</button>
 					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStoreOffline('offlinestore_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
 					<div id='text_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
@@ -3956,7 +3959,7 @@
 				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
 				<input autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="resetOfflineData(); showPage('offline_home')">NO PASSWORD</button>
+					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="resetOfflineData(); saveThenShowPage('offline_home')">NO PASSWORD</button>
 					<!-- <button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="resetOfflineData(); extractInputDataOffline('set_offlineDBasePass_input'); verifyOfflineDBasePasswordLength() ">PASSWORD READY</button> -->
 					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="superCheckEncPassword()">PASSWORD READY</button>
 				</div>
@@ -3973,7 +3976,7 @@
 	<div style="display:flex; flex-direction:column;">
 		<div id="savetodisk_warning" style="background-color:yellow; display:none; flex-direction:column;">
 			<h2>NEW DATA HAS BEEN STORED TO MEMORY. IN ORDER TO SAVE TO DISK PLEASE CLICK THIS BUTTON TO SAVE CURRENTLY RUNNING HTML TO A FILE. THIS WILL ALLOW YOUR DATA TO PERSIST THROUGH REBOOTS.</h2>
-			<button id='' style="align-self:center;" onclick="saveToDisk(); showPage('offline_home')">SAVE DATA TO DISK</button>
+			<button id='' style="align-self:center;" onclick="saveToDisk(); saveThenShowPage('offline_home')">SAVE DATA TO DISK</button>
 		</div>
 	</div>
 </div>
@@ -4203,6 +4206,59 @@
 		// Reset delete overlay
 		deleteCheckHide('offlineoverlay_delete_cmd');
 		deleteCheckHide('offlineoverlay_delete_browser');
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//							Back functionality															  //
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Listen for the popstate event which should be fired by user activating browser back button.
+	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
+	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
+	window.addEventListener('popstate', (event) => {
+		//console.log("popstate history stack", window.history);
+		//console.log('Navigated!', event.state); 
+		//console.log('popstate! going to page saved in state object:', event.state.page); 
+		// Use event.state or window.location to update content
+		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
+			showPage(event.state.page);
+		} else {
+			// Skip showPage for this popstate:
+			// we don't want to flicker as we're history.go()ing back programmatically if the user clicks back after completing a flow job.
+			showPageFlag = 'true';
+		}
+	});
+
+	// Save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
+	function saveCurrentStateToHistorySoBackWillWork(){
+		//console.log("Current history stack", window.history);
+		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
+		const state = { page: currentPage };
+		//console.log("pushing state:", state['page']);
+		// First, state is js object that can contain more data than just the page if needed.
+		// Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
+		// Last, window.location should be url of current page.
+		// Replace the current history entry with additional state data that we will use to return to with custom function.
+		history.replaceState(state, '', window.location);
+		// My current theory is under the hood function isn't expecting a manual removal of a state so we have to work around their garbage collection?
+		// Create new (empty) entry in the history stack.
+		history.pushState({}, '', '');
+	}
+
+	// Need to save the state whenever user is on their way to a new page.
+	// Create record in history before moving to new page. This enables history's back function to return to the page.
+	// So, manually create a history record of the page we're currently on before moving to new target page.
+	function saveThenShowPage(target){
+		saveCurrentStateToHistorySoBackWillWork();
+		showPage(target);
+	}
+
+	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
+	let showPageFlag = 'true';
+	function goBackProgrammaticallyXandDontTriggerPopstateShowPage(numPlaces){
+		showPageFlag = 'false';
+		//console.log('going back X places:', numPlaces);
+		//console.log("Current history stack", window.history);
+		history.go(-numPlaces);
 	}
 
 	// Keep track of the page we're on. Start on home page.
@@ -4486,7 +4542,7 @@
 		checkFingerprintAndData(fingerprint, encryptedData);
 		// Retrieve the database and pointer for the Flow we are in.
 		let pointer = await getOfflineDBasePointer();
-console.log("pointer value: " + pointer);
+		//console.log("pointer value: " + pointer);
 		let offlineDatabase = await getOfflineDBase();
 		//Check if the offline database is full.
 		if (checkIfOfflineDBaseIsFull(pointer)){
@@ -4656,6 +4712,7 @@ console.log("pointer value: " + pointer);
 	}
 
 	async function attemptCMDStoreOffline(){
+		goBackProgrammaticallyXandDontTriggerPopstateShowPage(7);
 		//const fingerprintAndData = await getFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const encryptedData = await encryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['data']);
@@ -4681,6 +4738,7 @@ console.log("pointer value: " + pointer);
 
 	// storeDataToServer() can be used for both Store Flows because the fail/pass outcome is the same for both Browser and CMD.
 	async function attemptBrowserStoreOffline(inputId){
+		goBackProgrammaticallyXandDontTriggerPopstateShowPage(9);
 		extractInputDataOffline(inputId);
 		//const fingerprintAndData = await getFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
@@ -4724,6 +4782,7 @@ console.log("pointer value: " + pointer);
 	}
 
 	async function attemptCMDAccessOffline(){
+		goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		// Add additional parameter?
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
@@ -4738,6 +4797,7 @@ console.log("pointer value: " + pointer);
 	}
 
 	async function attemptSyncToOnline(inputId){
+		goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
 		// Get ctrPass - pass2.
 		extractInputDataOffline(inputId);
 		// First load encrypted data from offline database.
@@ -4792,6 +4852,7 @@ console.log("pointer value: " + pointer);
 	}
 
 	async function attemptBrowserAccessOffline(inputId){
+		goBackProgrammaticallyXandDontTriggerPopstateShowPage(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		extractInputDataOffline(inputId);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
