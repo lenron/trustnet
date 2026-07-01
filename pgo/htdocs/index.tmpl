@@ -1268,7 +1268,7 @@
 	function saveCurrentStateToHistorySoBackWillWork(){
 		//console.log("Current history stack", window.history);
 		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
-		const state = { page: currentPage };
+		const state = {page:currentPage}; // Create JS object with attribute page that has value currentPage.
 		//console.log("pushing state:", state['page']);
 		// First, state is js object that can contain more data than just the page if needed.
 		// Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
