@@ -529,7 +529,7 @@
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex">
-					<button class="" id='save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStore('access_data_outputdisplay')">SAVE DATA</button>
+					<button class="" id='save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStoreBackWrapper('access_data_outputdisplay')">SAVE DATA</button>
 					<button class="" id='editdata_button' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="editData()">EDIT DATA</button>
 					<button class="" id='delete_button' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
 				</div>
@@ -806,7 +806,7 @@
 				<textarea class="browser_input" id="store_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('store_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('store_opensslpass_browsercheck')">BACK</button>
-					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStore('store_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
+					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStore('store_data_textarea', 'false')">ENCRYPT DATA AND COMMIT TO SERVER</button>
 					<div id='text_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
@@ -1851,9 +1851,22 @@
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 	}// attemptCMDStore()
 
-	// storeDataToServer() can be used for both Store Flows because the fail/pass outcome is the same for both Browser and CMD.
-	async function attemptBrowserStore(inputId){
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(9);
+
+	async function attemptBrowserStoreBackWrapper(inputId){
+		console.log('back wrapper hit.');
+		await attemptBrowserStore(inputId, 'true');
+	}
+
+	async function attemptBrowserStore(inputId, fromWrapper){
+		// This ugly conditional is necessary for back functionality.
+		if (fromWrapper === 'true'){
+			// Got here from edit, use go back value for Access flow.
+			goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
+			showPageFlag = 'true';
+		} else {
+			// Got here from Store flow.
+			goBackProgrammaticallyXandDontTriggerPopstateShowPage(9);
+		}
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprintAndData = await getFpAndDataForStore();
@@ -3612,7 +3625,7 @@
 					</div>
 				</div>
 				<div class="button_pair" id="" style="display:flex">
-					<button class="" id='offline_save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStoreOffline('offlineaccess_data_outputdisplay')">SAVE DATA</button>
+					<button class="" id='offline_save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStoreOfflineBackWrapper('offlineaccess_data_outputdisplay')">SAVE DATA</button>
 					<button class="" id='offline_editdata_button' style="flex-grow:1" onclick="editDataOffline()">EDIT DATA</button>
 					<button class="" id='offline_delete_button' style="flex-grow:1" onclick="deleteCheckShow('offlineoverlay_delete_browser')">DELETE DATA</button>
 				</div>
@@ -3906,7 +3919,7 @@
 				<textarea class="browser_input" id="offlinestore_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('offlinestore_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_opensslpass_browsercheck')">BACK</button>
-					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStoreOffline('offlinestore_data_textarea')">ENCRYPT DATA AND COMMIT TO SERVER</button>
+					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStoreOffline('offlinestore_data_textarea', 'false')">ENCRYPT DATA AND COMMIT TO SERVER</button>
 					<div id='text_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
@@ -3956,6 +3969,7 @@
 
 			<!--------------------------Ask user for encrypted pointer password-----------------------!>
 			<div class="flow_pages" id="enter_offlinedbase_pass" style="display:flex; ">
+				<label id='emptyPassWarning' style='color:magenta; display:none; '>Please enter a password or choose NO PASSWORD.</label>
 				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
 				<input autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
@@ -3974,7 +3988,7 @@
 	</div> <!-------------------------------------------- Center HTML----------------------------------------------------!>
 	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
-		<div id="savetodisk_warning" style="background-color:yellow; display:none; flex-direction:column;">
+		<div id="savetodisk_warning" style="background-color:gray; display:none; flex-direction:column;">
 			<h2>NEW DATA HAS BEEN STORED TO MEMORY. IN ORDER TO SAVE TO DISK PLEASE CLICK THIS BUTTON TO SAVE CURRENTLY RUNNING HTML TO A FILE. THIS WILL ALLOW YOUR DATA TO PERSIST THROUGH REBOOTS.</h2>
 			<button id='' style="align-self:center;" onclick="saveToDisk(); saveThenShowPage('offline_home')">SAVE DATA TO DISK</button>
 		</div>
@@ -4215,9 +4229,10 @@
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
 	window.addEventListener('popstate', (event) => {
-		//console.log("popstate history stack", window.history);
-		//console.log('Navigated!', event.state); 
-		//console.log('popstate! going to page saved in state object:', event.state.page); 
+		console.log("popstate history stack", window.history);
+		console.log('show page flag: ', showPageFlag); 
+		console.log('Navigated!', event.state); 
+		console.log('popstate! going to page saved in state object:', event.state.page); 
 		// Use event.state or window.location to update content
 		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
 			showPage(event.state.page);
@@ -4230,10 +4245,10 @@
 
 	// Save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
 	function saveCurrentStateToHistorySoBackWillWork(){
-		//console.log("Current history stack", window.history);
+		console.log("Current history stack", window.history);
 		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
 		const state = { page: currentPage };
-		//console.log("pushing state:", state['page']);
+		console.log("pushing state:", state['page']);
 		// First, state is js object that can contain more data than just the page if needed.
 		// Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
 		// Last, window.location should be url of current page.
@@ -4248,16 +4263,18 @@
 	// Create record in history before moving to new page. This enables history's back function to return to the page.
 	// So, manually create a history record of the page we're currently on before moving to new target page.
 	function saveThenShowPage(target){
+		console.log("history stack before save", window.history);
 		saveCurrentStateToHistorySoBackWillWork();
 		showPage(target);
+		console.log("history stack after show page", window.history);
 	}
 
 	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
 	let showPageFlag = 'true';
 	function goBackProgrammaticallyXandDontTriggerPopstateShowPage(numPlaces){
 		showPageFlag = 'false';
-		//console.log('going back X places:', numPlaces);
-		//console.log("Current history stack", window.history);
+		console.log('going back X places:', numPlaces);
+		console.log("Current history stack", window.history);
 		history.go(-numPlaces);
 	}
 
@@ -4643,6 +4660,7 @@
 	async function verifyOfflineDBasePasswordLength(){
 		if (offlineData['offlineDBasePass'] === undefined || offlineData['offlineDBasePass'] === ''){
 			console.log('caught empty ENC password');
+			document.getElementById('emptyPassWarning').style.display = 'inline';
 		}else{
 			console.log('ENC password has successfully been entered.');
 			const encPassCorrect = await checkEncPassword();
@@ -4698,6 +4716,7 @@
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
 	function checkDataOffline(inputId, nextPageId){
+		saveCurrentStateToHistorySoBackWillWork();
 		const keyword = extractKeyword(inputId);
 		const cleartextPass = extractCleartextData(inputId);
 		if (offlineData[keyword] === cleartextPass){
@@ -4736,9 +4755,20 @@
 		}
 	}
 
-	// storeDataToServer() can be used for both Store Flows because the fail/pass outcome is the same for both Browser and CMD.
-	async function attemptBrowserStoreOffline(inputId){
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(9);
+	async function attemptBrowserStoreOfflineBackWrapper(inputId){
+		console.log('back wrapper hit.');
+		await attemptBrowserStoreOffline(inputId, 'true');
+	}
+
+	async function attemptBrowserStoreOffline(inputId, fromWrapper){
+		if (fromWrapper === 'true'){
+			// Got here from edit, use go back value for Access flow.
+			goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
+			showPageFlag = 'true';
+		} else {
+			// Got here from Store flow.
+			goBackProgrammaticallyXandDontTriggerPopstateShowPage(9);
+		}
 		extractInputDataOffline(inputId);
 		//const fingerprintAndData = await getFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
@@ -4797,7 +4827,7 @@
 	}
 
 	async function attemptSyncToOnline(inputId){
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
+		goBackProgrammaticallyXandDontTriggerPopstateShowPage(2);
 		// Get ctrPass - pass2.
 		extractInputDataOffline(inputId);
 		// First load encrypted data from offline database.
