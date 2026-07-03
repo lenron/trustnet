@@ -304,8 +304,7 @@
 				<a href="https://obf.mkrsvr.org/dev_site">DEV_SITE</a>
 			</div>
 			<div class="header_label" style="">
-				<a href="https://obf.mkrsvr.org/contact">CONTACT</a>
-			</div>
+				<a href="https://obf.mkrsvr.org/contact">CONTACT</a> </div>
 		</div>
 	</div>
 
@@ -313,100 +312,109 @@
 	<!--------------------------SINGLE PAGE OF FUNCTIONS----------------------------!>
 	<div class="center_html" id="center_html" style="display:flex; flex-direction:column; align-items:center; ">
 
-		<!--------------------------OpenSSL ENCRYPT----------------------------!>
-		<div class="" id="openssl_enc_section" style="display:flex; flex-direction:column; ">
-			<div style="display:flex; flex-direction:row; justify-content:space-between;">
-				<label>OpenSSL ENCRYPT</label>
+		<!--------------------------OpenSSL SECTION----------------------------!>
+		<div class="" id="openssl_section" style="display:flex; flex-direction:row; background-color: tan; border: 2px solid black; padding: 6px; ">
+			<!--------------------------OpenSSL ENCRYPT----------------------------!>
+			<div class="" id="openssl_enc_section" style="display:flex; flex-direction:column; ">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>OpenSSL ENCRYPT</label>
+				</div>
+				<label>Password:</label>
+				<input autocomplete="off" type="" value="" id="openssl_enc_password_input" style="" >
+				<label>Cleartext Data:</label>
+				<textarea value="" id="openssl_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="openSSLEnc()">Encrypt OpenSSL</button>
+				</div>
+				<label>Output: Encrypted Data</label>
+				<textarea value="" id="openssl_enc_output" style="color:gray" rows="8" cols="50"></textarea>
 			</div>
-			<label>Password:</label>
-			<input autocomplete="off" type="" value="" id="openssl_enc_password_input" style="" >
-			<label>Cleartext Data:</label>
-			<textarea value="" id="openssl_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
-			<div class="button_pair" id="" style="display:flex;">
-				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="openSSLEnc()">Encrypt OpenSSL</button>
+
+			<!--------------------------OpenSSL DECRYPT----------------------------!>
+			<div class="" id="openssl_dec_section" style="display:flex; flex-direction:column; ">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>OpenSSL DECRYPT</label>
+				</div>
+				<label>Password:</label>
+				<input autocomplete="off" type="" value="" id="openssl_dec_password_input" style="" >
+				<label>Encrypted Data:</label>
+				<textarea value="" id="openssl_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="openSSLDec()">Decrypt OpenSSL</button>
+				</div>
+				<label>Output: Cleartext Data</label>
+				<textarea value="" id="openssl_dec_output" style="color:gray" rows="8" cols="50"></textarea>
 			</div>
-			<label>Output: Encrypted Data</label>
-			<textarea value="" id="openssl_enc_output" style="color:gray" rows="8" cols="50"></textarea>
 		</div>
 
-		<!--------------------------OpenSSL DECRYPT----------------------------!>
-		<div class="" id="openssl_dec_section" style="display:flex; flex-direction:column; ">
-			<div style="display:flex; flex-direction:row; justify-content:space-between;">
-				<label>OpenSSL DECRYPT</label>
+		<!--------------------------OBF-1000 SECTION----------------------------!>
+		<div class="" id="obf1000_section" style="display:flex; flex-direction:row; background-color: teal; border: 2px solid black; padding: 6px; ">
+			<!--------------------------OBF-1000 ENCRYPT----------------------------!>
+			<div class="" id="obf-1000_enc_section" style="display:flex; flex-direction:column; ">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>OBF-1000 ENCRYPT</label>
+				</div>
+				<label>Password:</label>
+				<input autocomplete="off" type="" value="" id="obf-1000_enc_password_input" style="" >
+				<label>Cleartext Data:</label>
+				<textarea value="" id="obf-1000_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="obf1000Enc()">Encrypt OBF-1000</button>
+				</div>
+				<label>Output: Encrypted Data</label>
+				<textarea value="" id="obf-1000_enc_output" style="color:gray" rows="8" cols="50"></textarea>
 			</div>
-			<label>Password:</label>
-			<input autocomplete="off" type="" value="" id="openssl_dec_password_input" style="" >
-			<label>Encrypted Data:</label>
-			<textarea value="" id="openssl_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
-			<div class="button_pair" id="" style="display:flex;">
-				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="openSSLDec()">Decrypt OpenSSL</button>
+
+			<!--------------------------OBF-1000 DECRYPT----------------------------!>
+			<div class="" id="obf-1000_dec_section" style="display:flex; flex-direction:column; ">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>OBF-1000 DECRYPT</label>
+				</div>
+				<label>Password:</label>
+				<input autocomplete="off" type="" value="" id="obf-1000_dec_password_input" style="" >
+				<label>Encrypted Data:</label>
+				<textarea value="" id="obf-1000_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="obf1000Dec()">Decrypt OBF-1000</button>
+				</div>
+				<label>Output: Cleartext Data</label>
+				<textarea value="" id="obf-1000_dec_output" style="color:gray" rows="8" cols="50"></textarea>
 			</div>
-			<label>Output: Cleartext Data</label>
-			<textarea value="" id="openssl_dec_output" style="color:gray" rows="8" cols="50"></textarea>
 		</div>
 
-		<!--------------------------OBF-1000 ENCRYPT----------------------------!>
-		<div class="" id="obf-1000_enc_section" style="display:flex; flex-direction:column; ">
-			<div style="display:flex; flex-direction:row; justify-content:space-between;">
-				<label>OBF-1000 ENCRYPT</label>
+		<!--------------------------AES-CTR SECTION----------------------------!>
+		<div class="" id="aes-ctr_section" style="display:flex; flex-direction:row; background-color: orange; border: 2px solid black; padding: 6px; ">
+			<!--------------------------AES-CTR ENCRYPT----------------------------!>
+			<div class="" id="aes-ctr_enc_section" style="display:flex; flex-direction:column; ">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>AES-CTR ENCRYPT</label>
+				</div>
+				<label>Password:</label>
+				<input autocomplete="off" type="" value="" id="aes-ctr_enc_password_input" style="" >
+				<label>Cleartext Data:</label>
+				<textarea value="" id="aes-ctr_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="aesCtrEnc()">Encrypt AES-CTR</button>
+				</div>
+				<label>Output: Encrypted Data</label>
+				<textarea value="" id="aes-ctr_enc_output" style="color:gray" rows="8" cols="50"></textarea>
 			</div>
-			<label>Password:</label>
-			<input autocomplete="off" type="" value="" id="obf-1000_enc_password_input" style="" >
-			<label>Cleartext Data:</label>
-			<textarea value="" id="obf-1000_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
-			<div class="button_pair" id="" style="display:flex;">
-				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="obf1000Enc()">Encrypt OBF-1000</button>
-			</div>
-			<label>Output: Encrypted Data</label>
-			<textarea value="" id="obf-1000_enc_output" style="color:gray" rows="8" cols="50"></textarea>
-		</div>
 
-		<!--------------------------OBF-1000 DECRYPT----------------------------!>
-		<div class="" id="obf-1000_dec_section" style="display:flex; flex-direction:column; ">
-			<div style="display:flex; flex-direction:row; justify-content:space-between;">
-				<label>OBF-1000 DECRYPT</label>
+			<!--------------------------AES-CTR DECRYPT----------------------------!>
+			<div class="" id="aes-ctr_dec_section" style="display:flex; flex-direction:column; ">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>AES-CTR DECRYPT</label>
+				</div>
+				<label>Password:</label>
+				<input autocomplete="off" type="" value="" id="aes-ctr_dec_password_input" style="" >
+				<label>Encrypted Data:</label>
+				<textarea value="" id="aes-ctr_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="aesCtrDec()">Decrypt AES-CTR</button>
+				</div>
+				<label>Output: Cleartext Data</label>
+				<textarea value="" id="aes-ctr_dec_output" style="color:gray" rows="8" cols="50"></textarea>
 			</div>
-			<label>Password:</label>
-			<input autocomplete="off" type="" value="" id="obf-1000_dec_password_input" style="" >
-			<label>Encrypted Data:</label>
-			<textarea value="" id="obf-1000_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
-			<div class="button_pair" id="" style="display:flex;">
-				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="obf1000Dec()">Decrypt OBF-1000</button>
-			</div>
-			<label>Output: Cleartext Data</label>
-			<textarea value="" id="obf-1000_dec_output" style="color:gray" rows="8" cols="50"></textarea>
-		</div>
-
-		<!--------------------------AES-CTR ENCRYPT----------------------------!>
-		<div class="" id="aes-ctr_enc_section" style="display:flex; flex-direction:column; ">
-			<div style="display:flex; flex-direction:row; justify-content:space-between;">
-				<label>AES-CTR ENCRYPT</label>
-			</div>
-			<label>Password:</label>
-			<input autocomplete="off" type="" value="" id="aes-ctr_enc_password_input" style="" >
-			<label>Cleartext Data:</label>
-			<textarea value="" id="aes-ctr_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
-			<div class="button_pair" id="" style="display:flex;">
-				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="aesCtrEnc()">Encrypt AES-CTR</button>
-			</div>
-			<label>Output: Encrypted Data</label>
-			<textarea value="" id="aes-ctr_enc_output" style="color:gray" rows="8" cols="50"></textarea>
-		</div>
-
-		<!--------------------------AES-CTR DECRYPT----------------------------!>
-		<div class="" id="aes-ctr_dec_section" style="display:flex; flex-direction:column; ">
-			<div style="display:flex; flex-direction:row; justify-content:space-between;">
-				<label>AES-CTR DECRYPT</label>
-			</div>
-			<label>Password:</label>
-			<input autocomplete="off" type="" value="" id="aes-ctr_dec_password_input" style="" >
-			<label>Encrypted Data:</label>
-			<textarea value="" id="aes-ctr_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
-			<div class="button_pair" id="" style="display:flex;">
-				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="aesCtrDec()">Decrypt AES-CTR</button>
-			</div>
-			<label>Output: Cleartext Data</label>
-			<textarea value="" id="aes-ctr_dec_output" style="color:gray" rows="8" cols="50"></textarea>
 		</div>
 
 	</div><!----------------CENTER HTML---------------->
