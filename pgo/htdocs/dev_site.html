@@ -1,0 +1,468 @@
+<!DOCTYPE HTML>
+<html>
+<meta content="text/plain;charset=utf-8" http-equiv="Content-Type" />
+<meta content="utf-8" http-equiv="encoding" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+</head>
+<style>
+
+	* {
+		font-family: "Orbitron", serif;
+		font-optical-sizing: auto;
+		font-weight: 600;
+		font-style: normal;
+		color: #54c597;
+	}
+
+	html, body {
+		background-color: #272727;
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		margin: 0;
+		padding: 0;
+	}
+
+	.main_site {
+		height: 100%;
+	}
+
+	.header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		color: #54c597;
+		padding: 4px;
+		padding-right: 10px;
+		padding-left: 10px;
+	}
+
+	.header_content {
+		display: flex;
+	}
+
+	.header_title:hover {
+		cursor: pointer;
+	}
+
+	.header_label {
+		padding: 8px;
+	}
+
+	.center_html {
+		width: 100%;
+		min-height: 100%;
+		background-color: #272727;
+		flex: 1 auto;
+		display: flex;
+		justify-content: center;
+	}
+
+	/* Single (pages) shown to user as they (flow) through site. */
+	.flow_pages {
+		width: 700px;
+		margin: 10px;
+		align-self: center;
+		display: flex;
+		flex-direction: column;
+		justify-content: center; 
+		color: #54c597;
+	}
+
+	/* default button styling. HTML style="" will override. */
+	button {
+		/*width: 400px;*/
+		height: 65px;
+		background-color: #434343;
+		border: 2px solid;
+		padding: 2px;
+		margin: 8px;
+		padding-right: 10px;
+		padding-left: 10px;
+		color: #54c597;
+		border-color: #54c597;
+		font-size: 17px;
+		border-radius: 15px;
+	}
+
+	/*input[type="password"] {*/
+	input {
+		height: 80px;
+		width: 95%;
+		background-color: #272727;
+		border: 2px solid;
+		padding: 8px;
+		margin: 8px;
+		border-color: #54c597;
+		color: #54c597;
+		font-size: 25px;
+		border-radius: 20px;
+	}
+
+	a {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: blue;
+	}
+
+	p {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: black;
+	}
+
+	/* Change the textareas inside divs with 'flow_pages' class to the following: */
+	.flow_pages textarea {
+		width: 95%;
+		height: 150px;
+		background-color: #272727;
+		border: 2px solid;
+		padding: 12px;
+		margin: 8px;
+		border-color: #54c597;
+		color: #54c597;
+		font-size: 25px;
+		border-radius: 30px;
+	}
+
+	/* 'Are you sure?' overlay */
+	.deletecheck {
+		justify-content:center;
+		align-items:center;
+		z-index:10;
+		position:absolute;
+		width:100%;
+		height:215%;
+		background-color:gray;
+		padding:8px;
+		margin-left:0;
+		margin-top:-40%;
+		flex-direction: column;
+		border:2px solid;
+		border-color:red; 
+		border-radius:30px;
+	}
+
+	.devsite_inputs {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: black;
+		background-color: grey;
+	}
+
+	.tooltip {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: black;
+	}
+
+	/* Add this class to a span or label (and other types?) to make it a cool looking pink */
+	.coolpink {
+		color:#ff00ff;
+		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	}
+
+	/* Change cursor image to pointer with plus (identified by 'copy' indicator) */
+	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
+	.encrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div id*/
+	#encrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#encrypt_click_store:hover {
+		cursor: copy;
+	}
+
+	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
+	.decrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_store:hover {
+		cursor: copy;
+	}
+
+	.openssl_encrypt_flowchart {
+		background-image: url('./svg_images/openssl_encrypt_flowchart.drawio.svg');
+	}
+
+	.openssl_decrypt_flowchart {
+		background-image: url('./svg_images/openssl_decrypt_flowchart.drawio.svg');
+	}
+
+	/* Makes the background color blend from orange to #AEE850 */
+	.glossy_button {
+		background: linear-gradient(orange, #aee850);
+		border: 1px solid #1d6511;
+		color: black;
+		font-size: 12px;
+		height: 30px;
+		cursor: pointer;
+	}
+
+	/* Makes the text blend from orange to #AEE850 */
+	/* background-clip: text creates a 'cut-out' of the background where the text exists, creating text with a linear gradient.*/
+	.glossy_icon {
+		background-image: linear-gradient(orange, #aee850);
+		color: transparent;
+		background-clip: text;
+	}
+
+	/* Set minimum page Width to */
+	@media screen and (max-width: 340px){ html,body {min-width: 340px} }
+
+	/* Set minimum page Height to 400 */
+	@media screen and (max-height: 400px){ html,body {min-height: 400px} }	
+
+	/* Responsive Design: When the viewport is fewer than 700px wide, activate the following CSS. */
+	@media screen and (max-width:700px) {
+
+		input[type="password"] {
+			width: 90%;
+		}
+
+		textarea {
+			width: 90%;
+		}
+
+		.header {
+			flex-direction: column;
+		}
+
+		.home button {
+			width: 200px;
+			/*border-color: black;*/
+		}
+
+		.home_buttons {
+			/*flex-direction: column;*/
+		}
+
+		.choose button {
+			font-size: 14px;
+		}
+
+		.upload input {
+			font-size: 16px;
+		}
+
+		.deletecheck {
+			margin-top: -50%;
+			height: 220%;
+		}
+		
+	}
+	@media screen and (max-width:500px) {
+/*
+		input {
+			width: 400px;
+		}
+
+		textarea {
+			width: 400px;
+		}
+*/
+		.home button {
+			width: 150px;
+			font-size: 14px;
+			/*border-color: black;*/
+		}
+
+		.deletecheck {
+			width: 95%;
+			margin-top: -75%;
+			height:250%;
+		}
+	}
+
+</style>
+<body>
+	<!--------------------------HEADER----------------------------!>
+	<div class="header" id="header">
+		<div class="header_content" id="header_left">
+			<div class="header_title">
+				<a href="https://obf.mkrsvr.org" id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-SECRETWORD</a>
+			</div>
+		</div>
+		<div class="header_content" id="header_right">
+			<div class="header_label" style="">
+				<a href="https://obf.mkrsvr.org/faq">FAQ</a>
+			</div>
+			<div class="header_label" style="">
+				<a href="https://obf.mkrsvr.org/dev_site">DEV_SITE</a>
+			</div>
+			<div class="header_label" style="">
+				<a href="https://obf.mkrsvr.org/contact">CONTACT</a>
+			</div>
+		</div>
+	</div>
+
+	<!--------------------------Div Housing for Flow Pages----------------------------!>
+	<!--------------------------SINGLE PAGE OF FUNCTIONS----------------------------!>
+	<div class="center_html" id="center_html" style="display:flex; flex-direction:column; align-items:center; ">
+
+		<!--------------------------OpenSSL ENCRYPT----------------------------!>
+		<div class="" id="openssl_enc_section" style="display:flex; flex-direction:column; ">
+			<div style="display:flex; flex-direction:row; justify-content:space-between;">
+				<label>OpenSSL ENCRYPT</label>
+			</div>
+			<label>Password:</label>
+			<input autocomplete="off" type="" value="" id="openssl_enc_password_input" style="" >
+			<label>Cleartext Data:</label>
+			<textarea value="" id="openssl_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
+			<div class="button_pair" id="" style="display:flex;">
+				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="openSSLEnc()">Encrypt OpenSSL</button>
+			</div>
+			<label>Output: Encrypted Data</label>
+			<textarea value="" id="openssl_enc_output" style="color:gray" rows="8" cols="50"></textarea>
+		</div>
+
+		<!--------------------------OpenSSL DECRYPT----------------------------!>
+		<div class="" id="openssl_dec_section" style="display:flex; flex-direction:column; ">
+			<div style="display:flex; flex-direction:row; justify-content:space-between;">
+				<label>OpenSSL DECRYPT</label>
+			</div>
+			<label>Password:</label>
+			<input autocomplete="off" type="" value="" id="openssl_dec_password_input" style="" >
+			<label>Encrypted Data:</label>
+			<textarea value="" id="openssl_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
+			<div class="button_pair" id="" style="display:flex;">
+				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="openSSLDec()">Decrypt OpenSSL</button>
+			</div>
+			<label>Output: Cleartext Data</label>
+			<textarea value="" id="openssl_dec_output" style="color:gray" rows="8" cols="50"></textarea>
+		</div>
+
+		<!--------------------------OBF-1000 ENCRYPT----------------------------!>
+		<div class="" id="obf-1000_enc_section" style="display:flex; flex-direction:column; ">
+			<div style="display:flex; flex-direction:row; justify-content:space-between;">
+				<label>OBF-1000 ENCRYPT</label>
+			</div>
+			<label>Password:</label>
+			<input autocomplete="off" type="" value="" id="obf-1000_enc_password_input" style="" >
+			<label>Cleartext Data:</label>
+			<textarea value="" id="obf-1000_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
+			<div class="button_pair" id="" style="display:flex;">
+				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="obf1000Enc()">Encrypt OBF-1000</button>
+			</div>
+			<label>Output: Encrypted Data</label>
+			<textarea value="" id="obf-1000_enc_output" style="color:gray" rows="8" cols="50"></textarea>
+		</div>
+
+		<!--------------------------OBF-1000 DECRYPT----------------------------!>
+		<div class="" id="obf-1000_dec_section" style="display:flex; flex-direction:column; ">
+			<div style="display:flex; flex-direction:row; justify-content:space-between;">
+				<label>OBF-1000 DECRYPT</label>
+			</div>
+			<label>Password:</label>
+			<input autocomplete="off" type="" value="" id="obf-1000_dec_password_input" style="" >
+			<label>Encrypted Data:</label>
+			<textarea value="" id="obf-1000_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
+			<div class="button_pair" id="" style="display:flex;">
+				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="obf1000Dec()">Decrypt OBF-1000</button>
+			</div>
+			<label>Output: Cleartext Data</label>
+			<textarea value="" id="obf-1000_dec_output" style="color:gray" rows="8" cols="50"></textarea>
+		</div>
+
+		<!--------------------------AES-CTR ENCRYPT----------------------------!>
+		<div class="" id="aes-ctr_enc_section" style="display:flex; flex-direction:column; ">
+			<div style="display:flex; flex-direction:row; justify-content:space-between;">
+				<label>AES-CTR ENCRYPT</label>
+			</div>
+			<label>Password:</label>
+			<input autocomplete="off" type="" value="" id="aes-ctr_enc_password_input" style="" >
+			<label>Cleartext Data:</label>
+			<textarea value="" id="aes-ctr_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
+			<div class="button_pair" id="" style="display:flex;">
+				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="aesCtrEnc()">Encrypt AES-CTR</button>
+			</div>
+			<label>Output: Encrypted Data</label>
+			<textarea value="" id="aes-ctr_enc_output" style="color:gray" rows="8" cols="50"></textarea>
+		</div>
+
+		<!--------------------------AES-CTR DECRYPT----------------------------!>
+		<div class="" id="aes-ctr_dec_section" style="display:flex; flex-direction:column; ">
+			<div style="display:flex; flex-direction:row; justify-content:space-between;">
+				<label>AES-CTR DECRYPT</label>
+			</div>
+			<label>Password:</label>
+			<input autocomplete="off" type="" value="" id="aes-ctr_dec_password_input" style="" >
+			<label>Encrypted Data:</label>
+			<textarea value="" id="aes-ctr_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
+			<div class="button_pair" id="" style="display:flex;">
+				<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="aesCtrDec()">Decrypt AES-CTR</button>
+			</div>
+			<label>Output: Cleartext Data</label>
+			<textarea value="" id="aes-ctr_dec_output" style="color:gray" rows="8" cols="50"></textarea>
+		</div>
+
+	</div><!----------------CENTER HTML---------------->
+	<!--------------------------SINGLE PAGE OF FUNCTIONS----------------------------!>
+
+<script>
+
+
+
+	// Detect when user presses 'Enter' on their keyboard.
+	// Then on current page click button if it contains class 'activatable_by_enter'
+	window.addEventListener("keydown", function(event){
+		if (event.key === "Enter"){
+			// If focused element is an input, enter clicks the button with activatable_by_enter.
+			if (document.activeElement.tagName == "INPUT"){
+				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
+				if (buttonObj !== null){
+					buttonObj.click();
+				}else{
+					console.log("We hit a null page: " + currentPage);
+				}
+				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
+				// Prevent strange behavior where "the default action is performed on the newly focused element".
+				event.preventDefault();
+				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
+			}else{
+				// Focused element isn't an Input, do nothng I guess?
+			}
+		}
+	});// Listener for Enter
+
+	// We need to set the origin differently depending if we're a standalone file or not.
+	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
+	// Returns the SERVER_URL to be used for server communication functions.
+	function getServerOrigin(){
+		// Check origin.
+		const url_origin = window.location.origin;
+		let server_origin = '';
+		// If we're standalone, set address to chat.dance instead of a relative path.
+		const regex = new RegExp(/^file/);
+		if (regex.test(url_origin)){
+			//console.log("We're a standalone file!");
+			//server_origin = 'https://chat.dance/obf/';
+			server_origin = 'https://obf.mkrsvr.org/';
+		}else{
+			//console.log("We're NOT a standalone file!");
+			//server_origin = '/obf/';
+			//server_origin = '/';
+			server_origin = '';
+		}
+		return server_origin;
+	}// getServerOrigin()
+
+
+</script>
+
+
+</body>
+</html>

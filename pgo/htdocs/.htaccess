@@ -31,6 +31,7 @@ RewriteBase /
 # Contact, faq pages stored in HTML will be parsed, sent to client using perl scripts that do only 1 thing.
 RewriteRule ^faq$ faq.pl
 RewriteRule ^contact$ contact.pl
+RewriteRule ^dev_site$ dev_site.pl
 
 # Redirect calls e.g. from /exestore to /backend-perl-scripts/store.pl
 RewriteRule ^exestore$ backend-perl-scripts/store.pl
