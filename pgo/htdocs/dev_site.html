@@ -15,7 +15,7 @@
 		font-optical-sizing: auto;
 		font-weight: 600;
 		font-style: normal;
-		color: #54c597;
+		color: aliceblue;
 	}
 
 	html, body {
@@ -63,20 +63,10 @@
 		justify-content: center;
 	}
 
-	/* Single (pages) shown to user as they (flow) through site. */
-	.flow_pages {
-		width: 700px;
-		margin: 10px;
-		align-self: center;
-		display: flex;
-		flex-direction: column;
-		justify-content: center; 
-		color: #54c597;
-	}
 
 	/* default button styling. HTML style="" will override. */
+/*
 	button {
-		/*width: 400px;*/
 		height: 65px;
 		background-color: #434343;
 		border: 2px solid;
@@ -89,8 +79,10 @@
 		font-size: 17px;
 		border-radius: 15px;
 	}
+*/
 
 	/*input[type="password"] {*/
+/*
 	input {
 		height: 80px;
 		width: 95%;
@@ -103,189 +95,20 @@
 		font-size: 25px;
 		border-radius: 20px;
 	}
+*/
+	input {
+		background-color: gray;
+	}
+	textarea {
+		background-color: gray;
+	}
 
 	a {
 		font-family: Arial, Helvetica, sans-serif;
 		font-size: 16px;
-		color: blue;
+		color: cornflowerblue;
 	}
 
-	p {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: black;
-	}
-
-	/* Change the textareas inside divs with 'flow_pages' class to the following: */
-	.flow_pages textarea {
-		width: 95%;
-		height: 150px;
-		background-color: #272727;
-		border: 2px solid;
-		padding: 12px;
-		margin: 8px;
-		border-color: #54c597;
-		color: #54c597;
-		font-size: 25px;
-		border-radius: 30px;
-	}
-
-	/* 'Are you sure?' overlay */
-	.deletecheck {
-		justify-content:center;
-		align-items:center;
-		z-index:10;
-		position:absolute;
-		width:100%;
-		height:215%;
-		background-color:gray;
-		padding:8px;
-		margin-left:0;
-		margin-top:-40%;
-		flex-direction: column;
-		border:2px solid;
-		border-color:red; 
-		border-radius:30px;
-	}
-
-	.devsite_inputs {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: black;
-		background-color: grey;
-	}
-
-	.tooltip {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: black;
-	}
-
-	/* Add this class to a span or label (and other types?) to make it a cool looking pink */
-	.coolpink {
-		color:#ff00ff;
-		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-	}
-
-	/* Change cursor image to pointer with plus (identified by 'copy' indicator) */
-	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
-	.encrypt_hover:hover * {
-		cursor: copy;
-	}
-	/* Apply hover to specific div id*/
-	#encrypt_click_access:hover {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#encrypt_click_store:hover {
-		cursor: copy;
-	}
-
-	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
-	.decrypt_hover:hover * {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#decrypt_click_access:hover {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#decrypt_click_store:hover {
-		cursor: copy;
-	}
-
-	.openssl_encrypt_flowchart {
-		background-image: url('./svg_images/openssl_encrypt_flowchart.drawio.svg');
-	}
-
-	.openssl_decrypt_flowchart {
-		background-image: url('./svg_images/openssl_decrypt_flowchart.drawio.svg');
-	}
-
-	/* Makes the background color blend from orange to #AEE850 */
-	.glossy_button {
-		background: linear-gradient(orange, #aee850);
-		border: 1px solid #1d6511;
-		color: black;
-		font-size: 12px;
-		height: 30px;
-		cursor: pointer;
-	}
-
-	/* Makes the text blend from orange to #AEE850 */
-	/* background-clip: text creates a 'cut-out' of the background where the text exists, creating text with a linear gradient.*/
-	.glossy_icon {
-		background-image: linear-gradient(orange, #aee850);
-		color: transparent;
-		background-clip: text;
-	}
-
-	/* Set minimum page Width to */
-	@media screen and (max-width: 340px){ html,body {min-width: 340px} }
-
-	/* Set minimum page Height to 400 */
-	@media screen and (max-height: 400px){ html,body {min-height: 400px} }	
-
-	/* Responsive Design: When the viewport is fewer than 700px wide, activate the following CSS. */
-	@media screen and (max-width:700px) {
-
-		input[type="password"] {
-			width: 90%;
-		}
-
-		textarea {
-			width: 90%;
-		}
-
-		.header {
-			flex-direction: column;
-		}
-
-		.home button {
-			width: 200px;
-			/*border-color: black;*/
-		}
-
-		.home_buttons {
-			/*flex-direction: column;*/
-		}
-
-		.choose button {
-			font-size: 14px;
-		}
-
-		.upload input {
-			font-size: 16px;
-		}
-
-		.deletecheck {
-			margin-top: -50%;
-			height: 220%;
-		}
-		
-	}
-	@media screen and (max-width:500px) {
-/*
-		input {
-			width: 400px;
-		}
-
-		textarea {
-			width: 400px;
-		}
-*/
-		.home button {
-			width: 150px;
-			font-size: 14px;
-			/*border-color: black;*/
-		}
-
-		.deletecheck {
-			width: 95%;
-			margin-top: -75%;
-			height:250%;
-		}
-	}
 
 </style>
 <body>
@@ -308,165 +131,783 @@
 		</div>
 	</div>
 
-	<!--------------------------Div Housing for Flow Pages----------------------------!>
 	<!--------------------------SINGLE PAGE OF FUNCTIONS----------------------------!>
-	<div class="center_html" id="center_html" style="display:flex; flex-direction:column; align-items:center; ">
-
-		<!--------------------------OpenSSL SECTION----------------------------!>
-		<div class="" id="openssl_section" style="display:flex; flex-direction:row; background-color: tan; border: 2px solid black; padding: 6px; ">
-			<!--------------------------OpenSSL ENCRYPT----------------------------!>
-			<div class="" id="openssl_enc_section" style="display:flex; flex-direction:column; ">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>OpenSSL ENCRYPT</label>
-				</div>
-				<label>Password:</label>
-				<input autocomplete="off" type="" value="" id="openssl_enc_password_input" style="" >
-				<label>Cleartext Data:</label>
-				<textarea value="" id="openssl_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="openSSLEnc()">Encrypt OpenSSL</button>
-				</div>
-				<label>Output: Encrypted Data</label>
-				<textarea value="" id="openssl_enc_output" style="color:gray" rows="8" cols="50"></textarea>
+	<div class="" id="openssl_encdec" style="display:flex; flex-direction:column; padding:10px; ">
+		<h1>OPENSSL AES-256-CBC</h1>
+		<div id="" style="display:flex; flex-direction:row; ">
+			<div id="" style="display:flex; flex-direction:column; ">
+				<label>Cleartext:</label>
+				<textarea value="" id="openssl_cleartext" style="" rows="8" cols="50" oninput="executeOpenSSL()"></textarea>
 			</div>
-
-			<!--------------------------OpenSSL DECRYPT----------------------------!>
-			<div class="" id="openssl_dec_section" style="display:flex; flex-direction:column; ">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>OpenSSL DECRYPT</label>
-				</div>
-				<label>Password:</label>
-				<input autocomplete="off" type="" value="" id="openssl_dec_password_input" style="" >
-				<label>Encrypted Data:</label>
-				<textarea value="" id="openssl_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="openSSLDec()">Decrypt OpenSSL</button>
-				</div>
-				<label>Output: Cleartext Data</label>
-				<textarea value="" id="openssl_dec_output" style="color:gray" rows="8" cols="50"></textarea>
+			<div id="" style="display:flex; flex-direction:column; margin-left:5px; margin-right:5px; ">
+				<button class="" id='openssl_enc_button' style="flex-grow:1; background-color:green; " onclick="activateEncOpenSSL()">Encrypt</button>
+				<button class="" id='openssl_dec_button' style="flex-grow:1; background-color:darkred; " onclick="activateDecOpenSSL()">Decrypt</button>
+			</div>
+			<div id="" style="display:flex; flex-direction:column; ">
+				<label>Ciphertext:</label>
+				<textarea disabled value="" id="openssl_ciphertext" style="" rows="8" cols="50" oninput="executeOpenSSL()"></textarea>
 			</div>
 		</div>
-
-		<!--------------------------OBF-1000 SECTION----------------------------!>
-		<div class="" id="obf1000_section" style="display:flex; flex-direction:row; background-color: teal; border: 2px solid black; padding: 6px; ">
-			<!--------------------------OBF-1000 ENCRYPT----------------------------!>
-			<div class="" id="obf-1000_enc_section" style="display:flex; flex-direction:column; ">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>OBF-1000 ENCRYPT</label>
-				</div>
-				<label>Password:</label>
-				<input autocomplete="off" type="" value="" id="obf-1000_enc_password_input" style="" >
-				<label>Cleartext Data:</label>
-				<textarea value="" id="obf-1000_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="obf1000Enc()">Encrypt OBF-1000</button>
-				</div>
-				<label>Output: Encrypted Data</label>
-				<textarea value="" id="obf-1000_enc_output" style="color:gray" rows="8" cols="50"></textarea>
-			</div>
-
-			<!--------------------------OBF-1000 DECRYPT----------------------------!>
-			<div class="" id="obf-1000_dec_section" style="display:flex; flex-direction:column; ">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>OBF-1000 DECRYPT</label>
-				</div>
-				<label>Password:</label>
-				<input autocomplete="off" type="" value="" id="obf-1000_dec_password_input" style="" >
-				<label>Encrypted Data:</label>
-				<textarea value="" id="obf-1000_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="obf1000Dec()">Decrypt OBF-1000</button>
-				</div>
-				<label>Output: Cleartext Data</label>
-				<textarea value="" id="obf-1000_dec_output" style="color:gray" rows="8" cols="50"></textarea>
-			</div>
-		</div>
-
-		<!--------------------------AES-CTR SECTION----------------------------!>
-		<div class="" id="aes-ctr_section" style="display:flex; flex-direction:row; background-color: orange; border: 2px solid black; padding: 6px; ">
-			<!--------------------------AES-CTR ENCRYPT----------------------------!>
-			<div class="" id="aes-ctr_enc_section" style="display:flex; flex-direction:column; ">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>AES-CTR ENCRYPT</label>
-				</div>
-				<label>Password:</label>
-				<input autocomplete="off" type="" value="" id="aes-ctr_enc_password_input" style="" >
-				<label>Cleartext Data:</label>
-				<textarea value="" id="aes-ctr_enc_data_input" style="color:gray" rows="8" cols="50"></textarea>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="aesCtrEnc()">Encrypt AES-CTR</button>
-				</div>
-				<label>Output: Encrypted Data</label>
-				<textarea value="" id="aes-ctr_enc_output" style="color:gray" rows="8" cols="50"></textarea>
-			</div>
-
-			<!--------------------------AES-CTR DECRYPT----------------------------!>
-			<div class="" id="aes-ctr_dec_section" style="display:flex; flex-direction:column; ">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<label>AES-CTR DECRYPT</label>
-				</div>
-				<label>Password:</label>
-				<input autocomplete="off" type="" value="" id="aes-ctr_dec_password_input" style="" >
-				<label>Encrypted Data:</label>
-				<textarea value="" id="aes-ctr_dec_data_input" style="color:gray" rows="8" cols="50"></textarea>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="aesCtrDec()">Decrypt AES-CTR</button>
-				</div>
-				<label>Output: Cleartext Data</label>
-				<textarea value="" id="aes-ctr_dec_output" style="color:gray" rows="8" cols="50"></textarea>
-			</div>
-		</div>
-
-	</div><!----------------CENTER HTML---------------->
-	<!--------------------------SINGLE PAGE OF FUNCTIONS----------------------------!>
+		<label>Password:</label>
+		<input autocomplete="off" type="" value="" id="openssl_password" style="" oninput="executeOpenSSL()">
+	</div>
 
 <script>
 
+	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
+	let openSSLEncrypt = true;
 
-
-	// Detect when user presses 'Enter' on their keyboard.
-	// Then on current page click button if it contains class 'activatable_by_enter'
-	window.addEventListener("keydown", function(event){
-		if (event.key === "Enter"){
-			// If focused element is an input, enter clicks the button with activatable_by_enter.
-			if (document.activeElement.tagName == "INPUT"){
-				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-				if (buttonObj !== null){
-					buttonObj.click();
-				}else{
-					console.log("We hit a null page: " + currentPage);
-				}
-				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
-				// Prevent strange behavior where "the default action is performed on the newly focused element".
-				event.preventDefault();
-				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
-			}else{
-				// Focused element isn't an Input, do nothng I guess?
+	async function executeOpenSSL() {
+		if (openSSLEncrypt === true) { // Encrypt function
+			// Gather inputs.
+			const cleartext = document.getElementById('openssl_cleartext').value;
+			const password = document.getElementById('openssl_password').value;
+			// Execute
+			document.getElementById('openssl_ciphertext').value = await encOpenSSL(cleartext, password);
+		} else { // Decrypt function
+			// Gather inputs.
+			const ciphertext = document.getElementById('openssl_ciphertext').value;
+			const password = document.getElementById('openssl_password').value;
+			// Execute
+			try {
+				document.getElementById('openssl_cleartext').value = await decOpenSSL(ciphertext, password);
+			} catch {
+				document.getElementById('openssl_cleartext').value = 'ERROR';
 			}
 		}
-	});// Listener for Enter
+	}
 
-	// We need to set the origin differently depending if we're a standalone file or not.
-	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
-	// Returns the SERVER_URL to be used for server communication functions.
-	function getServerOrigin(){
-		// Check origin.
-		const url_origin = window.location.origin;
-		let server_origin = '';
-		// If we're standalone, set address to chat.dance instead of a relative path.
-		const regex = new RegExp(/^file/);
-		if (regex.test(url_origin)){
-			//console.log("We're a standalone file!");
-			//server_origin = 'https://chat.dance/obf/';
-			server_origin = 'https://obf.mkrsvr.org/';
-		}else{
-			//console.log("We're NOT a standalone file!");
-			//server_origin = '/obf/';
-			//server_origin = '/';
-			server_origin = '';
+	function activateEncOpenSSL() {
+		// Set flag
+		openSSLEncrypt = true;
+		// Disable decrypt.
+		document.getElementById('openssl_dec_button').style.backgroundColor = 'darkred';
+		document.getElementById('openssl_ciphertext').style.backgroundColor = 'dimgray';
+		document.getElementById('openssl_ciphertext').disabled = true;
+
+		// Enable encrypt.
+		document.getElementById('openssl_enc_button').style.backgroundColor = 'green';
+		document.getElementById('openssl_cleartext').style.backgroundColor = 'gray';
+		document.getElementById('openssl_cleartext').disabled = false;
+	}
+
+	function activateDecOpenSSL() {
+		// Set flag
+		openSSLEncrypt = false;
+		// Enable decrypt.
+		document.getElementById('openssl_dec_button').style.backgroundColor = 'red';
+		document.getElementById('openssl_ciphertext').style.backgroundColor = 'gray';
+		document.getElementById('openssl_ciphertext').disabled = false;
+
+		// Disable encrypt.
+		document.getElementById('openssl_enc_button').style.backgroundColor = 'darkgreen';
+		document.getElementById('openssl_cleartext').style.backgroundColor = 'dimgray';
+		document.getElementById('openssl_cleartext').disabled = true;
+	}
+
+
+	////////////////////////////////////////////////////////////
+	//				ported from index						  //
+	////////////////////////////////////////////////////////////
+	// Base 64 encoding as standardized in RFC 4648: https://datatracker.ietf.org/doc/html/rfc4648#section-4
+	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	// Single Record (TOTAL_RECORD_LENGTH) in bytes:
+	//        43	       1024
+	// |--fingerprint--||--Data--|
+	// Constant declarations.
+	const FINGERPRINT_LENGTH = 43;
+	const FINGERPRINT_BYTE_LENGTH = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
+	const DATA_LENGTH = 1024;
+	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
+	const PASSLOCK_LENGTH = 36;
+	const BROWSERINPUT_LENGTH_LIMIT = 526;
+	const CMDINPUT_LENGTH_LIMIT = 544;
+	const PREBASE64_RANDDATA_BYTE_LENGTH = 768;
+	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
+	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
+	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
+	const MAX_POINTER_VALUE = 999;
+	const FIVE_SECONDS = 5000;
+	const TEN_SECONDS = 10000;
+	const FOUR_MINUTES_THIRTY_SECONDS = 270000;
+	const FIVE_MINUTES = 300000;
+
+	//////////////////////////////////////////////////////////////
+	//				Cryptographic Functions					    //
+	//////////////////////////////////////////////////////////////
+	// Our implementation of OpenSSL's encrypt function.
+	// Inputs: Plaintext.
+	// Output: OpenSSL encrypted base64 string.
+	async function encOpenSSL(plaintext, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
+		// Prepare plaintext for encryption.
+		// Encode plaintext in utf8 and store in Uint8Array inputbytes.
+		const inputbytes = new TextEncoder().encode(plaintext);
+
+		// Make the plaintext look like a file by adding a single newline char to the end of the string.
+		const single_newline = new Uint8Array(1);
+		// utf8 newline code is the value 10(decimal).
+		single_newline[0] = 10;
+		// Merge the two Uint8Arrays.
+		const plaintextbytes = concatBuffer(inputbytes, single_newline);
+
+		// Prepare inputs for digest.
+		//const iter = 10000;
+		//const digest_hash = 'SHA-256';
+		// Generate random salt.
+		//let salt = new Uint8Array(8);
+		let salt;
+		// Turning off dev site functionality while testing crypto.
+		// This also illuminated that we need to decrypt password in checkPasslock because enc data will be different with a different random salt which all enc data should get.
+		salt = window.crypto.getRandomValues(new Uint8Array(8));
+		// Salt is used when hashing, IV (Initialization Vector) for encryption.
+
+		const encoded_pass = new TextEncoder().encode(pass);
+		// Import password into a subtlecrypto-usable key object.
+		const keyMaterial = await getKeyMaterial(encoded_pass);
+		// Derives input bits used for the PBKDF2 cryptoKey object AND the IV.
+		const derived_bits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				//name: key_derivation_algo,
+				salt,
+				iterations: iter,
+				hash: digest_hash,
+			},
+			keyMaterial,
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
+		);
+		const derivedKeyBuffer = new Uint8Array(derived_bits);
+
+		// OpenSSL derives the key and IV using the same PBKDF2 digest.
+		// The first 256 bits are used as key, the last 128 are used for IV.
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keyBytes, 
+			{
+				//name: 'AES-CBC', 
+				name: digest_algorithm,
+				length: 256
+			}, 
+			false, 
+			['encrypt']
+		);
+		// Main Function Digest
+		// MDN syntax: encrypt(algorithm, key, data)
+		//const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
+		const encrypted_result = await window.crypto.subtle.encrypt({ name: digest_algorithm, iv: ivbytes }, key, plaintextbytes);
+		// Combine (OpenSSL hardcoded) constant salt, random salt, and encrypted result as array buffers, then convert to base64.
+		const saltedLiteral = "Salted__";	// OpenSSL hardcoded.
+		const saltbytes = new TextEncoder().encode(saltedLiteral);
+		const two_salts = concatBuffer(saltbytes, salt);
+		// Merge salts with encoded ciphertext.
+		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
+		const encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
+		return encrypted_output_buf.toBase64();
+	}// encOpenSSL()
+
+	// Our implementation of OpenSSL's decrypt function.
+	// Inputs: ciphertext64 is base64. pass is plaintext.
+	// Output: decrypted plaintext.
+	//async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash=, digest_algorithm) {
+	async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
+		
+		// Convert input base 64 to binary.
+		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
+		// ciphertext is now in a form that is ready to give to the encryption function.
+		// Prepare inputs for digest.
+		//const digest_hash = 'SHA-256';
+		//const iter = 10000;
+		// Salt has been preserved from encrypt. Pull digits from their place in the ciphertext.
+		const salta = ciphertextbytes.slice(8,16);
+		const salt = new Uint8Array(salta);
+
+		// Use the key derivation function PBKDF2 to derive bits that will 
+		// be used to create the cryptoKey object needed for the main digest.
+		const encoded_pass = new TextEncoder().encode(pass);
+		const keyMaterial = await getKeyMaterial(encoded_pass);
+		const derived_bits = await window.crypto.subtle.deriveBits(
+			{
+				name: "PBKDF2",
+				salt,
+				iterations: iter,
+				hash: digest_hash,
+			},
+			keyMaterial,
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
+		);
+		const derivedKeyBuffer = new Uint8Array(derived_bits);
+
+		// OpenSSL derives the key and IV using the same PBKDF2 digest.
+		// The first 256 bits are used as key, the last 128 are used for IV.
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const ivbytes = derivedKeyBuffer.slice(32);
+
+		// Extract the encrypted phrase (data) from OpenSSL input
+		const cipherbytesphrase = ciphertextbytes.slice(16);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw', 
+			keyBytes, 
+			{
+				//name: 'AES-CBC', 
+				name: digest_algorithm, 
+				length: 256
+			}, 
+			false, 
+			['decrypt']
+		);
+
+		// MDN syntax: decrypt(algorithm, key, data)
+		const decrypted_result = await window.crypto.subtle.decrypt({ name: digest_algorithm, iv: ivbytes }, key, cipherbytesphrase);
+		// Convert bytes to string.
+		let decrypted_string = new TextDecoder().decode(decrypted_result);
+		// Pop single newline added in enc (openssl emulation).
+		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
+		return decrypted_string;
+	}// decOpenSSL()
+
+	// Process plaintext password into a Key Object usable by subtlecrypto functions.
+	// Input: Plaintext password.
+	// Output: Subtlecrypto usable Key Object.
+	function getKeyMaterial(encoded_pass) {
+		// importKey(format, keyData, algorithm, extractable, keyUsages)
+		return window.crypto.subtle.importKey(
+			"raw",
+			encoded_pass,	// plaintext -> binary
+			"PBKDF2",
+			//algo,
+			false,
+			["deriveBits", "deriveKey"],
+		);
+	}// getKeyMaterial()
+
+	// Encrypting function that prepends a countstring, then runs an XOR on the byte arrrays of the input data and password,
+	// and finally converts the result to a specific length output of 1000 base 64 character string.
+	// Inputs: plaintext64 is base64, password is plaintext.
+	// Outputs: 1000 characters of base64 string.
+	async function obf1000Encrypt(plaintext64, password) {
+		// Add our custom countstring to the data.
+		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext64);
+
+		if (!checkBase64Chars(plaintext64)){
+			throw new Error('Obfuscation step 1 INVALID characters found!');
 		}
-		return server_origin;
-	}// getServerOrigin()
+
+		// Prepare password side for XOR.
+		const passwordBytes = new TextEncoder().encode(password);
+		const shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
+
+		// Perform the XOR bitwise byte by byte.
+		let xorResult = new Array();
+		// XOR is a ^ in javascript
+		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
+			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
+		}
+		// toBase64() works on Uint8Arrays
+		xorResult = new Uint8Array(xorResult);
+		return xorResult.toBase64();
+	}// obf1000Encrypt()
+
+	// obf1000Decrypt() is the inverse function of obf1000Encrypt().
+	// Inputs: ciphertext64 is a base64 string, password is plaintext
+	// Output: decrypted_string is a base64 string
+	async function obf1000Decrypt(ciphertext64, password) {
+		// Convert base64 string to Uint8Array of bytes.
+		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
+
+		// Compute password for XOR.
+		const passwordBytes = new TextEncoder().encode(password);
+		let shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
+
+		// Inverse of XOR is XOR and is communicative.
+		// XOR password and output to get input.
+		// Regular Array needed for shift, pop.
+		let xorResult = new Array();
+		// XOR is typically the carrot char: ^ 
+		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
+			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
+		}
+		// Slice off set of bytes that represent data lenght.
+		const sevenByteSlice = xorResult.slice(0, 7);
+		// Compute value that 7Byte set represents.
+		const dataLength = eval7ByteValue(sevenByteSlice);
+		// Extract data bytes.
+		const dataOffset  = dataLength + 7;
+		let dataBytes = xorResult.slice(7, dataOffset);
+		// Add Salted__ literal.
+		const saltedOffset  = dataLength + 8;
+		let dataBytesWithSalt = new Uint8Array(saltedOffset);
+		const saltedLiteral = "Salted__";
+		const saltBytes = new TextEncoder().encode(saltedLiteral);
+		dataBytesWithSalt.set(saltBytes, 0);
+		// Add data.
+		dataBytesWithSalt.set(dataBytes, 8);
+		// Convert to base64.
+		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
+		return saltedData64;
+	}// obf1000Decrypt()
+
+	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+	// Output always packed into base64.
+	async function encryptAESCTR(cleartext, password, inputType='base64'){
+		console.log("encryptAESCTR called with inputType: " + inputType);
+		let cleartextUint8;
+		// Select input processing type based on function input parameter.
+		if (inputType === 'base64'){// Default usage.
+			
+			cleartextUint8 = Uint8Array.fromBase64(cleartext);
+		}else if (inputType === 'utf8'){
+			cleartextUint8 = new TextEncoder().encode(cleartext);
+		}else{
+			throw new Error("Invalid encryptAESCTR inputType parameter!");
+		}
+		// Convert password text into Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
+		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
+		// This increases our Triple Encrypted Data Record size to 1024.
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// the allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				//name: key_derivation_algo,
+				salt: randSalt,					// salt (MDN suggests at least 16 bytes for security)
+				iterations: 10000,				// strength
+				hash: 'SHA-256',				// 
+			},
+			keyMaterial,						//
+			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+		);
+		// Split the derived bits into key and iv for the encrypt call.
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		// Take first 256 bits derived from deriveBits above for the cryptoKey.
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// Here using same derivation method as for AES-CBC's Initialization Vector.
+		// AES-CTR uses a nonce and a counter block which seems to do a similar thing to an IV. 
+		// Take the rest of the bits (should be 128)
+		// First half of these 128 bits are the nonce.
+		// Second half is the counter.
+		// Slice everything 32 index and after.
+		// |-keyBytes-| |-nonce-| |-counter-| (where X is 32 bit chunk)
+		//  xxxx xxxx 	xx 			xx
+		//
+		// AES-CTR parameters described here:
+		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
+		const nonceAndCounterBytes = derivedKeyBuffer.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-CTR', 
+				length: 256			// Length in bits of input.
+			}, 
+			false,					// extractable boolean 
+			['encrypt']				// keyUsages
+		);
+		// MDN syntax: encrypt(algorithm, key, data)
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
+		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+		// Wrap salt with encoded data so it can be used in the decrypt.
+		const saltAndData = concatBuffer(randSalt, encryptedUint8);
+		// This function outputs base64.
+		const encrypted64 = saltAndData.toBase64();
+		console.log("ciphertext:" + encrypted64 + " password:" + password);
+		console.log("length:" + encrypted64.length);
+		console.log("salt: " + randSalt);
+		return encrypted64;
+	}// encryptAESCTR()
+
+	// Default usage sets output to base64.
+	// Input always packed as base64.
+	async function decryptAESCTR(saltAndCiphertext, password, outputType='base64'){
+		// Convert password into bytes.
+		const passwordUint8 = new TextEncoder().encode(password);
+		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
+		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
+		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		// Cast array returned by slice into a (usable) Uint8Array.
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
+
+		console.log("decryptAESCTR called with outputType: " + outputType);
+		console.log("ciphertext:" + saltAndCiphertext + " password:" + password);
+		console.log("salt: " + packedSalt);
+
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				salt: packedSalt,					// salt (at least 16 bytes for security;
+				iterations: 10000,				// exectute hash function this maniy times
+				hash: 'SHA-256',				// digest algorithm
+			},
+			keyMaterial,						// input data as cryptoKey object
+			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+		);
+
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// 64 nonce bytes with 64 counter block bytes.
+		const nonceAndCounterBytes = derivedKeyBuffer.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let key = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-CTR', 
+				length: 256			// Length in bits of input.
+			}, 
+			false,					// extractable boolean 
+			['decrypt']				// keyUsages
+		);
+
+		// MDN syntax: decrypt(algorithm, key, data)
+		const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
+		const decryptedUint8 = new Uint8Array(decryptedBuffer);
+		let decryptedDecoded;
+		// Select output data type based on function parameter.
+		if (outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+			decryptedDecoded = decryptedUint8.toBase64();
+		}else if (outputType === 'utf8'){
+			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
+		}else{
+			throw new Error("Invalid decryptAESCTR outputType parameter!");
+		}
+		return decryptedDecoded;
+	}// decryptAESCTR()
+
+	// Encrypt stack used in the case user chooses command line.
+	async function encryptDouble(obf1000Pass, ctrPass, fileData){
+		// Obfuscation Step 1 Encrypt
+		const obf1000Encrypted = await obf1000Encrypt(fileData, obf1000Pass);
+		// Obfuscation Step 2 Encrypt
+		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		return ctrEncrypted;
+	}// encryptDouble()
+
+	// Encrypt stack used in the case user chooses Browser.
+	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData){
+		// OpenSSL Encrypt (base 64 encoded)
+		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
+		// Obfuscation Step 1 Encrypt
+		const obf1000Encrypted = await obf1000Encrypt(opensslEncrypted, obf1000Pass);
+		// Obfuscation Step 2 Encrypt
+		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		return ctrEncrypted;
+	}// encryptTriple()
+
+	// Decrypt stack used in the case user chooses Command Line.
+	async function decryptDouble(obf1000Pass, ctrPass, encryptedData){
+		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
+		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
+		return obf1000Decrypted;
+	}// decryptDouble()
+
+	// Decrypt stack used in the case user chooses Browser.
+	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
+		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
+		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
+		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
+		return cleartext;
+	}// decryptTriple()
+
+
+	////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////
+	//				7Byte Functions                       //
+	////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////
+
+	// Input: 
+	// Output: 
+	function add7ByteAndRandFiller(inputData) {
+		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
+		const dataUint8 = Uint8Array.fromBase64(inputData);
+		const dataSansSalt = dataUint8.slice(8);
+		// Length of the data with salt bytes removed.
+		const dataLength = dataSansSalt.length;
+		// Find a 7Byte set that represents dataLength.
+		const sevenByteSet = find7ByteSetForValue(dataLength);
+		// Leave spoace for 7Byte set.
+		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
+		// Compile set of random bytes for filler.
+		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
+		// Compile Byte Stack
+		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
+		// Prepend 7Byte set.
+		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
+		// Next fill in data.
+		dataWithCountBytesAndRandFiller.set(dataSansSalt, 7);
+		// Set remaining space to random data.
+		const dataOffset = 7 + dataLength;
+		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
+		return dataWithCountBytesAndRandFiller;
+	}// add7ByteAndRandFiller()
+
+	// Find set of bytes that compute to an exact value.
+	function find7ByteSetForValue(targetValue){
+		let computedValue;
+		let sevenByteUint8;
+		do{
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
+			computedValue = eval7ByteValue(sevenByteUint8);
+		}while(computedValue != targetValue);
+		return sevenByteUint8;
+	}// find7ByteSetForValue()
+
+	// Find set of bytes that compute to a value in the input range.
+	function find7ByteSetInRange(targetMin, targetMax){
+		let computedValue;
+		let sevenByteUint8;
+		do{
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
+			computedValue = eval7ByteValue(sevenByteUint8);
+		}while(computedValue < targetMin || computedValue > targetMax);
+		return sevenByteUint8;
+	}// find7ByteSetInRange()
+
+	// Convert 7Byte array into mathematical expression then evaluate it.
+	function eval7ByteValue(sevenByteUint8){
+		// Start with empty expression.
+		let mathExpression = "";
+		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
+		for(let i=0; i < 7; i++){
+			if (i % 2 === 0){
+				// Even index bytes -->  numbers
+				mathExpression += sevenByteUint8[i];
+			}else{
+				// Odd index bytes --> symbols
+				if (sevenByteUint8[i] % 2 === 0){
+					// Even bytes convert to (+)
+					mathExpression += "+";
+				}else{
+					// Odd bytes convert to (-)
+					mathExpression += "-";
+				}
+			}
+		}
+		//console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
+		return Math.abs(eval(mathExpression));
+	}// eval7ByteValue()
+
+	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
+	// Inputs: pass is plaintext, length is an integer 
+	// Output: Uint8Array
+	async function getPassHash(passwordBytes, outputLength) {
+		// Take initial SHA256.
+		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
+		let	sha_result;
+		// Loop until we have more than the input length number of bytes of data.
+		do{
+			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
+			// Append SHA256 of Hash(n-1)
+			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
+		} while(sha_cumulative.length < outputLength);
+		// Truncate array to size <length>
+		sha_cumulative = sha_cumulative.slice(0, outputLength);
+		return sha_cumulative;
+	}// getPassHash()
+
+
+	// Return true if input only contains base64 chars, including padding char: '='
+	function checkBase64Chars(input){
+		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
+		if (regex.test(input)){
+			// Return true/valid
+			return true;
+		}else{
+			// Return false/invalid
+			return false;
+		}
+	}// checkBase64Chars()
+
+	// Input: input is a string.
+	// Output: Returns false if the input length (in bytes) is over 526.
+	function checkInputLength(input){
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		let difference = BROWSERINPUT_LENGTH_LIMIT - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		//console.log("size_string: " + size_string);
+		document.getElementById("browserdata_length_label").innerHTML = size_string;
+		if (size > BROWSERINPUT_LENGTH_LIMIT){
+			return false; // Length Check Failed.
+		}else{
+			return true; // Length Check Passed.
+		}
+	}// checkInputLength()
+
+	// Input: input is a string.
+	// Output: Returns false if the input length (in bytes) is over 544.
+	function checkInputLengthUpload(input){
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		let difference = CMDINPUT_LENGTH_LIMIT - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		//console.log("size_string: " + size_string);
+		document.getElementById("uploaddata_length_label").innerHTML = size_string;
+		if (size > CMDINPUT_LENGTH_LIMIT){
+			return false; // Length Check Failed.
+		}else{
+			return true; // Length Check Passed.
+		}
+	}// checkInputLength()
+
+	////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////
+	//				7Byte Functions                       //
+	////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////
+
+	// Input: 
+	// Output: 
+	function add7ByteAndRandFiller(inputData) {
+		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
+		const dataUint8 = Uint8Array.fromBase64(inputData);
+		const dataSansSalt = dataUint8.slice(8);
+		// Length of the data with salt bytes removed.
+		const dataLength = dataSansSalt.length;
+		// Find a 7Byte set that represents dataLength.
+		const sevenByteSet = find7ByteSetForValue(dataLength);
+		// Leave spoace for 7Byte set.
+		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
+		// Compile set of random bytes for filler.
+		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
+		// Compile Byte Stack
+		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
+		// Prepend 7Byte set.
+		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
+		// Next fill in data.
+		dataWithCountBytesAndRandFiller.set(dataSansSalt, 7);
+		// Set remaining space to random data.
+		const dataOffset = 7 + dataLength;
+		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
+		return dataWithCountBytesAndRandFiller;
+	}// add7ByteAndRandFiller()
+
+	// Find set of bytes that compute to an exact value.
+	function find7ByteSetForValue(targetValue){
+		let computedValue;
+		let sevenByteUint8;
+		do{
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
+			computedValue = eval7ByteValue(sevenByteUint8);
+		}while(computedValue != targetValue);
+		return sevenByteUint8;
+	}// find7ByteSetForValue()
+
+	// Find set of bytes that compute to a value in the input range.
+	function find7ByteSetInRange(targetMin, targetMax){
+		let computedValue;
+		let sevenByteUint8;
+		do{
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
+			computedValue = eval7ByteValue(sevenByteUint8);
+		}while(computedValue < targetMin || computedValue > targetMax);
+		return sevenByteUint8;
+	}// find7ByteSetInRange()
+
+	// Convert 7Byte array into mathematical expression then evaluate it.
+	function eval7ByteValue(sevenByteUint8){
+		// Start with empty expression.
+		let mathExpression = "";
+		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
+		for(let i=0; i < 7; i++){
+			if (i % 2 === 0){
+				// Even index bytes -->  numbers
+				mathExpression += sevenByteUint8[i];
+			}else{
+				// Odd index bytes --> symbols
+				if (sevenByteUint8[i] % 2 === 0){
+					// Even bytes convert to (+)
+					mathExpression += "+";
+				}else{
+					// Odd bytes convert to (-)
+					mathExpression += "-";
+				}
+			}
+		}
+		//console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
+		return Math.abs(eval(mathExpression));
+	}// eval7ByteValue()
+
+	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
+	// Inputs: pass is plaintext, length is an integer 
+	// Output: Uint8Array
+	async function getPassHash(passwordBytes, outputLength) {
+		// Take initial SHA256.
+		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
+		let	sha_result;
+		// Loop until we have more than the input length number of bytes of data.
+		do{
+			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
+			// Append SHA256 of Hash(n-1)
+			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
+		} while(sha_cumulative.length < outputLength);
+		// Truncate array to size <length>
+		sha_cumulative = sha_cumulative.slice(0, outputLength);
+		return sha_cumulative;
+	}// getPassHash()
+
+	// Concatenates ArrayBuffers.
+	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
+	// Output: return = buffer1 concatenated with buffer2 in order buffer1, then buffer2.
+	// There doesn't appear to be a native array merge for typed arrays like Uint8Array (their length is fixed).
+	function concatBuffer(buffer1, buffer2) {
+		// Create new uint8array with size of buffer1 length + buffer 2 length.
+		let tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+		// Set left part of the array to buffer 1.
+		tmp.set(new Uint8Array(buffer1), 0);
+		// Set right part of the array to buffer 2.
+		tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
+		return tmp;
+	}// concatBuffer()
+
 
 
 </script>
