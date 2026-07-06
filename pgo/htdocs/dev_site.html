@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin">
 </head>
 <style>
 
@@ -68,17 +69,6 @@
 		font-size: 16px;
 		color: cornflowerblue;
 	}
-/*
-	input {
-		color: maroon;
-		background-color: silver;
-	}
-
-	textarea {
-		color: maroon;
-		background-color: silver;
-	}
-*/
 
 	input {
 		background-color: #272727;
@@ -87,7 +77,8 @@
 		color: #54c597;
 		border-radius: 10px;
 		height: 25px;
-		font-family: Arial, Helvetica, sans-serif;
+		/* Use the first font installed on your system. */
+		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
 	}
 
 	textarea {
@@ -96,18 +87,10 @@
 		border-color: #54c597;
 		color: #54c597;
 		border-radius: 10px;
-		font-family: 'Courier New', monospace; /* I's and L's don't look the same. */
+		/* Use the first font installed on your system. */
+		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+		/*font-family: Liberation Mono;*/
 	}
-
-/*
-	input:disabled {
-		background-color: dimgray;
-	}
-
-	textarea:disabled {
-		background-color: gray;
-	}
-*/
 
 	button {
 		background-color: #434343;
@@ -118,11 +101,7 @@
 		border-radius: 10px;
 		transition: all 0.2s ease;
 	}
-/*
-	button {
-		transition: all 0.2s ease;
-	}
-*/
+
 	button:hover {
 		box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.4);
 		transform: translateY(-2px);
@@ -134,6 +113,38 @@
 		color: #4491d5;
 	}
 
+	.glossy_icon {
+		 background-image: linear-gradient(orange, #aee850);
+		 color: transparent;
+		 background-clip: text;
+	 }
+
+	/* Change cursor image to pointer with plus (identified by 'copy' indicator) */
+	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
+	.encrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div id*/
+	#encrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#encrypt_click_store:hover {
+		cursor: copy;
+	}
+
+	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
+	.decrypt_hover:hover * {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_access:hover {
+		cursor: copy;
+	}
+	/* Apply hover to specific div */
+	#decrypt_click_store:hover {
+		cursor: copy;
+	}
 
 </style>
 <body>
@@ -159,8 +170,46 @@
 	<!--------------------------SINGLE PAGE OF FUNCTIONS----------------------------!>
 
 	<!--------------------------OpenSSL SECTION-------------------------------------!>
-	<div class="" id="openssl_section" style="display:flex; flex-direction:column; padding:10px; width:900px; ">
-		<h1>OpenSSL AES-256-CBC</h1>
+	<div class="" id="openssl_section" style="display:flex; flex-direction:column; padding:10px; width:90%; ">
+		<div style="position:relative; ">
+			<div class="" id="openssl_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+				<p>
+					OpenSSL was chosen for the base encryption because it is widely available from the command line and its featureset includes AES-256-CBC symmetric encryption/decryption which is good enough for the US government as described in its spec document,
+					<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
+					<br><br>
+
+					Our OpenSSL implementation uses the MDN SubtleCrypto library with the encrypt() function which has many options for use including AES-256-CBC.
+					<br>
+
+					<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+					<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-encrypt" target="_blank">encrypt() W3C Specification/Documentation</a><br>
+					<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+
+					<div style='display:flex; flex-direction:column; width:fit-content; padding:5px;'>
+						<label>Linux Command Line Commands:</label>
+						<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+							<div style="display:flex; justify-content:space-between;">
+								<label>Encrypt:</label>
+								<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+							</div>
+							<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+						</div>
+						<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+							<div style="display:flex; justify-content:space-between;">
+								<label>Decrypt:</label>
+								<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
+							</div>
+							<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+						</div>
+					</div>
+				</p>
+				<button class="glossy_button" onclick="hideTipOpenSSL()">Close</button>
+			</div>
+		</div>
+		<div style="display:flex;  ">
+			<h1>OpenSSL AES-256-CBC</h1>
+			<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipOpenSSL()" >[?]</a>
+		</div>
 		<div id="" style="display:flex; flex-direction:row; ">
 			<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 				<label id="cleartext_label">Cleartext:</label>
@@ -191,6 +240,14 @@
 
 	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
 	let openSSLEncrypt = true;
+
+	function showTipOpenSSL () {
+		document.getElementById('openssl_tooltip').style.display = "inline";
+	}
+
+	function hideTipOpenSSL () {
+		document.getElementById('openssl_tooltip').style.display = "none";
+	}
 
 	async function executeOpenSSL() {
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
@@ -988,6 +1045,73 @@
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
 		return tmp;
 	}// concatBuffer()
+
+
+	// Attach encrypt function listeners to access and store divs.
+	document.getElementById("encrypt_click_access").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
+	// Attach decrypt function listeners to access and store divs.
+	document.getElementById("decrypt_click_access").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
+
+	// Copy command line OpenSSL command to clipboard as user clicks div.
+	async function copyEncryptOpenSslCmdToClipboard(){
+		try {
+			// Copy command to clipboard.
+			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc");
+			console.log("OpenSSL encrypt command copied to clipboard.");
+			// Display message indicating command was copied to clipboard.
+			showAllCopiedEncryptCommandInform();
+			// Undisplay message in 5 seconds after showing it.
+			setTimeout(() => {
+				hideAllCopiedEncryptCommandInform();
+			}, FIVE_SECONDS); 
+		} catch (error){
+			console.error(error.message);
+		}
+	}
+
+	function showAllCopiedEncryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
+		}
+	}
+
+	function hideAllCopiedEncryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'none'; // Or 'inline', 'flex', etc.
+		}   
+	}
+
+	// Copy command line OpenSSL command to clipboard as user clicks div.
+	async function copyDecryptOpenSslCmdToClipboard(){
+		try {
+			// Copy command to clipboard.
+			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt");
+			console.log("OpenSSL decrypt command copied to clipboard.");
+			// Display message indicating command was copied to clipboard.
+			showAllCopiedDecryptCommandInform();
+			// Undisplay message in 5 seconds after showing it.
+			setTimeout(() => {
+				hideAllCopiedDecryptCommandInform();
+			}, FIVE_SECONDS); 
+		} catch (error){
+			console.error(error.message);
+		}
+	}
+
+	function showAllCopiedDecryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
+		}
+	}
+	function hideAllCopiedDecryptCommandInform(){
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements){
+			element.style.display = 'none'; // Or 'inline', 'flex', etc.
+		}   
+	}
 
 
 
