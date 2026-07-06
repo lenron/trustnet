@@ -15,7 +15,7 @@
 		font-optical-sizing: auto;
 		font-weight: 600;
 		font-style: normal;
-		color: aliceblue;
+		color: #54c597;
 	}
 
 	html, body {
@@ -63,50 +63,75 @@
 		justify-content: center;
 	}
 
-
-	/* default button styling. HTML style="" will override. */
-/*
-	button {
-		height: 65px;
-		background-color: #434343;
-		border: 2px solid;
-		padding: 2px;
-		margin: 8px;
-		padding-right: 10px;
-		padding-left: 10px;
-		color: #54c597;
-		border-color: #54c597;
-		font-size: 17px;
-		border-radius: 15px;
-	}
-*/
-
-	/*input[type="password"] {*/
-/*
-	input {
-		height: 80px;
-		width: 95%;
-		background-color: #272727;
-		border: 2px solid;
-		padding: 8px;
-		margin: 8px;
-		border-color: #54c597;
-		color: #54c597;
-		font-size: 25px;
-		border-radius: 20px;
-	}
-*/
-	input {
-		background-color: gray;
-	}
-	textarea {
-		background-color: gray;
-	}
-
 	a {
 		font-family: Arial, Helvetica, sans-serif;
 		font-size: 16px;
 		color: cornflowerblue;
+	}
+/*
+	input {
+		color: maroon;
+		background-color: silver;
+	}
+
+	textarea {
+		color: maroon;
+		background-color: silver;
+	}
+*/
+
+	input {
+		background-color: #272727;
+		border: 2px solid;
+		border-color: #54c597;
+		color: #54c597;
+		border-radius: 10px;
+		height: 25px;
+		font-family: Arial, Helvetica, sans-serif;
+	}
+
+	textarea {
+		background-color: #272727;
+		border: 2px solid;
+		border-color: #54c597;
+		color: #54c597;
+		border-radius: 10px;
+		font-family: 'Courier New', monospace; /* I's and L's don't look the same. */
+	}
+
+/*
+	input:disabled {
+		background-color: dimgray;
+	}
+
+	textarea:disabled {
+		background-color: gray;
+	}
+*/
+
+	button {
+		background-color: #434343;
+		border: 2px solid;
+		margin: 5px;
+		color: #54c597;
+		border-color: #54c597;
+		border-radius: 10px;
+		transition: all 0.2s ease;
+	}
+/*
+	button {
+		transition: all 0.2s ease;
+	}
+*/
+	button:hover {
+		box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.4);
+		transform: translateY(-2px);
+	}   
+
+	a {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 16px;
+		color: #4491d5;
 	}
 
 
@@ -132,38 +157,51 @@
 	</div>
 
 	<!--------------------------SINGLE PAGE OF FUNCTIONS----------------------------!>
-	<div class="" id="openssl_encdec" style="display:flex; flex-direction:column; padding:10px; ">
-		<h1>OPENSSL AES-256-CBC</h1>
+
+	<!--------------------------OpenSSL SECTION-------------------------------------!>
+	<div class="" id="openssl_section" style="display:flex; flex-direction:column; padding:10px; width:900px; ">
+		<h1>OpenSSL AES-256-CBC</h1>
 		<div id="" style="display:flex; flex-direction:row; ">
-			<div id="" style="display:flex; flex-direction:column; ">
-				<label>Cleartext:</label>
-				<textarea value="" id="openssl_cleartext" style="" rows="8" cols="50" oninput="executeOpenSSL()"></textarea>
+			<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+				<label id="cleartext_label">Cleartext:</label>
+				<textarea value="" id="openssl_cleartext" style="" rows="8" oninput="executeOpenSSL()"></textarea>
 			</div>
-			<div id="" style="display:flex; flex-direction:column; margin-left:5px; margin-right:5px; ">
-				<button class="" id='openssl_enc_button' style="flex-grow:1; background-color:green; " onclick="activateEncOpenSSL()">Encrypt</button>
-				<button class="" id='openssl_dec_button' style="flex-grow:1; background-color:darkred; " onclick="activateDecOpenSSL()">Decrypt</button>
+			<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
+				<button class="" id='openssl_enc_button' style="flex-grow:1; " onclick="activateEncOpenSSL()">Encrypt<br>------></button>
+				<button class="" id='openssl_dec_button' style="flex-grow:1; " onclick="activateDecOpenSSL()">Decrypt<br><------</button>
 			</div>
-			<div id="" style="display:flex; flex-direction:column; ">
-				<label>Ciphertext:</label>
-				<textarea disabled value="" id="openssl_ciphertext" style="" rows="8" cols="50" oninput="executeOpenSSL()"></textarea>
+			<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+				<label id="ciphertext_label">Ciphertext:</label>
+				<textarea disabled value="" id="openssl_ciphertext" style="" rows="8" oninput="executeOpenSSL()"></textarea>
 			</div>
 		</div>
+		<label id="openssl_error_label" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
 		<label>Password:</label>
 		<input autocomplete="off" type="" value="" id="openssl_password" style="" oninput="executeOpenSSL()">
 	</div>
+	<!--------------------------OpenSSL SECTION-------------------------------------!>
+	<!--------------------------OpenSSL SECTION-------------------------------------!>
 
 <script>
+
+	window.onload = function () {
+		//  Cleaner to set colors using this than setting default?
+		activateEncOpenSSL();
+	}
 
 	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
 	let openSSLEncrypt = true;
 
 	async function executeOpenSSL() {
+		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (openSSLEncrypt === true) { // Encrypt function
 			// Gather inputs.
 			const cleartext = document.getElementById('openssl_cleartext').value;
 			const password = document.getElementById('openssl_password').value;
-			// Execute
-			document.getElementById('openssl_ciphertext').value = await encOpenSSL(cleartext, password);
+			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			if (cleartext !== '' || password !== '') {
+				document.getElementById('openssl_ciphertext').value = await encOpenSSL(cleartext, password);
+			}
 		} else { // Decrypt function
 			// Gather inputs.
 			const ciphertext = document.getElementById('openssl_ciphertext').value;
@@ -171,8 +209,11 @@
 			// Execute
 			try {
 				document.getElementById('openssl_cleartext').value = await decOpenSSL(ciphertext, password);
+				document.getElementById('openssl_error_label').style.visibility = 'hidden';
 			} catch {
-				document.getElementById('openssl_cleartext').value = 'ERROR';
+				//document.getElementById('openssl_error_label').style.display = 'inline';
+				document.getElementById('openssl_error_label').style.visibility = 'visible';
+				document.getElementById('openssl_cleartext').value = '';
 			}
 		}
 	}
@@ -180,29 +221,69 @@
 	function activateEncOpenSSL() {
 		// Set flag
 		openSSLEncrypt = true;
+
+		// Turn off decryption error.
+		document.getElementById('openssl_error_label').style.visibility = 'hidden';
+
 		// Disable decrypt.
-		document.getElementById('openssl_dec_button').style.backgroundColor = 'darkred';
-		document.getElementById('openssl_ciphertext').style.backgroundColor = 'dimgray';
+		// Change button text to disabled color.
+		document.getElementById('openssl_dec_button').style.color = 'dimgray';
+		// Change outline, label to diabled color.
+		document.getElementById('ciphertext_label').style.color = 'gray';
+		document.getElementById('openssl_ciphertext').style.color = 'gray';
+		document.getElementById('openssl_ciphertext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
 		document.getElementById('openssl_ciphertext').disabled = true;
 
 		// Enable encrypt.
-		document.getElementById('openssl_enc_button').style.backgroundColor = 'green';
-		document.getElementById('openssl_cleartext').style.backgroundColor = 'gray';
+		// Change button text to enabled color.
+		document.getElementById('openssl_enc_button').style.color = 'lime';
+		// Change outline, label to enabled color.
+		document.getElementById('cleartext_label').style.color = '#54c597';
+		document.getElementById('openssl_cleartext').style.color = '#54c597';
+		document.getElementById('openssl_cleartext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
 		document.getElementById('openssl_cleartext').disabled = false;
+
+		// Focus newly active textarea
+		document.getElementById('openssl_cleartext').focus();
+
+		// Execute crypto on button click.
+		executeOpenSSL();
 	}
+
+// PGO Green: #54c597
+// PGO Readonly Blue: #4491d5
 
 	function activateDecOpenSSL() {
 		// Set flag
 		openSSLEncrypt = false;
-		// Enable decrypt.
-		document.getElementById('openssl_dec_button').style.backgroundColor = 'red';
-		document.getElementById('openssl_ciphertext').style.backgroundColor = 'gray';
+
+		// Enable decrypt - ciphertext.
+		// Change button text to enabled color.
+		document.getElementById('openssl_dec_button').style.color = 'lime';
+		// Change outline, label to diabled color.
+		document.getElementById('ciphertext_label').style.color = '#54c597';
+		document.getElementById('openssl_ciphertext').style.color = '#54c597';
+		document.getElementById('openssl_ciphertext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
 		document.getElementById('openssl_ciphertext').disabled = false;
 
-		// Disable encrypt.
-		document.getElementById('openssl_enc_button').style.backgroundColor = 'darkgreen';
-		document.getElementById('openssl_cleartext').style.backgroundColor = 'dimgray';
+		// Disable encrypt - cleartext.
+		// Change button text to disabled color.
+		document.getElementById('openssl_enc_button').style.color = 'dimgray';
+		// Change outline, label to enabled color.
+		document.getElementById('cleartext_label').style.color = 'gray';
+		document.getElementById('openssl_cleartext').style.color = 'gray';
+		document.getElementById('openssl_cleartext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
 		document.getElementById('openssl_cleartext').disabled = true;
+
+		// Focus newly active textarea
+		document.getElementById('openssl_ciphertext').focus();
+
+		// Execute crypto on button click.
+		executeOpenSSL();
 	}
 
 
