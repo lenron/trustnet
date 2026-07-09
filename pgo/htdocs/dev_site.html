@@ -846,17 +846,17 @@
 		);
 	}// getKeyMaterial()
 
-	// Encrypting function that prepends a countstring, then runs an XOR on the byte arrrays of the input data and password,
+	// Encrypting function that prepends a countstring, then runs an XOR on the byte arrays of the input data and password,
 	// and finally converts the result to a specific length output of 1000 base 64 character string.
 	// Inputs: plaintext64 is base64, password is plaintext.
 	// Outputs: 1000 characters of base64 string.
-	async function obf1000Encrypt(plaintext64, password) {
+	async function obf1000Encrypt(plaintext, password) {
 		// Add our custom countstring to the data.
-		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext64);
+		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext);
 
-		if (!checkBase64Chars(plaintext64)){
-			throw new Error('Obfuscation step 1 INVALID characters found!');
-		}
+		//if (!checkBase64Chars(plaintext64)){
+			//throw new Error('Obfuscation step 1 INVALID characters found!');
+		//}
 
 		// Prepare password side for XOR.
 		const passwordBytes = new TextEncoder().encode(password);
@@ -892,13 +892,14 @@
 		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
 			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
 		}
-		// Slice off set of bytes that represent data lenght.
+		// Slice off set of bytes that represent data length.
 		const sevenByteSlice = xorResult.slice(0, 7);
 		// Compute value that 7Byte set represents.
 		const dataLength = eval7ByteValue(sevenByteSlice);
 		// Extract data bytes.
 		const dataOffset  = dataLength + 7;
 		let dataBytes = xorResult.slice(7, dataOffset);
+/*
 		// Add Salted__ literal.
 		const saltedOffset  = dataLength + 8;
 		let dataBytesWithSalt = new Uint8Array(saltedOffset);
@@ -908,8 +909,11 @@
 		// Add data.
 		dataBytesWithSalt.set(dataBytes, 8);
 		// Convert to base64.
-		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
-		return saltedData64;
+		//const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
+		const saltedData = new TextDecoder().decode(dataBytesWithSalt);
+*/
+		const saltedData = new TextDecoder().decode(new Uint8Array(dataBytes));
+		return saltedData;
 	}// obf1000Decrypt()
 
 	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
@@ -992,9 +996,9 @@
 		const saltAndData = concatBuffer(randSalt, encryptedUint8);
 		// This function outputs base64.
 		const encrypted64 = saltAndData.toBase64();
-		console.log("ciphertext:" + encrypted64 + " password:" + password);
-		console.log("length:" + encrypted64.length);
-		console.log("salt: " + randSalt);
+		//console.log("ciphertext:" + encrypted64 + " password:" + password);
+		//console.log("length:" + encrypted64.length);
+		//console.log("salt: " + randSalt);
 		return encrypted64;
 	}// encryptAESCTR()
 
@@ -1009,9 +1013,9 @@
 		// Cast array returned by slice into a (usable) Uint8Array.
 		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
 
-		console.log("decryptAESCTR called with outputType: " + outputType);
-		console.log("ciphertext:" + saltAndCiphertext + " password:" + password);
-		console.log("salt: " + packedSalt);
+		//console.log("decryptAESCTR called with outputType: " + outputType);
+		//console.log("ciphertext:" + saltAndCiphertext + " password:" + password);
+		//console.log("salt: " + packedSalt);
 
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
@@ -1116,13 +1120,16 @@
 	// Output: 
 	function add7ByteAndRandFiller(inputData) {
 		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
-		const dataUint8 = Uint8Array.fromBase64(inputData);
-		const dataSansSalt = dataUint8.slice(8);
+		//const dataUint8 = Uint8Array.fromBase64(inputData);
+		//const dataUint8 = new TextEncoder().encode(inputData);
+		const dataUint8 = new TextEncoder().encode(inputData);
+		//const dataSansSalt = dataUint8.slice(8);
+		const dataSansSalt = dataUint8;
 		// Length of the data with salt bytes removed.
 		const dataLength = dataSansSalt.length;
 		// Find a 7Byte set that represents dataLength.
 		const sevenByteSet = find7ByteSetForValue(dataLength);
-		// Leave spoace for 7Byte set.
+		// Leave space for 7Byte set.
 		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
 		// Compile set of random bytes for filler.
 		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
@@ -1251,104 +1258,6 @@
 		}
 	}// checkInputLength()
 
-	////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////
-	//				7Byte Functions                       //
-	////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////
-
-	// Input: 
-	// Output: 
-	function add7ByteAndRandFiller(inputData) {
-		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
-		const dataUint8 = Uint8Array.fromBase64(inputData);
-		const dataSansSalt = dataUint8.slice(8);
-		// Length of the data with salt bytes removed.
-		const dataLength = dataSansSalt.length;
-		// Find a 7Byte set that represents dataLength.
-		const sevenByteSet = find7ByteSetForValue(dataLength);
-		// Leave spoace for 7Byte set.
-		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
-		// Compile set of random bytes for filler.
-		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
-		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
-		// Prepend 7Byte set.
-		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
-		// Next fill in data.
-		dataWithCountBytesAndRandFiller.set(dataSansSalt, 7);
-		// Set remaining space to random data.
-		const dataOffset = 7 + dataLength;
-		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
-		return dataWithCountBytesAndRandFiller;
-	}// add7ByteAndRandFiller()
-
-	// Find set of bytes that compute to an exact value.
-	function find7ByteSetForValue(targetValue){
-		let computedValue;
-		let sevenByteUint8;
-		do{
-			// Roll 7 random bytes.
-			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
-			computedValue = eval7ByteValue(sevenByteUint8);
-		}while(computedValue != targetValue);
-		return sevenByteUint8;
-	}// find7ByteSetForValue()
-
-	// Find set of bytes that compute to a value in the input range.
-	function find7ByteSetInRange(targetMin, targetMax){
-		let computedValue;
-		let sevenByteUint8;
-		do{
-			// Roll 7 random bytes.
-			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
-			computedValue = eval7ByteValue(sevenByteUint8);
-		}while(computedValue < targetMin || computedValue > targetMax);
-		return sevenByteUint8;
-	}// find7ByteSetInRange()
-
-	// Convert 7Byte array into mathematical expression then evaluate it.
-	function eval7ByteValue(sevenByteUint8){
-		// Start with empty expression.
-		let mathExpression = "";
-		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
-		for(let i=0; i < 7; i++){
-			if (i % 2 === 0){
-				// Even index bytes -->  numbers
-				mathExpression += sevenByteUint8[i];
-			}else{
-				// Odd index bytes --> symbols
-				if (sevenByteUint8[i] % 2 === 0){
-					// Even bytes convert to (+)
-					mathExpression += "+";
-				}else{
-					// Odd bytes convert to (-)
-					mathExpression += "-";
-				}
-			}
-		}
-		//console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
-		return Math.abs(eval(mathExpression));
-	}// eval7ByteValue()
-
-	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
-	// Inputs: pass is plaintext, length is an integer 
-	// Output: Uint8Array
-	async function getPassHash(passwordBytes, outputLength) {
-		// Take initial SHA256.
-		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
-		let	sha_result;
-		// Loop until we have more than the input length number of bytes of data.
-		do{
-			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
-			// Append SHA256 of Hash(n-1)
-			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
-		} while(sha_cumulative.length < outputLength);
-		// Truncate array to size <length>
-		sha_cumulative = sha_cumulative.slice(0, outputLength);
-		return sha_cumulative;
-	}// getPassHash()
-
 	// Concatenates ArrayBuffers.
 	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
 	// Output: return = buffer1 concatenated with buffer2 in order buffer1, then buffer2.
@@ -1363,7 +1272,6 @@
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
 		return tmp;
 	}// concatBuffer()
-
 
 	// Attach encrypt function listeners to access and store divs.
 	document.getElementById("encrypt_click_access").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
