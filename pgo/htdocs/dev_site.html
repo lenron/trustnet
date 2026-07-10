@@ -144,6 +144,14 @@
 		cursor: copy;
 	}
 
+	.sidebar_button {
+		margin-top: 30px;
+		writing-mode: vertical-lr;
+		transform: scale(-1, -1);
+		cursor: pointer;
+		
+	}
+
 	.dev_site_sections {
 		display:flex;
 		flex-direction:column;
@@ -161,191 +169,216 @@
 
 </style>
 <body>
-	<!--------------------------HEADER----------------------------!>
-	<div class="header" id="header">
-		<div class="header_content" id="header_left">
-			<div class="header_title">
-				<a href="https://obf.mkrsvr.org" id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-SECRETWORD</a>
+			<!--------------------------HEADER----------------------------!>
+			<div class="header" id="header" style="position:fixed; display:flex; justify-content:space-around; background-color:#434343; height:50px; width:100%; padding: ">
+				<div class="header_content" id="header_left">
+					<div class="header_title">
+						<a href="https://obf.mkrsvr.org" id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-SECRETWORD</a>
+					</div>
+				</div>
+				<div class="header_content" id="header_right">
+					<div class="header_label" style="">
+						<a href="https://obf.mkrsvr.org/faq">FAQ</a>
+					</div>
+					<div class="header_label" style="">
+						<a href="https://obf.mkrsvr.org/dev_site">DEV_SITE</a>
+					</div>
+					<div class="header_label" style="">
+						<a href="https://obf.mkrsvr.org/contact">CONTACT</a>
+					</div>
+				</div>
+			</div>
+			<!--------------------------HEADER----------------------------!>
+	<!--------------------------Sidebar and Page----------------------------!>
+	<div class="" id="sidebar_and_page" style="display:flex; flex-direction:row; width:100%; ">
+		<!--------------------------SIDEBAR----------------------------!>
+		<div class="" id="sidebar_section" style="position:fixed; display:flex; flex-direction:column; background-color:#434343; margin-top:50px; width:70px; height:100%; ">
+			<div class="sidebar_button" id="openssl_sidebar_button" style="border-left: solid magenta;">
+				<a href="#openssl" style="text-decoration:none; "><h1>OpenSSL</h1></a>
+			</div>
+			<div class="sidebar_button" id="obf1000_sidebar_button" style="">
+				<a href="#obf1000" style="text-decoration:none; "><h1>OBF-1000</h1></a>
+			</div>
+			<div class="sidebar_button" id="aesctr_sidebar_button" style="">
+				<a href="#aesctr" style="text-decoration:none; "><h1>AES-CTR</h1></a>
+			</div>
+			<div class="sidebar_button" id="triple_sidebar_button" style="">
+				<a href="#triple" style="text-decoration:none; "><h1>Triple</h1></a>
 			</div>
 		</div>
-		<div class="header_content" id="header_right">
-			<div class="header_label" style="">
-				<a href="https://obf.mkrsvr.org/faq">FAQ</a>
-			</div>
-			<div class="header_label" style="">
-				<a href="https://obf.mkrsvr.org/dev_site">DEV_SITE</a>
-			</div>
-			<div class="header_label" style="">
-				<a href="https://obf.mkrsvr.org/contact">CONTACT</a> </div>
-		</div>
-	</div>
+		<!--------------------------SIDEBAR----------------------------!>
+		<!--------------------------Header and Functions----------------------------!>
+		<div class="" id="header_and_functions" style="display:flex; flex-direction:column; margin-left:70px; width:100%; ">
+			<!--------------------------FUNCTIONS----------------------------!>
+			<div class="" id="functions_section" style="display:flex; flex-direction:column; align-items:center; width:100%; margin-top:50px; ">
+				<!--------------------------OpenSSL SECTION-------------------------------------!>
+				<div class="dev_site_sections" id="openssl_section" style="">
+					<div style="position:relative; ">
+						<div class="" id="openssl_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+							<p>
+								OpenSSL was chosen for the base encryption because it is widely available from the command line and its featureset includes AES-256-CBC symmetric encryption/decryption which is good enough for the US government as described in its spec document,
+								<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
+								<br>
+								<br>
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 
-	<!--------------------------SINGLE PAGE OF FUNCTIONS----------------------------!>
-	<div class="" id="" style="display:flex; flex-direction:column; align-items:center; ">
-		<!--------------------------OpenSSL SECTION-------------------------------------!>
-		<div class="dev_site_sections" id="openssl_section" style="">
-			<div style="position:relative; ">
-				<div class="" id="openssl_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
-					<p>
-						OpenSSL was chosen for the base encryption because it is widely available from the command line and its featureset includes AES-256-CBC symmetric encryption/decryption which is good enough for the US government as described in its spec document,
-						<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
-						<br>
-						<br>
-						<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								Our OpenSSL implementation uses the MDN SubtleCrypto library with the encrypt() function which has many options for use including AES-256-CBC.
+								<br>
 
-						Our OpenSSL implementation uses the MDN SubtleCrypto library with the encrypt() function which has many options for use including AES-256-CBC.
-						<br>
-
-						<div style='display:flex; flex-direction:column; width:fit-content; padding:5px;'>
-							<label>Linux Command Line Commands:</label>
-							<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
-								<div style="display:flex; justify-content:space-between;">
-									<label>Encrypt:</label>
-									<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+								<div style='display:flex; flex-direction:column; width:fit-content; padding:5px;'>
+									<label>Linux Command Line Commands:</label>
+									<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+										<div style="display:flex; justify-content:space-between;">
+											<label>Encrypt:</label>
+											<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+										</div>
+										<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+									</div>
+									<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+										<div style="display:flex; justify-content:space-between;">
+											<label>Decrypt:</label>
+											<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
+										</div>
+										<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+									</div>
 								</div>
-								<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
-							</div>
-							<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
-								<div style="display:flex; justify-content:space-between;">
-									<label>Decrypt:</label>
-									<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
-								</div>
-								<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
-							</div>
+
+								Specification Documentation:
+								<br>
+								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+								<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+
+							</p>
+							<button class="glossy_button" onclick="hideTipOpenSSL()">Close</button>
 						</div>
+					</div>
+					<div style="display:flex;  ">
+						<h1 id="openssl" style="scroll-margin-top:75px; ">OpenSSL AES-256-CBC</h1>
+						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipOpenSSL()" >[?]</a>
+					</div>
+					<div id="" style="display:flex; flex-direction:row; ">
+						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+							<label id="openssl_cleartext_label">Cleartext:</label>
+							<textarea value="" id="openssl_cleartext" style="" rows="8" oninput="executeOpenSSL()"></textarea>
+						</div>
+						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
+							<button class="" id='openssl_enc_button' style="flex-grow:1; " onclick="activateEncOpenSSL()">Encrypt<br>------></button>
+							<button class="" id='openssl_dec_button' style="flex-grow:1; " onclick="activateDecOpenSSL()">Decrypt<br><------</button>
+						</div>
+						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+							<label id="openssl_ciphertext_label">Ciphertext:</label>
+							<textarea value="" id="openssl_ciphertext" style="" rows="8" oninput="executeOpenSSL()"></textarea>
+						</div>
+					</div>
+					<label id="openssl_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+					<label>Password:</label>
+					<input autocomplete="off" type="" value="" id="openssl_password" style="" oninput="executeOpenSSL()">
+				</div>
+				<!--------------------------OpenSSL SECTION-------------------------------------!>
+				<!--------------------------OBF-1000 SECTION-------------------------------------!>
+				<div class="dev_site_sections" id="obf1000_section" style="">
+					<div style="position:relative; ">
+						<div class="" id="obf1000_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+							<!------------------COPY IN TOOLTIP LATER------------------------->
+							<p>
+								OBF-1000 TOOLTIP SECTION
+								<br>
+								<br>
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<br>
+								Specification Documentation:
+								<br>
+								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+								<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
 
-						Specification Documentation:
-						<br>
-						<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
-						<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
-						<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
-						<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
-						<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
-						<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+							</p>
+							<button class="glossy_button" onclick="hideTipObf1000()">Close</button>
+						</div>
+					</div>
+					<div style="display:flex;  ">
+						<h1 id="obf1000" style="scroll-margin-top:75px; ">OBF-1000</h1>
+						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipObf1000()">[?]</a>
+					</div>
+					<div id="" style="display:flex; flex-direction:row; height:350px; ">
+						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+							<label id="obf1000_cleartext_label">Cleartext:</label>
+							<textarea value="" id="obf1000_cleartext" style="" rows="8" oninput="executeObf1000()"></textarea>
+						</div>
+						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
+							<button class="" id='obf1000_enc_button' style="flex-grow:1; " onclick="activateEncObf1000()">Encrypt<br>------></button>
+							<button class="" id='obf1000_dec_button' style="flex-grow:1; " onclick="activateDecObf1000()">Decrypt<br><------</button>
+						</div>
+						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+							<label id="obf1000_ciphertext_label">Ciphertext:</label>
+							<textarea value="" id="obf1000_ciphertext" style="" rows="8" oninput="executeObf1000()"></textarea>
+						</div>
+					</div>
+					<label id="obf1000_error_label" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+					<label>Password:</label>
+					<input autocomplete="off" type="" value="" id="obf1000_password" style="" oninput="executeObf1000()">
+				</div>
+				<!--------------------------OBF-1000 SECTION-------------------------------------!>
+				<!--------------------------AES-CTR SECTION-------------------------------------!>
+				<div class="dev_site_sections" id="aesctr_section" style="">
+					<div style="position:relative; ">
+						<div class="" id="aesctr_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+							<!------------------COPY IN TOOLTIP LATER------------------------->
+							<p>
+								AES-CTR TOOLTIP SECTION
+								<br>
+								<br>
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<br>
+								Specification Documentation:
+								<br>
+								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+								<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
 
-					</p>
-					<button class="glossy_button" onclick="hideTipOpenSSL()">Close</button>
+							</p>
+							<button class="glossy_button" onclick="hideTipAESCTR()">Close</button>
+						</div>
+					</div>
+					<div style="display:flex;  ">
+						<h1 id="aesctr" style="scroll-margin-top:75px; ">AES-CTR</h1>
+						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipAESCTR()" >[?]</a>
+					</div>
+					<div id="" style="display:flex; flex-direction:row; ">
+						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+							<label id="aesctr_cleartext_label">Cleartext:</label>
+							<textarea value="" id="aesctr_cleartext" style="" rows="8" oninput="executeAESCTR()"></textarea>
+						</div>
+						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
+							<button class="" id='aesctr_enc_button' style="flex-grow:1; " onclick="activateEncAESCTR()">Encrypt<br>------></button>
+							<button class="" id='aesctr_dec_button' style="flex-grow:1; " onclick="activateDecAESCTR()">Decrypt<br><------</button>
+						</div>
+						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+							<label id="aesctr_ciphertext_label">Ciphertext:</label>
+							<textarea value="" id="aesctr_ciphertext" style="" rows="8" oninput="executeAESCTR()"></textarea>
+						</div>
+					</div>
+					<label id="aesctr_error_label" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+					<label>Password:</label>
+					<input autocomplete="off" type="" value="" id="aesctr_password" style="" oninput="executeAESCTR()">
 				</div>
+				<!--------------------------AES-CTR SECTION-------------------------------------!>
 			</div>
-			<div style="display:flex;  ">
-				<h1 id="openssl">OpenSSL AES-256-CBC</h1>
-				<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipOpenSSL()" >[?]</a>
-			</div>
-			<div id="" style="display:flex; flex-direction:row; ">
-				<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-					<label id="openssl_cleartext_label">Cleartext:</label>
-					<textarea value="" id="openssl_cleartext" style="" rows="8" oninput="executeOpenSSL()"></textarea>
-				</div>
-				<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
-					<button class="" id='openssl_enc_button' style="flex-grow:1; " onclick="activateEncOpenSSL()">Encrypt<br>------></button>
-					<button class="" id='openssl_dec_button' style="flex-grow:1; " onclick="activateDecOpenSSL()">Decrypt<br><------</button>
-				</div>
-				<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-					<label id="openssl_ciphertext_label">Ciphertext:</label>
-					<textarea disabled value="" id="openssl_ciphertext" style="" rows="8" oninput="executeOpenSSL()"></textarea>
-				</div>
-			</div>
-			<label id="openssl_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
-			<label>Password:</label>
-			<input autocomplete="off" type="" value="" id="openssl_password" style="" oninput="executeOpenSSL()">
+			<!--------------------------FUNCTIONS----------------------------!>
 		</div>
-		<!--------------------------OpenSSL SECTION-------------------------------------!>
-		<!--------------------------OBF-1000 SECTION-------------------------------------!>
-		<div class="dev_site_sections" id="obf1000_section" style="">
-			<div style="position:relative; ">
-				<div class="" id="obf1000_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
-					<!------------------COPY IN TOOLTIP LATER------------------------->
-					<p>
-						OBF-1000 TOOLTIP SECTION
-						<br>
-						<br>
-						<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
-						<br>
-						Specification Documentation:
-						<br>
-						<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
-						<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
-						<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
-						<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
-						<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
-						<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
-
-					</p>
-					<button class="glossy_button" onclick="hideTipObf1000()">Close</button>
-				</div>
-			</div>
-			<div style="display:flex;  ">
-				<h1 id="obf1000">OBF-1000</h1>
-				<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipObf1000()">[?]</a>
-			</div>
-			<div id="" style="display:flex; flex-direction:row; height:350px; ">
-				<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-					<label id="obf1000_cleartext_label">Cleartext:</label>
-					<textarea value="" id="obf1000_cleartext" style="" rows="8" oninput="executeObf1000()"></textarea>
-				</div>
-				<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
-					<button class="" id='obf1000_enc_button' style="flex-grow:1; " onclick="activateEncObf1000()">Encrypt<br>------></button>
-					<button class="" id='obf1000_dec_button' style="flex-grow:1; " onclick="activateDecObf1000()">Decrypt<br><------</button>
-				</div>
-				<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-					<label id="obf1000_ciphertext_label">Ciphertext:</label>
-					<textarea disabled value="" id="obf1000_ciphertext" style="" rows="8" oninput="executeObf1000()"></textarea>
-				</div>
-			</div>
-			<label id="obf1000_error_label" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
-			<label>Password:</label>
-			<input autocomplete="off" type="" value="" id="obf1000_password" style="" oninput="executeObf1000()">
-		</div>
-		<!--------------------------OBF-1000 SECTION-------------------------------------!>
-		<!--------------------------AES-CTR SECTION-------------------------------------!>
-		<div class="dev_site_sections" id="aesctr_section" style="">
-			<div style="position:relative; ">
-				<div class="" id="aesctr_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
-					<!------------------COPY IN TOOLTIP LATER------------------------->
-					<p>
-						AES-CTR TOOLTIP SECTION
-						<br>
-						<br>
-						<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
-						<br>
-						Specification Documentation:
-						<br>
-						<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
-						<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
-						<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
-						<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
-						<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
-						<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
-
-					</p>
-					<button class="glossy_button" onclick="hideTipAESCTR()">Close</button>
-				</div>
-			</div>
-			<div style="display:flex;  ">
-				<h1 id="aesctr">AES-CTR</h1>
-				<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipAESCTR()" >[?]</a>
-			</div>
-			<div id="" style="display:flex; flex-direction:row; ">
-				<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-					<label id="aesctr_cleartext_label">Cleartext:</label>
-					<textarea value="" id="aesctr_cleartext" style="" rows="8" oninput="executeAESCTR()"></textarea>
-				</div>
-				<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
-					<button class="" id='aesctr_enc_button' style="flex-grow:1; " onclick="activateEncAESCTR()">Encrypt<br>------></button>
-					<button class="" id='aesctr_dec_button' style="flex-grow:1; " onclick="activateDecAESCTR()">Decrypt<br><------</button>
-				</div>
-				<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-					<label id="aesctr_ciphertext_label">Ciphertext:</label>
-					<textarea disabled value="" id="aesctr_ciphertext" style="" rows="8" oninput="executeAESCTR()"></textarea>
-				</div>
-			</div>
-			<label id="aesctr_error_label" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
-			<label>Password:</label>
-			<input autocomplete="off" type="" value="" id="aesctr_password" style="" oninput="executeAESCTR()">
-		</div>
-		<!--------------------------AES-CTR SECTION-------------------------------------!>
+		<!--------------------------Header and Functions----------------------------!>
 	</div>
-	<!--------------------------SINGLE PAGE OF FUNCTIONS----------------------------!>
+	<!--------------------------Sidebar and Page----------------------------!>
 	<!--------------------------FOOTER SPACE----------------------------!>
 	<div id="" style="height:500px; ">
 	</div>
@@ -354,11 +387,65 @@
 <script>
 
 	window.onload = function () {
+		//window.scrollTo(0, 0)
 		//  Cleaner to set colors using this than setting default?
-		activateEncOpenSSL();
-		activateEncObf1000();
-		activateEncAESCTR();
+		//activateEncOpenSSL();
+		//activateEncObf1000();
+		//activateEncAESCTR();
 	}
+
+			//<div class="sidebar_button" id="openssl_sidebar_button" style="border-left: solid magenta;">
+	function turnOffPinkBar() {
+		document.getElementById('openssl_sidebar_button').style.borderLeft = 'none';
+		document.getElementById('obf1000_sidebar_button').style.borderLeft = 'none';
+		document.getElementById('aesctr_sidebar_button').style.borderLeft = 'none';
+	}
+
+	function turnOnPinkBarOpenSSL() {
+		document.getElementById('openssl_sidebar_button').style.borderLeft = 'solid magenta';
+	}
+	function turnOnPinkBarObf1000() {
+		document.getElementById('obf1000_sidebar_button').style.borderLeft = 'solid magenta';
+	}
+	function turnOnPinkBarAESCTR() {
+		document.getElementById('aesctr_sidebar_button').style.borderLeft = 'solid magenta';
+	}
+
+	window.addEventListener("scroll", (event) => {
+		let scroll = window.scrollY;
+		console.log(scroll);
+
+		if (scroll < 300) {
+			turnOffPinkBar();
+			turnOnPinkBarOpenSSL();
+		} else if (scroll >= 300 && scroll < 700){
+			turnOffPinkBar();
+			turnOnPinkBarObf1000();
+		} else if (scroll >= 700){
+			turnOffPinkBar();
+			turnOnPinkBarAESCTR();
+		}
+	});
+
+	// Add listeners for focus events for each cleartext + ciphertext window.
+	document.getElementById('openssl_cleartext').addEventListener("focus", (event) => {
+		activateEncOpenSSL();
+	});
+	document.getElementById('openssl_ciphertext').addEventListener("focus", (event) => {
+		activateDecOpenSSL();
+	});
+	document.getElementById('obf1000_cleartext').addEventListener("focus", (event) => {
+		activateEncObf1000();
+	});
+	document.getElementById('obf1000_ciphertext').addEventListener("focus", (event) => {
+		activateDecObf1000();
+	});
+	document.getElementById('aesctr_cleartext').addEventListener("focus", (event) => {
+		activateEncAESCTR();
+	});
+	document.getElementById('aesctr_ciphertext').addEventListener("focus", (event) => {
+		activateDecAESCTR();
+	});
 
 	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
 	let openSSLEncrypt_f = true;
