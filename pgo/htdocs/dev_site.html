@@ -307,7 +307,7 @@
 						<h1 id="obf1000" style="scroll-margin-top:75px; ">OBF-1000</h1>
 						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipObf1000()">[?]</a>
 					</div>
-					<div id="" style="display:flex; flex-direction:row; height:350px; ">
+					<div id="" style="display:flex; flex-direction:row; height:370px; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<label id="obf1000_cleartext_label">Cleartext:</label>
 							<textarea value="" id="obf1000_cleartext" style="" rows="8" oninput="executeObf1000()"></textarea>
@@ -321,7 +321,7 @@
 							<textarea value="" id="obf1000_ciphertext" style="" rows="8" oninput="executeObf1000()"></textarea>
 						</div>
 					</div>
-					<label id="obf1000_error_label" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+					<label id="obf1000_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
 					<label>Password:</label>
 					<input autocomplete="off" type="" value="" id="obf1000_password" style="" oninput="executeObf1000()">
 				</div>
@@ -368,9 +368,61 @@
 							<textarea value="" id="aesctr_ciphertext" style="" rows="8" oninput="executeAESCTR()"></textarea>
 						</div>
 					</div>
-					<label id="aesctr_error_label" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+					<label id="aesctr_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
 					<label>Password:</label>
 					<input autocomplete="off" type="" value="" id="aesctr_password" style="" oninput="executeAESCTR()">
+				</div>
+				<!--------------------------AES-CTR SECTION-------------------------------------!>
+
+				<!--------------------------TRIPLE SECTION-------------------------------------!>
+				<div class="dev_site_sections" id="triple_section" style="">
+					<div style="position:relative; ">
+						<div class="" id="triple_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+							<!------------------COPY IN TOOLTIP LATER------------------------->
+							<p>
+								TRIPLE TOOLTIP SECTION
+								<br>
+								<br>
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<br>
+								Specification Documentation:
+								<br>
+								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
+								<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+								<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+
+							</p>
+							<button class="glossy_button" onclick="hideTipTriple()">Close</button>
+						</div>
+					</div>
+					<div style="display:flex;  ">
+						<h1 id="triple" style="scroll-margin-top:75px; ">Triple</h1>
+						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipTriple()" >[?]</a>
+					</div>
+					<div id="" style="display:flex; flex-direction:row; height:370px; ">
+						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+							<label id="triple_cleartext_label">Cleartext:</label>
+							<textarea value="" id="triple_cleartext" style="" rows="8" oninput="executeTriple()"></textarea>
+						</div>
+						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
+							<button class="" id='triple_enc_button' style="flex-grow:1; " onclick="activateEncTriple()">Encrypt<br>------></button>
+							<button class="" id='triple_dec_button' style="flex-grow:1; " onclick="activateDecTriple()">Decrypt<br><------</button>
+						</div>
+						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+							<label id="triple_ciphertext_label">Ciphertext:</label>
+							<textarea value="" id="triple_ciphertext" style="" rows="8" oninput="executeTriple()"></textarea>
+						</div>
+					</div>
+					<label id="triple_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+					<label>Password 1:</label>
+					<input autocomplete="off" type="" value="" id="triple_password_1" style="" oninput="executeTriple()">
+					<label>Password 2:</label>
+					<input autocomplete="off" type="" value="" id="triple_password_2" style="" oninput="executeTriple()">
+					<label>Password 3:</label>
+					<input autocomplete="off" type="" value="" id="triple_password_3" style="" oninput="executeTriple()">
 				</div>
 				<!--------------------------AES-CTR SECTION-------------------------------------!>
 			</div>
@@ -387,18 +439,15 @@
 <script>
 
 	window.onload = function () {
+		// scroll to top of page (default)
 		//window.scrollTo(0, 0)
-		//  Cleaner to set colors using this than setting default?
-		//activateEncOpenSSL();
-		//activateEncObf1000();
-		//activateEncAESCTR();
 	}
 
-			//<div class="sidebar_button" id="openssl_sidebar_button" style="border-left: solid magenta;">
 	function turnOffPinkBar() {
 		document.getElementById('openssl_sidebar_button').style.borderLeft = 'none';
 		document.getElementById('obf1000_sidebar_button').style.borderLeft = 'none';
 		document.getElementById('aesctr_sidebar_button').style.borderLeft = 'none';
+		document.getElementById('triple_sidebar_button').style.borderLeft = 'none';
 	}
 
 	function turnOnPinkBarOpenSSL() {
@@ -410,10 +459,13 @@
 	function turnOnPinkBarAESCTR() {
 		document.getElementById('aesctr_sidebar_button').style.borderLeft = 'solid magenta';
 	}
+	function turnOnPinkBarTriple() {
+		document.getElementById('triple_sidebar_button').style.borderLeft = 'solid magenta';
+	}
 
 	window.addEventListener("scroll", (event) => {
 		let scroll = window.scrollY;
-		console.log(scroll);
+		//console.log(scroll);
 
 		if (scroll < 300) {
 			turnOffPinkBar();
@@ -421,9 +473,12 @@
 		} else if (scroll >= 300 && scroll < 700){
 			turnOffPinkBar();
 			turnOnPinkBarObf1000();
-		} else if (scroll >= 700){
+		} else if (scroll >= 700 && scroll < 1100){
 			turnOffPinkBar();
 			turnOnPinkBarAESCTR();
+		} else if (scroll >= 1100){
+			turnOffPinkBar();
+			turnOnPinkBarTriple();
 		}
 	});
 
@@ -446,11 +501,18 @@
 	document.getElementById('aesctr_ciphertext').addEventListener("focus", (event) => {
 		activateDecAESCTR();
 	});
+	document.getElementById('triple_cleartext').addEventListener("focus", (event) => {
+		activateEncTriple();
+	});
+	document.getElementById('triple_ciphertext').addEventListener("focus", (event) => {
+		activateDecTriple();
+	});
 
 	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
 	let openSSLEncrypt_f = true;
 	let obf1000Encrypt_f = true;
 	let aesctrEncrypt_f = true;
+	let tripleEncrypt_f = true;
 
 	// Show / hide tooltip functionality.
 	function showTipOpenSSL () {
@@ -477,6 +539,14 @@
 		document.getElementById('aesctr_tooltip').style.display = "none";
 	}
 
+	function showTipTriple() {
+		document.getElementById('triple_tooltip').style.display = "inline";
+	}
+
+	function hideTipTriple() {
+		document.getElementById('triple_tooltip').style.display = "none";
+	}
+
 	///////////////////////////////////////////////////////////////////////////////
 	//					OpenSSL HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
@@ -487,7 +557,7 @@
 			const cleartext = document.getElementById('openssl_cleartext').value;
 			const password = document.getElementById('openssl_password').value;
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
-			if (cleartext !== '' || password !== '') {
+			if (cleartext !== '') {
 				try {
 					document.getElementById('openssl_ciphertext').value = await encOpenSSL(cleartext, password);
 					document.getElementById('openssl_outcome_message').style.visibility = 'visible';
@@ -522,7 +592,7 @@
 		setTimeout(() => {
 			turnOffOpenSSLDecryptOutcomeMessage();
 		}, 2000); 
-	}
+	}// executeOpenSSL()
 
 	function turnOffOpenSSLDecryptOutcomeMessage() {
 		document.getElementById('openssl_outcome_message').style.visibility = 'hidden';
@@ -560,7 +630,7 @@
 
 		// Execute crypto on button click.
 		executeOpenSSL();
-	}
+	}// activateEncOpenSSL()
 
 // PGO Green: #54c597
 // PGO Readonly Blue: #4491d5
@@ -594,7 +664,7 @@
 
 		// Execute crypto on button click.
 		executeOpenSSL();
-	}
+	}// activateDecOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////
 	//					OBF-1000 HTML handling									 //
@@ -606,8 +676,18 @@
 			const cleartext = document.getElementById('obf1000_cleartext').value;
 			const password = document.getElementById('obf1000_password').value;
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
-			if (cleartext !== '' || password !== '') {
-				document.getElementById('obf1000_ciphertext').value = await obf1000Encrypt(cleartext, password);
+			if (cleartext !== '') {
+				try {
+					document.getElementById('obf1000_ciphertext').value = await obf1000EncryptSingle(cleartext, password);
+					document.getElementById('obf1000_outcome_message').style.visibility = 'visible';
+					document.getElementById('obf1000_outcome_message').style.color = 'lime';
+					document.getElementById('obf1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+				} catch {
+					document.getElementById('obf1000_outcome_message').style.visibility = 'visible';
+					document.getElementById('obf1000_outcome_message').style.color = 'red';
+					document.getElementById('obf1000_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+					document.getElementById('obf1000_cleartext').value = '';
+				}
 			}
 		} else { // Decrypt function
 			// Gather inputs.
@@ -615,14 +695,24 @@
 			const password = document.getElementById('obf1000_password').value;
 			// Execute
 			try {
-				document.getElementById('obf1000_cleartext').value = await obf1000Decrypt(ciphertext, password);
-				document.getElementById('obf1000_error_label').style.visibility = 'hidden';
+				document.getElementById('obf1000_cleartext').value = await obf1000DecryptSingle(ciphertext, password);
+				document.getElementById('obf1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('obf1000_outcome_message').style.color = 'lime';
+				document.getElementById('obf1000_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
 			} catch {
-				//document.getElementById('obf1000_error_label').style.display = 'inline';
-				document.getElementById('obf1000_error_label').style.visibility = 'visible';
+				document.getElementById('obf1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('obf1000_outcome_message').style.color = 'red';
+				document.getElementById('obf1000_outcome_message').innerHTML = 'Decryption unsuccessful';
 				document.getElementById('obf1000_cleartext').value = '';
 			}
 		}
+		setTimeout(() => {
+			turnOffObf1000DecryptOutcomeMessage();
+		}, 2000); 
+	}// executeObf1000()
+
+	function turnOffObf1000DecryptOutcomeMessage() {
+		document.getElementById('obf1000_outcome_message').style.visibility = 'hidden';
 	}
 
 	function activateEncObf1000() {
@@ -630,7 +720,7 @@
 		obf1000Encrypt_f = true;
 
 		// Turn off decryption error.
-		document.getElementById('obf1000_error_label').style.visibility = 'hidden';
+		document.getElementById('obf1000_outcome_message').style.visibility = 'hidden';
 
 		// Disable decrypt.
 		// Change button text to disabled color.
@@ -657,7 +747,7 @@
 
 		// Execute crypto on button click.
 		executeObf1000();
-	}
+	}// activateEncObf1000()
 
 // PGO Green: #54c597
 // PGO Readonly Blue: #4491d5
@@ -691,7 +781,7 @@
 
 		// Execute crypto on button click.
 		executeObf1000();
-	}
+	}// activateDecObf1000()
 
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -704,8 +794,18 @@
 			const cleartext = document.getElementById('aesctr_cleartext').value;
 			const password = document.getElementById('aesctr_password').value;
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
-			if (cleartext !== '' || password !== '') {
-				document.getElementById('aesctr_ciphertext').value = await encryptAESCTR(cleartext, password, 'utf8');
+			if (cleartext !== '') {
+				try {
+					document.getElementById('aesctr_ciphertext').value = await encryptAESCTR(cleartext, password, 'utf8');
+					document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+					document.getElementById('aesctr_outcome_message').style.color = 'lime';
+					document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+				} catch {
+					document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+					document.getElementById('aesctr_outcome_message').style.color = 'red';
+					document.getElementById('aesctr_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+					document.getElementById('aesctr_cleartext').value = '';
+				}
 			}
 		} else { // Decrypt function
 			// Gather inputs.
@@ -714,21 +814,32 @@
 			// Execute
 			try {
 				document.getElementById('aesctr_cleartext').value = await decryptAESCTR(ciphertext, password, 'utf8');
-				document.getElementById('aesctr_error_label').style.visibility = 'hidden';
+				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				document.getElementById('aesctr_outcome_message').style.color = 'lime';
+				document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
 			} catch {
-				//document.getElementById('aesctr_error_label').style.display = 'inline';
-				document.getElementById('aesctr_error_label').style.visibility = 'visible';
+				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				document.getElementById('aesctr_outcome_message').style.color = 'red';
+				document.getElementById('aesctr_outcome_message').innerHTML = 'Decryption unsuccessful';
 				document.getElementById('aesctr_cleartext').value = '';
 			}
 		}
+		setTimeout(() => {
+			turnOffAESCTRDecryptOutcomeMessage();
+		}, 2000); 
+	}// executeAESCTR()
+
+	function turnOffAESCTRDecryptOutcomeMessage() {
+		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
 	}
+
 
 	function activateEncAESCTR() {
 		// Set flag
 		aesctrEncrypt_f = true;
 
 		// Turn off decryption error.
-		document.getElementById('aesctr_error_label').style.visibility = 'hidden';
+		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
 
 		// Disable decrypt.
 		// Change button text to disabled color.
@@ -755,7 +866,7 @@
 
 		// Execute crypto on button click.
 		executeAESCTR();
-	}
+	}// activateEncAESCTR()
 
 // PGO Green: #54c597
 // PGO Readonly Blue: #4491d5
@@ -789,8 +900,129 @@
 
 		// Execute crypto on button click.
 		executeAESCTR();
+	}// activateDecAESCTR()
+
+
+	///////////////////////////////////////////////////////////////////////////////
+	//					Triple HTML handling									 //
+	///////////////////////////////////////////////////////////////////////////////
+	async function executeTriple() {
+		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
+		if (tripleEncrypt_f === true) { // Encrypt function
+			// Gather inputs.
+			const cleartext = document.getElementById('triple_cleartext').value;
+			const password1 = document.getElementById('triple_password_1').value;
+			const password2 = document.getElementById('triple_password_2').value;
+			const password3 = document.getElementById('triple_password_3').value;
+			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			if (cleartext !== '') {
+				try {
+					document.getElementById('triple_ciphertext').value = await encryptTriple(password1, password2, password3, cleartext);
+					document.getElementById('triple_outcome_message').style.visibility = 'visible';
+					document.getElementById('triple_outcome_message').style.color = 'lime';
+					document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+				} catch {
+					document.getElementById('triple_outcome_message').style.visibility = 'visible';
+					document.getElementById('triple_outcome_message').style.color = 'red';
+					document.getElementById('triple_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+					document.getElementById('triple_cleartext').value = '';
+				}
+			}
+		} else { // Decrypt function
+			// Gather inputs.
+			const ciphertext = document.getElementById('triple_ciphertext').value;
+			const password1 = document.getElementById('triple_password_1').value;
+			const password2 = document.getElementById('triple_password_2').value;
+			const password3 = document.getElementById('triple_password_3').value;
+			// Execute
+			try {
+				document.getElementById('triple_cleartext').value = await decryptTriple(password1, password2, password3, ciphertext);
+				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				document.getElementById('triple_outcome_message').style.color = 'lime';
+				document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
+			} catch {
+				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				document.getElementById('triple_outcome_message').style.color = 'red';
+				document.getElementById('triple_outcome_message').innerHTML = 'Decryption unsuccessful';
+				document.getElementById('triple_cleartext').value = '';
+			}
+		}
+		setTimeout(() => {
+			turnOffTripleDecryptOutcomeMessage();
+		}, 2000); 
+	}// executeTriple()
+
+	function turnOffTripleDecryptOutcomeMessage() {
+		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
 	}
 
+	function activateEncTriple() {
+		// Set flag
+		tripleEncrypt_f = true;
+
+		// Turn off decryption error.
+		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
+
+		// Disable decrypt.
+		// Change button text to disabled color.
+		document.getElementById('triple_dec_button').style.color = 'dimgray';
+		// Change outline, label to diabled color.
+		document.getElementById('triple_ciphertext_label').style.color = 'gray';
+		document.getElementById('triple_ciphertext').style.color = 'gray';
+		document.getElementById('triple_ciphertext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('triple_ciphertext').disabled = true;
+
+		// Enable encrypt.
+		// Change button text to enabled color.
+		document.getElementById('triple_enc_button').style.color = 'lime';
+		// Change outline, label to enabled color.
+		document.getElementById('triple_cleartext_label').style.color = '#54c597';
+		document.getElementById('triple_cleartext').style.color = '#54c597';
+		document.getElementById('triple_cleartext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('triple_cleartext').disabled = false;
+
+		// Focus newly active textarea
+		document.getElementById('triple_cleartext').focus();
+
+		// Execute crypto on button click.
+		executeTriple();
+	}// activateEncTriple()
+
+// PGO Green: #54c597
+// PGO Readonly Blue: #4491d5
+
+	function activateDecTriple() {
+		// Set flag
+		tripleEncrypt_f = false;
+
+		// Enable decrypt - ciphertext.
+		// Change button text to enabled color.
+		document.getElementById('triple_dec_button').style.color = 'lime';
+		// Change outline, label to diabled color.
+		document.getElementById('triple_ciphertext_label').style.color = '#54c597';
+		document.getElementById('triple_ciphertext').style.color = '#54c597';
+		document.getElementById('triple_ciphertext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('triple_ciphertext').disabled = false;
+
+		// Disable encrypt - cleartext.
+		// Change button text to disabled color.
+		document.getElementById('triple_enc_button').style.color = 'dimgray';
+		// Change outline, label to enabled color.
+		document.getElementById('triple_cleartext_label').style.color = 'gray';
+		document.getElementById('triple_cleartext').style.color = 'gray';
+		document.getElementById('triple_cleartext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('triple_cleartext').disabled = true;
+
+		// Focus newly active textarea
+		document.getElementById('triple_ciphertext').focus();
+
+		// Execute crypto on button click.
+		executeTriple();
+	}// activateDecTriple()
 
 
 	////////////////////////////////////////////////////////////
@@ -977,13 +1209,37 @@
 		);
 	}// getKeyMaterial()
 
+	// Outputs: 1000 characters of base64 string.
+	async function obf1000Encrypt(plaintext64, password) {
+		// Add our custom countstring to the data.
+		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext64);
+
+		if (!checkBase64Chars(plaintext64)){
+			throw new Error('Obfuscation step 1 INVALID characters found!');
+		}
+
+		// Prepare password side for XOR.
+		const passwordBytes = new TextEncoder().encode(password);
+		const shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
+
+		// Perform the XOR bitwise byte by byte.
+		let xorResult = new Array();
+		// XOR is a ^ in javascript
+		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
+			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
+		}
+		// toBase64() works on Uint8Arrays
+		xorResult = new Uint8Array(xorResult);
+		return xorResult.toBase64();
+	}// obf1000Encrypt()
+
 	// Encrypting function that prepends a countstring, then runs an XOR on the byte arrays of the input data and password,
 	// and finally converts the result to a specific length output of 1000 base 64 character string.
 	// Inputs: plaintext64 is base64, password is plaintext.
 	// Outputs: 1000 characters of base64 string.
-	async function obf1000Encrypt(plaintext, password) {
+	async function obf1000EncryptSingle(plaintext, password) {
 		// Add our custom countstring to the data.
-		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext);
+		let dataWithCountAndRandFiller = add7ByteAndRandFillerSingle(plaintext);
 
 		//if (!checkBase64Chars(plaintext64)){
 			//throw new Error('Obfuscation step 1 INVALID characters found!');
@@ -1002,12 +1258,50 @@
 		// toBase64() works on Uint8Arrays
 		xorResult = new Uint8Array(xorResult);
 		return xorResult.toBase64();
-	}// obf1000Encrypt()
+	}// obf1000EncryptSingle()
 
-	// obf1000Decrypt() is the inverse function of obf1000Encrypt().
+
+	async function obf1000Decrypt(ciphertext64, password) {
+		// Convert base64 string to Uint8Array of bytes.
+		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
+
+		// Compute password for XOR.
+		const passwordBytes = new TextEncoder().encode(password);
+		let shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
+
+		// Inverse of XOR is XOR and is communicative.
+		// XOR password and output to get input.
+		// Regular Array needed for shift, pop.
+		let xorResult = new Array();
+		// XOR is typically the carrot char: ^ 
+		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
+			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
+		}
+		// Slice off set of bytes that represent data lenght.
+		const sevenByteSlice = xorResult.slice(0, 7);
+		// Compute value that 7Byte set represents.
+		const dataLength = eval7ByteValue(sevenByteSlice);
+		// Extract data bytes.
+		const dataOffset  = dataLength + 7;
+		let dataBytes = xorResult.slice(7, dataOffset);
+		// Add Salted__ literal.
+		const saltedOffset  = dataLength + 8;
+		let dataBytesWithSalt = new Uint8Array(saltedOffset);
+		const saltedLiteral = "Salted__";
+		const saltBytes = new TextEncoder().encode(saltedLiteral);
+		dataBytesWithSalt.set(saltBytes, 0);
+		// Add data.
+		dataBytesWithSalt.set(dataBytes, 8);
+		// Convert to base64.
+		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
+		return saltedData64;
+	}// obf1000Decrypt()
+
+
+	// obf1000DecryptSingle() is the inverse function of obf1000EncryptSingle().
 	// Inputs: ciphertext64 is a base64 string, password is plaintext
 	// Output: decrypted_string is a base64 string
-	async function obf1000Decrypt(ciphertext64, password) {
+	async function obf1000DecryptSingle(ciphertext64, password) {
 		// Convert base64 string to Uint8Array of bytes.
 		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
 
@@ -1045,7 +1339,9 @@
 */
 		const saltedData = new TextDecoder().decode(new Uint8Array(dataBytes));
 		return saltedData;
-	}// obf1000Decrypt()
+	}// obf1000DecryptSingle()
+
+
 
 	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 	// Output always packed into base64.
@@ -1247,9 +1543,33 @@
 	////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////
 
+	function add7ByteAndRandFiller(inputData) {
+		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
+		const dataUint8 = Uint8Array.fromBase64(inputData);
+		const dataSansSalt = dataUint8.slice(8);
+		// Length of the data with salt bytes removed.
+		const dataLength = dataSansSalt.length;
+		// Find a 7Byte set that represents dataLength.
+		const sevenByteSet = find7ByteSetForValue(dataLength);
+		// Leave spoace for 7Byte set.
+		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
+		// Compile set of random bytes for filler.
+		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
+		// Compile Byte Stack
+		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
+		// Prepend 7Byte set.
+		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
+		// Next fill in data.
+		dataWithCountBytesAndRandFiller.set(dataSansSalt, 7);
+		// Set remaining space to random data.
+		const dataOffset = 7 + dataLength;
+		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
+		return dataWithCountBytesAndRandFiller;
+	}// add7ByteAndRandFiller()
+
 	// Input: 
 	// Output: 
-	function add7ByteAndRandFiller(inputData) {
+	function add7ByteAndRandFillerSingle(inputData) {
 		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
 		//const dataUint8 = Uint8Array.fromBase64(inputData);
 		//const dataUint8 = new TextEncoder().encode(inputData);
@@ -1274,7 +1594,7 @@
 		const dataOffset = 7 + dataLength;
 		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
 		return dataWithCountBytesAndRandFiller;
-	}// add7ByteAndRandFiller()
+	}// add7ByteAndRandFillerSingle()
 
 	// Find set of bytes that compute to an exact value.
 	function find7ByteSetForValue(targetValue){
