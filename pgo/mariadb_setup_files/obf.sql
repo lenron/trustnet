@@ -4,7 +4,7 @@
 USE chatriwe_obf;
 
 -- Create table for obfuscated data.
-CREATE TABLE IF NOT EXISTS obfuscation (id INT NOT NULL AUTO_INCREMENT, fingerprint VARCHAR(43), data VARCHAR(1024), timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(id), UNIQUE(fingerprint));
+CREATE TABLE IF NOT EXISTS obfuscation (id INT NOT NULL AUTO_INCREMENT, fingerprint VARCHAR(43), data VARCHAR(1072), timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(id), UNIQUE(fingerprint));
 -- Create table for passlocks.
 CREATE TABLE IF NOT EXISTS passlock_table (id INT NOT NULL AUTO_INCREMENT, browser_id VARCHAR(64), passlock VARCHAR(64), timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(id));
 

@@ -297,11 +297,6 @@
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
-			<!--<div class="header_label" style="">
-				<label id="dev_site_link">DEV SITE</label>
-				<label id="faq">FAQ</label>
-				<label id="contact">CONTACT</label>
-			</div>-->
 			<div class="header_label" style="">
 				<a href="https://obf.mkrsvr.org/faq">FAQ</a>
 			</div>
@@ -405,22 +400,22 @@
 				<input autocomplete="off" type="password" value="" id="access_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');saveThenShowPage('access_obf1000Pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('access_codeword_input');saveThenShowPage('access_gcm1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="access_obf1000Pass" style="display:none">
+			<!---------------------------gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="access_gcm1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
 					<label>PASS 1</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="access_obf1000Pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="access_gcm1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_obf1000Pass_input');saveThenShowPage('access_ctrPass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_gcm1000Pass_input');saveThenShowPage('access_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -434,7 +429,7 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="access_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_obf1000Pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_gcm1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_ctrPass_input');saveThenShowPage('access_choose');">CONTINUE</button>
 				</div>
 			</div>
@@ -581,22 +576,22 @@
 				<input autocomplete="off" type="password" value="" id="store_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');saveThenShowPage('store_obf1000Pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('store_codeword_input');saveThenShowPage('store_gcm1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="store_obf1000Pass" style="display:none">
+			<!---------------------------gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="store_gcm1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>PASS 1</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf1000Pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="store_gcm1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_obf1000Pass_input');saveThenShowPage('store_ctrPass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_gcm1000Pass_input');saveThenShowPage('store_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -610,7 +605,7 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="store_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_obf1000Pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_gcm1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_ctrPass_input');saveThenShowPage('store_choose');">CONTINUE</button>
 				</div>
 			</div>
@@ -650,12 +645,12 @@
 				<input autocomplete="off" type="password" value="" id="store_codeword_cmdcheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_choose')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdcheckinput', 'store_obf1000Pass_cmdcheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_cmdcheckinput', 'store_gcm1000Pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="store_obf1000Pass_cmdcheck" style="display:none">
+			<!---------------------------Check gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="store_gcm1000Pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
@@ -663,10 +658,10 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf1000Pass_cmdcheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_gcm1000Pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_codeword_cmdcheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1000Pass_cmdcheckinput', 'store_ctrPass_cmdcheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_gcm1000Pass_cmdcheckinput', 'store_ctrPass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -681,7 +676,7 @@
 				<h2>RE-ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="store_ctrPass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_obf1000Pass_cmdcheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_gcm1000Pass_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_ctrPass_cmdcheckinput', 'store_upload')">CONTINUE</button>
 				</div>
 			</div>
@@ -747,12 +742,12 @@
 				<input autocomplete="off" type="password" value="" id="store_codeword_browsercheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_opensslpass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_browsercheckinput', 'store_obf1000Pass_browsercheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_codeword_browsercheckinput', 'store_gcm1000Pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="store_obf1000Pass_browsercheck" style="display:none">
+			<!---------------------------Check gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="store_gcm1000Pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
@@ -760,10 +755,10 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="store_obf1000Pass_browsercheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="store_gcm1000Pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_codeword_browsercheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_obf1000Pass_browsercheckinput', 'store_ctrPass_browsercheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_gcm1000Pass_browsercheckinput', 'store_ctrPass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -778,7 +773,7 @@
 				<h2>RE-ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="store_ctrPass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_obf1000Pass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_gcm1000Pass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkPasslock('store_ctrPass_browsercheckinput', 'store_opensslpass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -891,22 +886,22 @@
 				<input autocomplete="off" type="password" value="" id="existingdata_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_dbase_2options')">BACK</button>-->
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('existingdata_codeword_input');saveThenShowPage('newofflinedatabase_existingdata_obf1000Pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('existingdata_codeword_input');saveThenShowPage('newofflinedatabase_existingdata_gcm1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------EXISTING DATA obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="newofflinedatabase_existingdata_obf1000Pass" style="display:none">
+			<!---------------------------EXISTING DATA gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="newofflinedatabase_existingdata_gcm1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>OFFLINE DATABASE - EXISTING DATA FLOW</label>
 					<label>PASS 1</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="existingdata_obf1000Pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="existingdata_gcm1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('existingdata_obf1000Pass_input');saveThenShowPage('newofflinedatabase_existingdata_ctrPass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('existingdata_gcm1000Pass_input');saveThenShowPage('newofflinedatabase_existingdata_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -920,7 +915,7 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="existingdata_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_existingdata_obf1000Pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_existingdata_gcm1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="getOnlineRecordForNewOfflineDBase('existingdata_ctrPass_input');">CONTINUE</button>
 				</div>
 			</div>
@@ -994,7 +989,8 @@
 	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
 	const FINGERPRINT_BYTE_LENGTH = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
-	const DATA_LENGTH = 1024;
+	//const DATA_LENGTH = 1024;
+	const DATA_LENGTH = 1072;
 	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
 	const PASSLOCK_LENGTH = 36;
 	const BROWSERINPUT_LENGTH_LIMIT = 526;
@@ -1002,6 +998,7 @@
 	const PREBASE64_RANDDATA_BYTE_LENGTH = 768;
 	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
+	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
 	const MAX_POINTER_VALUE = 999;
 	const FIVE_SECONDS = 5000;
@@ -1557,11 +1554,13 @@
 	function getRandDatabase(){
 		// Each record has 43 base64 chars for fingerprint and 1024 chars for the data.
 		// There are 1000 records, so 1000*(1024+43) = 1,067,000 base64 chars.
+		const TOTAL_BASE64_CHARS = 1000 * (DATA_LENGTH + FINGERPRINT_LENGTH);
 		// So we need 1067000 base64 chars * (3 raw bytes/4 base 64 chars) = 800250 raw bytes from subtle crypto.
-
+		const TOTAL_RAW_BYTES_NEEDED = TOTAL_BASE64_CHARS * (3/4);
+console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		let randBytes = new Uint8Array(0);			// random raw bytes that will be converted to base64 database
 		//let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
-		let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
+		let bytesStillNeeded = TOTAL_RAW_BYTES_NEEDED; // total number of random raw bytes we need to generate to make the database.
 		do{
 			if (bytesStillNeeded > 65536){
 				randBytes = concatBuffer(randBytes, window.crypto.getRandomValues(new Uint8Array(65536)));
@@ -1606,7 +1605,7 @@
 	// Returns true if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint){
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
-		const regex = new RegExp(`^[A-Za-z0-9+/]{${FINGERPRINT_LENGTH}}$`);
+		const regex = new RegExp(`^[A-Za-z0-9+/=]{${FINGERPRINT_LENGTH}}$`);
 		if (regex.test(fingerprint)){
 			return true;
 		}else{
@@ -1616,7 +1615,7 @@
 
 	// Returns true if input has precisely DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
-		const regex = new RegExp(`^[A-Za-z0-9+/]{${DATA_LENGTH}}$`);
+		const regex = new RegExp(`^[A-Za-z0-9+/=]{${DATA_LENGTH}}$`);
 		if (regex.test(data)){
 			return true;
 		}else{
@@ -1632,6 +1631,8 @@
 		}
 
 		if (!checkDataIsValid(encryptedData)){
+//console.log('encrypted data: ', encryptedData);
+//console.log('encrypted data length', encryptedData.length);
 			throw new Error('Attempt to store failed! DATA is invalid.');
 		}else{
 			console.log("DATA IS VALID!");
@@ -1717,7 +1718,7 @@
 		//console.log("new passlock: " + passlock);
 
 		// Data will be stored at keyword's 'location'.
-		// Extract keyword using regex. could be: codeword, obf1000Pass, obf12pass, opensslpass
+		// Extract keyword using regex. could be: codeword, gcm1000Pass, obf12pass, opensslpass
 		const keyword = extractKeyword(inputId);
 		// Extracts either user password or data from DOM object's  value.
 		const cleartextData = extractCleartextData(inputId);
@@ -1836,13 +1837,13 @@
 		// Get cleartext passwords for encryption.
 		const cleartextSet = await passlockDecryptSet();
 		const fingerprintAndData = {};
-		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1000Pass'], cleartextSet['ctrPass']);
+		fingerprintAndData['fingerprint'] = await computeFingerprint(cleartextSet['codeword'], cleartextSet['gcm1000Pass'], cleartextSet['ctrPass']);
 		//Check for existence of 'key' in js Object.
 		if ('opensslpass' in passlockedData){
 			//console.log("we found opensslpass in passlockedData");
-			fingerprintAndData['data'] = await encryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], cleartextSet['data']);
+			fingerprintAndData['data'] = await encryptTriple(cleartextSet['gcm1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], cleartextSet['data']);
 		}else{
-			fingerprintAndData['data'] = await encryptDouble(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['data']);
+			fingerprintAndData['data'] = await encryptDouble(cleartextSet['gcm1000Pass'], cleartextSet['ctrPass'], cleartextSet['data']);
 		}
 		return fingerprintAndData;
 	}// getFpAndDataForStore()
@@ -1893,7 +1894,7 @@
 	async function getFpForAccess(){
 		// Get cleartext passwords for encryption.
 		const cleartextSet = await passlockDecryptSet();
-		const fingerprint = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1000Pass'], cleartextSet['ctrPass']);
+		const fingerprint = await computeFingerprint(cleartextSet['codeword'], cleartextSet['gcm1000Pass'], cleartextSet['ctrPass']);
 		return fingerprint;
 	}// getFpForAccess()
 
@@ -1920,7 +1921,7 @@
 		// Get set of decrypted user passwords.
 		const cleartextSet = await passlockDecryptSet();
 		// Not adding try/catch here. I think it would be more helpful to know what failed instead as it would likely be not a password entry error since there was data to operate on (fingerprint loaded data).
-		const decryptedData  = await decryptDouble(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], encryptedData);
+		const decryptedData  = await decryptDouble(cleartextSet['gcm1000Pass'], cleartextSet['ctrPass'], encryptedData);
 
 			// bytes is Uint8Array
 			const bytes = Uint8Array.fromBase64(decryptedData);
@@ -1968,11 +1969,12 @@
 
 	async function decryptAndShowCleartext(encryptedData){
 		const cleartextSet = await passlockDecryptSet();
-		//const decryptedData  = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
+		//const decryptedData  = await decryptTriple(cleartextSet['gcm1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
 		let decryptedData;
 		try {
-			decryptedData = await decryptTriple(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
+			decryptedData = await decryptTriple(cleartextSet['gcm1000Pass'], cleartextSet['ctrPass'], cleartextSet['opensslpass'], encryptedData);
 		}catch (error){
+			console.log(error);
 			// Would it make sense to catch a specific error?
 			// Assume there was a password entry error.
 			showPage("password_entry_error");
@@ -2636,71 +2638,263 @@
 		);
 	}// getKeyMaterial()
 
-	// Encrypting function that prepends a countstring, then runs an XOR on the byte arrrays of the input data and password,
-	// and finally converts the result to a specific length output of 1000 base 64 character string.
-	// Inputs: plaintext64 is base64, password is plaintext.
-	// Outputs: 1000 characters of base64 string.
-	async function obf1000Encrypt(plaintext64, password) {
-		// Add our custom countstring to the data.
-		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext64);
 
-		if (!checkBase64Chars(plaintext64)){
-			throw new Error('Obfuscation step 1 INVALID characters found!');
+	// Default triple indicates this will be used in PGO triple stack.
+	async function encryptGCM1000(cleartext, password, inputType='triple'){
+		// Create byte array to hold cleartext data.
+		let cleartextUint8 = new Uint8Array;
+		// Compose data based on function parameter.
+		if (inputType === 'base64'){ // Default usage.
+			cleartextUint8 = Uint8Array.fromBase64(cleartext);
+		}else if (inputType === 'utf8'){
+			cleartextUint8 = new TextEncoder().encode(cleartext);
+		}else if (inputType === 'triple'){ // Default usage.
+			// Extract salt for triple stack usage.
+			cleartextWithSalt = Uint8Array.fromBase64(cleartext);
+			// Slice off the 8 bytes from OpenSSL that convert to: Salted__
+			cleartextUint8 = cleartextWithSalt.slice(8);
+		}else{
+			throw new Error("Invalid encryptGCM inputType parameter!");
 		}
+		// Add 7byte prepend (representing length of filler) and random filler postpend of that length.
+		const wrappedCleartext64 = wrap7Byte(cleartextUint8);
+		// Always use base64 for 1000 wrapping for base encryption.
+		const gcmEncrypted64 = await encryptGCM(wrappedCleartext64, password, 'base64');
+		return gcmEncrypted64;
+	}
 
-		// Prepare password side for XOR.
-		const passwordBytes = new TextEncoder().encode(password);
-		const shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
+	// Default triple indicates this will be used in PGO triple stack.
+	async function decryptGCM1000(ciphertext64, password, outputType='triple'){
+		// Always output base64 for base encryption in 1000 wrapping context.
+		const gcmDecrypted64 = await decryptGCM(ciphertext64, password, 'base64');
+		const unwrappedCleartextUint8 = unwrap7Byte(gcmDecrypted64);
 
-		// Perform the XOR bitwise byte by byte.
-		let xorResult = new Array();
-		// XOR is a ^ in javascript
-		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
+		let decryptedCleartext;
+		// Select output data type based on function parameter.
+		if (outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+			decryptedCleartext = unwrappedCleartextUint8.toBase64();
+		}else if (outputType === 'utf8'){
+			decryptedCleartext = new TextDecoder().decode(unwrappedCleartextUint8);
+		}else if (outputType === 'triple'){// Default usage.
+			saltAddedCleartextUint8 = addSaltedLiteral(unwrappedCleartextUint8);
+			decryptedCleartext = saltAddedCleartextUint8.toBase64();
+		}else{
+			throw new Error("Invalid decryptAESGCM outputType parameter!");
 		}
-		// toBase64() works on Uint8Arrays
-		xorResult = new Uint8Array(xorResult);
-		return xorResult.toBase64();
-	}// obf1000Encrypt()
+		return decryptedCleartext;
+	}
 
-	// obf1000Decrypt() is the inverse function of obf1000Encrypt().
-	// Inputs: ciphertext64 is a base64 string, password is plaintext
-	// Output: decrypted_string is a base64 string
-	async function obf1000Decrypt(ciphertext64, password) {
-		// Convert base64 string to Uint8Array of bytes.
-		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
+	function addSaltedLiteral(inputDataUint8) {
+		// Get length of input data in number of bytes.
+		const dataLength = inputDataUint8.length;
+		const saltedOffset  = dataLength + 8;
+		// Create new array that is the input length +8 for the salt.
+		let dataBytesWithSalt = new Uint8Array(saltedOffset);
+		// Get byte form of salted literal.
+		const saltedLiteral = "Salted__";
+		const saltBytes = new TextEncoder().encode(saltedLiteral);
+		// Prepend with salted literal.
+		dataBytesWithSalt.set(saltBytes, 0);
+		// Finally, fill in data behind salted literal.
+		dataBytesWithSalt.set(inputDataUint8, 8);
+		return dataBytesWithSalt;
+	}
 
-		// Compute password for XOR.
-		const passwordBytes = new TextEncoder().encode(password);
-		let shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
-
-		// Inverse of XOR is XOR and is communicative.
-		// XOR password and output to get input.
-		// Regular Array needed for shift, pop.
-		let xorResult = new Array();
-		// XOR is typically the carrot char: ^ 
-		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
-		}
-		// Slice off set of bytes that represent data lenght.
-		const sevenByteSlice = xorResult.slice(0, 7);
+	function unwrap7Byte(inputData64) {
+		inputDataUint8 = Uint8Array.fromBase64(inputData64);
+		// Slice off set of bytes that represent data length.
+		const sevenByteSlice = inputDataUint8.slice(0, 7);
 		// Compute value that 7Byte set represents.
 		const dataLength = eval7ByteValue(sevenByteSlice);
 		// Extract data bytes.
 		const dataOffset  = dataLength + 7;
-		let dataBytes = xorResult.slice(7, dataOffset);
-		// Add Salted__ literal.
-		const saltedOffset  = dataLength + 8;
-		let dataBytesWithSalt = new Uint8Array(saltedOffset);
-		const saltedLiteral = "Salted__";
-		const saltBytes = new TextEncoder().encode(saltedLiteral);
-		dataBytesWithSalt.set(saltBytes, 0);
-		// Add data.
-		dataBytesWithSalt.set(dataBytes, 8);
-		// Convert to base64.
-		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
-		return saltedData64;
-	}// obf1000Decrypt()
+		dataBytes = inputDataUint8.slice(7, dataOffset);
+		return dataBytes;
+	}
+
+	function wrap7Byte(inputDataUint8) {
+		// Length of the data with salt bytes removed.
+		const dataLength = inputDataUint8.length;
+		// Find a 7Byte set that represents dataLength.
+		const sevenByteSet = find7ByteSetForValue(dataLength);
+		// Leave space for 7Byte set.
+		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
+		// Compile set of random bytes for filler.
+		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
+		// Compile Byte Stack
+		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
+		// Prepend 7Byte set.
+		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
+		// Next fill in data.
+		dataWithCountBytesAndRandFiller.set(inputDataUint8, 7);
+		// Set remaining space to random data.
+		const dataOffset = 7 + dataLength;
+		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
+		dataWithCountBytesAndRandFiller64 = dataWithCountBytesAndRandFiller.toBase64();
+		return dataWithCountBytesAndRandFiller64;
+	}// wrap7Byte()
+
+
+	// Replacing obf1000 with standard that natively offers authentication.
+	async function encryptGCM(cleartext, password, inputType='base64'){
+		//console.log("encryptGCM1000 called with inputType: " + inputType);
+
+		// Create byte array to hold cleartext data.
+		let cleartextUint8 = new Uint8Array;
+		// Compose data based on function parameter.
+		if (inputType === 'base64'){ // Default usage.
+			cleartextUint8 = Uint8Array.fromBase64(cleartext);
+		}else if (inputType === 'utf8'){
+			cleartextUint8 = new TextEncoder().encode(cleartext);
+		}else{
+			throw new Error("Invalid encryptGCM inputType parameter!");
+		}
+		// Convert password text into Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
+		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
+		// This increases our Triple Encrypted Data Record size to 1024.
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// the allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				//name: key_derivation_algo,
+				salt: randSalt,					// salt (MDN suggests at least 16 bytes for security)
+				iterations: 10000,				// strength
+				hash: 'SHA-256',				// 
+			},
+			keyMaterial,						//
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 96 for random IV as specified NIST SP800-38D Section 8.2.
+		);
+		// Split the derived bits into key and iv for the encrypt call.
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		// Take first 256 bits derived from deriveBits above for the cryptoKey.
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// 256 bits for key, 96 bits for IV for GCM.
+		// |-keyBytes-| |-IV-| (where X is 32 bit chunk)
+		//  xxxx xxxx 	 x x x  			
+		//
+		// AES-CTR parameters described here:
+		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
+		const ivBytes = derivedKeyBuffer.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-GCM 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let keyGCM = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-GCM', 
+				length: 256			// Length in bits of input.
+			}, 
+			false,					// extractable boolean 
+			['encrypt']				// keyUsages
+		);
+
+		// AesGcmParams object.
+		// {name, iv, additionalData, tagLength}
+		// tagLength defaults to 128 (16 bytes)
+		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
+		// MDN syntax: encrypt(algorithm, key, data)
+		const inputTypeUint8 = new TextEncoder().encode(inputType);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8}, keyGCM, cleartextUint8);
+
+        //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
+		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+		// Wrap salt with encoded data so it can be used in the decrypt.
+		const saltAndData = concatBuffer(randSalt, encryptedUint8);
+		// This function outputs base64.
+		const encrypted64 = saltAndData.toBase64();
+		//console.log("ciphertext:" + encrypted64 + " password:" + password);
+		//console.log("length:" + encrypted64.length);
+		//console.log("salt: " + randSalt);
+		return encrypted64;
+	}// encryptGCM()
+
+
+	async function decryptGCM(saltAndCiphertext, password, outputType='base64'){
+		// Convert password into bytes.
+		const passwordUint8 = new TextEncoder().encode(password);
+		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
+		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
+		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		// Cast array returned by slice into a (usable) Uint8Array.
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				salt: packedSalt,					// salt (at least 16 bytes for security;
+				iterations: 10000,				// exectute hash function this maniy times
+				hash: 'SHA-256',				// digest algorithm
+			},
+			keyMaterial,						// input data as cryptoKey object
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+		);
+
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// 96 IV bits for GCM
+		const ivBytes = derivedKeyBuffer.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let keyGCM = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-GCM', 
+				length: 256			// Length in bits of input.
+			}, 
+			false,					// extractable boolean 
+			['decrypt']				// keyUsages
+		);
+
+		// MDN syntax: decrypt(algorithm, key, data)
+		//const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
+		const outputTypeUint8 = new TextEncoder().encode(outputType);
+        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8}, keyGCM, encodedCiphertextUint8);
+
+		const decryptedUint8 = new Uint8Array(decryptedBuffer);
+		let decryptedDecoded;
+		// Select output data type based on function parameter.
+		if (outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+			decryptedDecoded = decryptedUint8.toBase64();
+		}else if (outputType === 'utf8'){
+			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
+		}else{
+			throw new Error("Invalid decryptAESGCM outputType parameter!");
+		}
+		return decryptedDecoded;
+	}// decryptGCM()
+
+
+
 
 	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 	// Output always packed into base64.
@@ -2860,56 +3054,58 @@
 		return decryptedDecoded;
 	}// decryptAESCTR()
 
+
 	// Encrypt stack used in the case user chooses command line.
-	async function encryptDouble(obf1000Pass, ctrPass, fileData){
+	async function encryptDouble(gcm1000Pass, ctrPass, fileData){
 		// Obfuscation Step 1 Encrypt
-		const obf1000Encrypted = await obf1000Encrypt(fileData, obf1000Pass);
+		const gcm1000Encrypted = await encryptGCM1000(fileData, gcm1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
 		return ctrEncrypted;
 	}// encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
-	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData){
+	async function encryptTriple(gcm1000Pass, ctrPass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
 		// Obfuscation Step 1 Encrypt
-		const obf1000Encrypted = await obf1000Encrypt(opensslEncrypted, obf1000Pass);
+		const gcm1000Encrypted = await encryptGCM1000(opensslEncrypted, gcm1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
 		return ctrEncrypted;
 	}// encryptTriple()
 
 	// Decrypt stack used in the case user chooses Command Line.
-	async function decryptDouble(obf1000Pass, ctrPass, encryptedData){
+	async function decryptDouble(gcm1000Pass, ctrPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
-		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
-		return obf1000Decrypted;
+		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass);
+		return gcm1000Decrypted;
 	}// decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
-	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
+	async function decryptTriple(gcm1000Pass, ctrPass, opensslPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
-		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
-		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
+		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass);
+		const cleartext = await decOpenSSL(gcm1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
 		return cleartext;
 	}// decryptTriple()
+
 
 	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
 	// Inputs: plaintext.
 	// Output: hexadecimal.
-	async function computeFingerprint(codeword, obf1000Pass, ctrPass){
+	async function computeFingerprint(codeword, gcm1000Pass, ctrPass){
 		// Convert to lowercase.
 		const codewordLower = codeword.toLowerCase();
 		// Take SHA-256 hash of codeword, obf1_pass, obf2_pass
 		const enc = new TextEncoder();
 		const codewordBuf = enc.encode(codewordLower);
-		const obf1000PassBuff = enc.encode(obf1000Pass);
+		const gcm1000PassBuff = enc.encode(gcm1000Pass);
 		const ctrPassBuff = enc.encode(ctrPass);
 		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
 		const uint8 = new Uint8Array(codewordHash);
 		const cwh_b64 = uint8.toBase64();
-		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1000PassBuff);
+		const obf1pHash = await crypto.subtle.digest('SHA-256', gcm1000PassBuff);
 		const obf2pHash = await crypto.subtle.digest('SHA-256', ctrPassBuff);
 		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
 		const codeword_and_obf1pHash = concatBuffer(codewordHash, obf1pHash)
@@ -2984,31 +3180,6 @@
 	////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////
 
-	// Input: 
-	// Output: 
-	function add7ByteAndRandFiller(inputData) {
-		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
-		const dataUint8 = Uint8Array.fromBase64(inputData);
-		const dataSansSalt = dataUint8.slice(8);
-		// Length of the data with salt bytes removed.
-		const dataLength = dataSansSalt.length;
-		// Find a 7Byte set that represents dataLength.
-		const sevenByteSet = find7ByteSetForValue(dataLength);
-		// Leave spoace for 7Byte set.
-		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
-		// Compile set of random bytes for filler.
-		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
-		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
-		// Prepend 7Byte set.
-		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
-		// Next fill in data.
-		dataWithCountBytesAndRandFiller.set(dataSansSalt, 7);
-		// Set remaining space to random data.
-		const dataOffset = 7 + dataLength;
-		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
-		return dataWithCountBytesAndRandFiller;
-	}// add7ByteAndRandFiller()
 
 	// Find set of bytes that compute to an exact value.
 	function find7ByteSetForValue(targetValue){
@@ -3401,7 +3572,6 @@
 		<div class="header_content" id="header_left">
 			<div class="header_title">
 				<a id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-OFFLINEWORD</a>
-				<!--<a id="titletext" style="font-size:30px" href="/obf">SECRETWORD</a>--!>
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
@@ -3446,12 +3616,12 @@
 				<input autocomplete="off" type="password" value="" id="offlinesync_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_codeword_input'); saveThenShowPage('offlinesync_obf1000Pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_codeword_input'); saveThenShowPage('offlinesync_gcm1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------SYNC TO ONLINE obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinesync_obf1000Pass" style="display:none">
+			<!---------------------------SYNC TO ONLINE gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinesync_gcm1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>SYNC FLOW</label>
@@ -3459,10 +3629,10 @@
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinesync_obf1000Pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlinesync_gcm1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_obf1000Pass_input'); saveThenShowPage('offlinesync_ctrPass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_gcm1000Pass_input'); saveThenShowPage('offlinesync_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3477,7 +3647,7 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlinesync_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_obf1000Pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_gcm1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptSyncToOnline('offlinesync_ctrPass_input')">SYNC TO ONLINE</button>
 				</div>
 			</div>
@@ -3495,12 +3665,12 @@
 				<input autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); saveThenShowPage('offlineaccess_obf1000Pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); saveThenShowPage('offlineaccess_gcm1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlineaccess_obf1000Pass" style="display:none">
+			<!---------------------------gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlineaccess_gcm1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>ACCESS FLOW</label>
@@ -3508,10 +3678,10 @@
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlineaccess_obf1000Pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlineaccess_gcm1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf1000Pass_input');saveThenShowPage('offlineaccess_ctrPass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_gcm1000Pass_input');saveThenShowPage('offlineaccess_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3526,7 +3696,7 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlineaccess_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_obf1000Pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_gcm1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_ctrPass_input');saveThenShowPage('offlineaccess_choose');">CONTINUE</button>
 				</div>
 			</div>
@@ -3681,12 +3851,12 @@
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');saveThenShowPage('offlinestore_obf1000Pass')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');saveThenShowPage('offlinestore_gcm1000Pass')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1000Pass" style="display:none">
+			<!---------------------------gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_gcm1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3694,10 +3864,10 @@
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_input" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_gcm1000Pass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf1000Pass_input');saveThenShowPage('offlinestore_ctrPass');">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_gcm1000Pass_input');saveThenShowPage('offlinestore_ctrPass');">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3712,7 +3882,7 @@
 				<h2>ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_obf1000Pass')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_gcm1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_ctrPass_input');saveThenShowPage('offlinestore_choose');">CONTINUE</button>
 				</div>
 			</div>
@@ -3754,12 +3924,12 @@
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdcheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_choose')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdcheckinput', 'offlinestore_obf1000Pass_cmdcheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdcheckinput', 'offlinestore_gcm1000Pass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1000Pass_cmdcheck" style="display:none">
+			<!---------------------------Check gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_gcm1000Pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3768,10 +3938,10 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 1</h2>c
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_cmdcheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_gcm1000Pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword_cmdcheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1000Pass_cmdcheckinput', 'offlinestore_ctrPass_cmdcheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_gcm1000Pass_cmdcheckinput', 'offlinestore_ctrPass_cmdcheck')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3787,7 +3957,7 @@
 				<h2>RE-ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_obf1000Pass_cmdcheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_gcm1000Pass_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_ctrPass_cmdcheckinput', 'offlinestore_upload')">CONTINUE</button>
 				</div>
 			</div>
@@ -3856,12 +4026,12 @@
 				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_browsercheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_opensslpass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_browsercheckinput', 'offlinestore_obf1000Pass_browsercheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_browsercheckinput', 'offlinestore_gcm1000Pass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
-			<!---------------------------Check obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1000Pass_browsercheck" style="display:none">
+			<!---------------------------Check gcm1000Pass-----------------------!>
+			<div class="flow_pages passlock" id="offlinestore_gcm1000Pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3870,10 +4040,10 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_browsercheckinput" style="">
+				<input autocomplete="off" type="password" value="" id="offlinestore_gcm1000Pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword_browsercheck')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1000Pass_browsercheckinput', 'offlinestore_ctrPass_browsercheck')">CONTINUE</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_gcm1000Pass_browsercheckinput', 'offlinestore_ctrPass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
 
@@ -3889,7 +4059,7 @@
 				<h2>RE-ENTER PASSWORD 2</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_obf1000Pass_browsercheck')">BACK</button>
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_gcm1000Pass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_ctrPass_browsercheckinput', 'offlinestore_opensslpass_browsercheck')">CONTINUE</button>
 				</div>
 			</div>
@@ -4015,7 +4185,8 @@
 	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
 	const FINGERPRINT_BYTE_LENGTH = 32;
-	const DATA_LENGTH = 1024;
+	//const DATA_LENGTH = 1024;
+	const DATA_LENGTH = 1072;
 	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
 	const PASSLOCK_LENGTH = 36;
 	const BROWSERINPUT_LENGTH_LIMIT = 526;
@@ -4023,6 +4194,7 @@
 	const PREBASE64_RANDDATA_BYTE_LENGTH = 768;
 	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
+	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
 	const MAX_POINTER_VALUE = 999;
 	const FIVE_SECONDS = 5000;
@@ -4421,7 +4593,7 @@
 	// Returns true if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint){
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
-		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${FINGERPRINT_LENGTH}}$\`);
+		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${FINGERPRINT_LENGTH}}$\`);
 		if (regex.test(fingerprint)){
 			return true;
 		}else{
@@ -4431,7 +4603,7 @@
 
 	// Returns true if input has precisely DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
-		const regex = new RegExp(\`^[A-Za-z0-9+/]{\${DATA_LENGTH}}$\`);
+		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${DATA_LENGTH}}$\`);
 		if (regex.test(data)){
 			return true;
 		}else{
@@ -4736,8 +4908,8 @@
 	async function attemptCMDStoreOffline(){
 		goBackProgrammaticallyXandDontTriggerPopstateShowPage(7);
 		//const fingerprintAndData = await getFpAndDataForStore();
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
-		const encryptedData = await encryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['data']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['gcm1000Pass'], offlineData['ctrPass']);
+		const encryptedData = await encryptDouble(offlineData['gcm1000Pass'], offlineData['ctrPass'], offlineData['data']);
 		let storeResponse;
 		// Select encrypted or regular offline database.
 		storeResponse = await storeOfflineDBase(fingerprint, encryptedData);
@@ -4774,8 +4946,8 @@
 		}
 		extractInputDataOffline(inputId);
 		//const fingerprintAndData = await getFpAndDataForStore();
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
-		const encryptedData = await encryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], offlineData['data']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['gcm1000Pass'], offlineData['ctrPass']);
+		const encryptedData = await encryptTriple(offlineData['gcm1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], offlineData['data']);
 		let storeResponse;
 		// Select encrypted or regular offline database.
 		storeResponse = await storeOfflineDBase(fingerprint, encryptedData);
@@ -4816,7 +4988,7 @@
 
 	async function attemptCMDAccessOffline(){
 		goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['gcm1000Pass'], offlineData['ctrPass']);
 		// Add additional parameter?
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 
@@ -4834,7 +5006,7 @@
 		// Get ctrPass - pass2.
 		extractInputDataOffline(inputId);
 		// First load encrypted data from offline database.
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['gcm1000Pass'], offlineData['ctrPass']);
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 
 		if (encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
@@ -4873,7 +5045,7 @@
 
 
 	async function decryptAndDownloadFileOffline(encryptedData){
-		const decryptedData  = await decryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], encryptedData);
+		const decryptedData  = await decryptDouble(offlineData['gcm1000Pass'], offlineData['ctrPass'], encryptedData);
 			// bytes is Uint8Array
 			const bytes = Uint8Array.fromBase64(decryptedData);
 			// Produce file for user to decrypt.
@@ -4888,8 +5060,8 @@
 		goBackProgrammaticallyXandDontTriggerPopstateShowPage(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		extractInputDataOffline(inputId);
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
-		//console.log("fingerprint:" + fingerprint + " offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1000Pass]:" + offlineData['obf1000Pass'] + " offlineData[ctrPass]:" + offlineData['ctrPass']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['gcm1000Pass'], offlineData['ctrPass']);
+		//console.log("fingerprint:" + fingerprint + " offlineData[codeword]:" + offlineData['codeword'] + " offlineData[gcm1000Pass]:" + offlineData['gcm1000Pass'] + " offlineData[ctrPass]:" + offlineData['ctrPass']);
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
@@ -4902,13 +5074,13 @@
 	}
 
 	async function decryptAndShowCleartextOffline(encryptedData){
-		//console.log("offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1000Pass]:" + offlineData['obf1000Pass'] + " offlineData[ctrPass]:" + offlineData['ctrPass'] + " offlineData[opensslpass]:" + offlineData['opensslpass']);;
+		//console.log("offlineData[codeword]:" + offlineData['codeword'] + " offlineData[gcm1000Pass]:" + offlineData['gcm1000Pass'] + " offlineData[ctrPass]:" + offlineData['ctrPass'] + " offlineData[opensslpass]:" + offlineData['opensslpass']);;
 		//console.log("encryptedData: " + encryptedData);
-		//const decryptedData  = await decryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], encryptedData);
+		//const decryptedData  = await decryptTriple(offlineData['gcm1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], encryptedData);
 
 		let decryptedData;
 		try {
-			decryptedData  = await decryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], encryptedData);
+			decryptedData  = await decryptTriple(offlineData['gcm1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], encryptedData);
 		}catch (error){
 			// Would it make sense to catch a specific error?
 			// Assume there was a password entry error.
@@ -4921,7 +5093,7 @@
 	}
 
 	async function attemptDeleteOffline(){
-		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['gcm1000Pass'], offlineData['ctrPass']);
 		const deleteResponse = await deleteRecordOfflineDBase(fingerprint);
 		// Report delete outcome.
 		if (deleteResponse === "success"){
@@ -5454,72 +5626,266 @@
 		);
 	}//getKeyMaterial()
 
-	// Encrypting function that prepends a countstring, then runs an XOR on the byte arrrays of the input data and password,
-	// and finally converts the result to a specific length output of 1000 base 64 character string.
-	// Inputs: plaintext64 is base64, password is plaintext.
-	// Outputs: 1000 characters of base64 string.
-	async function obf1000Encrypt(plaintext64, password) {
-		// Add our custom countstring to the data.
-		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext64);
 
-		if (!checkBase64Chars(plaintext64)){
-			throw new Error('Obfuscation step 1 INVALID characters found!');
+	// Default triple indicates this will be used in PGO triple stack.
+	async function encryptGCM1000(cleartext, password, inputType='triple'){
+		// Create byte array to hold cleartext data.
+		let cleartextUint8 = new Uint8Array;
+		// Compose data based on function parameter.
+		if (inputType === 'base64'){ // Default usage.
+			cleartextUint8 = Uint8Array.fromBase64(cleartext);
+		}else if (inputType === 'utf8'){
+			cleartextUint8 = new TextEncoder().encode(cleartext);
+		}else if (inputType === 'triple'){ // Default usage.
+			// Extract salt for triple stack usage.
+			cleartextWithSalt = Uint8Array.fromBase64(cleartext);
+			// Slice off the 8 bytes from OpenSSL that convert to: Salted__
+			cleartextUint8 = cleartextWithSalt.slice(8);
+		}else{
+			throw new Error("Invalid encryptGCM inputType parameter!");
 		}
+		// Add 7byte prepend (representing length of filler) and random filler postpend of that length.
+		const wrappedCleartext64 = wrap7Byte(cleartextUint8);
+		// Always use base64 for 1000 wrapping for base encryption.
+		const gcmEncrypted64 = await encryptGCM(wrappedCleartext64, password, 'base64');
+		return gcmEncrypted64;
+	}
 
-		// Prepare password side for XOR.
-		const passwordBytes = new TextEncoder().encode(password);
-		const shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
+	// Default triple indicates this will be used in PGO triple stack.
+	async function decryptGCM1000(ciphertext64, password, outputType='triple'){
+		// Always output base64 for base encryption in 1000 wrapping context.
+		const gcmDecrypted64 = await decryptGCM(ciphertext64, password, 'base64');
+		const unwrappedCleartextUint8 = unwrap7Byte(gcmDecrypted64);
 
-		// Perform the XOR bitwise byte by byte.
-		let xorResult = new Array();
-		// XOR is a ^ in javascript
-		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
+		let decryptedCleartext;
+		// Select output data type based on function parameter.
+		if (outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+			decryptedCleartext = unwrappedCleartextUint8.toBase64();
+		}else if (outputType === 'utf8'){
+			decryptedCleartext = new TextDecoder().decode(unwrappedCleartextUint8);
+		}else if (outputType === 'triple'){// Default usage.
+			saltAddedCleartextUint8 = addSaltedLiteral(unwrappedCleartextUint8);
+			decryptedCleartext = saltAddedCleartextUint8.toBase64();
+		}else{
+			throw new Error("Invalid decryptAESGCM outputType parameter!");
 		}
-		// toBase64() works on Uint8Arrays
-		xorResult = new Uint8Array(xorResult);
-		return xorResult.toBase64();
-	}//obf1000Encrypt()
+		return decryptedCleartext;
+	}
 
-	// obf1000Decrypt() is the inverse function of obf1000Encrypt().
-	// Inputs: ciphertext64 is a base64 string, password is plaintext
-	// Output: decrypted_string is a base64 string
-	async function obf1000Decrypt(ciphertext64, password) {
-		// Convert base64 string to Uint8Array of bytes.
-		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
-		// Devsite window functrion.
+	function addSaltedLiteral(inputDataUint8) {
+		// Get length of input data in number of bytes.
+		const dataLength = inputDataUint8.length;
+		const saltedOffset  = dataLength + 8;
+		// Create new array that is the input length +8 for the salt.
+		let dataBytesWithSalt = new Uint8Array(saltedOffset);
+		// Get byte form of salted literal.
+		const saltedLiteral = "Salted__";
+		const saltBytes = new TextEncoder().encode(saltedLiteral);
+		// Prepend with salted literal.
+		dataBytesWithSalt.set(saltBytes, 0);
+		// Finally, fill in data behind salted literal.
+		dataBytesWithSalt.set(inputDataUint8, 8);
+		return dataBytesWithSalt;
+	}
 
-		// Compute password for XOR.
-		const passwordBytes = new TextEncoder().encode(password);
-		let shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
-
-		// Inverse of XOR is XOR and is communicative.
-		// XOR password and output to get input.
-		// Regular Array needed for shift, pop.
-		let xorResult = new Array();
-		// XOR is typically the carrot char: ^ 
-		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
-		}
-		// Slice off set of bytes that represent data lenght.
-		const sevenByteSlice = xorResult.slice(0, 7);
+	function unwrap7Byte(inputData64) {
+		inputDataUint8 = Uint8Array.fromBase64(inputData64);
+		// Slice off set of bytes that represent data length.
+		const sevenByteSlice = inputDataUint8.slice(0, 7);
 		// Compute value that 7Byte set represents.
 		const dataLength = eval7ByteValue(sevenByteSlice);
 		// Extract data bytes.
 		const dataOffset  = dataLength + 7;
-		let dataBytes = xorResult.slice(7, dataOffset);
-		// Add Salted__ literal.
-		const saltedOffset  = dataLength + 8;
-		let dataBytesWithSalt = new Uint8Array(saltedOffset);
-		const saltedLiteral = "Salted__";
-		const saltBytes = new TextEncoder().encode(saltedLiteral);
-		dataBytesWithSalt.set(saltBytes, 0);
-		// Add data.
-		dataBytesWithSalt.set(dataBytes, 8);
-		// Convert to base64.
-		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
-		return saltedData64;
-	}//obf1000Decrypt
+		dataBytes = inputDataUint8.slice(7, dataOffset);
+		return dataBytes;
+	}
+
+	function wrap7Byte(inputDataUint8) {
+		// Length of the data with salt bytes removed.
+		const dataLength = inputDataUint8.length;
+		// Find a 7Byte set that represents dataLength.
+		const sevenByteSet = find7ByteSetForValue(dataLength);
+		// Leave space for 7Byte set.
+		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
+		// Compile set of random bytes for filler.
+		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
+		// Compile Byte Stack
+		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
+		// Prepend 7Byte set.
+		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
+		// Next fill in data.
+		dataWithCountBytesAndRandFiller.set(inputDataUint8, 7);
+		// Set remaining space to random data.
+		const dataOffset = 7 + dataLength;
+		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
+		dataWithCountBytesAndRandFiller64 = dataWithCountBytesAndRandFiller.toBase64();
+		return dataWithCountBytesAndRandFiller64;
+	}// wrap7Byte()
+
+
+	// Replacing obf1000 with standard that natively offers authentication.
+	async function encryptGCM(cleartext, password, inputType='base64'){
+		//console.log("encryptGCM1000 called with inputType: " + inputType);
+
+		// Create byte array to hold cleartext data.
+		let cleartextUint8 = new Uint8Array;
+		// Compose data based on function parameter.
+		if (inputType === 'base64'){ // Default usage.
+			cleartextUint8 = Uint8Array.fromBase64(cleartext);
+		}else if (inputType === 'utf8'){
+			cleartextUint8 = new TextEncoder().encode(cleartext);
+		}else{
+			throw new Error("Invalid encryptGCM inputType parameter!");
+		}
+		// Convert password text into Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
+		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
+		// This increases our Triple Encrypted Data Record size to 1024.
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// the allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				//name: key_derivation_algo,
+				salt: randSalt,					// salt (MDN suggests at least 16 bytes for security)
+				iterations: 10000,				// strength
+				hash: 'SHA-256',				// 
+			},
+			keyMaterial,						//
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 96 for random IV as specified NIST SP800-38D Section 8.2.
+		);
+		// Split the derived bits into key and iv for the encrypt call.
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		// Take first 256 bits derived from deriveBits above for the cryptoKey.
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// 256 bits for key, 96 bits for IV for GCM.
+		// |-keyBytes-| |-IV-| (where X is 32 bit chunk)
+		//  xxxx xxxx 	 x x x  			
+		//
+		// AES-CTR parameters described here:
+		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
+		const ivBytes = derivedKeyBuffer.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-GCM 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let keyGCM = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-GCM', 
+				length: 256			// Length in bits of input.
+			}, 
+			false,					// extractable boolean 
+			['encrypt']				// keyUsages
+		);
+
+		// AesGcmParams object.
+		// {name, iv, additionalData, tagLength}
+		// tagLength defaults to 128 (16 bytes)
+		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
+		// MDN syntax: encrypt(algorithm, key, data)
+		const inputTypeUint8 = new TextEncoder().encode(inputType);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8}, keyGCM, cleartextUint8);
+
+        //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
+		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+		// Wrap salt with encoded data so it can be used in the decrypt.
+		const saltAndData = concatBuffer(randSalt, encryptedUint8);
+		// This function outputs base64.
+		const encrypted64 = saltAndData.toBase64();
+		//console.log("ciphertext:" + encrypted64 + " password:" + password);
+		//console.log("length:" + encrypted64.length);
+		//console.log("salt: " + randSalt);
+		return encrypted64;
+	}// encryptGCM()
+
+
+	async function decryptGCM(saltAndCiphertext, password, outputType='base64'){
+		// Convert password into bytes.
+		const passwordUint8 = new TextEncoder().encode(password);
+		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
+		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
+		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		// Cast array returned by slice into a (usable) Uint8Array.
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				salt: packedSalt,					// salt (at least 16 bytes for security;
+				iterations: 10000,				// exectute hash function this maniy times
+				hash: 'SHA-256',				// digest algorithm
+			},
+			keyMaterial,						// input data as cryptoKey object
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+		);
+
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// 96 IV bits for GCM
+		const ivBytes = derivedKeyBuffer.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let keyGCM = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-GCM', 
+				length: 256			// Length in bits of input.
+			}, 
+			false,					// extractable boolean 
+			['decrypt']				// keyUsages
+		);
+
+		// MDN syntax: decrypt(algorithm, key, data)
+		//const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
+		const outputTypeUint8 = new TextEncoder().encode(outputType);
+        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8}, keyGCM, encodedCiphertextUint8);
+
+		const decryptedUint8 = new Uint8Array(decryptedBuffer);
+		let decryptedDecoded;
+		// Select output data type based on function parameter.
+		if (outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+			decryptedDecoded = decryptedUint8.toBase64();
+		}else if (outputType === 'utf8'){
+			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
+		}else{
+			throw new Error("Invalid decryptAESGCM outputType parameter!");
+		}
+		return decryptedDecoded;
+	}// decryptGCM()
+
+
+
+
+
+
 
 	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 	// Output always packed into base64.
@@ -5679,56 +6045,58 @@
 		return decryptedDecoded;
 	}//decryptAESCTR()
 
+
 	// Encrypt stack used in the case user chooses command line.
-	async function encryptDouble(obf1000Pass, ctrPass, fileData){
+	async function encryptDouble(gcm1000Pass, ctrPass, fileData){
 		// Obfuscation Step 1 Encrypt
-		const obf1000Encrypted = await obf1000Encrypt(fileData, obf1000Pass);
+		const gcm1000Encrypted = await encryptGCM1000(fileData, gcm1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
 		return ctrEncrypted;
-	}//encryptDouble()
+	}// encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
-	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData){
+	async function encryptTriple(gcm1000Pass, ctrPass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
 		// Obfuscation Step 1 Encrypt
-		const obf1000Encrypted = await obf1000Encrypt(opensslEncrypted, obf1000Pass);
+		const gcm1000Encrypted = await encryptGCM1000(opensslEncrypted, gcm1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
 		return ctrEncrypted;
-	}//encryptTriple()
+	}// encryptTriple()
 
 	// Decrypt stack used in the case user chooses Command Line.
-	async function decryptDouble(obf1000Pass, ctrPass, encryptedData){
+	async function decryptDouble(gcm1000Pass, ctrPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
-		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
-		return obf1000Decrypted;
-	}//decryptDouble()
+		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass);
+		return gcm1000Decrypted;
+	}// decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
-	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
+	async function decryptTriple(gcm1000Pass, ctrPass, opensslPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
-		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
-		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);
+		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass);
+		const cleartext = await decOpenSSL(gcm1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
 		return cleartext;
-	}//decryptTriple()
+	}// decryptTriple()
+
 
 	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
 	// Inputs: plaintext.
 	// Output: hexadecimal.
-	async function computeFingerprint(codeword, obf1000Pass, ctrPass){
+	async function computeFingerprint(codeword, gcm1000Pass, ctrPass){
 		// Convert to lowercase.
 		const codewordLower = codeword.toLowerCase();
 		// Take SHA-256 hash of codeword, obf1_pass, obf2_pass
 		const enc = new TextEncoder();
 		const codewordBuf = enc.encode(codewordLower);
-		const obf1000PassBuff = enc.encode(obf1000Pass);
+		const gcm1000PassBuff = enc.encode(gcm1000Pass);
 		const ctrPassBuff = enc.encode(ctrPass);
 		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
 		const uint8 = new Uint8Array(codewordHash);
 		const cwh_b64 = uint8.toBase64();
-		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1000PassBuff);
+		const obf1pHash = await crypto.subtle.digest('SHA-256', gcm1000PassBuff);
 		const obf2pHash = await crypto.subtle.digest('SHA-256', ctrPassBuff);
 		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
 		const codeword_and_obf1pHash = concatBuffer(codewordHash, obf1pHash)
@@ -5798,31 +6166,6 @@
 		}
 	}//checkInputLength()
 
-	// Input: 
-	// Output: 
-	function add7ByteAndRandFiller(inputData) {
-		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
-		const dataUint8 = Uint8Array.fromBase64(inputData);
-		const dataSansSalt = dataUint8.slice(8);
-		// Length of the data with salt bytes removed.
-		const dataLength = dataSansSalt.length;
-		// Find a 7Byte set that represents dataLength.
-		const sevenByteSet = find7ByteSetForValue(dataLength);
-		// Leave space for 7Byte set.
-		const remainingSpace = 743 - dataLength;
-		// Compile set of random bytes for filler.
-		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
-		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
-		// Prepend 7Byte set.
-		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
-		// Next fill in data.
-		dataWithCountBytesAndRandFiller.set(dataSansSalt, 7);
-		// Set remaining space to random data.
-		const dataOffset = 7 + dataLength;
-		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
-		return dataWithCountBytesAndRandFiller;
-	}//add7ByteAndRandFiller()
 
 	// Find set of bytes that compute to an exact value.
 	function find7ByteSetForValue(targetValue){

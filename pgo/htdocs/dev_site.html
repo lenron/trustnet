@@ -196,8 +196,8 @@
 			<div class="sidebar_button" id="openssl_sidebar_button" style="border-left: solid magenta;">
 				<a href="#openssl" style="text-decoration:none; "><h1>OpenSSL</h1></a>
 			</div>
-			<div class="sidebar_button" id="obf1000_sidebar_button" style="">
-				<a href="#obf1000" style="text-decoration:none; "><h1>OBF-1000</h1></a>
+			<div class="sidebar_button" id="gcm1000_sidebar_button" style="">
+				<a href="#gcm1000" style="text-decoration:none; "><h1>GCM1000</h1></a>
 			</div>
 			<div class="sidebar_button" id="aesctr_sidebar_button" style="">
 				<a href="#aesctr" style="text-decoration:none; "><h1>AES-CTR</h1></a>
@@ -220,7 +220,7 @@
 								<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 
 								Our OpenSSL implementation uses the MDN SubtleCrypto library with the encrypt() function which has many options for use including AES-256-CBC.
 								<br>
@@ -279,16 +279,16 @@
 					<input autocomplete="off" type="" value="" id="openssl_password" style="" oninput="executeOpenSSL()">
 				</div>
 				<!--------------------------OpenSSL SECTION-------------------------------------!>
-				<!--------------------------OBF-1000 SECTION-------------------------------------!>
-				<div class="dev_site_sections" id="obf1000_section" style="">
+				<!--------------------------GCM1000 SECTION-------------------------------------!>
+				<div class="dev_site_sections" id="gcm1000_section" style="">
 					<div style="position:relative; ">
-						<div class="" id="obf1000_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+						<div class="" id="gcm1000_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
 							<!------------------COPY IN TOOLTIP LATER------------------------->
 							<p>
-								OBF-1000 TOOLTIP SECTION
+								GCM1000 TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -300,32 +300,32 @@
 								<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
 
 							</p>
-							<button class="glossy_button" onclick="hideTipObf1000()">Close</button>
+							<button class="glossy_button" onclick="hideTipGCM1000()">Close</button>
 						</div>
 					</div>
 					<div style="display:flex;  ">
-						<h1 id="obf1000" style="scroll-margin-top:75px; ">OBF-1000</h1>
-						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipObf1000()">[?]</a>
+						<h1 id="gcm1000" style="scroll-margin-top:75px; ">GCM1000</h1>
+						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipGCM1000()">[?]</a>
 					</div>
 					<div id="" style="display:flex; flex-direction:row; height:370px; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="obf1000_cleartext_label">Cleartext:</label>
-							<textarea value="" id="obf1000_cleartext" style="" rows="8" oninput="executeObf1000()"></textarea>
+							<label id="gcm1000_cleartext_label">Cleartext:</label>
+							<textarea value="" id="gcm1000_cleartext" style="" rows="8" oninput="executeGCM1000()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
-							<button class="" id='obf1000_enc_button' style="flex-grow:1; " onclick="activateEncObf1000()">Encrypt<br>------></button>
-							<button class="" id='obf1000_dec_button' style="flex-grow:1; " onclick="activateDecObf1000()">Decrypt<br><------</button>
+							<button class="" id='gcm1000_enc_button' style="flex-grow:1; " onclick="activateEncGCM1000()">Encrypt<br>------></button>
+							<button class="" id='gcm1000_dec_button' style="flex-grow:1; " onclick="activateDecGCM1000()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="obf1000_ciphertext_label">Ciphertext:</label>
-							<textarea value="" id="obf1000_ciphertext" style="" rows="8" oninput="executeObf1000()"></textarea>
+							<label id="gcm1000_ciphertext_label">Ciphertext:</label>
+							<textarea value="" id="gcm1000_ciphertext" style="" rows="8" oninput="executeGCM1000()"></textarea>
 						</div>
 					</div>
-					<label id="obf1000_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+					<label id="gcm1000_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
 					<label>Password:</label>
-					<input autocomplete="off" type="" value="" id="obf1000_password" style="" oninput="executeObf1000()">
+					<input autocomplete="off" type="" value="" id="gcm1000_password" style="" oninput="executeGCM1000()">
 				</div>
-				<!--------------------------OBF-1000 SECTION-------------------------------------!>
+				<!--------------------------GCM1000 SECTION-------------------------------------!>
 				<!--------------------------AES-CTR SECTION-------------------------------------!>
 				<div class="dev_site_sections" id="aesctr_section" style="">
 					<div style="position:relative; ">
@@ -335,7 +335,7 @@
 								AES-CTR TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -383,7 +383,7 @@
 								TRIPLE TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -445,7 +445,7 @@
 
 	function turnOffPinkBar() {
 		document.getElementById('openssl_sidebar_button').style.borderLeft = 'none';
-		document.getElementById('obf1000_sidebar_button').style.borderLeft = 'none';
+		document.getElementById('gcm1000_sidebar_button').style.borderLeft = 'none';
 		document.getElementById('aesctr_sidebar_button').style.borderLeft = 'none';
 		document.getElementById('triple_sidebar_button').style.borderLeft = 'none';
 	}
@@ -453,8 +453,8 @@
 	function turnOnPinkBarOpenSSL() {
 		document.getElementById('openssl_sidebar_button').style.borderLeft = 'solid magenta';
 	}
-	function turnOnPinkBarObf1000() {
-		document.getElementById('obf1000_sidebar_button').style.borderLeft = 'solid magenta';
+	function turnOnPinkBarGCM1000() {
+		document.getElementById('gcm1000_sidebar_button').style.borderLeft = 'solid magenta';
 	}
 	function turnOnPinkBarAESCTR() {
 		document.getElementById('aesctr_sidebar_button').style.borderLeft = 'solid magenta';
@@ -472,7 +472,7 @@
 			turnOnPinkBarOpenSSL();
 		} else if (scroll >= 300 && scroll < 700){
 			turnOffPinkBar();
-			turnOnPinkBarObf1000();
+			turnOnPinkBarGCM1000();
 		} else if (scroll >= 700 && scroll < 1100){
 			turnOffPinkBar();
 			turnOnPinkBarAESCTR();
@@ -489,11 +489,11 @@
 	document.getElementById('openssl_ciphertext').addEventListener("focus", (event) => {
 		activateDecOpenSSL();
 	});
-	document.getElementById('obf1000_cleartext').addEventListener("focus", (event) => {
-		activateEncObf1000();
+	document.getElementById('gcm1000_cleartext').addEventListener("focus", (event) => {
+		activateEncGCM1000();
 	});
-	document.getElementById('obf1000_ciphertext').addEventListener("focus", (event) => {
-		activateDecObf1000();
+	document.getElementById('gcm1000_ciphertext').addEventListener("focus", (event) => {
+		activateDecGCM1000();
 	});
 	document.getElementById('aesctr_cleartext').addEventListener("focus", (event) => {
 		activateEncAESCTR();
@@ -510,7 +510,7 @@
 
 	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
 	let openSSLEncrypt_f = true;
-	let obf1000Encrypt_f = true;
+	let gcm1000Encrypt_f = true;
 	let aesctrEncrypt_f = true;
 	let tripleEncrypt_f = true;
 
@@ -523,12 +523,12 @@
 		document.getElementById('openssl_tooltip').style.display = "none";
 	}
 
-	function showTipObf1000 () {
-		document.getElementById('obf1000_tooltip').style.display = "inline";
+	function showTipGCM1000 () {
+		document.getElementById('gcm1000_tooltip').style.display = "inline";
 	}
 
-	function hideTipObf1000 () {
-		document.getElementById('obf1000_tooltip').style.display = "none";
+	function hideTipGCM1000 () {
+		document.getElementById('gcm1000_tooltip').style.display = "none";
 	}
 
 	function showTipAESCTR () {
@@ -667,121 +667,121 @@
 	}// activateDecOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////
-	//					OBF-1000 HTML handling									 //
+	//					GCM1000 HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
-	async function executeObf1000() {
+	async function executeGCM1000() {
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
-		if (obf1000Encrypt_f === true) { // Encrypt function
+		if (gcm1000Encrypt_f === true) { // Encrypt function
 			// Gather inputs.
-			const cleartext = document.getElementById('obf1000_cleartext').value;
-			const password = document.getElementById('obf1000_password').value;
+			const cleartext = document.getElementById('gcm1000_cleartext').value;
+			const password = document.getElementById('gcm1000_password').value;
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
 			if (cleartext !== '') {
 				try {
-					document.getElementById('obf1000_ciphertext').value = await obf1000EncryptSingle(cleartext, password);
-					document.getElementById('obf1000_outcome_message').style.visibility = 'visible';
-					document.getElementById('obf1000_outcome_message').style.color = 'lime';
-					document.getElementById('obf1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+					document.getElementById('gcm1000_ciphertext').value = await encryptGCM1000(cleartext, password, 'utf8');
+					document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+					document.getElementById('gcm1000_outcome_message').style.color = 'lime';
+					document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
 				} catch {
-					document.getElementById('obf1000_outcome_message').style.visibility = 'visible';
-					document.getElementById('obf1000_outcome_message').style.color = 'red';
-					document.getElementById('obf1000_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('obf1000_cleartext').value = '';
+					document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+					document.getElementById('gcm1000_outcome_message').style.color = 'red';
+					document.getElementById('gcm1000_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+					document.getElementById('gcm1000_cleartext').value = '';
 				}
 			}
 		} else { // Decrypt function
 			// Gather inputs.
-			const ciphertext = document.getElementById('obf1000_ciphertext').value;
-			const password = document.getElementById('obf1000_password').value;
+			const ciphertext = document.getElementById('gcm1000_ciphertext').value;
+			const password = document.getElementById('gcm1000_password').value;
 			// Execute
 			try {
-				document.getElementById('obf1000_cleartext').value = await obf1000DecryptSingle(ciphertext, password);
-				document.getElementById('obf1000_outcome_message').style.visibility = 'visible';
-				document.getElementById('obf1000_outcome_message').style.color = 'lime';
-				document.getElementById('obf1000_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
+				document.getElementById('gcm1000_cleartext').value = await decryptGCM1000(ciphertext, password, 'utf8');
+				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('gcm1000_outcome_message').style.color = 'lime';
+				document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
 			} catch {
-				document.getElementById('obf1000_outcome_message').style.visibility = 'visible';
-				document.getElementById('obf1000_outcome_message').style.color = 'red';
-				document.getElementById('obf1000_outcome_message').innerHTML = 'Decryption unsuccessful';
-				document.getElementById('obf1000_cleartext').value = '';
+				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('gcm1000_outcome_message').style.color = 'red';
+				document.getElementById('gcm1000_outcome_message').innerHTML = 'Decryption unsuccessful';
+				document.getElementById('gcm1000_cleartext').value = '';
 			}
 		}
 		setTimeout(() => {
-			turnOffObf1000DecryptOutcomeMessage();
+			turnOffGCM1000DecryptOutcomeMessage();
 		}, 2000); 
-	}// executeObf1000()
+	}// executeGCM1000()
 
-	function turnOffObf1000DecryptOutcomeMessage() {
-		document.getElementById('obf1000_outcome_message').style.visibility = 'hidden';
+	function turnOffGCM1000DecryptOutcomeMessage() {
+		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
 	}
 
-	function activateEncObf1000() {
+	function activateEncGCM1000() {
 		// Set flag
-		obf1000Encrypt_f = true;
+		gcm1000Encrypt_f = true;
 
 		// Turn off decryption error.
-		document.getElementById('obf1000_outcome_message').style.visibility = 'hidden';
+		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
 
 		// Disable decrypt.
 		// Change button text to disabled color.
-		document.getElementById('obf1000_dec_button').style.color = 'dimgray';
+		document.getElementById('gcm1000_dec_button').style.color = 'dimgray';
 		// Change outline, label to diabled color.
-		document.getElementById('obf1000_ciphertext_label').style.color = 'gray';
-		document.getElementById('obf1000_ciphertext').style.color = 'gray';
-		document.getElementById('obf1000_ciphertext').style.borderColor = 'gray';
+		document.getElementById('gcm1000_ciphertext_label').style.color = 'gray';
+		document.getElementById('gcm1000_ciphertext').style.color = 'gray';
+		document.getElementById('gcm1000_ciphertext').style.borderColor = 'gray';
 		// Disable ciphertext textarea.
-		document.getElementById('obf1000_ciphertext').disabled = true;
+		document.getElementById('gcm1000_ciphertext').disabled = true;
 
 		// Enable encrypt.
 		// Change button text to enabled color.
-		document.getElementById('obf1000_enc_button').style.color = 'lime';
+		document.getElementById('gcm1000_enc_button').style.color = 'lime';
 		// Change outline, label to enabled color.
-		document.getElementById('obf1000_cleartext_label').style.color = '#54c597';
-		document.getElementById('obf1000_cleartext').style.color = '#54c597';
-		document.getElementById('obf1000_cleartext').style.borderColor = '#54c597';
+		document.getElementById('gcm1000_cleartext_label').style.color = '#54c597';
+		document.getElementById('gcm1000_cleartext').style.color = '#54c597';
+		document.getElementById('gcm1000_cleartext').style.borderColor = '#54c597';
 		// Enable cleartext textarea.
-		document.getElementById('obf1000_cleartext').disabled = false;
+		document.getElementById('gcm1000_cleartext').disabled = false;
 
 		// Focus newly active textarea
-		document.getElementById('obf1000_cleartext').focus();
+		document.getElementById('gcm1000_cleartext').focus();
 
 		// Execute crypto on button click.
-		executeObf1000();
-	}// activateEncObf1000()
+		executeGCM1000();
+	}// activateEncGCM1000()
 
 // PGO Green: #54c597
 // PGO Readonly Blue: #4491d5
 
-	function activateDecObf1000() {
+	function activateDecGCM1000() {
 		// Set flag
-		obf1000Encrypt_f = false;
+		gcm1000Encrypt_f = false;
 
 		// Enable decrypt - ciphertext.
 		// Change button text to enabled color.
-		document.getElementById('obf1000_dec_button').style.color = 'lime';
+		document.getElementById('gcm1000_dec_button').style.color = 'lime';
 		// Change outline, label to diabled color.
-		document.getElementById('obf1000_ciphertext_label').style.color = '#54c597';
-		document.getElementById('obf1000_ciphertext').style.color = '#54c597';
-		document.getElementById('obf1000_ciphertext').style.borderColor = '#54c597';
+		document.getElementById('gcm1000_ciphertext_label').style.color = '#54c597';
+		document.getElementById('gcm1000_ciphertext').style.color = '#54c597';
+		document.getElementById('gcm1000_ciphertext').style.borderColor = '#54c597';
 		// Enable cleartext textarea.
-		document.getElementById('obf1000_ciphertext').disabled = false;
+		document.getElementById('gcm1000_ciphertext').disabled = false;
 
 		// Disable encrypt - cleartext.
 		// Change button text to disabled color.
-		document.getElementById('obf1000_enc_button').style.color = 'dimgray';
+		document.getElementById('gcm1000_enc_button').style.color = 'dimgray';
 		// Change outline, label to enabled color.
-		document.getElementById('obf1000_cleartext_label').style.color = 'gray';
-		document.getElementById('obf1000_cleartext').style.color = 'gray';
-		document.getElementById('obf1000_cleartext').style.borderColor = 'gray';
+		document.getElementById('gcm1000_cleartext_label').style.color = 'gray';
+		document.getElementById('gcm1000_cleartext').style.color = 'gray';
+		document.getElementById('gcm1000_cleartext').style.borderColor = 'gray';
 		// Disable ciphertext textarea.
-		document.getElementById('obf1000_cleartext').disabled = true;
+		document.getElementById('gcm1000_cleartext').disabled = true;
 
 		// Focus newly active textarea
-		document.getElementById('obf1000_ciphertext').focus();
+		document.getElementById('gcm1000_ciphertext').focus();
 
 		// Execute crypto on button click.
-		executeObf1000();
-	}// activateDecObf1000()
+		executeGCM1000();
+	}// activateDecGCM1000()
 
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -1045,6 +1045,7 @@
 	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
+	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352;
 	const MAX_POINTER_VALUE = 999;
 	const FIVE_SECONDS = 5000;
 	const TEN_SECONDS = 10000;
@@ -1209,137 +1210,261 @@
 		);
 	}// getKeyMaterial()
 
-	// Outputs: 1000 characters of base64 string.
-	async function obf1000Encrypt(plaintext64, password) {
-		// Add our custom countstring to the data.
-		let dataWithCountAndRandFiller = add7ByteAndRandFiller(plaintext64);
 
-		if (!checkBase64Chars(plaintext64)){
-			throw new Error('Obfuscation step 1 INVALID characters found!');
+	// Default triple indicates this will be used in PGO triple stack.
+	async function encryptGCM1000(cleartext, password, inputType='triple'){
+		// Create byte array to hold cleartext data.
+		let cleartextUint8 = new Uint8Array;
+		// Compose data based on function parameter.
+		if (inputType === 'base64'){ // Default usage.
+			cleartextUint8 = Uint8Array.fromBase64(cleartext);
+		}else if (inputType === 'utf8'){
+			cleartextUint8 = new TextEncoder().encode(cleartext);
+		}else if (inputType === 'triple'){ // Default usage.
+			// Extract salt for triple stack usage.
+			cleartextWithSalt = Uint8Array.fromBase64(cleartext);
+			// Slice off the 8 bytes from OpenSSL that convert to: Salted__
+			cleartextUint8 = cleartextWithSalt.slice(8);
+		}else{
+			throw new Error("Invalid encryptGCM inputType parameter!");
 		}
+		// Add 7byte prepend (representing length of filler) and random filler postpend of that length.
+		const wrappedCleartext64 = wrap7Byte(cleartextUint8);
+		// Always use base64 for 1000 wrapping for base encryption.
+		const gcmEncrypted64 = await encryptGCM(wrappedCleartext64, password, 'base64');
+		return gcmEncrypted64;
+	}
 
-		// Prepare password side for XOR.
-		const passwordBytes = new TextEncoder().encode(password);
-		const shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
+	// Default triple indicates this will be used in PGO triple stack.
+	async function decryptGCM1000(ciphertext64, password, outputType='triple'){
+		// Always output base64 for base encryption in 1000 wrapping context.
+		const gcmDecrypted64 = await decryptGCM(ciphertext64, password, 'base64');
+		const unwrappedCleartextUint8 = unwrap7Byte(gcmDecrypted64);
 
-		// Perform the XOR bitwise byte by byte.
-		let xorResult = new Array();
-		// XOR is a ^ in javascript
-		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
+		let decryptedCleartext;
+		// Select output data type based on function parameter.
+		if (outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+			decryptedCleartext = unwrappedCleartextUint8.toBase64();
+		}else if (outputType === 'utf8'){
+			decryptedCleartext = new TextDecoder().decode(unwrappedCleartextUint8);
+		}else if (outputType === 'triple'){// Default usage.
+			saltAddedCleartextUint8 = addSaltedLiteral(unwrappedCleartextUint8);
+			decryptedCleartext = saltAddedCleartextUint8.toBase64();
+		}else{
+			throw new Error("Invalid decryptAESGCM outputType parameter!");
 		}
-		// toBase64() works on Uint8Arrays
-		xorResult = new Uint8Array(xorResult);
-		return xorResult.toBase64();
-	}// obf1000Encrypt()
+		return decryptedCleartext;
+	}
 
-	// Encrypting function that prepends a countstring, then runs an XOR on the byte arrays of the input data and password,
-	// and finally converts the result to a specific length output of 1000 base 64 character string.
-	// Inputs: plaintext64 is base64, password is plaintext.
-	// Outputs: 1000 characters of base64 string.
-	async function obf1000EncryptSingle(plaintext, password) {
-		// Add our custom countstring to the data.
-		let dataWithCountAndRandFiller = add7ByteAndRandFillerSingle(plaintext);
-
-		//if (!checkBase64Chars(plaintext64)){
-			//throw new Error('Obfuscation step 1 INVALID characters found!');
-		//}
-
-		// Prepare password side for XOR.
-		const passwordBytes = new TextEncoder().encode(password);
-		const shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
-
-		// Perform the XOR bitwise byte by byte.
-		let xorResult = new Array();
-		// XOR is a ^ in javascript
-		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ dataWithCountAndRandFiller[i]);
-		}
-		// toBase64() works on Uint8Arrays
-		xorResult = new Uint8Array(xorResult);
-		return xorResult.toBase64();
-	}// obf1000EncryptSingle()
-
-
-	async function obf1000Decrypt(ciphertext64, password) {
-		// Convert base64 string to Uint8Array of bytes.
-		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
-
-		// Compute password for XOR.
-		const passwordBytes = new TextEncoder().encode(password);
-		let shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
-
-		// Inverse of XOR is XOR and is communicative.
-		// XOR password and output to get input.
-		// Regular Array needed for shift, pop.
-		let xorResult = new Array();
-		// XOR is typically the carrot char: ^ 
-		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
-		}
-		// Slice off set of bytes that represent data lenght.
-		const sevenByteSlice = xorResult.slice(0, 7);
-		// Compute value that 7Byte set represents.
-		const dataLength = eval7ByteValue(sevenByteSlice);
-		// Extract data bytes.
-		const dataOffset  = dataLength + 7;
-		let dataBytes = xorResult.slice(7, dataOffset);
-		// Add Salted__ literal.
+	function addSaltedLiteral(inputDataUint8) {
+		// Get length of input data in number of bytes.
+		const dataLength = inputDataUint8.length;
 		const saltedOffset  = dataLength + 8;
+		// Create new array that is the input length +8 for the salt.
 		let dataBytesWithSalt = new Uint8Array(saltedOffset);
+		// Get byte form of salted literal.
 		const saltedLiteral = "Salted__";
 		const saltBytes = new TextEncoder().encode(saltedLiteral);
+		// Prepend with salted literal.
 		dataBytesWithSalt.set(saltBytes, 0);
-		// Add data.
-		dataBytesWithSalt.set(dataBytes, 8);
-		// Convert to base64.
-		const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
-		return saltedData64;
-	}// obf1000Decrypt()
+		// Finally, fill in data behind salted literal.
+		dataBytesWithSalt.set(inputDataUint8, 8);
+		return dataBytesWithSalt;
+	}
 
-
-	// obf1000DecryptSingle() is the inverse function of obf1000EncryptSingle().
-	// Inputs: ciphertext64 is a base64 string, password is plaintext
-	// Output: decrypted_string is a base64 string
-	async function obf1000DecryptSingle(ciphertext64, password) {
-		// Convert base64 string to Uint8Array of bytes.
-		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
-
-		// Compute password for XOR.
-		const passwordBytes = new TextEncoder().encode(password);
-		let shaExtPasswordBytes = await getPassHash(passwordBytes, PREBASE64_1000DATA_BYTE_LENGTH);
-
-		// Inverse of XOR is XOR and is communicative.
-		// XOR password and output to get input.
-		// Regular Array needed for shift, pop.
-		let xorResult = new Array();
-		// XOR is typically the carrot char: ^ 
-		for (let i = 0; i < PREBASE64_1000DATA_BYTE_LENGTH; i++) {
-			xorResult.push(shaExtPasswordBytes[i] ^ ciphertextbytes[i]);
-		}
+	function unwrap7Byte(inputData64) {
+		inputDataUint8 = Uint8Array.fromBase64(inputData64);
 		// Slice off set of bytes that represent data length.
-		const sevenByteSlice = xorResult.slice(0, 7);
+		const sevenByteSlice = inputDataUint8.slice(0, 7);
 		// Compute value that 7Byte set represents.
 		const dataLength = eval7ByteValue(sevenByteSlice);
 		// Extract data bytes.
 		const dataOffset  = dataLength + 7;
-		let dataBytes = xorResult.slice(7, dataOffset);
-/*
-		// Add Salted__ literal.
-		const saltedOffset  = dataLength + 8;
-		let dataBytesWithSalt = new Uint8Array(saltedOffset);
-		const saltedLiteral = "Salted__";
-		const saltBytes = new TextEncoder().encode(saltedLiteral);
-		dataBytesWithSalt.set(saltBytes, 0);
-		// Add data.
-		dataBytesWithSalt.set(dataBytes, 8);
-		// Convert to base64.
-		//const saltedData64 = dataBytesWithSalt.toBase64(); // DON'T omit padding. pretty sure OpenSSL -64 uses it.
-		const saltedData = new TextDecoder().decode(dataBytesWithSalt);
-*/
-		const saltedData = new TextDecoder().decode(new Uint8Array(dataBytes));
-		return saltedData;
-	}// obf1000DecryptSingle()
+		dataBytes = inputDataUint8.slice(7, dataOffset);
+		return dataBytes;
+	}
+
+	function wrap7Byte(inputDataUint8) {
+		// Length of the data with salt bytes removed.
+		const dataLength = inputDataUint8.length;
+		// Find a 7Byte set that represents dataLength.
+		const sevenByteSet = find7ByteSetForValue(dataLength);
+		// Leave space for 7Byte set.
+		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
+		// Compile set of random bytes for filler.
+		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
+		// Compile Byte Stack
+		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
+		// Prepend 7Byte set.
+		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
+		// Next fill in data.
+		dataWithCountBytesAndRandFiller.set(inputDataUint8, 7);
+		// Set remaining space to random data.
+		const dataOffset = 7 + dataLength;
+		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
+		dataWithCountBytesAndRandFiller64 = dataWithCountBytesAndRandFiller.toBase64();
+		return dataWithCountBytesAndRandFiller64;
+	}// wrap7Byte()
+
+
+	// Replacing obf1000 with standard that natively offers authentication.
+	async function encryptGCM(cleartext, password, inputType='base64'){
+		//console.log("encryptGCM1000 called with inputType: " + inputType);
+
+		// Create byte array to hold cleartext data.
+		let cleartextUint8 = new Uint8Array;
+		// Compose data based on function parameter.
+		if (inputType === 'base64'){ // Default usage.
+			cleartextUint8 = Uint8Array.fromBase64(cleartext);
+		}else if (inputType === 'utf8'){
+			cleartextUint8 = new TextEncoder().encode(cleartext);
+		}else{
+			throw new Error("Invalid encryptGCM inputType parameter!");
+		}
+		// Convert password text into Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
+		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
+		// This increases our Triple Encrypted Data Record size to 1024.
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// the allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				//name: key_derivation_algo,
+				salt: randSalt,					// salt (MDN suggests at least 16 bytes for security)
+				iterations: 10000,				// strength
+				hash: 'SHA-256',				// 
+			},
+			keyMaterial,						//
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 96 for random IV as specified NIST SP800-38D Section 8.2.
+		);
+		// Split the derived bits into key and iv for the encrypt call.
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		// Take first 256 bits derived from deriveBits above for the cryptoKey.
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// 256 bits for key, 96 bits for IV for GCM.
+		// |-keyBytes-| |-IV-| (where X is 32 bit chunk)
+		//  xxxx xxxx 	 x x x  			
+		//
+		// AES-CTR parameters described here:
+		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
+		const ivBytes = derivedKeyBuffer.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-GCM 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let keyGCM = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-GCM', 
+				length: 256			// Length in bits of input.
+			}, 
+			false,					// extractable boolean 
+			['encrypt']				// keyUsages
+		);
+
+		// AesGcmParams object.
+		// {name, iv, additionalData, tagLength}
+		// tagLength defaults to 128 (16 bytes)
+		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
+		// MDN syntax: encrypt(algorithm, key, data)
+		const inputTypeUint8 = new TextEncoder().encode(inputType);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8}, keyGCM, cleartextUint8);
+
+        //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
+		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+		// Wrap salt with encoded data so it can be used in the decrypt.
+		const saltAndData = concatBuffer(randSalt, encryptedUint8);
+		// This function outputs base64.
+		const encrypted64 = saltAndData.toBase64();
+		//console.log("ciphertext:" + encrypted64 + " password:" + password);
+		//console.log("length:" + encrypted64.length);
+		//console.log("salt: " + randSalt);
+		return encrypted64;
+	}// encryptGCM()
+
+
+
+	async function decryptGCM(saltAndCiphertext, password, outputType='base64'){
+		// Convert password into bytes.
+		const passwordUint8 = new TextEncoder().encode(password);
+		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
+		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
+		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		// Cast array returned by slice into a (usable) Uint8Array.
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				salt: packedSalt,					// salt (at least 16 bytes for security;
+				iterations: 10000,				// exectute hash function this maniy times
+				hash: 'SHA-256',				// digest algorithm
+			},
+			keyMaterial,						// input data as cryptoKey object
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+		);
+
+		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		// 96 IV bits for GCM
+		const ivBytes = derivedKeyBuffer.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let keyGCM = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytes, 				// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-GCM', 
+				length: 256			// Length in bits of input.
+			}, 
+			false,					// extractable boolean 
+			['decrypt']				// keyUsages
+		);
+
+		// MDN syntax: decrypt(algorithm, key, data)
+		//const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
+		const outputTypeUint8 = new TextEncoder().encode(outputType);
+        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8}, keyGCM, encodedCiphertextUint8);
+
+		const decryptedUint8 = new Uint8Array(decryptedBuffer);
+		let decryptedDecoded;
+		// Select output data type based on function parameter.
+		if (outputType === 'base64'){// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
+			decryptedDecoded = decryptedUint8.toBase64();
+		}else if (outputType === 'utf8'){
+			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
+		}else{
+			throw new Error("Invalid decryptAESGCM outputType parameter!");
+		}
+		return decryptedDecoded;
+	}// decryptGCM()
 
 
 
@@ -1350,7 +1475,6 @@
 		let cleartextUint8;
 		// Select input processing type based on function input parameter.
 		if (inputType === 'base64'){// Default usage.
-			
 			cleartextUint8 = Uint8Array.fromBase64(cleartext);
 		}else if (inputType === 'utf8'){
 			cleartextUint8 = new TextEncoder().encode(cleartext);
@@ -1502,37 +1626,37 @@
 	}// decryptAESCTR()
 
 	// Encrypt stack used in the case user chooses command line.
-	async function encryptDouble(obf1000Pass, ctrPass, fileData){
+	async function encryptDouble(gcm1000Pass, ctrPass, fileData){
 		// Obfuscation Step 1 Encrypt
-		const obf1000Encrypted = await obf1000Encrypt(fileData, obf1000Pass);
+		const gcm1000Encrypted = await encryptGCM1000(fileData, gcm1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
 		return ctrEncrypted;
 	}// encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
-	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData){
+	async function encryptTriple(gcm1000Pass, ctrPass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
 		// Obfuscation Step 1 Encrypt
-		const obf1000Encrypted = await obf1000Encrypt(opensslEncrypted, obf1000Pass);
+		const gcm1000Encrypted = await encryptGCM1000(opensslEncrypted, gcm1000Pass);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
 		return ctrEncrypted;
 	}// encryptTriple()
 
 	// Decrypt stack used in the case user chooses Command Line.
-	async function decryptDouble(obf1000Pass, ctrPass, encryptedData){
+	async function decryptDouble(gcm1000Pass, ctrPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
-		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
-		return obf1000Decrypted;
+		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass);
+		return gcm1000Decrypted;
 	}// decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
-	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData){
+	async function decryptTriple(gcm1000Pass, ctrPass, opensslPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
-		const obf1000Decrypted = await obf1000Decrypt(ctrDecrypted, obf1000Pass);
-		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
+		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass);
+		const cleartext = await decOpenSSL(gcm1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
 		return cleartext;
 	}// decryptTriple()
 
@@ -1542,59 +1666,6 @@
 	//				7Byte Functions                       //
 	////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////
-
-	function add7ByteAndRandFiller(inputData) {
-		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
-		const dataUint8 = Uint8Array.fromBase64(inputData);
-		const dataSansSalt = dataUint8.slice(8);
-		// Length of the data with salt bytes removed.
-		const dataLength = dataSansSalt.length;
-		// Find a 7Byte set that represents dataLength.
-		const sevenByteSet = find7ByteSetForValue(dataLength);
-		// Leave spoace for 7Byte set.
-		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
-		// Compile set of random bytes for filler.
-		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
-		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
-		// Prepend 7Byte set.
-		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
-		// Next fill in data.
-		dataWithCountBytesAndRandFiller.set(dataSansSalt, 7);
-		// Set remaining space to random data.
-		const dataOffset = 7 + dataLength;
-		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
-		return dataWithCountBytesAndRandFiller;
-	}// add7ByteAndRandFiller()
-
-	// Input: 
-	// Output: 
-	function add7ByteAndRandFillerSingle(inputData) {
-		// Remove Salted__ bytes. Think we need to convert back into a buffer to avoid partial byte problems with base64.
-		//const dataUint8 = Uint8Array.fromBase64(inputData);
-		//const dataUint8 = new TextEncoder().encode(inputData);
-		const dataUint8 = new TextEncoder().encode(inputData);
-		//const dataSansSalt = dataUint8.slice(8);
-		const dataSansSalt = dataUint8;
-		// Length of the data with salt bytes removed.
-		const dataLength = dataSansSalt.length;
-		// Find a 7Byte set that represents dataLength.
-		const sevenByteSet = find7ByteSetForValue(dataLength);
-		// Leave space for 7Byte set.
-		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
-		// Compile set of random bytes for filler.
-		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
-		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
-		// Prepend 7Byte set.
-		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
-		// Next fill in data.
-		dataWithCountBytesAndRandFiller.set(dataSansSalt, 7);
-		// Set remaining space to random data.
-		const dataOffset = 7 + dataLength;
-		dataWithCountBytesAndRandFiller.set(randFiller, dataOffset);
-		return dataWithCountBytesAndRandFiller;
-	}// add7ByteAndRandFillerSingle()
 
 	// Find set of bytes that compute to an exact value.
 	function find7ByteSetForValue(targetValue){
@@ -1643,25 +1714,6 @@
 		//console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
 		return Math.abs(eval(mathExpression));
 	}// eval7ByteValue()
-
-	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
-	// Inputs: pass is plaintext, length is an integer 
-	// Output: Uint8Array
-	async function getPassHash(passwordBytes, outputLength) {
-		// Take initial SHA256.
-		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
-		let	sha_result;
-		// Loop until we have more than the input length number of bytes of data.
-		do{
-			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
-			// Append SHA256 of Hash(n-1)
-			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
-		} while(sha_cumulative.length < outputLength);
-		// Truncate array to size <length>
-		sha_cumulative = sha_cumulative.slice(0, outputLength);
-		return sha_cumulative;
-	}// getPassHash()
-
 
 	// Return true if input only contains base64 chars, including padding char: '='
 	function checkBase64Chars(input){
