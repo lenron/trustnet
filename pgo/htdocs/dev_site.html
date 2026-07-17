@@ -589,10 +589,12 @@
 				document.getElementById('openssl_cleartext').value = '';
 			}
 		}
-		setTimeout(() => {
+		clearTimeout(timeoutIdOpenSSL)
+		timeoutIdOpenSSL = setTimeout(() => {
 			turnOffOpenSSLDecryptOutcomeMessage();
 		}, 2000); 
 	}// executeOpenSSL()
+	let timeoutIdOpenSSL;
 
 	function turnOffOpenSSLDecryptOutcomeMessage() {
 		document.getElementById('openssl_outcome_message').style.visibility = 'hidden';
@@ -706,10 +708,12 @@
 				document.getElementById('gcm1000_cleartext').value = '';
 			}
 		}
-		setTimeout(() => {
+		clearTimeout(timeoutIdGCM)
+		timeoutIdGCM = setTimeout(() => {
 			turnOffGCM1000DecryptOutcomeMessage();
 		}, 2000); 
 	}// executeGCM1000()
+	let timeoutIdGCM;
 
 	function turnOffGCM1000DecryptOutcomeMessage() {
 		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
@@ -824,10 +828,12 @@
 				document.getElementById('aesctr_cleartext').value = '';
 			}
 		}
-		setTimeout(() => {
+		clearTimeout(timeoutIdCTR)
+		timeoutIdCTR = setTimeout(() => {
 			turnOffAESCTRDecryptOutcomeMessage();
 		}, 2000); 
 	}// executeAESCTR()
+	let timeoutIdCTR;
 
 	function turnOffAESCTRDecryptOutcomeMessage() {
 		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
@@ -947,10 +953,12 @@
 				document.getElementById('triple_cleartext').value = '';
 			}
 		}
-		setTimeout(() => {
+		clearTimeout(timeoutIdTriple)
+		timeoutIdTriple = setTimeout(() => {
 			turnOffTripleDecryptOutcomeMessage();
 		}, 2000); 
 	}// executeTriple()
+	let timeoutIdTriple;
 
 	function turnOffTripleDecryptOutcomeMessage() {
 		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
