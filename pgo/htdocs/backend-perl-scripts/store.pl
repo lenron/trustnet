@@ -45,8 +45,8 @@ if ($q->param){
 		exit 0;
 	}
 
-	# Match exactly 43 base64 chars.      Match exactly 1024 base64 chars.
-	if (!($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/) || !($data =~ /^[a-zA-Z0-9\+\/=]{1072}$/)){
+	# Match exactly 43 base64 chars.      Match exactly 1068 base64 chars.
+	if (!($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/) || !($data =~ /^[a-zA-Z0-9\+\/=]{1068}$/)){
 		# Log denial due to incorrect data format.
 		add_log_message("ERROR: STORE DENIED: Incorrect data format.");
 		# Return fail if data isn't in the proper form.

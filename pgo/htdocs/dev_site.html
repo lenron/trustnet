@@ -1046,6 +1046,7 @@
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352;
+	const GCM_TAGLENGTH = 120; // 120 bits = 15 bytes
 	const MAX_POINTER_VALUE = 999;
 	const FIVE_SECONDS = 5000;
 	const TEN_SECONDS = 10000;
@@ -1382,7 +1383,7 @@
 		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
 		// MDN syntax: encrypt(algorithm, key, data)
 		const inputTypeUint8 = new TextEncoder().encode(inputType);
-        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8}, keyGCM, cleartextUint8);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH}, keyGCM, cleartextUint8);
 
         //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
@@ -1451,7 +1452,7 @@
 		// MDN syntax: decrypt(algorithm, key, data)
 		//const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
 		const outputTypeUint8 = new TextEncoder().encode(outputType);
-        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8}, keyGCM, encodedCiphertextUint8);
+        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH}, keyGCM, encodedCiphertextUint8);
 
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
