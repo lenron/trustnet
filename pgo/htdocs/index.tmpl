@@ -989,22 +989,25 @@
 	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
 	const FINGERPRINT_BYTE_LENGTH = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
-	const DATA_LENGTH = 1068;
-	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
-	const PASSLOCK_LENGTH = 36;
-	const BROWSERINPUT_LENGTH_LIMIT = 526;
-	const CMDINPUT_LENGTH_LIMIT = 544;
-	const PREBASE64_RANDDATA_BYTE_LENGTH = 768;
-	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
-	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
-	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352;
-	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
+	// List everything that is contributing to that length.
+	// 24 b64 chars for CTR salt + 24 b64 chars for GCM salt + 20 b64 chars for GCM sig + 
+	// 
+	const MAX_DATA_LENGTH = 1024;
+	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + MAX_DATA_LENGTH;
+	const PASSLOCK_LENGTH = 36; // Length of a typical UUID.
+	const BROWSERINPUT_LENGTH_LIMIT = 526; // Should derive programmatically.
+	const CMDINPUT_LENGTH_LIMIT = 544; // Should derive perogrammatically.
+	const BYTE_LENGTH_EQUIVALENT_1024_BASE64 = 768; // This number of bytes converts to exactly 1024 base64 chars.
+	const BYTE_LENGTH_EQUIVALENT_1000_BASE64 = 750; // This number of bytes converts to exactly 1000 base64 chars.
+	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384; // 256 bits for key + 128 for IV
+	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352; // 256 bits for key + 96 for IV
+	const KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR = 384; // 256 bits for key + 128 for (nonce + counter)
 	const GCM_TAGLENGTH = 120; // 120 bits = 15 bytes
-	const MAX_POINTER_VALUE = 999;
-	const FIVE_SECONDS = 5000;
-	const TEN_SECONDS = 10000;
-	const FOUR_MINUTES_THIRTY_SECONDS = 270000;
-	const FIVE_MINUTES = 300000;
+	const MAX_POINTER_VALUE = 999; // For offline database.
+	const FIVE_SECONDS_INTHOUSANDTHS = 5000;
+	const TEN_SECONDS_INTHOUSANDTHS = 10000;
+	const FOUR_MINUTES_THIRTY_SECONDS_INTHOUSANDTHS = 270000;
+	const FIVE_MINUTES_INTHOUSANDTHS = 300000;
 
 	// Automatically run this function on page load.
 	window.onload = async function() {
@@ -1139,7 +1142,7 @@
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
 				hideAllCopiedEncryptCommandInform();
-			}, FIVE_SECONDS); 
+			}, FIVE_SECONDS_INTHOUSANDTHS); 
 		} catch (error){
 			console.error(error.message);
 		}
@@ -1170,7 +1173,7 @@
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
 				hideAllCopiedDecryptCommandInform();
-			}, FIVE_SECONDS); 
+			}, FIVE_SECONDS_INTHOUSANDTHS); 
 		} catch (error){
 			console.error(error.message);
 		}
@@ -1431,7 +1434,7 @@
 		// Check that data is valid.
 		if (encryptedData === "TOO_MANY_ACCESS_FAILURES"){
 			showPage('too_many_access_failures');
-		} else if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		} else if (encryptedData.length !== MAX_DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access_for_new_offline_database_creation');
 		} else {
 			// Push fp, data to recordListForNewOfflineDBase collector object.
@@ -1539,7 +1542,7 @@
 
 	function getRandData(){
 		// Pick a value that will convert into 1024 base64 chars.
-		const randarray = window.crypto.getRandomValues(new Uint8Array(PREBASE64_RANDDATA_BYTE_LENGTH));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(BYTE_LENGTH_EQUIVALENT_1024_BASE64));
 		return randarray.toBase64();
 	}// getRandData()
 
@@ -1554,10 +1557,10 @@
 	function getRandDatabase(){
 		// Each record has 43 base64 chars for fingerprint and 1024 chars for the data.
 		// There are 1000 records, so 1000*(1024+43) = 1,067,000 base64 chars.
-		const TOTAL_BASE64_CHARS = 1000 * (DATA_LENGTH + FINGERPRINT_LENGTH);
+		const TOTAL_BASE64_CHARS = 1000 * (MAX_DATA_LENGTH + FINGERPRINT_LENGTH);
 		// So we need 1067000 base64 chars * (3 raw bytes/4 base 64 chars) = 800250 raw bytes from subtle crypto.
 		const TOTAL_RAW_BYTES_NEEDED = TOTAL_BASE64_CHARS * (3/4);
-console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
+//hconsole.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		let randBytes = new Uint8Array(0);			// random raw bytes that will be converted to base64 database
 		//let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
 		let bytesStillNeeded = TOTAL_RAW_BYTES_NEEDED; // total number of random raw bytes we need to generate to make the database.
@@ -1613,9 +1616,9 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		}
 	}// checkFingerprintIsValid()
 
-	// Returns true if input has precisely DATA_LENGTH (1024) base64 chars.
+	// Returns true if input has precisely MAX_DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
-		const regex = new RegExp(`^[A-Za-z0-9+/=]{${DATA_LENGTH}}$`);
+		const regex = new RegExp(`^[A-Za-z0-9+/=]{${MAX_DATA_LENGTH}}$`);
 		if (regex.test(data)){
 			return true;
 		}else{
@@ -1740,13 +1743,13 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 			// Delete passlock.
 			resetPasslock();
 			//console.log("5 mintue Timeout elapsed! Data session expired!");
-		}, FIVE_MINUTES); // Five minutes.
+		}, FIVE_MINUTES_INTHOUSANDTHS); // Five minutes.
 		//console.log("Starting passlock timeout! timeoutId: " + timeoutId);
 		// Set warning timeout to 30 seconds before hard timeout.
 		warningTimeoutId = setTimeout(() => {
 			// Show warning overlay so user can click to extend timeout.
 			document.getElementById("timeout_warning_overlay").style.display = "flex";
-		}, FOUR_MINUTES_THIRTY_SECONDS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
+		}, FOUR_MINUTES_THIRTY_SECONDS_INTHOUSANDTHS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
 		//}, 1000); // set for 1 second for debug.
 		//console.log("Setting Timeout Warning timeout! warningTimeoutId: " + warningTimeoutId);
 	}// setTimeoutAndWarning()
@@ -1905,7 +1908,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		const encryptedData = await serverLoad(fingerprint);
 		if (encryptedData === "TOO_MANY_ACCESS_FAILURES"){
 			showPage('too_many_access_failures');
-		} else if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		} else if (encryptedData.length !== MAX_DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 		}else{
 			showPage('access_file');
@@ -1943,7 +1946,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		if (encryptedData === "TOO_MANY_ACCESS_FAILURES"){
 			showPage('too_many_access_failures');
 			resetPasslock();
-		}else if (encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		}else if (encryptedData.length !== MAX_DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('failed_to_access');
 			resetPasslock();
 		}else{
@@ -2205,7 +2208,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND"){
 				console.log("serverLoad Error: " + responseObj.access_response);
 				return responseObj.access_response;
-			} else if (responseObj.access_response.length === DATA_LENGTH && checkBase64Chars(responseObj.access_response)){ // Data looks good.
+			} else if (responseObj.access_response.length === MAX_DATA_LENGTH && checkBase64Chars(responseObj.access_response)){ // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.access_response;
 			} else {
@@ -2718,11 +2721,11 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		// Find a 7Byte set that represents dataLength.
 		const sevenByteSet = find7ByteSetForValue(dataLength);
 		// Leave space for 7Byte set.
-		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
+		const remainingSpace = BYTE_LENGTH_EQUIVALENT_1000_BASE64 - 7 - dataLength;
 		// Compile set of random bytes for filler.
 		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
 		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
+		let dataWithCountBytesAndRandFiller = new Uint8Array(BYTE_LENGTH_EQUIVALENT_1000_BASE64);
 		// Prepend 7Byte set.
 		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
 		// Next fill in data.
@@ -2937,7 +2940,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 				hash: 'SHA-256',				// 
 			},
 			keyMaterial,						//
-			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 		// Split the derived bits into key and iv for the encrypt call.
 		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
@@ -3017,7 +3020,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 				hash: 'SHA-256',				// digest algorithm
 			},
 			keyMaterial,						// input data as cryptoKey object
-			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 
 		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
@@ -4185,20 +4188,20 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
 	const FINGERPRINT_BYTE_LENGTH = 32;
-	const DATA_LENGTH = 1068;
-	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
+	const MAX_DATA_LENGTH = 1068;
+	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + MAX_DATA_LENGTH;
 	const PASSLOCK_LENGTH = 36;
 	const BROWSERINPUT_LENGTH_LIMIT = 526;
 	const CMDINPUT_LENGTH_LIMIT = 544;
-	const PREBASE64_RANDDATA_BYTE_LENGTH = 768;
-	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
+	const BYTE_LENGTH_EQUIVALENT_1024_BASE64 = 768;
+	const BYTE_LENGTH_EQUIVALENT_1000_BASE64 = 750;
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352;
-	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
+	const KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR = 384;
 	const GCM_TAGLENGTH = 120; // 120 bits = 15 bytes
 	const MAX_POINTER_VALUE = 999;
-	const FIVE_SECONDS = 5000;
-	const TEN_SECONDS = 10000;
+	const FIVE_SECONDS_INTHOUSANDTHS = 5000;
+	const TEN_SECONDS_INTHOUSANDTHS = 10000;
 
 	// Base 64 character map.
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -4296,7 +4299,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
 				hideAllCopiedEncryptCommandInform();
-			}, FIVE_SECONDS); 
+			}, FIVE_SECONDS_INTHOUSANDTHS); 
 		} catch (error){
 			console.error(error.message);
 		}
@@ -4327,7 +4330,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
 				hideAllCopiedDecryptCommandInform();
-			}, FIVE_SECONDS); 
+			}, FIVE_SECONDS_INTHOUSANDTHS); 
 		} catch (error){
 			console.error(error.message);
 		}
@@ -4552,7 +4555,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 	}
 
 	function getRandData(){
-		const randarray = window.crypto.getRandomValues(new Uint8Array(PREBASE64_RANDDATA_BYTE_LENGTH));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(BYTE_LENGTH_EQUIVALENT_1024_BASE64));
 		return randarray.toBase64();
 	}
 
@@ -4601,9 +4604,9 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		}
 	}
 
-	// Returns true if input has precisely DATA_LENGTH (1024) base64 chars.
+	// Returns true if input has precisely MAX_DATA_LENGTH (1024) base64 chars.
 	function checkDataIsValid(data){
-		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${DATA_LENGTH}}$\`);
+		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${MAX_DATA_LENGTH}}$\`);
 		if (regex.test(data)){
 			return true;
 		}else{
@@ -4774,7 +4777,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 	function getRecordOfflineDBase(fingerprint, offlineDatabase){
 		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
 		const fingerprintEndIndex = fingerprintStartIndex + FINGERPRINT_LENGTH;
-		const dataEndIndex = fingerprintEndIndex + DATA_LENGTH;
+		const dataEndIndex = fingerprintEndIndex + MAX_DATA_LENGTH;
 		// Get the data between fingerprintEndIndex and dataEndIndex.
 		return offlineDatabase.substring(fingerprintEndIndex, dataEndIndex);
 	}
@@ -4992,7 +4995,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		// Add additional parameter?
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 
-		if (encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData === 'miss' || encryptedData.length !== MAX_DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_file');
@@ -5009,7 +5012,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['gcm1000Pass'], offlineData['ctrPass']);
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 
-		if (encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData === 'miss' || encryptedData.length !== MAX_DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('offlinefailed_to_access'); // Access fail is valid here?
 		}else{
 			//showPage('offlineaccess_file');
@@ -5065,7 +5068,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
-		if (encryptedData === 'miss' || encryptedData.length !== DATA_LENGTH || !checkBase64Chars(encryptedData)){
+		if (encryptedData === 'miss' || encryptedData.length !== MAX_DATA_LENGTH || !checkBase64Chars(encryptedData)){
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_cleartext');
@@ -5206,7 +5209,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND"){
 				console.log("serverLoad Error: " + responseObj.access_response);
 				return responseObj.access_response;
-			} else if (responseObj.access_response.length === DATA_LENGTH && checkBase64Chars(responseObj.access_response)){ // Data looks good.
+			} else if (responseObj.access_response.length === MAX_DATA_LENGTH && checkBase64Chars(responseObj.access_response)){ // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.access_response;
 			} else {
@@ -5305,7 +5308,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Load responseObj.data: " + responseObj.data);
-			if (responseObj.data.length === DATA_LENGTH && checkBase64Chars(responseObj.data)){ // Data looks good.
+			if (responseObj.data.length === MAX_DATA_LENGTH && checkBase64Chars(responseObj.data)){ // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.data;
 			}else{
@@ -5374,7 +5377,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		for(let i=0; i < offline_dbase_pointer; i++ ){
 			fp_start = i * TOTAL_RECORD_LENGTH;
 			fp_end = fp_start + FINGERPRINT_LENGTH;
-			data_end = fp_end + DATA_LENGTH;
+			data_end = fp_end + MAX_DATA_LENGTH;
 
 			offline_dbase_json_flat += '{"fingerprint":"' + offline_dbase.substring(fp_start, fp_end) + '",';
 			offline_dbase_json_flat += '"data":"' + offline_dbase.substring(fp_end, data_end) + '"},';
@@ -5706,11 +5709,11 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		// Find a 7Byte set that represents dataLength.
 		const sevenByteSet = find7ByteSetForValue(dataLength);
 		// Leave space for 7Byte set.
-		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
+		const remainingSpace = BYTE_LENGTH_EQUIVALENT_1000_BASE64 - 7 - dataLength;
 		// Compile set of random bytes for filler.
 		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
 		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
+		let dataWithCountBytesAndRandFiller = new Uint8Array(BYTE_LENGTH_EQUIVALENT_1000_BASE64);
 		// Prepend 7Byte set.
 		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
 		// Next fill in data.
@@ -5927,7 +5930,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 				hash: 'SHA-256',				// 
 			},
 			keyMaterial,						//
-			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 		// Split the derived bits into key and iv for the encrypt call.
 		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
@@ -6008,7 +6011,7 @@ console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 				hash: 'SHA-256',				// 
 			},
 			keyMaterial,						//
-			KEY_AND_IV_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 
 		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);

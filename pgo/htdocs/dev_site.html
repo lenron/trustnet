@@ -64,12 +64,6 @@
 		justify-content: center;
 	}
 
-	a {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: cornflowerblue;
-	}
-
 	input {
 		padding: 6px;
 		background-color: #272727;
@@ -113,6 +107,11 @@
 		font-size: 16px;
 		color: #4491d5;
 	}
+
+	label {
+		font-size: 14px;
+	}
+
 	.glossy_icon {
 		color: magenta;
 	}
@@ -145,32 +144,38 @@
 	}
 
 	.sidebar_button {
-		margin-top: 30px;
+		margin-top: 20px;
 		writing-mode: vertical-lr;
-		transform: scale(-1, -1);
+		transform: scale(-1, -1) translate(-15px);
 		cursor: pointer;
-		
 	}
 
 	.dev_site_sections {
 		display:flex;
 		flex-direction:column;
 		padding:10px;
-		margin-bottom:100px;
+		margin-bottom:10px;
 		width: 90%;
+	}
+
+	.textarea_div_heightcontrol {
+		height: 400px;
 	}
 
 	/* Responsive Design */
 	/* --> below width size that changes from desktop to mobile or tablet, */
 	/* width 90% or whatever makes sense */
 
-
-
+	@media screen and (max-width:500px) {
+		textarea {
+			width: 140px;
+		}
+	}
 
 </style>
 <body>
 			<!--------------------------HEADER----------------------------!>
-			<div class="header" id="header" style="position:fixed; display:flex; justify-content:space-around; background-color:#434343; height:50px; width:100%; padding: ">
+			<div class="header" id="header" style="position:fixed; display:flex; justify-content:space-around; background-color:#434343; z-index:10; height:50px; width:100%; ">
 				<div class="header_content" id="header_left">
 					<div class="header_title">
 						<a href="https://obf.mkrsvr.org" id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-SECRETWORD</a>
@@ -192,27 +197,27 @@
 	<!--------------------------Sidebar and Page----------------------------!>
 	<div class="" id="sidebar_and_page" style="display:flex; flex-direction:row; width:100%; ">
 		<!--------------------------SIDEBAR----------------------------!>
-		<div class="" id="sidebar_section" style="position:fixed; display:flex; flex-direction:column; background-color:#434343; margin-top:50px; width:70px; height:100%; ">
-			<div class="sidebar_button" id="openssl_sidebar_button" style="border-left: solid magenta;">
-				<a href="#openssl" style="text-decoration:none; "><h1>OpenSSL</h1></a>
+		<div class="" id="sidebar_section" style="position:fixed; display:flex; flex-direction:column; align-items:flex-end; background-color:#434343; margin-top:50px; width:20px; height:100%; ">
+			<div class="sidebar_button" id="openssl_sidebar_button" style="">
+				<a id="" href="#openssl" style="text-decoration:none; "><p id="openssl_sidebar_text" style="color:magenta; ">OpenSSL</p></a>
 			</div>
 			<div class="sidebar_button" id="gcm1000_sidebar_button" style="">
-				<a href="#gcm1000" style="text-decoration:none; "><h1>GCM1000</h1></a>
+				<a id="" href="#gcm1000" style="text-decoration:none; "><p id="gcm1000_sidebar_text" style=" ">GCM-1000</p></a>
 			</div>
 			<div class="sidebar_button" id="aesctr_sidebar_button" style="">
-				<a href="#aesctr" style="text-decoration:none; "><h1>AES-CTR</h1></a>
+				<a id="" href="#aesctr" style="text-decoration:none; "><p id="aesctr_sidebar_text" style=" ">AES-CTR</p></a>
 			</div>
 			<div class="sidebar_button" id="triple_sidebar_button" style="">
-				<a href="#triple" style="text-decoration:none; "><h1>Triple</h1></a>
+				<a id="" href="#triple" style="text-decoration:none; "><p id="triple_sidebar_text" style=" ">Triple</p></a>
 			</div>
 		</div>
 		<!--------------------------SIDEBAR----------------------------!>
 		<!--------------------------Header and Functions----------------------------!>
-		<div class="" id="header_and_functions" style="display:flex; flex-direction:column; margin-left:70px; width:100%; ">
+		<div class="" id="header_and_functions" style="display:flex; flex-direction:column; margin-left:5px; width:100%; ">
 			<!--------------------------FUNCTIONS----------------------------!>
-			<div class="" id="functions_section" style="display:flex; flex-direction:column; align-items:center; width:100%; margin-top:50px; ">
+			<div class="" id="functions_section" style="display:flex; flex-direction:column; align-items:center; width:90%; margin-top:50px; ">
 				<!--------------------------OpenSSL SECTION-------------------------------------!>
-				<div class="dev_site_sections" id="openssl_section" style="">
+				<div class="dev_site_sections" id="openssl_section" style=" padding-bottom:20px; ">
 					<div style="position:relative; ">
 						<div class="" id="openssl_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
 							<p>
@@ -220,7 +225,7 @@
 								<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 
 								Our OpenSSL implementation uses the MDN SubtleCrypto library with the encrypt() function which has many options for use including AES-256-CBC.
 								<br>
@@ -257,38 +262,44 @@
 						</div>
 					</div>
 					<div style="display:flex;  ">
-						<h1 id="openssl" style="scroll-margin-top:75px; ">OpenSSL AES-256-CBC</h1>
+						<h3 id="openssl" style="scroll-margin-top:75px; ">OpenSSL AES-256-CBC</h3>
 						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipOpenSSL()" >[?]</a>
 					</div>
-					<div id="" style="display:flex; flex-direction:row; ">
+					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="openssl_cleartext_label">Cleartext:</label>
-							<textarea value="" id="openssl_cleartext" style="" rows="8" oninput="executeOpenSSL()"></textarea>
+							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+								<label id="openssl_cleartext_label" style="">Cleartext:</label>
+								<label id="openssl_cleartext_length_label" style="color:gray; "></label>
+							</div>
+							<textarea value="" id="openssl_cleartext" style="" oninput="executeOpenSSL()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
 							<button class="" id='openssl_enc_button' style="flex-grow:1; " onclick="activateEncOpenSSL()">Encrypt<br>------></button>
 							<button class="" id='openssl_dec_button' style="flex-grow:1; " onclick="activateDecOpenSSL()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="openssl_ciphertext_label">Ciphertext:</label>
-							<textarea value="" id="openssl_ciphertext" style="" rows="8" oninput="executeOpenSSL()"></textarea>
+							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+								<label id="openssl_ciphertext_label" style="">Ciphertext:</label>
+								<label id="openssl_ciphertext_length_label" style="color:gray; "></label>
+							</div>
+							<textarea value="" id="openssl_ciphertext" style="" oninput="executeOpenSSL()"></textarea>
 						</div>
 					</div>
 					<label id="openssl_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
-					<label>Password:</label>
+					<label style="">Password:</label>
 					<input autocomplete="off" type="" value="" id="openssl_password" style="" oninput="executeOpenSSL()">
 				</div>
 				<!--------------------------OpenSSL SECTION-------------------------------------!>
-				<!--------------------------GCM1000 SECTION-------------------------------------!>
+				<!--------------------------GCM-1000 SECTION-------------------------------------!>
 				<div class="dev_site_sections" id="gcm1000_section" style="">
 					<div style="position:relative; ">
 						<div class="" id="gcm1000_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
 							<!------------------COPY IN TOOLTIP LATER------------------------->
 							<p>
-								GCM1000 TOOLTIP SECTION
+								GCM-1000 TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -300,16 +311,19 @@
 								<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
 
 							</p>
-							<button class="glossy_button" onclick="hideTipGCM1000()">Close</button>
+							<button class="glossy_button" onclick="hideTipGCM-1000()">Close</button>
 						</div>
 					</div>
 					<div style="display:flex;  ">
-						<h1 id="gcm1000" style="scroll-margin-top:75px; ">GCM1000</h1>
+						<h3 id="gcm1000" style="scroll-margin-top:75px; ">GCM-1000</h3>
 						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipGCM1000()">[?]</a>
 					</div>
-					<div id="" style="display:flex; flex-direction:row; height:370px; ">
+					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="gcm1000_cleartext_label">Cleartext:</label>
+							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+								<label id="gcm1000_cleartext_label">Cleartext:</label>
+								<label id="gcm1000_cleartext_length_label" style="color:gray; "></label>
+							</div>
 							<textarea value="" id="gcm1000_cleartext" style="" rows="8" oninput="executeGCM1000()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
@@ -317,7 +331,10 @@
 							<button class="" id='gcm1000_dec_button' style="flex-grow:1; " onclick="activateDecGCM1000()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="gcm1000_ciphertext_label">Ciphertext:</label>
+							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+								<label id="gcm1000_ciphertext_label">Ciphertext:</label>
+								<label id="gcm1000_ciphertext_length_label" style="color:gray; "></label>
+							</div>
 							<textarea value="" id="gcm1000_ciphertext" style="" rows="8" oninput="executeGCM1000()"></textarea>
 						</div>
 					</div>
@@ -325,7 +342,7 @@
 					<label>Password:</label>
 					<input autocomplete="off" type="" value="" id="gcm1000_password" style="" oninput="executeGCM1000()">
 				</div>
-				<!--------------------------GCM1000 SECTION-------------------------------------!>
+				<!--------------------------GCM-1000 SECTION-------------------------------------!>
 				<!--------------------------AES-CTR SECTION-------------------------------------!>
 				<div class="dev_site_sections" id="aesctr_section" style="">
 					<div style="position:relative; ">
@@ -335,7 +352,7 @@
 								AES-CTR TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -351,12 +368,15 @@
 						</div>
 					</div>
 					<div style="display:flex;  ">
-						<h1 id="aesctr" style="scroll-margin-top:75px; ">AES-CTR</h1>
+						<h3 id="aesctr" style="scroll-margin-top:75px; ">AES-CTR</h3>
 						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipAESCTR()" >[?]</a>
 					</div>
-					<div id="" style="display:flex; flex-direction:row; ">
+					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="aesctr_cleartext_label">Cleartext:</label>
+							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+								<label id="aesctr_cleartext_label">Cleartext:</label>
+								<label id="aesctr_cleartext_length_label" style="color:gray; "></label>
+							</div>
 							<textarea value="" id="aesctr_cleartext" style="" rows="8" oninput="executeAESCTR()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
@@ -364,7 +384,10 @@
 							<button class="" id='aesctr_dec_button' style="flex-grow:1; " onclick="activateDecAESCTR()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="aesctr_ciphertext_label">Ciphertext:</label>
+							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+								<label id="aesctr_ciphertext_label">Ciphertext:</label>
+								<label id="aesctr_ciphertext_length_label" style="color:gray; "></label>
+							</div>
 							<textarea value="" id="aesctr_ciphertext" style="" rows="8" oninput="executeAESCTR()"></textarea>
 						</div>
 					</div>
@@ -383,7 +406,7 @@
 								TRIPLE TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -399,12 +422,15 @@
 						</div>
 					</div>
 					<div style="display:flex;  ">
-						<h1 id="triple" style="scroll-margin-top:75px; ">Triple</h1>
+						<h3 id="triple" style="scroll-margin-top:75px; ">Triple</h3>
 						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipTriple()" >[?]</a>
 					</div>
-					<div id="" style="display:flex; flex-direction:row; height:370px; ">
+					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="triple_cleartext_label">Cleartext:</label>
+							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+								<label id="triple_cleartext_label">Cleartext:</label>
+								<label id="triple_cleartext_length_label" style="color:gray; "></label>
+							</div>
 							<textarea value="" id="triple_cleartext" style="" rows="8" oninput="executeTriple()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
@@ -412,16 +438,19 @@
 							<button class="" id='triple_dec_button' style="flex-grow:1; " onclick="activateDecTriple()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<label id="triple_ciphertext_label">Ciphertext:</label>
+							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+								<label id="triple_ciphertext_label">Ciphertext:</label>
+								<label id="triple_ciphertext_length_label" style="color:gray; "></label>
+							</div>
 							<textarea value="" id="triple_ciphertext" style="" rows="8" oninput="executeTriple()"></textarea>
 						</div>
 					</div>
 					<label id="triple_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
-					<label>Password 1:</label>
+					<label>Password 1 - AES-GCM:</label>
 					<input autocomplete="off" type="" value="" id="triple_password_1" style="" oninput="executeTriple()">
-					<label>Password 2:</label>
+					<label>Password 2 - AES-CTR:</label>
 					<input autocomplete="off" type="" value="" id="triple_password_2" style="" oninput="executeTriple()">
-					<label>Password 3:</label>
+					<label>Password 3 - AES-CBC (OpenSSL):</label>
 					<input autocomplete="off" type="" value="" id="triple_password_3" style="" oninput="executeTriple()">
 				</div>
 				<!--------------------------AES-CTR SECTION-------------------------------------!>
@@ -444,39 +473,39 @@
 	}
 
 	function turnOffPinkBar() {
-		document.getElementById('openssl_sidebar_button').style.borderLeft = 'none';
-		document.getElementById('gcm1000_sidebar_button').style.borderLeft = 'none';
-		document.getElementById('aesctr_sidebar_button').style.borderLeft = 'none';
-		document.getElementById('triple_sidebar_button').style.borderLeft = 'none';
+		document.getElementById('openssl_sidebar_text').style.color = '#54c597';
+		document.getElementById('gcm1000_sidebar_text').style.color = '#54c597';
+		document.getElementById('aesctr_sidebar_text').style.color = '#54c597';
+		document.getElementById('triple_sidebar_text').style.color = '#54c597';
 	}
 
 	function turnOnPinkBarOpenSSL() {
-		document.getElementById('openssl_sidebar_button').style.borderLeft = 'solid magenta';
+		document.getElementById('openssl_sidebar_text').style.color = 'magenta';
 	}
 	function turnOnPinkBarGCM1000() {
-		document.getElementById('gcm1000_sidebar_button').style.borderLeft = 'solid magenta';
+		document.getElementById('gcm1000_sidebar_text').style.color = 'magenta';
 	}
 	function turnOnPinkBarAESCTR() {
-		document.getElementById('aesctr_sidebar_button').style.borderLeft = 'solid magenta';
+		document.getElementById('aesctr_sidebar_text').style.color = 'magenta';
 	}
 	function turnOnPinkBarTriple() {
-		document.getElementById('triple_sidebar_button').style.borderLeft = 'solid magenta';
+		document.getElementById('triple_sidebar_text').style.color = 'magenta';
 	}
 
 	window.addEventListener("scroll", (event) => {
 		let scroll = window.scrollY;
 		//console.log(scroll);
 
-		if (scroll < 300) {
+		if (scroll < 500) {
 			turnOffPinkBar();
 			turnOnPinkBarOpenSSL();
-		} else if (scroll >= 300 && scroll < 700){
+		} else if (scroll >= 500 && scroll < 1000){
 			turnOffPinkBar();
 			turnOnPinkBarGCM1000();
-		} else if (scroll >= 700 && scroll < 1100){
+		} else if (scroll >= 1000 && scroll < 1500){
 			turnOffPinkBar();
 			turnOnPinkBarAESCTR();
-		} else if (scroll >= 1100){
+		} else if (scroll >= 1500){
 			turnOffPinkBar();
 			turnOnPinkBarTriple();
 		}
@@ -551,6 +580,7 @@
 	//					OpenSSL HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 	async function executeOpenSSL() {
+		setLengthOpenSSL();
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (openSSLEncrypt_f === true) { // Encrypt function
 			// Gather inputs.
@@ -563,7 +593,8 @@
 					document.getElementById('openssl_outcome_message').style.visibility = 'visible';
 					document.getElementById('openssl_outcome_message').style.color = 'lime';
 					document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch {
+				} catch (e) {
+					console.log(e);
 					//document.getElementById('openssl_outcome_message').style.display = 'inline';
 					document.getElementById('openssl_outcome_message').style.visibility = 'visible';
 					document.getElementById('openssl_outcome_message').style.color = 'red';
@@ -581,7 +612,8 @@
 				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
 				document.getElementById('openssl_outcome_message').style.color = 'lime';
 				document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
-			} catch {
+			} catch (e) {
+				console.log(e);
 				//document.getElementById('openssl_outcome_message').style.display = 'inline';
 				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
 				document.getElementById('openssl_outcome_message').style.color = 'red';
@@ -595,6 +627,13 @@
 		}, 2000); 
 	}// executeOpenSSL()
 	let timeoutIdOpenSSL;
+
+	function setLengthOpenSSL() {
+		let cleartext_length_string = "Length: " + document.getElementById('openssl_cleartext').value.length;
+		let ciphertext_length_string = "Length: " + document.getElementById('openssl_ciphertext').value.length;
+		document.getElementById('openssl_cleartext_length_label').innerHTML = cleartext_length_string;
+		document.getElementById('openssl_ciphertext_length_label').innerHTML = ciphertext_length_string;
+	}
 
 	function turnOffOpenSSLDecryptOutcomeMessage() {
 		document.getElementById('openssl_outcome_message').style.visibility = 'hidden';
@@ -669,9 +708,10 @@
 	}// activateDecOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////
-	//					GCM1000 HTML handling									 //
+	//					GCM-1000 HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 	async function executeGCM1000() {
+		setLengthGCM1000();
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (gcm1000Encrypt_f === true) { // Encrypt function
 			// Gather inputs.
@@ -684,7 +724,8 @@
 					document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 					document.getElementById('gcm1000_outcome_message').style.color = 'lime';
 					document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch {
+				} catch (e) {
+					console.log(e);
 					document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 					document.getElementById('gcm1000_outcome_message').style.color = 'red';
 					document.getElementById('gcm1000_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
@@ -701,7 +742,8 @@
 				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 				document.getElementById('gcm1000_outcome_message').style.color = 'lime';
 				document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
-			} catch {
+			} catch (e) {
+				console.log(e);
 				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 				document.getElementById('gcm1000_outcome_message').style.color = 'red';
 				document.getElementById('gcm1000_outcome_message').innerHTML = 'Decryption unsuccessful';
@@ -714,6 +756,13 @@
 		}, 2000); 
 	}// executeGCM1000()
 	let timeoutIdGCM;
+
+	function setLengthGCM1000() {
+		let cleartext_length_string = "Length: " + document.getElementById('gcm1000_cleartext').value.length;
+		let ciphertext_length_string = "Length: " + document.getElementById('gcm1000_ciphertext').value.length;
+		document.getElementById('gcm1000_cleartext_length_label').innerHTML = cleartext_length_string;
+		document.getElementById('gcm1000_ciphertext_length_label').innerHTML = ciphertext_length_string;
+	}
 
 	function turnOffGCM1000DecryptOutcomeMessage() {
 		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
@@ -792,6 +841,7 @@
 	//					AES-CTR HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 	async function executeAESCTR() {
+		setLengthAESCTR();
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (aesctrEncrypt_f === true) { // Encrypt function
 			// Gather inputs.
@@ -804,7 +854,8 @@
 					document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
 					document.getElementById('aesctr_outcome_message').style.color = 'lime';
 					document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch {
+				} catch (e) {
+					console.log(e);
 					document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
 					document.getElementById('aesctr_outcome_message').style.color = 'red';
 					document.getElementById('aesctr_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
@@ -821,7 +872,8 @@
 				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
 				document.getElementById('aesctr_outcome_message').style.color = 'lime';
 				document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
-			} catch {
+			} catch (e) {
+				console.log(e);
 				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
 				document.getElementById('aesctr_outcome_message').style.color = 'red';
 				document.getElementById('aesctr_outcome_message').innerHTML = 'Decryption unsuccessful';
@@ -834,6 +886,13 @@
 		}, 2000); 
 	}// executeAESCTR()
 	let timeoutIdCTR;
+
+	function setLengthAESCTR() {
+		let cleartext_length_string = "Length: " + document.getElementById('aesctr_cleartext').value.length;
+		let ciphertext_length_string = "Length: " + document.getElementById('aesctr_ciphertext').value.length;
+		document.getElementById('aesctr_cleartext_length_label').innerHTML = cleartext_length_string;
+		document.getElementById('aesctr_ciphertext_length_label').innerHTML = ciphertext_length_string;
+	}
 
 	function turnOffAESCTRDecryptOutcomeMessage() {
 		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
@@ -913,21 +972,24 @@
 	//					Triple HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 	async function executeTriple() {
+		setLengthTriple();
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (tripleEncrypt_f === true) { // Encrypt function
 			// Gather inputs.
 			const cleartext = document.getElementById('triple_cleartext').value;
-			const password1 = document.getElementById('triple_password_1').value;
-			const password2 = document.getElementById('triple_password_2').value;
-			const password3 = document.getElementById('triple_password_3').value;
+			const password1GCM = document.getElementById('triple_password_1').value;
+			const password2CTR = document.getElementById('triple_password_2').value;
+			const password3OpenSSL = document.getElementById('triple_password_3').value;
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
 			if (cleartext !== '') {
 				try {
-					document.getElementById('triple_ciphertext').value = await encryptTriple(password1, password2, password3, cleartext);
+					// async function encryptTriple(gcm1000Pass, ctrPass, opensslPass, cleartextData){
+					document.getElementById('triple_ciphertext').value = await encryptTriple(password1GCM, password2CTR, password3OpenSSL, cleartext);
 					document.getElementById('triple_outcome_message').style.visibility = 'visible';
 					document.getElementById('triple_outcome_message').style.color = 'lime';
 					document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch {
+				} catch (e) {
+					console.log(e);
 					document.getElementById('triple_outcome_message').style.visibility = 'visible';
 					document.getElementById('triple_outcome_message').style.color = 'red';
 					document.getElementById('triple_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
@@ -937,16 +999,17 @@
 		} else { // Decrypt function
 			// Gather inputs.
 			const ciphertext = document.getElementById('triple_ciphertext').value;
-			const password1 = document.getElementById('triple_password_1').value;
-			const password2 = document.getElementById('triple_password_2').value;
-			const password3 = document.getElementById('triple_password_3').value;
+			const password1GCM = document.getElementById('triple_password_1').value;
+			const password2CTR = document.getElementById('triple_password_2').value;
+			const password3OpenSSL = document.getElementById('triple_password_3').value;
 			// Execute
 			try {
-				document.getElementById('triple_cleartext').value = await decryptTriple(password1, password2, password3, ciphertext);
+				document.getElementById('triple_cleartext').value = await decryptTriple(password1GCM, password2CTR, password3OpenSSL, ciphertext);
 				document.getElementById('triple_outcome_message').style.visibility = 'visible';
 				document.getElementById('triple_outcome_message').style.color = 'lime';
 				document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
 			} catch {
+				console.log(e);
 				document.getElementById('triple_outcome_message').style.visibility = 'visible';
 				document.getElementById('triple_outcome_message').style.color = 'red';
 				document.getElementById('triple_outcome_message').innerHTML = 'Decryption unsuccessful';
@@ -959,6 +1022,13 @@
 		}, 2000); 
 	}// executeTriple()
 	let timeoutIdTriple;
+
+	function setLengthTriple() {
+		let cleartext_length_string = "Length: " + document.getElementById('triple_cleartext').value.length;
+		let ciphertext_length_string = "Length: " + document.getElementById('triple_ciphertext').value.length;
+		document.getElementById('triple_cleartext_length_label').innerHTML = cleartext_length_string;
+		document.getElementById('triple_ciphertext_length_label').innerHTML = ciphertext_length_string;
+	}
 
 	function turnOffTripleDecryptOutcomeMessage() {
 		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
@@ -1044,13 +1114,29 @@
 	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
 	const FINGERPRINT_BYTE_LENGTH = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
+	//const DATA_LENGTH = 1024;
 	const DATA_LENGTH = 1024;
 	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
 	const PASSLOCK_LENGTH = 36;
 	const BROWSERINPUT_LENGTH_LIMIT = 526;
 	const CMDINPUT_LENGTH_LIMIT = 544;
-	const PREBASE64_RANDDATA_BYTE_LENGTH = 768;
-	const PREBASE64_1000DATA_BYTE_LENGTH = 750;
+	//const BYTE_LENGTH_CONVERTS_TO_1024_BASE64_CHARS = 768;
+	//const BYTE_LENGTH_LIMIT_RANDDATA = 735; // used for creating randomly generated data entry
+
+	// 1024 total limit
+	// - 24 base64 CTR salt
+	// - 24 base64 GCM salt
+	// - 20 base64 GCM sig
+	// = 965 base64 chars = OBF1000 limit below = 717 bytes
+
+	// 717 bytes total limit for OBF1000
+	// - 7 7byte set
+	// 710 = OBF1000 byte length input limit.
+
+
+	const BYTE_LENGTH_CONVERTS_TO_1000_BASE64_CHARS = 750;
+	const SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL = 717; // Converts to 956 base64 chars.
+	const MAX_INPUT_SIZE_OBF1000 = SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL - 7; // 710
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352;
@@ -1299,11 +1385,11 @@
 		// Find a 7Byte set that represents dataLength.
 		const sevenByteSet = find7ByteSetForValue(dataLength);
 		// Leave space for 7Byte set.
-		const remainingSpace = PREBASE64_1000DATA_BYTE_LENGTH - 7 - dataLength;
+		const remainingSpace = SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL - 7 - dataLength;
 		// Compile set of random bytes for filler.
 		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
 		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(PREBASE64_1000DATA_BYTE_LENGTH);
+		let dataWithCountBytesAndRandFiller = new Uint8Array(SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL);
 		// Prepend 7Byte set.
 		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
 		// Next fill in data.
@@ -1736,39 +1822,6 @@
 		}
 	}// checkBase64Chars()
 
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over 526.
-	function checkInputLength(input){
-		// show input size in bytes
-		let size = new Blob([input]).size;
-		let difference = BROWSERINPUT_LENGTH_LIMIT - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		//console.log("size_string: " + size_string);
-		document.getElementById("browserdata_length_label").innerHTML = size_string;
-		if (size > BROWSERINPUT_LENGTH_LIMIT){
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}// checkInputLength()
-
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over 544.
-	function checkInputLengthUpload(input){
-		// show input size in bytes
-		let size = new Blob([input]).size;
-		let difference = CMDINPUT_LENGTH_LIMIT - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		//console.log("size_string: " + size_string);
-		document.getElementById("uploaddata_length_label").innerHTML = size_string;
-		if (size > CMDINPUT_LENGTH_LIMIT){
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}// checkInputLength()
 
 	// Concatenates ArrayBuffers.
 	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
