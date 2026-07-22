@@ -55,15 +55,6 @@
 		padding: 8px;
 	}
 
-	.center_html {
-		width: 100%;
-		min-height: 100%;
-		background-color: #272727;
-		flex: 1 auto;
-		display: flex;
-		justify-content: center;
-	}
-
 	input {
 		padding: 6px;
 		background-color: #272727;
@@ -146,6 +137,7 @@
 	.sidebar_button {
 		margin-top: 20px;
 		writing-mode: vertical-lr;
+		/* Scale appears to rotate text around a center point. Translate then moves it to the right enough to not be cut off by the left screen edge. */
 		transform: scale(-1, -1) translate(-15px);
 		cursor: pointer;
 	}
@@ -167,6 +159,7 @@
 	/* width 90% or whatever makes sense */
 
 	@media screen and (max-width:500px) {
+		/* Narrow all textareas on mobile screens. */
 		textarea {
 			width: 140px;
 		}
@@ -268,19 +261,25 @@
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="openssl_cleartext_label" style="">Cleartext:</label>
-								<label id="openssl_cleartext_length_label" style="color:gray; "></label>
+								<label id="openssl_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+								<div id="" style="display:flex; flex-direction:column;  ">
+									<label id="openssl_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
+									<label id="openssl_cleartext_length_label" style="color:gray; ">Char Length:</label>
+								</div>
 							</div>
 							<textarea value="" id="openssl_cleartext" style="" oninput="executeOpenSSL()"></textarea>
 						</div>
-						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
+						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:32px;">
 							<button class="" id='openssl_enc_button' style="flex-grow:1; " onclick="activateEncOpenSSL()">Encrypt<br>------></button>
 							<button class="" id='openssl_dec_button' style="flex-grow:1; " onclick="activateDecOpenSSL()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="openssl_ciphertext_label" style="">Ciphertext:</label>
-								<label id="openssl_ciphertext_length_label" style="color:gray; "></label>
+								<label id="openssl_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
+								<div id="" style="display:flex; flex-direction:column;  ">
+									<label id="openssl_ciphertext_bytesize_label" style="color:gray; ">Byte Length:</label>
+									<label id="openssl_ciphertext_length_label" style="color:gray; ">Char Length:</label>
+								</div>
 							</div>
 							<textarea value="" id="openssl_ciphertext" style="" oninput="executeOpenSSL()"></textarea>
 						</div>
@@ -321,19 +320,25 @@
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="gcm1000_cleartext_label">Cleartext:</label>
-								<label id="gcm1000_cleartext_length_label" style="color:gray; "></label>
+								<label id="gcm1000_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+								<div id="" style="display:flex; flex-direction:column;  ">
+									<label id="gcm1000_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
+									<label id="gcm1000_cleartext_length_label" style="color:gray; ">Char Length:</label>
+								</div>
 							</div>
 							<textarea value="" id="gcm1000_cleartext" style="" rows="8" oninput="executeGCM1000()"></textarea>
 						</div>
-						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
+						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
 							<button class="" id='gcm1000_enc_button' style="flex-grow:1; " onclick="activateEncGCM1000()">Encrypt<br>------></button>
 							<button class="" id='gcm1000_dec_button' style="flex-grow:1; " onclick="activateDecGCM1000()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="gcm1000_ciphertext_label">Ciphertext:</label>
-								<label id="gcm1000_ciphertext_length_label" style="color:gray; "></label>
+								<label id="gcm1000_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
+								<div id="" style="display:flex; flex-direction:column;  ">
+									<label id="gcm1000_ciphertext_bytesize_label" style="color:gray; ">Byte Length:</label>
+									<label id="gcm1000_ciphertext_length_label" style="color:gray; ">Char Length:</label>
+								</div>
 							</div>
 							<textarea value="" id="gcm1000_ciphertext" style="" rows="8" oninput="executeGCM1000()"></textarea>
 						</div>
@@ -374,19 +379,25 @@
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="aesctr_cleartext_label">Cleartext:</label>
-								<label id="aesctr_cleartext_length_label" style="color:gray; "></label>
+								<label id="aesctr_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+								<div id="" style="display:flex; flex-direction:column;  ">
+									<label id="aesctr_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
+									<label id="aesctr_cleartext_length_label" style="color:gray; ">Char Length:</label>
+								</div>
 							</div>
 							<textarea value="" id="aesctr_cleartext" style="" rows="8" oninput="executeAESCTR()"></textarea>
 						</div>
-						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
+						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
 							<button class="" id='aesctr_enc_button' style="flex-grow:1; " onclick="activateEncAESCTR()">Encrypt<br>------></button>
 							<button class="" id='aesctr_dec_button' style="flex-grow:1; " onclick="activateDecAESCTR()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="aesctr_ciphertext_label">Ciphertext:</label>
-								<label id="aesctr_ciphertext_length_label" style="color:gray; "></label>
+								<label id="aesctr_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
+								<div id="" style="display:flex; flex-direction:column;  ">
+									<label id="aesctr_ciphertext_bytesize_label" style="color:gray; ">Byte Length:</label>
+									<label id="aesctr_ciphertext_length_label" style="color:gray; ">Char Length:</label>
+								</div>
 							</div>
 							<textarea value="" id="aesctr_ciphertext" style="" rows="8" oninput="executeAESCTR()"></textarea>
 						</div>
@@ -428,19 +439,25 @@
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="triple_cleartext_label">Cleartext:</label>
-								<label id="triple_cleartext_length_label" style="color:gray; "></label>
+								<label id="triple_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+								<div id="" style="display:flex; flex-direction:column;  ">
+									<label id="triple_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
+									<label id="triple_cleartext_length_label" style="color:gray; ">Char Length:</label>
+								</div>
 							</div>
 							<textarea value="" id="triple_cleartext" style="" rows="8" oninput="executeTriple()"></textarea>
 						</div>
-						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:19px;">
+						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
 							<button class="" id='triple_enc_button' style="flex-grow:1; " onclick="activateEncTriple()">Encrypt<br>------></button>
 							<button class="" id='triple_dec_button' style="flex-grow:1; " onclick="activateDecTriple()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="triple_ciphertext_label">Ciphertext:</label>
-								<label id="triple_ciphertext_length_label" style="color:gray; "></label>
+								<label id="triple_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
+								<div id="" style="display:flex; flex-direction:column;  ">
+									<label id="triple_ciphertext_bytesize_label" style="color:gray; ">Byte Length:</label>
+									<label id="triple_ciphertext_length_label" style="color:gray; ">Char Length:</label>
+								</div>
 							</div>
 							<textarea value="" id="triple_ciphertext" style="" rows="8" oninput="executeTriple()"></textarea>
 						</div>
@@ -580,7 +597,6 @@
 	//					OpenSSL HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 	async function executeOpenSSL() {
-		setLengthOpenSSL();
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (openSSLEncrypt_f === true) { // Encrypt function
 			// Gather inputs.
@@ -593,13 +609,13 @@
 					document.getElementById('openssl_outcome_message').style.visibility = 'visible';
 					document.getElementById('openssl_outcome_message').style.color = 'lime';
 					document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch (e) {
-					console.log(e);
+				} catch (error) {
+					console.log(error);
 					//document.getElementById('openssl_outcome_message').style.display = 'inline';
 					document.getElementById('openssl_outcome_message').style.visibility = 'visible';
 					document.getElementById('openssl_outcome_message').style.color = 'red';
 					document.getElementById('openssl_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('openssl_cleartext').value = '';
+					document.getElementById('openssl_ciphertext').value = '';
 				}
 			}
 		} else { // Decrypt function
@@ -612,8 +628,8 @@
 				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
 				document.getElementById('openssl_outcome_message').style.color = 'lime';
 				document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
-			} catch (e) {
-				console.log(e);
+			} catch (error) {
+				console.log(error);
 				//document.getElementById('openssl_outcome_message').style.display = 'inline';
 				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
 				document.getElementById('openssl_outcome_message').style.color = 'red';
@@ -625,14 +641,26 @@
 		timeoutIdOpenSSL = setTimeout(() => {
 			turnOffOpenSSLDecryptOutcomeMessage();
 		}, 2000); 
+		// Show length value AFTER execution.
+		setLengthOpenSSL();
 	}// executeOpenSSL()
 	let timeoutIdOpenSSL;
 
 	function setLengthOpenSSL() {
-		let cleartext_length_string = "Length: " + document.getElementById('openssl_cleartext').value.length;
-		let ciphertext_length_string = "Length: " + document.getElementById('openssl_ciphertext').value.length;
+		// Cleartext 
+		const cleartext = document.getElementById('openssl_cleartext').value;
+		const cleartextByteSize = new Blob([cleartext]).size;
+		const cleartext_length_string = "Char Length: " + cleartext.length;
+		const cleartext_bytesize_string = "Byte Length: " + cleartextByteSize;
 		document.getElementById('openssl_cleartext_length_label').innerHTML = cleartext_length_string;
+		document.getElementById('openssl_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		// Ciphertext
+		const ciphertext = document.getElementById('openssl_ciphertext').value;
+		const ciphertextByteSize = new Blob([ciphertext]).size;
+		const ciphertext_length_string = "Char Length: " + ciphertext.length;
+		const ciphertext_bytesize_string = "Byte Length: " + ciphertextByteSize;
 		document.getElementById('openssl_ciphertext_length_label').innerHTML = ciphertext_length_string;
+		document.getElementById('openssl_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}
 
 	function turnOffOpenSSLDecryptOutcomeMessage() {
@@ -711,7 +739,6 @@
 	//					GCM-1000 HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 	async function executeGCM1000() {
-		setLengthGCM1000();
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (gcm1000Encrypt_f === true) { // Encrypt function
 			// Gather inputs.
@@ -724,12 +751,12 @@
 					document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 					document.getElementById('gcm1000_outcome_message').style.color = 'lime';
 					document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch (e) {
-					console.log(e);
+				} catch (error) {
+					console.log(error);
 					document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 					document.getElementById('gcm1000_outcome_message').style.color = 'red';
 					document.getElementById('gcm1000_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('gcm1000_cleartext').value = '';
+					document.getElementById('gcm1000_ciphertext').value = '';
 				}
 			}
 		} else { // Decrypt function
@@ -742,8 +769,8 @@
 				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 				document.getElementById('gcm1000_outcome_message').style.color = 'lime';
 				document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
-			} catch (e) {
-				console.log(e);
+			} catch (error) {
+				console.log(error);
 				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 				document.getElementById('gcm1000_outcome_message').style.color = 'red';
 				document.getElementById('gcm1000_outcome_message').innerHTML = 'Decryption unsuccessful';
@@ -754,14 +781,26 @@
 		timeoutIdGCM = setTimeout(() => {
 			turnOffGCM1000DecryptOutcomeMessage();
 		}, 2000); 
+		// Show length value AFTER execution.
+		setLengthGCM1000();
 	}// executeGCM1000()
 	let timeoutIdGCM;
 
 	function setLengthGCM1000() {
-		let cleartext_length_string = "Length: " + document.getElementById('gcm1000_cleartext').value.length;
-		let ciphertext_length_string = "Length: " + document.getElementById('gcm1000_ciphertext').value.length;
+		// Cleartext 
+		const cleartext = document.getElementById('gcm1000_cleartext').value;
+		const cleartextByteSize = new Blob([cleartext]).size;
+		const cleartext_length_string = "Char Length: " + cleartext.length;
+		const cleartext_bytesize_string = "Byte Length: " + cleartextByteSize;
 		document.getElementById('gcm1000_cleartext_length_label').innerHTML = cleartext_length_string;
+		document.getElementById('gcm1000_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		// Ciphertext
+		const ciphertext = document.getElementById('gcm1000_ciphertext').value;
+		const ciphertextByteSize = new Blob([ciphertext]).size;
+		const ciphertext_length_string = "Char Length: " + ciphertext.length;
+		const ciphertext_bytesize_string = "Byte Length: " + ciphertextByteSize;
 		document.getElementById('gcm1000_ciphertext_length_label').innerHTML = ciphertext_length_string;
+		document.getElementById('gcm1000_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}
 
 	function turnOffGCM1000DecryptOutcomeMessage() {
@@ -841,7 +880,6 @@
 	//					AES-CTR HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 	async function executeAESCTR() {
-		setLengthAESCTR();
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (aesctrEncrypt_f === true) { // Encrypt function
 			// Gather inputs.
@@ -854,12 +892,12 @@
 					document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
 					document.getElementById('aesctr_outcome_message').style.color = 'lime';
 					document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch (e) {
-					console.log(e);
+				} catch (error) {
+					console.log(error);
 					document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
 					document.getElementById('aesctr_outcome_message').style.color = 'red';
 					document.getElementById('aesctr_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('aesctr_cleartext').value = '';
+					document.getElementById('aesctr_ciphertext').value = '';
 				}
 			}
 		} else { // Decrypt function
@@ -872,8 +910,8 @@
 				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
 				document.getElementById('aesctr_outcome_message').style.color = 'lime';
 				document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
-			} catch (e) {
-				console.log(e);
+			} catch (error) {
+				console.log(error);
 				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
 				document.getElementById('aesctr_outcome_message').style.color = 'red';
 				document.getElementById('aesctr_outcome_message').innerHTML = 'Decryption unsuccessful';
@@ -884,20 +922,31 @@
 		timeoutIdCTR = setTimeout(() => {
 			turnOffAESCTRDecryptOutcomeMessage();
 		}, 2000); 
+		// Show length value AFTER execution.
+		setLengthAESCTR();
 	}// executeAESCTR()
 	let timeoutIdCTR;
 
 	function setLengthAESCTR() {
-		let cleartext_length_string = "Length: " + document.getElementById('aesctr_cleartext').value.length;
-		let ciphertext_length_string = "Length: " + document.getElementById('aesctr_ciphertext').value.length;
+		// Cleartext 
+		const cleartext = document.getElementById('aesctr_cleartext').value;
+		const cleartextByteSize = new Blob([cleartext]).size;
+		const cleartext_length_string = "Char Length: " + cleartext.length;
+		const cleartext_bytesize_string = "Byte Length: " + cleartextByteSize;
 		document.getElementById('aesctr_cleartext_length_label').innerHTML = cleartext_length_string;
+		document.getElementById('aesctr_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		// Ciphertext
+		const ciphertext = document.getElementById('aesctr_ciphertext').value;
+		const ciphertextByteSize = new Blob([ciphertext]).size;
+		const ciphertext_length_string = "Char Length: " + ciphertext.length;
+		const ciphertext_bytesize_string = "Byte Length: " + ciphertextByteSize;
 		document.getElementById('aesctr_ciphertext_length_label').innerHTML = ciphertext_length_string;
+		document.getElementById('aesctr_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}
 
 	function turnOffAESCTRDecryptOutcomeMessage() {
 		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
 	}
-
 
 	function activateEncAESCTR() {
 		// Set flag
@@ -972,7 +1021,6 @@
 	//					Triple HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 	async function executeTriple() {
-		setLengthTriple();
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (tripleEncrypt_f === true) { // Encrypt function
 			// Gather inputs.
@@ -988,12 +1036,12 @@
 					document.getElementById('triple_outcome_message').style.visibility = 'visible';
 					document.getElementById('triple_outcome_message').style.color = 'lime';
 					document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch (e) {
-					console.log(e);
+				} catch (error) {
+					console.log(error);
 					document.getElementById('triple_outcome_message').style.visibility = 'visible';
 					document.getElementById('triple_outcome_message').style.color = 'red';
 					document.getElementById('triple_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('triple_cleartext').value = '';
+					document.getElementById('triple_ciphertext').value = '';
 				}
 			}
 		} else { // Decrypt function
@@ -1008,8 +1056,8 @@
 				document.getElementById('triple_outcome_message').style.visibility = 'visible';
 				document.getElementById('triple_outcome_message').style.color = 'lime';
 				document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
-			} catch {
-				console.log(e);
+			} catch (error) {
+				console.log(error);
 				document.getElementById('triple_outcome_message').style.visibility = 'visible';
 				document.getElementById('triple_outcome_message').style.color = 'red';
 				document.getElementById('triple_outcome_message').innerHTML = 'Decryption unsuccessful';
@@ -1020,14 +1068,26 @@
 		timeoutIdTriple = setTimeout(() => {
 			turnOffTripleDecryptOutcomeMessage();
 		}, 2000); 
+		// Show length AFTER execution.
+		setLengthTriple();
 	}// executeTriple()
 	let timeoutIdTriple;
 
 	function setLengthTriple() {
-		let cleartext_length_string = "Length: " + document.getElementById('triple_cleartext').value.length;
-		let ciphertext_length_string = "Length: " + document.getElementById('triple_ciphertext').value.length;
+		// Cleartext 
+		const cleartext = document.getElementById('triple_cleartext').value;
+		const cleartextByteSize = new Blob([cleartext]).size;
+		const cleartext_length_string = "Char Length: " + cleartext.length;
+		const cleartext_bytesize_string = "Byte Length: " + cleartextByteSize;
 		document.getElementById('triple_cleartext_length_label').innerHTML = cleartext_length_string;
+		document.getElementById('triple_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		// Ciphertext
+		const ciphertext = document.getElementById('triple_ciphertext').value;
+		const ciphertextByteSize = new Blob([ciphertext]).size;
+		const ciphertext_length_string = "Char Length: " + ciphertext.length;
+		const ciphertext_bytesize_string = "Byte Length: " + ciphertextByteSize;
 		document.getElementById('triple_ciphertext_length_label').innerHTML = ciphertext_length_string;
+		document.getElementById('triple_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}
 
 	function turnOffTripleDecryptOutcomeMessage() {
@@ -1114,9 +1174,6 @@
 	// Constant declarations.
 	const FINGERPRINT_LENGTH = 43;
 	const FINGERPRINT_BYTE_LENGTH = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
-	//const DATA_LENGTH = 1024;
-	const DATA_LENGTH = 1024;
-	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + DATA_LENGTH;
 	const PASSLOCK_LENGTH = 36;
 	const BROWSERINPUT_LENGTH_LIMIT = 526;
 	const CMDINPUT_LENGTH_LIMIT = 544;
@@ -1124,23 +1181,46 @@
 	//const BYTE_LENGTH_LIMIT_RANDDATA = 735; // used for creating randomly generated data entry
 
 	// 1024 total limit
-	// - 24 base64 CTR salt
+	const TRIPLE_ENCRYPTED_DATA_LENGTH = 1024; // Chosen for beauty, proximity to 1000.
+	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + TRIPLE_ENCRYPTED_DATA_LENGTH;
+	const SALT_SIZE_BYTES = 18; // Chosen by balancing space with cryptographic strength.
+	const AESCTR_SALT_SIZE_B64 = SALT_SIZE_BYTES * (4/3);
+	const GCM_TAGLENGTH = 120; // 120 bits is 8 less than default but still under spec recommendation.
+	const GCM_SIG_SIZE_BYTES = GCM_TAGLENGTH / 8; // 120 bits / 8 = 15 bytes
+	const GCM_SIG_SIZE_B64 = GCM_SIG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to b64.
+
+	const GCM_SALT_SIZE_B64 = AESCTR_SALT_SIZE_B64; // Currently using same salt of 24 base64 / 18 bytes.
+	// 1024 - 24 base64 CTR salt
+	const AESCTR_OUTPUT_LIMIT_B64 = TRIPLE_ENCRYPTED_DATA_LENGTH;
+	const OBF1000_OUTPUT_LIMIT_B64 = TRIPLE_ENCRYPTED_DATA_LENGTH - AESCTR_SALT_SIZE_B64;
 	// - 24 base64 GCM salt
 	// - 20 base64 GCM sig
-	// = 965 base64 chars = OBF1000 limit below = 717 bytes
+	const OPENSSL_OUTPUT_LIMIT_B64 = OBF1000_OUTPUT_LIMIT_B64 - GCM_SIG_SIZE_B64 - GCM_SALT_SIZE_B64;
+	const SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL_BYTES = OPENSSL_OUTPUT_LIMIT_B64 * 3 / 4; // 
+
+
 
 	// 717 bytes total limit for OBF1000
 	// - 7 7byte set
 	// 710 = OBF1000 byte length input limit.
 
+	//const BYTE_LENGTH_CONVERTS_TO_1000_BASE64_CHARS = 750;
+	//const SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL_BYTES = 717; // Converts to 956 base64 chars.
+	//  we sized this by hand in meeting by taking 24 + 20 = 44 ->Bytes-> 33
 
-	const BYTE_LENGTH_CONVERTS_TO_1000_BASE64_CHARS = 750;
-	const SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL = 717; // Converts to 956 base64 chars.
-	const MAX_INPUT_SIZE_OBF1000 = SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL - 7; // 710
+	// Programmatically get to:
+	// Length limits on Encrypts: OpenSSL - with blocking jump, OBF1000 salt + sig, CTR salt
+	//	OpenSSL Input Limit: 686 base64? (-2 array size with 687)
+	//	OpenSSL Output + OBF-1000 Input Limit: 965 base64 -> 
+	//	OBF-1000 Output + AES-CTR Input Limit: 1000 base64 -> 750 bytes
+	// 717 Limit: 7byte + Data + Rand Filler 
+	// 
+	//
+	// Add corresponding length check functions.
+
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESCTR = 384;
 	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352;
-	const GCM_TAGLENGTH = 120; // 120 bits = 15 bytes
 	const MAX_POINTER_VALUE = 999;
 	const FIVE_SECONDS = 5000;
 	const TEN_SECONDS = 10000;
@@ -1308,6 +1388,7 @@
 
 	// Default triple indicates this will be used in PGO triple stack.
 	async function encryptGCM1000(cleartext, password, inputType='triple'){
+		//console.log('encryptGCM1000 cleartext length: ', cleartext.length);
 		// Create byte array to hold cleartext data.
 		let cleartextUint8 = new Uint8Array;
 		// Compose data based on function parameter.
@@ -1318,8 +1399,10 @@
 		}else if (inputType === 'triple'){ // Default usage.
 			// Extract salt for triple stack usage.
 			cleartextWithSalt = Uint8Array.fromBase64(cleartext);
+			//console.log('encryptGCM1000 cleartext byte (uint8) length: ', cleartextWithSalt.length);
 			// Slice off the 8 bytes from OpenSSL that convert to: Salted__
 			cleartextUint8 = cleartextWithSalt.slice(8);
+			//console.log('encryptGCM1000 cleartext byte (uint8) length SALT REMOVED: ', cleartextUint8.length);
 		}else{
 			throw new Error("Invalid encryptGCM inputType parameter!");
 		}
@@ -1327,6 +1410,7 @@
 		const wrappedCleartext64 = wrap7Byte(cleartextUint8);
 		// Always use base64 for 1000 wrapping for base encryption.
 		const gcmEncrypted64 = await encryptGCM(wrappedCleartext64, password, 'base64');
+		//console.log('encryptGCM1000 output length: ', gcmEncrypted64.length);
 		return gcmEncrypted64;
 	}
 
@@ -1385,11 +1469,11 @@
 		// Find a 7Byte set that represents dataLength.
 		const sevenByteSet = find7ByteSetForValue(dataLength);
 		// Leave space for 7Byte set.
-		const remainingSpace = SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL - 7 - dataLength;
+		const remainingSpace = SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL_BYTES - 7 - dataLength;
 		// Compile set of random bytes for filler.
 		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
 		// Compile Byte Stack
-		let dataWithCountBytesAndRandFiller = new Uint8Array(SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL);
+		let dataWithCountBytesAndRandFiller = new Uint8Array(SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL_BYTES);
 		// Prepend 7Byte set.
 		dataWithCountBytesAndRandFiller.set(sevenByteSet, 0);
 		// Next fill in data.
@@ -1421,7 +1505,7 @@
 		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
 		// This increases our Triple Encrypted Data Record size to 1024.
-		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -1498,9 +1582,9 @@
 		const passwordUint8 = new TextEncoder().encode(password);
 		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
 		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
-		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0, SALT_SIZE_BYTES));
 		// Cast array returned by slice into a (usable) Uint8Array.
-		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -1581,7 +1665,7 @@
 		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
 		// This increases our Triple Encrypted Data Record size to 1024.
-		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -1655,9 +1739,9 @@
 		const passwordUint8 = new TextEncoder().encode(password);
 		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
 		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
-		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0, SALT_SIZE_BYTES));
 		// Cast array returned by slice into a (usable) Uint8Array.
-		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(SALT_SIZE_BYTES));
 
 		//console.log("decryptAESCTR called with outputType: " + outputType);
 		//console.log("ciphertext:" + saltAndCiphertext + " password:" + password);
@@ -1730,15 +1814,33 @@
 	}// encryptDouble()
 
 	// Encrypt stack used in the case user chooses Browser.
+	// Let's put all the length checks here for managability/readability.
 	async function encryptTriple(gcm1000Pass, ctrPass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
+		checkDataLengthAndIsB64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_B64);
 		// Obfuscation Step 1 Encrypt
 		const gcm1000Encrypted = await encryptGCM1000(opensslEncrypted, gcm1000Pass);
+		checkDataLengthAndIsB64(gcm1000Encrypted, OBF1000_OUTPUT_LIMIT_B64);
 		// Obfuscation Step 2 Encrypt
 		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
+		checkDataLengthAndIsB64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_B64);
 		return ctrEncrypted;
 	}// encryptTriple()
+
+	// Returns true if input has precisely MAX_DATA_LENGTH (1024) base64 chars.
+	function checkDataLengthAndIsB64(data, length) {
+		if (data.length <= length) {
+			// Data confirmed valid.
+			//console.log('Data Length confirmed valid! Length: ', data.length);
+			//console.log('Data: ', data);
+		} else {
+			// Data INVALID.
+			console.log('Invalid Length: ', data.length);
+			console.log('Invalid Data: ', data);
+			throw new Error('Invalid Length check in encryptTriple()');
+		}
+	}// checkDataIsValid()
 
 	// Decrypt stack used in the case user chooses Command Line.
 	async function decryptDouble(gcm1000Pass, ctrPass, encryptedData){
