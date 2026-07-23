@@ -505,9 +505,19 @@
 						<h3 id="double" style="scroll-margin-top:75px; ">Double</h3>
 						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipDouble()" >[?]</a>
 					</div>
-					<!---------------------------------CATCH UPLOAD------------------------------------------------>
-					<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
-					<!---------------------------------CATCH UPLOAD------------------------------------------------>
+					<div id="double_special_inputs_div" style="display:flex; justify-content:space-around; ">
+						<!---------------------------------CATCH UPLOAD------------------------------------------------>
+						<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
+						<!---------------------------------CATCH UPLOAD------------------------------------------------>
+						<div>
+							<!---------------------------------RADIO BUTTONS------------------------------------------------>
+							<input type="radio" id="double_radio_base64" name="double_input_type" value="base64" checked>
+							<label for="double_radio_base64">base64</label><br>
+							<input type="radio" id="double_radio_utf8" name="double_input_type" value="utf8">
+							<label for="double_radio_utf8">utf8</label><br>
+							<!---------------------------------RADIO BUTTONS------------------------------------------------>
+						</div>
+					</div>
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
@@ -1267,6 +1277,8 @@
 			console.log("Caught Upload data: filedata: " + filedata);
 			// Set cleartext textarea to uploaded data.
 			document.getElementById('double_cleartext').value = filedata;
+			// Make sure base64 is selected.
+			document.getElementById('double_radio_base64').checked = true;
 			document.getElementById('double_cleartext').focus();
 		}
 	}// catchUpload()
@@ -2054,8 +2066,11 @@
 
 	// Encrypt stack used in the case user chooses command line.
 	async function encryptDouble(gcm1000Pass, ctrPass, fileData){
+		// Pass through currently selected radiobutton value.
+		let gcm1000_input_type = document.querySelector('input[name="double_input_type"]:checked').value;
+		console.log('gcm1000 selected input type: ', gcm1000_input_type);
 		// Obfuscation Step 1 Encrypt
-		const gcm1000Encrypted = await encryptGCM1000(fileData, gcm1000Pass);
+		const gcm1000Encrypted = await encryptGCM1000(fileData, gcm1000Pass, gcm1000_input_type);
 		// Obfuscation Step 2 Encrypt
 		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
 		return ctrEncrypted;
@@ -2093,7 +2108,8 @@
 	// Decrypt stack used in the case user chooses Command Line.
 	async function decryptDouble(gcm1000Pass, ctrPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
-		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass);
+		let gcm1000_input_type = document.querySelector('input[name="double_input_type"]:checked').value;
+		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass, gcm1000_input_type);
 		return gcm1000Decrypted;
 	}// decryptDouble()
 
