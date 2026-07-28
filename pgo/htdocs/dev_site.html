@@ -195,7 +195,7 @@
 				<a id="" href="#openssl" style="text-decoration:none; "><p id="openssl_sidebar_text" style="color:magenta; ">OpenSSL</p></a>
 			</div>
 			<div class="sidebar_button" id="gcm1000_sidebar_button" style="">
-				<a id="" href="#gcm1000" style="text-decoration:none; "><p id="gcm1000_sidebar_text" style=" ">GCM-1000</p></a>
+				<a id="" href="#gcm1000" style="text-decoration:none; "><p id="gcm1000_sidebar_text" style=" ">OBF-1000</p></a>
 			</div>
 			<div class="sidebar_button" id="aesctr_sidebar_button" style="">
 				<a id="" href="#aesctr" style="text-decoration:none; "><p id="aesctr_sidebar_text" style=" ">AES-CTR</p></a>
@@ -221,7 +221,7 @@
 								<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 
 								Our OpenSSL implementation uses the MDN SubtleCrypto library with the encrypt() function which has many options for use including AES-256-CBC.
 								<br>
@@ -293,16 +293,16 @@
 				</div>
 				<!--------------------------OpenSSL SECTION-------------------------------------!>
 
-				<!--------------------------GCM-1000 SECTION-------------------------------------!>
+				<!--------------------------OBF-1000 SECTION-------------------------------------!>
 				<div class="dev_site_sections" id="gcm1000_section" style="">
 					<div style="position:relative; ">
 						<div class="" id="gcm1000_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
 							<!------------------COPY IN TOOLTIP LATER------------------------->
 							<p>
-								GCM-1000 TOOLTIP SECTION
+								OBF-1000 TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -314,12 +314,12 @@
 								<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
 
 							</p>
-							<button class="glossy_button" onclick="hideTipGCM-1000()">Close</button>
+							<button class="glossy_button" onclick="hideTipOBF1000()">Close</button>
 						</div>
 					</div>
 					<div style="display:flex;  ">
-						<h3 id="gcm1000" style="scroll-margin-top:75px; ">GCM-1000</h3>
-						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipGCM1000()">[?]</a>
+						<h3 id="gcm1000" style="scroll-margin-top:75px; ">OBF-1000</h3>
+						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipOBF1000()">[?]</a>
 					</div>
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
@@ -330,11 +330,11 @@
 									<label id="gcm1000_cleartext_length_label" style="color:gray; ">Char Length:</label>
 								</div>
 							</div>
-							<textarea value="" id="gcm1000_cleartext" style="" rows="8" oninput="executeGCM1000()"></textarea>
+							<textarea value="" id="gcm1000_cleartext" style="" rows="8" oninput="executeOBF1000()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
-							<button class="" id='gcm1000_enc_button' style="flex-grow:1; " onclick="activateEncGCM1000()">Encrypt<br>------></button>
-							<button class="" id='gcm1000_dec_button' style="flex-grow:1; " onclick="activateDecGCM1000()">Decrypt<br><------</button>
+							<button class="" id='gcm1000_enc_button' style="flex-grow:1; " onclick="activateEncOBF1000()">Encrypt<br>------></button>
+							<button class="" id='gcm1000_dec_button' style="flex-grow:1; " onclick="activateDecOBF1000()">Decrypt<br><------</button>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
@@ -344,14 +344,14 @@
 									<label id="gcm1000_ciphertext_length_label" style="color:gray; ">Char Length:</label>
 								</div>
 							</div>
-							<textarea value="" id="gcm1000_ciphertext" style="" rows="8" oninput="executeGCM1000()"></textarea>
+							<textarea value="" id="gcm1000_ciphertext" style="" rows="8" oninput="executeOBF1000()"></textarea>
 						</div>
 					</div>
 					<label id="gcm1000_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
 					<label>Password:</label>
-					<input autocomplete="off" type="" value="" id="gcm1000_password" style="" oninput="executeGCM1000()">
+					<input autocomplete="off" type="" value="" id="gcm1000_password" style="" oninput="executeOBF1000()">
 				</div>
-				<!--------------------------GCM-1000 SECTION-------------------------------------!>
+				<!--------------------------OBF-1000 SECTION-------------------------------------!>
 
 				<!--------------------------AES-CTR SECTION-------------------------------------!>
 				<div class="dev_site_sections" id="aesctr_section" style="">
@@ -362,7 +362,7 @@
 								AES-CTR TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -422,7 +422,7 @@
 								TRIPLE TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -486,7 +486,7 @@
 								DOUBLE TOOLTIP SECTION
 								<br>
 								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, GCM-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 								<br>
 								Specification Documentation:
 								<br>
@@ -521,7 +521,7 @@
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="double_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+								<label id="double_cleartext_label" style="align-self:flex-end;">Raw bytes as b64 or utf8:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
 									<label id="double_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
 									<label id="double_cleartext_length_label" style="color:gray; ">Char Length:</label>
@@ -583,7 +583,7 @@
 	function turnOnPinkBarOpenSSL() {
 		document.getElementById('openssl_sidebar_text').style.color = 'magenta';
 	}
-	function turnOnPinkBarGCM1000() {
+	function turnOnPinkBarOBF1000() {
 		document.getElementById('gcm1000_sidebar_text').style.color = 'magenta';
 	}
 	function turnOnPinkBarAESCTR() {
@@ -605,7 +605,7 @@
 			turnOnPinkBarOpenSSL();
 		} else if (scroll >= 500 && scroll < 1000){
 			turnOffPinkBar();
-			turnOnPinkBarGCM1000();
+			turnOnPinkBarOBF1000();
 		} else if (scroll >= 1000 && scroll < 1500){
 			turnOffPinkBar();
 			turnOnPinkBarAESCTR();
@@ -626,10 +626,10 @@
 		activateDecOpenSSL();
 	});
 	document.getElementById('gcm1000_cleartext').addEventListener("focus", (event) => {
-		activateEncGCM1000();
+		activateEncOBF1000();
 	});
 	document.getElementById('gcm1000_ciphertext').addEventListener("focus", (event) => {
-		activateDecGCM1000();
+		activateDecOBF1000();
 	});
 	document.getElementById('aesctr_cleartext').addEventListener("focus", (event) => {
 		activateEncAESCTR();
@@ -664,10 +664,10 @@
 	function hideTipOpenSSL () {
 		document.getElementById('openssl_tooltip').style.display = "none";
 	}
-	function showTipGCM1000 () {
+	function showTipOBF1000 () {
 		document.getElementById('gcm1000_tooltip').style.display = "inline";
 	}
-	function hideTipGCM1000 () {
+	function hideTipOBF1000 () {
 		document.getElementById('gcm1000_tooltip').style.display = "none";
 	}
 	function showTipAESCTR () {
@@ -832,9 +832,9 @@
 	}// activateDecOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////
-	//					GCM-1000 HTML handling									 //
+	//					OBF-1000 HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
-	async function executeGCM1000() {
+	async function executeOBF1000() {
 		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (gcm1000Encrypt_f === true) { // Encrypt function
 			// Gather inputs.
@@ -843,7 +843,7 @@
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
 			if (cleartext !== '') {
 				try {
-					document.getElementById('gcm1000_ciphertext').value = await encryptGCM1000(cleartext, password, 'utf8');
+					document.getElementById('gcm1000_ciphertext').value = await encryptOBF1000(cleartext, password, 'utf8');
 					document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 					document.getElementById('gcm1000_outcome_message').style.color = 'lime';
 					document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
@@ -861,7 +861,7 @@
 			const password = document.getElementById('gcm1000_password').value;
 			// Execute
 			try {
-				document.getElementById('gcm1000_cleartext').value = await decryptGCM1000(ciphertext, password, 'utf8');
+				document.getElementById('gcm1000_cleartext').value = await decryptOBF1000(ciphertext, password, 'utf8');
 				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
 				document.getElementById('gcm1000_outcome_message').style.color = 'lime';
 				document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
@@ -875,14 +875,14 @@
 		}
 		clearTimeout(timeoutIdGCM)
 		timeoutIdGCM = setTimeout(() => {
-			turnOffGCM1000DecryptOutcomeMessage();
+			turnOffOBF1000DecryptOutcomeMessage();
 		}, 2000); 
 		// Show length value AFTER execution.
-		setLengthGCM1000();
-	}// executeGCM1000()
+		setLengthOBF1000();
+	}// executeOBF1000()
 	let timeoutIdGCM;
 
-	function setLengthGCM1000() {
+	function setLengthOBF1000() {
 		// Cleartext 
 		const cleartext = document.getElementById('gcm1000_cleartext').value;
 		const cleartextByteSize = new Blob([cleartext]).size;
@@ -899,11 +899,11 @@
 		document.getElementById('gcm1000_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}
 
-	function turnOffGCM1000DecryptOutcomeMessage() {
+	function turnOffOBF1000DecryptOutcomeMessage() {
 		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
 	}
 
-	function activateEncGCM1000() {
+	function activateEncOBF1000() {
 		// Set flag
 		gcm1000Encrypt_f = true;
 
@@ -934,13 +934,13 @@
 		document.getElementById('gcm1000_cleartext').focus();
 
 		// Execute crypto on button click.
-		executeGCM1000();
-	}// activateEncGCM1000()
+		executeOBF1000();
+	}// activateEncOBF1000()
 
 // PGO Green: #54c597
 // PGO Readonly Blue: #4491d5
 
-	function activateDecGCM1000() {
+	function activateDecOBF1000() {
 		// Set flag
 		gcm1000Encrypt_f = false;
 
@@ -968,8 +968,8 @@
 		document.getElementById('gcm1000_ciphertext').focus();
 
 		// Execute crypto on button click.
-		executeGCM1000();
-	}// activateDecGCM1000()
+		executeOBF1000();
+	}// activateDecOBF1000()
 
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -1269,8 +1269,12 @@
 		const file = event.target.files[0];
 		const reader = new FileReader();
 		reader.readAsArrayBuffer(file);
+		// Not sure it makes sense to show this to user?
+		//reader.readAsText(file);
 
 		reader.onload = async function(e) {
+			// Show file contents as text for user reading.
+			document.getElementById('double_cleartext').value = e.target.result;
 			let buffer = e.target.result;
 			const buffer_uint8a = new Uint8Array(buffer);
 			let filedata = buffer_uint8a.toBase64();
@@ -1563,6 +1567,12 @@
 		// Merge salts with encoded ciphertext.
 		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
 		const encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
+
+		const encryptedOutput = new Uint8Array(encrypted_result);
+		console.log("--------------OpenSSL Encrypt ------------------");
+		console.log("OpenSSL Enc Byte Length - Both Salts: ", two_salts.length);
+		console.log("OpenSSL Enc Byte Length - Encrypted Data: ", encryptedOutput.length);
+		console.log("OpenSSL Enc Byte Length - Total Output: ", encrypted_output_buf.length);
 		return encrypted_output_buf.toBase64();
 	}// encOpenSSL()
 
@@ -1647,8 +1657,8 @@
 
 
 	// Default triple indicates this will be used in PGO triple stack.
-	async function encryptGCM1000(cleartext, password, inputType='triple'){
-		//console.log('encryptGCM1000 cleartext length: ', cleartext.length);
+	async function encryptOBF1000(cleartext, password, inputType='triple'){
+		//console.log('encryptOBF1000 cleartext length: ', cleartext.length);
 		// Create byte array to hold cleartext data.
 		let cleartextUint8 = new Uint8Array;
 		// Compose data based on function parameter.
@@ -1659,10 +1669,10 @@
 		}else if (inputType === 'triple'){ // Default usage.
 			// Extract salt for triple stack usage.
 			cleartextWithSalt = Uint8Array.fromBase64(cleartext);
-			//console.log('encryptGCM1000 cleartext byte (uint8) length: ', cleartextWithSalt.length);
+			//console.log('encryptOBF1000 cleartext byte (uint8) length: ', cleartextWithSalt.length);
 			// Slice off the 8 bytes from OpenSSL that convert to: Salted__
 			cleartextUint8 = cleartextWithSalt.slice(8);
-			//console.log('encryptGCM1000 cleartext byte (uint8) length SALT REMOVED: ', cleartextUint8.length);
+			//console.log('encryptOBF1000 cleartext byte (uint8) length SALT REMOVED: ', cleartextUint8.length);
 		}else{
 			throw new Error("Invalid encryptGCM inputType parameter!");
 		}
@@ -1670,12 +1680,12 @@
 		const wrappedCleartext64 = wrap7Byte(cleartextUint8);
 		// Always use base64 for 1000 wrapping for base encryption.
 		const gcmEncrypted64 = await encryptGCM(wrappedCleartext64, password, 'base64');
-		//console.log('encryptGCM1000 output length: ', gcmEncrypted64.length);
+		//console.log('encryptOBF1000 output length: ', gcmEncrypted64.length);
 		return gcmEncrypted64;
-	}
+	}// encryptOBF1000()
 
 	// Default triple indicates this will be used in PGO triple stack.
-	async function decryptGCM1000(ciphertext64, password, outputType='triple'){
+	async function decryptOBF1000(ciphertext64, password, outputType='triple'){
 		// Always output base64 for base encryption in 1000 wrapping context.
 		const gcmDecrypted64 = await decryptGCM(ciphertext64, password, 'base64');
 		const unwrappedCleartextUint8 = unwrap7Byte(gcmDecrypted64);
@@ -1693,7 +1703,7 @@
 			throw new Error("Invalid decryptAESGCM outputType parameter!");
 		}
 		return decryptedCleartext;
-	}
+	}// decryptOBF1000()
 
 	function addSaltedLiteral(inputDataUint8) {
 		// Get length of input data in number of bytes.
@@ -1726,10 +1736,13 @@
 	function wrap7Byte(inputDataUint8) {
 		// Length of the data with salt bytes removed.
 		const dataLength = inputDataUint8.length;
+		console.log("--------------OBF-1000 Encrypt ------------------");
+		console.log("OBF-1000 Enc Byte Length - Input Data: ", dataLength);
 		// Find a 7Byte set that represents dataLength.
 		const sevenByteSet = find7ByteSetForValue(dataLength);
 		// Leave space for 7Byte set.
 		const remainingSpace = SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL_BYTES - 7 - dataLength;
+		console.log("OBF-1000 Enc Byte Length - Random Filler: ", remainingSpace);
 		// Compile set of random bytes for filler.
 		const randFiller = window.crypto.getRandomValues(new Uint8Array(remainingSpace));
 		// Compile Byte Stack
@@ -1748,7 +1761,7 @@
 
 	// Replacing obf1000 with standard that natively offers authentication.
 	async function encryptGCM(cleartext, password, inputType='base64'){
-		//console.log("encryptGCM1000 called with inputType: " + inputType);
+		//console.log("encryptOBF1000 called with inputType: " + inputType);
 
 		// Create byte array to hold cleartext data.
 		let cleartextUint8 = new Uint8Array;
@@ -2070,9 +2083,11 @@
 		let gcm1000_input_type = document.querySelector('input[name="double_input_type"]:checked').value;
 		console.log('gcm1000 selected input type: ', gcm1000_input_type);
 		// Obfuscation Step 1 Encrypt
-		const gcm1000Encrypted = await encryptGCM1000(fileData, gcm1000Pass, gcm1000_input_type);
+		let gcm1000Encrypted = await encryptOBF1000(fileData, gcm1000Pass, gcm1000_input_type);
+		checkDataLength(gcm1000Encrypted, OBF1000_OUTPUT_LIMIT_B64);
 		// Obfuscation Step 2 Encrypt
-		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
+		let ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
+		checkDataLength(ctrEncrypted, AESCTR_OUTPUT_LIMIT_B64);
 		return ctrEncrypted;
 	}// encryptDouble()
 
@@ -2081,18 +2096,18 @@
 	async function encryptTriple(gcm1000Pass, ctrPass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
-		checkDataLengthAndIsB64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_B64);
+		checkDataLength(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_B64);
 		// Obfuscation Step 1 Encrypt
-		const gcm1000Encrypted = await encryptGCM1000(opensslEncrypted, gcm1000Pass);
-		checkDataLengthAndIsB64(gcm1000Encrypted, OBF1000_OUTPUT_LIMIT_B64);
+		const gcm1000Encrypted = await encryptOBF1000(opensslEncrypted, gcm1000Pass);
+		checkDataLength(gcm1000Encrypted, OBF1000_OUTPUT_LIMIT_B64);
 		// Obfuscation Step 2 Encrypt
 		const ctrEncrypted = await encryptAESCTR(gcm1000Encrypted, ctrPass);
-		checkDataLengthAndIsB64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_B64);
+		checkDataLength(ctrEncrypted, AESCTR_OUTPUT_LIMIT_B64);
 		return ctrEncrypted;
 	}// encryptTriple()
 
 	// Returns true if input has precisely MAX_DATA_LENGTH (1024) base64 chars.
-	function checkDataLengthAndIsB64(data, length) {
+	function checkDataLength(data, length) {
 		if (data.length <= length) {
 			// Data confirmed valid.
 			//console.log('Data Length confirmed valid! Length: ', data.length);
@@ -2101,7 +2116,7 @@
 			// Data INVALID.
 			console.log('Invalid Length: ', data.length);
 			console.log('Invalid Data: ', data);
-			throw new Error('Invalid Length check in encryptTriple()');
+			throw new Error('Invalid Length check!');
 		}
 	}// checkDataIsValid()
 
@@ -2109,14 +2124,14 @@
 	async function decryptDouble(gcm1000Pass, ctrPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		let gcm1000_input_type = document.querySelector('input[name="double_input_type"]:checked').value;
-		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass, gcm1000_input_type);
+		const gcm1000Decrypted = await decryptOBF1000(ctrDecrypted, gcm1000Pass, gcm1000_input_type);
 		return gcm1000Decrypted;
 	}// decryptDouble()
 
 	// Decrypt stack used in the case user chooses Browser.
 	async function decryptTriple(gcm1000Pass, ctrPass, opensslPass, encryptedData){
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
-		const gcm1000Decrypted = await decryptGCM1000(ctrDecrypted, gcm1000Pass);
+		const gcm1000Decrypted = await decryptOBF1000(ctrDecrypted, gcm1000Pass);
 		const cleartext = await decOpenSSL(gcm1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
 		return cleartext;
 	}// decryptTriple()
