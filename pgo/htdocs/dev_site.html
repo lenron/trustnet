@@ -192,7 +192,7 @@
 		<!--------------------------SIDEBAR----------------------------!>
 		<div class="" id="sidebar_section" style="position:fixed; display:flex; flex-direction:column; align-items:flex-end; background-color:#434343; margin-top:50px; width:20px; height:100%; ">
 			<div class="sidebar_button" id="openssl_sidebar_button" style="">
-				<a id="" href="#openssl" style="text-decoration:none; "><p id="openssl_sidebar_text" style="color:magenta; ">OpenSSL</p></a>
+				<a id="" href="#openssl" style="text-decoration:none; "><p id="openssl_sidebar_text" style="color:magenta; ">AES-CBC</p></a>
 			</div>
 			<div class="sidebar_button" id="gcm1000_sidebar_button" style="">
 				<a id="" href="#gcm1000" style="text-decoration:none; "><p id="gcm1000_sidebar_text" style=" ">OBF-1000</p></a>
@@ -201,10 +201,7 @@
 				<a id="" href="#aesctr" style="text-decoration:none; "><p id="aesctr_sidebar_text" style=" ">AES-CTR</p></a>
 			</div>
 			<div class="sidebar_button" id="triple_sidebar_button" style="">
-				<a id="" href="#triple" style="text-decoration:none; "><p id="triple_sidebar_text" style=" ">Triple - Browser</p></a>
-			</div>
-			<div class="sidebar_button" id="double_sidebar_button" style="">
-				<a id="" href="#double" style="text-decoration:none; "><p id="double_sidebar_text" style=" ">Double - CMD Line</p></a>
+				<a id="" href="#triple" style="text-decoration:none; "><p id="triple_sidebar_text" style=" ">Triple Cipher</p></a>
 			</div>
 		</div>
 		<!--------------------------SIDEBAR----------------------------!>
@@ -213,7 +210,7 @@
 			<!--------------------------FUNCTIONS----------------------------!>
 			<div class="" id="functions_section" style="display:flex; flex-direction:column; align-items:center; width:90%; margin-top:50px; ">
 				<!--------------------------OpenSSL SECTION-------------------------------------!>
-				<div class="dev_site_sections" id="openssl_section" style=" padding-bottom:20px; ">
+				<div class="dev_site_sections" id="openssl_section" style=" padding-bottom:30px; ">
 					<div style="position:relative; ">
 						<div class="" id="openssl_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
 							<p>
@@ -265,9 +262,8 @@
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
 								<label id="openssl_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
-								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="openssl_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="openssl_cleartext_length_label" style="color:gray; ">Char Length:</label>
+								<div id="" style="display:flex; flex-direction:column; justify-content:flex-end; ">
+									<label id="openssl_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
 							<textarea value="" id="openssl_cleartext" style="" oninput="executeOpenSSL()"></textarea>
@@ -280,8 +276,7 @@
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
 								<label id="openssl_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="openssl_ciphertext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="openssl_ciphertext_length_label" style="color:gray; ">Char Length:</label>
+									<label id="openssl_ciphertext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
 							<textarea value="" id="openssl_ciphertext" style="" oninput="executeOpenSSL()"></textarea>
@@ -326,8 +321,7 @@
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
 								<label id="gcm1000_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="gcm1000_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="gcm1000_cleartext_length_label" style="color:gray; ">Char Length:</label>
+									<label id="gcm1000_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
 							<textarea value="" id="gcm1000_cleartext" style="" rows="8" oninput="executeOBF1000()"></textarea>
@@ -340,8 +334,7 @@
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
 								<label id="gcm1000_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="gcm1000_ciphertext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="gcm1000_ciphertext_length_label" style="color:gray; ">Char Length:</label>
+									<label id="gcm1000_ciphertext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
 							<textarea value="" id="gcm1000_ciphertext" style="" rows="8" oninput="executeOBF1000()"></textarea>
@@ -386,8 +379,7 @@
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
 								<label id="aesctr_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="aesctr_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="aesctr_cleartext_length_label" style="color:gray; ">Char Length:</label>
+									<label id="aesctr_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
 							<textarea value="" id="aesctr_cleartext" style="" rows="8" oninput="executeAESCTR()"></textarea>
@@ -400,8 +392,7 @@
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
 								<label id="aesctr_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="aesctr_ciphertext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="aesctr_ciphertext_length_label" style="color:gray; ">Char Length:</label>
+									<label id="aesctr_ciphertext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
 							<textarea value="" id="aesctr_ciphertext" style="" rows="8" oninput="executeAESCTR()"></textarea>
@@ -438,7 +429,7 @@
 						</div>
 					</div>
 					<div style="display:flex;  ">
-						<h3 id="triple" style="scroll-margin-top:75px; ">Triple</h3>
+						<h3 id="triple" style="scroll-margin-top:75px; ">Triple Cipher</h3>
 						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipTriple()" >[?]</a>
 					</div>
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
@@ -446,8 +437,7 @@
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
 								<label id="triple_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="triple_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="triple_cleartext_length_label" style="color:gray; ">Char Length:</label>
+									<label id="triple_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
 							<textarea value="" id="triple_cleartext" style="" rows="8" oninput="executeTriple()"></textarea>
@@ -460,97 +450,21 @@
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
 								<label id="triple_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="triple_ciphertext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="triple_ciphertext_length_label" style="color:gray; ">Char Length:</label>
+									<label id="triple_ciphertext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
 							<textarea value="" id="triple_ciphertext" style="" rows="8" oninput="executeTriple()"></textarea>
 						</div>
 					</div>
 					<label id="triple_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
-					<label>Password 1 - AES-GCM:</label>
+					<label>OBF-1000:</label>
 					<input autocomplete="off" type="" value="" id="triple_password_1" style="" oninput="executeTriple()">
-					<label>Password 2 - AES-CTR:</label>
+					<label>AES-CTR:</label>
 					<input autocomplete="off" type="" value="" id="triple_password_2" style="" oninput="executeTriple()">
-					<label>Password 3 - AES-CBC (OpenSSL):</label>
+					<label>AES-CBC:</label>
 					<input autocomplete="off" type="" value="" id="triple_password_3" style="" oninput="executeTriple()">
 				</div>
 				<!--------------------------TRIPLE SECTION-------------------------------------!>
-
-				<!--------------------------DOUBLE SECTION-------------------------------------!>
-				<div class="dev_site_sections" id="double_section" style="">
-					<div style="position:relative; ">
-						<div class="" id="double_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
-							<!------------------COPY IN TOOLTIP LATER------------------------->
-							<p>
-								DOUBLE TOOLTIP SECTION
-								<br>
-								<br>
-								<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
-								<br>
-								Specification Documentation:
-								<br>
-								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
-								<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
-								<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
-								<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
-								<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
-								<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
-
-							</p>
-							<button class="glossy_button" onclick="hideTipDouble()">Close</button>
-						</div>
-					</div>
-					<div style="display:flex;  ">
-						<h3 id="double" style="scroll-margin-top:75px; ">Double</h3>
-						<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipDouble()" >[?]</a>
-					</div>
-					<div id="double_special_inputs_div" style="display:flex; justify-content:space-around; ">
-						<!---------------------------------CATCH UPLOAD------------------------------------------------>
-						<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
-						<!---------------------------------CATCH UPLOAD------------------------------------------------>
-						<div>
-							<!---------------------------------RADIO BUTTONS------------------------------------------------>
-							<input type="radio" id="double_radio_base64" name="double_input_type" value="base64" checked>
-							<label for="double_radio_base64">base64</label><br>
-							<input type="radio" id="double_radio_utf8" name="double_input_type" value="utf8">
-							<label for="double_radio_utf8">utf8</label><br>
-							<!---------------------------------RADIO BUTTONS------------------------------------------------>
-						</div>
-					</div>
-					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
-						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="double_cleartext_label" style="align-self:flex-end;">Raw bytes as b64 or utf8:</label>
-								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="double_cleartext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="double_cleartext_length_label" style="color:gray; ">Char Length:</label>
-								</div>
-							</div>
-							<textarea value="" id="double_cleartext" style="" rows="8" oninput="executeDouble()"></textarea>
-						</div>
-						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
-							<button class="" id='double_enc_button' style="flex-grow:1; " onclick="activateEncDouble()">Encrypt<br>------></button>
-							<button class="" id='double_dec_button' style="flex-grow:1; " onclick="activateDecDouble()">Decrypt<br><------</button>
-						</div>
-						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
-							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="double_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
-								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="double_ciphertext_bytesize_label" style="color:gray; ">Byte Length:</label>
-									<label id="double_ciphertext_length_label" style="color:gray; ">Char Length:</label>
-								</div>
-							</div>
-							<textarea value="" id="double_ciphertext" style="" rows="8" oninput="executeDouble()"></textarea>
-						</div>
-					</div>
-					<label id="double_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
-					<label>Password 1 - AES-GCM:</label>
-					<input autocomplete="off" type="" value="" id="double_password_1" style="" oninput="executeDouble()">
-					<label>Password 2 - AES-CTR:</label>
-					<input autocomplete="off" type="" value="" id="double_password_2" style="" oninput="executeDouble()">
-				</div>
-				<!--------------------------DOUBLE SECTION-------------------------------------!>
 
 			</div>
 			<!--------------------------FUNCTIONS----------------------------!>
@@ -577,7 +491,6 @@
 		document.getElementById('gcm1000_sidebar_text').style.color = '#54c597';
 		document.getElementById('aesctr_sidebar_text').style.color = '#54c597';
 		document.getElementById('triple_sidebar_text').style.color = '#54c597';
-		document.getElementById('double_sidebar_text').style.color = '#54c597';
 	}
 
 	function turnOnPinkBarOpenSSL() {
@@ -591,9 +504,6 @@
 	}
 	function turnOnPinkBarTriple() {
 		document.getElementById('triple_sidebar_text').style.color = 'magenta';
-	}
-	function turnOnPinkBarDouble() {
-		document.getElementById('double_sidebar_text').style.color = 'magenta';
 	}
 
 	window.addEventListener("scroll", (event) => {
@@ -609,12 +519,9 @@
 		} else if (scroll >= 1000 && scroll < 1500){
 			turnOffPinkBar();
 			turnOnPinkBarAESCTR();
-		} else if (scroll >= 1500 && scroll < 2000){
+		} else if (scroll >= 1500){
 			turnOffPinkBar();
 			turnOnPinkBarTriple();
-		} else if (scroll >= 2000){
-			turnOffPinkBar();
-			turnOnPinkBarDouble();
 		}
 	});
 
@@ -643,19 +550,12 @@
 	document.getElementById('triple_ciphertext').addEventListener("focus", (event) => {
 		activateDecTriple();
 	});
-	document.getElementById('double_cleartext').addEventListener("focus", (event) => {
-		activateEncDouble();
-	});
-	document.getElementById('double_ciphertext').addEventListener("focus", (event) => {
-		activateDecDouble();
-	});
 
 	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
 	let openSSLEncrypt_f = true;
 	let gcm1000Encrypt_f = true;
 	let aesctrEncrypt_f = true;
 	let tripleEncrypt_f = true;
-	let doubleEncrypt_f = true;
 
 	// Show / hide tooltip functionality.
 	function showTipOpenSSL () {
@@ -682,12 +582,6 @@
 	function hideTipTriple() {
 		document.getElementById('triple_tooltip').style.display = "none";
 	}
-	function showTipDouble() {
-		document.getElementById('double_tooltip').style.display = "inline";
-	}
-	function hideTipDouble() {
-		document.getElementById('double_tooltip').style.display = "none";
-	}
 
 	///////////////////////////////////////////////////////////////////////////////
 	//					OpenSSL HTML handling									 //
@@ -699,20 +593,18 @@
 			const cleartext = document.getElementById('openssl_cleartext').value;
 			const password = document.getElementById('openssl_password').value;
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
-			if (cleartext !== '') {
-				try {
-					document.getElementById('openssl_ciphertext').value = await encOpenSSL(cleartext, password);
-					document.getElementById('openssl_outcome_message').style.visibility = 'visible';
-					document.getElementById('openssl_outcome_message').style.color = 'lime';
-					document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch (error) {
-					console.log(error);
-					//document.getElementById('openssl_outcome_message').style.display = 'inline';
-					document.getElementById('openssl_outcome_message').style.visibility = 'visible';
-					document.getElementById('openssl_outcome_message').style.color = 'red';
-					document.getElementById('openssl_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('openssl_ciphertext').value = '';
-				}
+			try {
+				document.getElementById('openssl_ciphertext').value = await encOpenSSL(cleartext, password);
+				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				document.getElementById('openssl_outcome_message').style.color = 'lime';
+				document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+			} catch (error) {
+				console.log(error);
+				//document.getElementById('openssl_outcome_message').style.display = 'inline';
+				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				document.getElementById('openssl_outcome_message').style.color = 'red';
+				document.getElementById('openssl_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				document.getElementById('openssl_ciphertext').value = '';
 			}
 		} else { // Decrypt function
 			// Gather inputs.
@@ -746,16 +638,12 @@
 		// Cleartext 
 		const cleartext = document.getElementById('openssl_cleartext').value;
 		const cleartextByteSize = new Blob([cleartext]).size;
-		const cleartext_length_string = "Char Length: " + cleartext.length;
-		const cleartext_bytesize_string = "Byte Length: " + cleartextByteSize;
-		document.getElementById('openssl_cleartext_length_label').innerHTML = cleartext_length_string;
+		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
 		document.getElementById('openssl_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
 		// Ciphertext
 		const ciphertext = document.getElementById('openssl_ciphertext').value;
 		const ciphertextByteSize = new Blob([ciphertext]).size;
-		const ciphertext_length_string = "Char Length: " + ciphertext.length;
-		const ciphertext_bytesize_string = "Byte Length: " + ciphertextByteSize;
-		document.getElementById('openssl_ciphertext_length_label').innerHTML = ciphertext_length_string;
+		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
 		document.getElementById('openssl_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}
 
@@ -841,19 +729,17 @@
 			const cleartext = document.getElementById('gcm1000_cleartext').value;
 			const password = document.getElementById('gcm1000_password').value;
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
-			if (cleartext !== '') {
-				try {
-					document.getElementById('gcm1000_ciphertext').value = await encryptOBF1000(cleartext, password, 'utf8');
-					document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
-					document.getElementById('gcm1000_outcome_message').style.color = 'lime';
-					document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch (error) {
-					console.log(error);
-					document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
-					document.getElementById('gcm1000_outcome_message').style.color = 'red';
-					document.getElementById('gcm1000_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('gcm1000_ciphertext').value = '';
-				}
+			try {
+				document.getElementById('gcm1000_ciphertext').value = await encryptOBF1000(cleartext, password, 'utf8');
+				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('gcm1000_outcome_message').style.color = 'lime';
+				document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('gcm1000_outcome_message').style.color = 'red';
+				document.getElementById('gcm1000_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				document.getElementById('gcm1000_ciphertext').value = '';
 			}
 		} else { // Decrypt function
 			// Gather inputs.
@@ -886,16 +772,12 @@
 		// Cleartext 
 		const cleartext = document.getElementById('gcm1000_cleartext').value;
 		const cleartextByteSize = new Blob([cleartext]).size;
-		const cleartext_length_string = "Char Length: " + cleartext.length;
-		const cleartext_bytesize_string = "Byte Length: " + cleartextByteSize;
-		document.getElementById('gcm1000_cleartext_length_label').innerHTML = cleartext_length_string;
+		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
 		document.getElementById('gcm1000_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
 		// Ciphertext
 		const ciphertext = document.getElementById('gcm1000_ciphertext').value;
 		const ciphertextByteSize = new Blob([ciphertext]).size;
-		const ciphertext_length_string = "Char Length: " + ciphertext.length;
-		const ciphertext_bytesize_string = "Byte Length: " + ciphertextByteSize;
-		document.getElementById('gcm1000_ciphertext_length_label').innerHTML = ciphertext_length_string;
+		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
 		document.getElementById('gcm1000_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}
 
@@ -982,19 +864,17 @@
 			const cleartext = document.getElementById('aesctr_cleartext').value;
 			const password = document.getElementById('aesctr_password').value;
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
-			if (cleartext !== '') {
-				try {
-					document.getElementById('aesctr_ciphertext').value = await encryptAESCTR(cleartext, password, 'utf8');
-					document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
-					document.getElementById('aesctr_outcome_message').style.color = 'lime';
-					document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch (error) {
-					console.log(error);
-					document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
-					document.getElementById('aesctr_outcome_message').style.color = 'red';
-					document.getElementById('aesctr_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('aesctr_ciphertext').value = '';
-				}
+			try {
+				document.getElementById('aesctr_ciphertext').value = await encryptAESCTR(cleartext, password, 'utf8');
+				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				document.getElementById('aesctr_outcome_message').style.color = 'lime';
+				document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				document.getElementById('aesctr_outcome_message').style.color = 'red';
+				document.getElementById('aesctr_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				document.getElementById('aesctr_ciphertext').value = '';
 			}
 		} else { // Decrypt function
 			// Gather inputs.
@@ -1027,16 +907,12 @@
 		// Cleartext 
 		const cleartext = document.getElementById('aesctr_cleartext').value;
 		const cleartextByteSize = new Blob([cleartext]).size;
-		const cleartext_length_string = "Char Length: " + cleartext.length;
-		const cleartext_bytesize_string = "Byte Length: " + cleartextByteSize;
-		document.getElementById('aesctr_cleartext_length_label').innerHTML = cleartext_length_string;
+		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
 		document.getElementById('aesctr_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
 		// Ciphertext
 		const ciphertext = document.getElementById('aesctr_ciphertext').value;
 		const ciphertextByteSize = new Blob([ciphertext]).size;
-		const ciphertext_length_string = "Char Length: " + ciphertext.length;
-		const ciphertext_bytesize_string = "Byte Length: " + ciphertextByteSize;
-		document.getElementById('aesctr_ciphertext_length_label').innerHTML = ciphertext_length_string;
+		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
 		document.getElementById('aesctr_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}
 
@@ -1125,20 +1001,18 @@
 			const password2CTR = document.getElementById('triple_password_2').value;
 			const password3OpenSSL = document.getElementById('triple_password_3').value;
 			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
-			if (cleartext !== '') {
-				try {
-					// async function encryptTriple(gcm1000Pass, ctrPass, opensslPass, cleartextData){
-					document.getElementById('triple_ciphertext').value = await encryptTriple(password1GCM, password2CTR, password3OpenSSL, cleartext);
-					document.getElementById('triple_outcome_message').style.visibility = 'visible';
-					document.getElementById('triple_outcome_message').style.color = 'lime';
-					document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch (error) {
-					console.log(error);
-					document.getElementById('triple_outcome_message').style.visibility = 'visible';
-					document.getElementById('triple_outcome_message').style.color = 'red';
-					document.getElementById('triple_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('triple_ciphertext').value = '';
-				}
+			try {
+				// async function encryptTriple(gcm1000Pass, ctrPass, opensslPass, cleartextData){
+				document.getElementById('triple_ciphertext').value = await encryptTriple(password1GCM, password2CTR, password3OpenSSL, cleartext);
+				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				document.getElementById('triple_outcome_message').style.color = 'lime';
+				document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				document.getElementById('triple_outcome_message').style.color = 'red';
+				document.getElementById('triple_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				document.getElementById('triple_ciphertext').value = '';
 			}
 		} else { // Decrypt function
 			// Gather inputs.
@@ -1173,16 +1047,12 @@
 		// Cleartext 
 		const cleartext = document.getElementById('triple_cleartext').value;
 		const cleartextByteSize = new Blob([cleartext]).size;
-		const cleartext_length_string = "Char Length: " + cleartext.length;
-		const cleartext_bytesize_string = "Byte Length: " + cleartextByteSize;
-		document.getElementById('triple_cleartext_length_label').innerHTML = cleartext_length_string;
+		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
 		document.getElementById('triple_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
 		// Ciphertext
 		const ciphertext = document.getElementById('triple_ciphertext').value;
 		const ciphertextByteSize = new Blob([ciphertext]).size;
-		const ciphertext_length_string = "Char Length: " + ciphertext.length;
-		const ciphertext_bytesize_string = "Byte Length: " + ciphertextByteSize;
-		document.getElementById('triple_ciphertext_length_label').innerHTML = ciphertext_length_string;
+		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
 		document.getElementById('triple_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}
 
@@ -1257,174 +1127,6 @@
 		// Execute crypto on button click.
 		executeTriple();
 	}// activateDecTriple()
-
-
-	///////////////////////////////////////////////////////////////////////////////
-	//					Double HTML handling									 //
-	///////////////////////////////////////////////////////////////////////////////
-
-	// Catch File Ingest
-	// listener is placed inline of the html
-	async function catchUpload(event) {
-		const file = event.target.files[0];
-		const reader = new FileReader();
-		reader.readAsArrayBuffer(file);
-		// Not sure it makes sense to show this to user?
-		//reader.readAsText(file);
-
-		reader.onload = async function(e) {
-			// Show file contents as text for user reading.
-			document.getElementById('double_cleartext').value = e.target.result;
-			let buffer = e.target.result;
-			const buffer_uint8a = new Uint8Array(buffer);
-			let filedata = buffer_uint8a.toBase64();
-			console.log("Caught Upload data: filedata: " + filedata);
-			// Set cleartext textarea to uploaded data.
-			document.getElementById('double_cleartext').value = filedata;
-			// Make sure base64 is selected.
-			document.getElementById('double_radio_base64').checked = true;
-			document.getElementById('double_cleartext').focus();
-		}
-	}// catchUpload()
-
-	async function executeDouble() {
-		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
-		if (doubleEncrypt_f === true) { // Encrypt function
-			// Gather inputs.
-			const cleartext = document.getElementById('double_cleartext').value;
-			const password1GCM = document.getElementById('double_password_1').value;
-			const password2CTR = document.getElementById('double_password_2').value;
-			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
-			if (cleartext !== '') {
-				try {
-					document.getElementById('double_ciphertext').value = await encryptDouble(password1GCM, password2CTR, cleartext);
-					document.getElementById('double_outcome_message').style.visibility = 'visible';
-					document.getElementById('double_outcome_message').style.color = 'lime';
-					document.getElementById('double_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
-				} catch (error) {
-					console.log(error);
-					document.getElementById('double_outcome_message').style.visibility = 'visible';
-					document.getElementById('double_outcome_message').style.color = 'red';
-					document.getElementById('double_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
-					document.getElementById('double_ciphertext').value = '';
-				}
-			}
-		} else { // Decrypt function
-			// Gather inputs.
-			const ciphertext = document.getElementById('double_ciphertext').value;
-			const password1GCM = document.getElementById('double_password_1').value;
-			const password2CTR = document.getElementById('double_password_2').value;
-			// Execute
-			try {
-				document.getElementById('double_cleartext').value = await decryptDouble(password1GCM, password2CTR, ciphertext);
-				document.getElementById('double_outcome_message').style.visibility = 'visible';
-				document.getElementById('double_outcome_message').style.color = 'lime';
-				document.getElementById('double_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
-			} catch (error) {
-				console.log(error);
-				document.getElementById('double_outcome_message').style.visibility = 'visible';
-				document.getElementById('double_outcome_message').style.color = 'red';
-				document.getElementById('double_outcome_message').innerHTML = 'Decryption unsuccessful';
-				document.getElementById('double_cleartext').value = '';
-			}
-		}
-		clearTimeout(timeoutIdDouble)
-		timeoutIdDouble = setTimeout(() => {
-			turnOffDoubleDecryptOutcomeMessage();
-		}, 2000); 
-		// Show length AFTER execution.
-		setLengthDouble();
-	}// executeDouble()
-	let timeoutIdDouble;
-
-	function setLengthDouble() {
-		// Cleartext 
-		const cleartext = document.getElementById('double_cleartext').value;
-		const cleartextByteSize = new Blob([cleartext]).size;
-		const cleartext_length_string = "Char Length: " + cleartext.length;
-		const cleartext_bytesize_string = "Byte Length: " + cleartextByteSize;
-		document.getElementById('double_cleartext_length_label').innerHTML = cleartext_length_string;
-		document.getElementById('double_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
-		// Ciphertext
-		const ciphertext = document.getElementById('double_ciphertext').value;
-		const ciphertextByteSize = new Blob([ciphertext]).size;
-		const ciphertext_length_string = "Char Length: " + ciphertext.length;
-		const ciphertext_bytesize_string = "Byte Length: " + ciphertextByteSize;
-		document.getElementById('double_ciphertext_length_label').innerHTML = ciphertext_length_string;
-		document.getElementById('double_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
-	}
-
-	function turnOffDoubleDecryptOutcomeMessage() {
-		document.getElementById('double_outcome_message').style.visibility = 'hidden';
-	}
-
-	function activateEncDouble() {
-		// Set flag
-		doubleEncrypt_f = true;
-
-		// Turn off decryption error.
-		document.getElementById('double_outcome_message').style.visibility = 'hidden';
-
-		// Disable decrypt.
-		// Change button text to disabled color.
-		document.getElementById('double_dec_button').style.color = 'dimgray';
-		// Change outline, label to diabled color.
-		document.getElementById('double_ciphertext_label').style.color = 'gray';
-		document.getElementById('double_ciphertext').style.color = 'gray';
-		document.getElementById('double_ciphertext').style.borderColor = 'gray';
-		// Disable ciphertext textarea.
-		document.getElementById('double_ciphertext').disabled = true;
-
-		// Enable encrypt.
-		// Change button text to enabled color.
-		document.getElementById('double_enc_button').style.color = 'lime';
-		// Change outline, label to enabled color.
-		document.getElementById('double_cleartext_label').style.color = '#54c597';
-		document.getElementById('double_cleartext').style.color = '#54c597';
-		document.getElementById('double_cleartext').style.borderColor = '#54c597';
-		// Enable cleartext textarea.
-		document.getElementById('double_cleartext').disabled = false;
-
-		// Focus newly active textarea
-		document.getElementById('double_cleartext').focus();
-
-		// Execute crypto on button click.
-		executeDouble();
-	}// activateEncDouble()
-
-// PGO Green: #54c597
-// PGO Readonly Blue: #4491d5
-
-	function activateDecDouble() {
-		// Set flag
-		doubleEncrypt_f = false;
-
-		// Enable decrypt - ciphertext.
-		// Change button text to enabled color.
-		document.getElementById('double_dec_button').style.color = 'lime';
-		// Change outline, label to diabled color.
-		document.getElementById('double_ciphertext_label').style.color = '#54c597';
-		document.getElementById('double_ciphertext').style.color = '#54c597';
-		document.getElementById('double_ciphertext').style.borderColor = '#54c597';
-		// Enable cleartext textarea.
-		document.getElementById('double_ciphertext').disabled = false;
-
-		// Disable encrypt - cleartext.
-		// Change button text to disabled color.
-		document.getElementById('double_enc_button').style.color = 'dimgray';
-		// Change outline, label to enabled color.
-		document.getElementById('double_cleartext_label').style.color = 'gray';
-		document.getElementById('double_cleartext').style.color = 'gray';
-		document.getElementById('double_cleartext').style.borderColor = 'gray';
-		// Disable ciphertext textarea.
-		document.getElementById('double_cleartext').disabled = true;
-
-		// Focus newly active textarea
-		document.getElementById('double_ciphertext').focus();
-
-		// Execute crypto on button click.
-		executeDouble();
-	}// activateDecDouble()
 
 
 	////////////////////////////////////////////////////////////
@@ -1663,6 +1365,7 @@
 		let cleartextUint8 = new Uint8Array;
 		// Compose data based on function parameter.
 		if (inputType === 'base64'){ // Default usage.
+			// 3/4 multiplier input size to bytes
 			cleartextUint8 = Uint8Array.fromBase64(cleartext);
 		}else if (inputType === 'utf8'){
 			cleartextUint8 = new TextEncoder().encode(cleartext);
@@ -2096,7 +1799,7 @@
 	async function encryptTriple(gcm1000Pass, ctrPass, opensslPass, cleartextData){
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
-		checkDataLength(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_B64);
+		//checkDataLength(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_B64);
 		// Obfuscation Step 1 Encrypt
 		const gcm1000Encrypted = await encryptOBF1000(opensslEncrypted, gcm1000Pass);
 		checkDataLength(gcm1000Encrypted, OBF1000_OUTPUT_LIMIT_B64);
