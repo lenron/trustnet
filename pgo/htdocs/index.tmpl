@@ -2520,8 +2520,23 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// 																															 //
 	// Crypto explained below.																									 //
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Double Cipher - 710 byte Input Limit
 	//
+	// User Input (File Upload) ==> OBF-1000 ==> AES-CTR ==> Database Storage
+	//
+	// User Input (File Upload)
+	//    |<--------------710 byte check - CMDINPUT_LENGTH_LIMIT
+	// OBF-1000 (AES-GCM)
+	//    |<--------------1000 base64 check - OBF1000_OUTPUT_LIMIT_BASE64
+	// AES-CTR
+	//    |<--------------1024 base64 check - AESCTR_OUTPUT_LIMIT_BASE64
+	// Double Encrypted
+	//    |<--------------1024 base64 check - FULLY_ENCRYPTED_DATA_LENGTH_BASE64
+	// Database Storage (Server or Offline)
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Triple Cipher - 686 byte Input Limit
+	//
 	// User Input (Browser) ==> OpenSSL ==> OBF-1000 ==> AES-CTR ==> Database Storage
 	//
 	// User Input (Browser)
@@ -2537,48 +2552,74 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Database Storage (Server or Offline)
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Double Cipher - 710 byte Input Limit
-	// User Input (File Upload) ==> OBF-1000 ==> AES-CTR ==> Database Storage
-	//
-	// User Input (File Upload)
-	//    |<--------------710 byte check - CMDINPUT_LENGTH_LIMIT
-	// OBF-1000 (AES-GCM)
-	//    |<--------------1000 base64 check - OBF1000_OUTPUT_LIMIT_BASE64
-	// AES-CTR
-	//    |<--------------1024 base64 check - AESCTR_OUTPUT_LIMIT_BASE64
-	// Double Encrypted
-	//    |<--------------1024 base64 check - FULLY_ENCRYPTED_DATA_LENGTH_BASE64
-	// Database Storage (Server or Offline)
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Fully Encrypted Datapiece
-	//
-	// Triple Cipher:
-	//  |----------------------------------------------Fully Encrypted Datapiece----------------------------------------------------------------|
-	//     __________________________________________________________________________________________________________________________________
-	//    /_________________________________________________________________________________________________________________________ AES-CTR \
-	//   //             ___________________________________________________________________________          OBF-1000  		        \         \
-	//  //             /       OpenSSL          ___________________________                        \	     						 \         \
-	// // 7ByteHeader / Salted__ + Random Salt / Browser Cleartext Payload \ newline + CBC Blocking \      Random Filler     +  Salt  \  Salt   \
-	// |---7 Bytes---||-----8----||-----8-----||------Up to 686 Bytes-------||--1--||---1 to 16---||-(710 - OpenSSL Output)-||---18---||---18---|
 	// 
 	// Double Cipher:
-	// |--------------------------Fully Encrypted Datapiece--------------------------------|
-	//    ______________________________________________________________________________
-	//   /_______________________________________________________________________AES-CTR\
-	//  //             __________________________                  OBF-1000      \       \
-	// // 7ByteHeader /   File Upload Payload	 \      Random Filler     +  Salt \  Salt \
-	// |---7 Bytes---||-----Up to 710 Bytes------||--(710 - upload size)--||--18--||--18--|					
+	//     ________________________________________________________________________________________________________________________
+	//    / AES-CTR _______________________________________________________________________________________________________________\ 
+	//   /         / OBF-1000 _____________________________________________________________________________________________________\\
+	//  /         /          /             ____________________________________________________________________________   AES-GCM  \\\
+	// / CTR Salt/ GCM Salt / 7ByteHeader /                              Data Payload + Random Filler                  \   GCM Tag  \\\ 
+	// |---18---||----18---||---7 Bytes--||------------------------------------------710 Bytes-------------------------||------15-----|
+	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted--------------------------||---GCM Tag---|
+	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted--------------------------------------------|
+	// |----------------------------------------------Fully Encrypted Datapiece-------------------------------------------------------|
+	// 
+	// Triple Cipher:
+	//       ________________________________________________________________________________________________________________________________________
+	//      / AES-CTR _______________________________________________________________________________________________________________________________\ 
+	//     /         / OBF-1000 __________________________________________________________________________________________________________           \\
+	//    /         /          /             ____________________________________________________________________________      AES-GCM    \           \\
+	//   /         /          /             /      OpenSSL           ____________________________________________________\                 \           \\ 
+	//  /         /          /             /                        /___________________________        AES-CBC          \\                 \           \\
+	// / CTR Salt/ GCM Salt / 7ByteHeader / Salted__  +   CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
+	// |---18---||----18---||---7 Bytes--||-----8----||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
+	//                                    |------------------------------------------710 Bytes-----------------------------------------------||-----15-----|
+	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
+	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
+	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted-----------------------------------------------------------------|
+	// |----------------------------------------------------------Fully Encrypted Datapiece----------------------------------------------------------------|
 	// 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OpenSSL
+	//    ____________________________________________________________________________ 
+	//   /                        ____________________________________________________\ 
+	//  /                        /___________________________         				  \\
+	// / Salted__ + Random Salt //          Cleartext        \ newline* + CBC Blocking \\ 
+	// |-----8----||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
+	// |----**----||----***----||------------------AES-CBC Encrypted--------------------|
+	// *A single newline byte character is used to simulate a linux file so that the cipher is identical to command line usage.
+	// **The literal string 'Salted__' is used in OpenSSL encryption to specify salted key derivation, indicating the next 8 bytes are that indicated salt.
+	// ***Cryptographically strong randomly generated salt here is used to generate the key (and the Initialization Vector - IV) which is then used in the AES-CBC encryption, 
+	// ensuring a crypto strong new key is generated and used with each newly rolled encryption execution instance. (Can you just say 'encryption cipher' in the singular form here? does that english good?)
+	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
 	// 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OBF-1000 
-	// 
+	//    __________________________________________________________________________________
+	//   /      ___________________________________________________________________         \
+	//  /      /             ______________________________________________________\         \
+	// / Salt / 7ByteHeader /         Data Payload	    +      Random Filler       \\ GCM Tag \
+	// |--18--||--7 Bytes--||-------------------------710 Bytes---------------------||---15---|
+	// |--*---||----------------------------AES-GCM Encrypted-----------------------||---Tag--|
+	// *Cryptographically strong randomly generated salt here is used to generate the key (and the Initialization Vector - IV) which is then used in the AES-GCM encryption, 
+	// ensuring a crypto strong new key is generated and used with each newly rolled encryption execution instance. (Can you just say 'encryption cipher' in the singular form here? does that english good?)
+	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
+	//
+	// GCM Tag used for validation of data (will error on decrypt if checksum is wrong).
+	//
+	// Blocking to 1000 base64 output chars is done by satisfying this sum depending on the length of the Data Payload input:
+	// 710 = Data Payload size in bytes + Random Filler size in bytes
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// AES-CTR
+	//   _________________________
+	//  /       __________________\
+	// / Salt  /   Data Payload   \\
+	// |--18--||-----750 Bytes-----|					
+	// |--*---||-AES-CTR Encrypted-|
+	// *Cryptographically strong randomly generated salt here is used to generate the key (and the nonce and counter bytes) which is then used in the AES-CTR encryption, 
+	// ensuring a crypto strong new key is generated and used with each newly rolled encryption cipher.
+	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
 	// 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// These functions make up the cryptographic core of PGO. We are using each of the 3 available ciphers in the subtle crypto library.
