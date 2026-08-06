@@ -1739,7 +1739,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Extracts either user password or data from DOM object's  value.
 		const cleartextData = extractCleartextData(inputId);
 		// OpenSSL encrypt user data and store in global Object. 
-		passlockedData[keyword] = await encOpenSSL(cleartextData, passlock);
+		passlockedData[keyword] = await encryptOpenSSL(cleartextData, passlock);
 	}// initPasslockFlow()
 
 	function clearInputs(){
@@ -1840,13 +1840,13 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Use previously generated passlock to encrypt input.
 	async function passlockEncrypt(cleartextPassword) {
 		const passlock = await getPasslock();
-		const encryptedPassword = await encOpenSSL(cleartextPassword, passlock);
+		const encryptedPassword = await encryptOpenSSL(cleartextPassword, passlock);
 		return encryptedPassword;
 	}// passlockEncrypt()
 
 	async function passlockDecrypt(encryptedData) {
 		const passlock = await getPasslock();
-		const cleartextData = await decOpenSSL(encryptedData, passlock);
+		const cleartextData = await decryptOpenSSL(encryptedData, passlock);
 		return cleartextData;
 	}// passlockDecrypt()
 
@@ -1855,7 +1855,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const passlock = await getPasslock();
 		let cleartextSet = {};
 		for(const keyword in passlockedData) {
-			cleartextSet[keyword] = await decOpenSSL(passlockedData[keyword], passlock);
+			cleartextSet[keyword] = await decryptOpenSSL(passlockedData[keyword], passlock);
 		}
 		console.log("Cleartext Set: ");
 		console.log(cleartextSet);
@@ -2014,7 +2014,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 	// Main Delete Function Handler
 	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
-	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
+	// Inputs: cleartext held in inputs hidden from the user until all data is ready for the server query.
 	// Output: functionality.
 	async function attemptDelete() {
 		goBackProgrammaticallyXandDontFireShowPage(4);
@@ -2552,7 +2552,13 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Database Storage (Server or Offline)
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Fully Encrypted Datapiece
+	// I'm not sure what to call the final double or triple encrypted piece of data?
+	// Ideas:
+	// Fully Encrypted Datapiece - FED
+	// PGO Multi Encrypted Datarecord - PMED
+	// PGO Multi Encrypted Datapiece - PMED - PME-Datapiece
+	// PGO Multi-Cipher
+	// PGO Multicipher Encrypted Datarecord
 	// 
 	// Double Cipher:
 	//     ________________________________________________________________________________________________________________________
@@ -2589,9 +2595,9 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// |-----8----||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
 	// |----**----||----***----||------------------AES-CBC Encrypted--------------------|
 	// *A single newline byte character is used to simulate a linux file so that the cipher is identical to command line usage.
-	// **The literal string 'Salted__' is used in OpenSSL encryption to specify salted key derivation, indicating the next 8 bytes are that indicated salt.
+	// **The literal string 'Salted__' is used in OpenSSL encryption to specify salted key derivation, indicating the next 8 bytes are that salt.
 	// ***Cryptographically strong randomly generated salt here is used to generate the key (and the Initialization Vector - IV) which is then used in the AES-CBC encryption, 
-	// ensuring a crypto strong new key is generated and used with each newly rolled encryption execution instance. (Can you just say 'encryption cipher' in the singular form here? does that english good?)
+	// ensuring a crypto strong new key is generated and used with each newly rolled encryption cipher.
 	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
 	// 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2603,7 +2609,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// |--18--||--7 Bytes--||-------------------------710 Bytes---------------------||---15---|
 	// |--*---||----------------------------AES-GCM Encrypted-----------------------||---Tag--|
 	// *Cryptographically strong randomly generated salt here is used to generate the key (and the Initialization Vector - IV) which is then used in the AES-GCM encryption, 
-	// ensuring a crypto strong new key is generated and used with each newly rolled encryption execution instance. (Can you just say 'encryption cipher' in the singular form here? does that english good?)
+	// ensuring a crypto strong new key is generated and used with each newly rolled encryption cipher.
 	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
 	//
 	// GCM Tag used for validation of data (will error on decrypt if checksum is wrong).
@@ -2634,85 +2640,81 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	
-	// Inputs:
-	// Outputs:
+	// Purpose:	Built to perfectly replicate OpenSSL behavior on Linux command line, which I think it probably does.
+	//			Specifically the command: openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
+	//			This uses an 8 byte salt and the key derivation function PBKDF2 to generate both the key and the IV to run 
+	//			the Subtle Crypto encrypt() with AES-CBC encryption.
+	// Inputs:	A cleartext datapiece from Browser textarea input and a password from Browser UI password 3.
+	// Outputs:	A base64 packed cipher that perfectly matches the output of the command above.
+	//			This matches the OpenSSL datapiece spec shown in this section's description.
 	//
-	// Our implementation of OpenSSL's encrypt function.
-	// Inputs: Plaintext.
-	// Output: OpenSSL encrypted base64 string.
-	async function encOpenSSL(plaintext, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
-		// Prepare plaintext for encryption.
-		// Encode plaintext in utf8 and store in Uint8Array inputbytes.
-		const inputbytes = new TextEncoder().encode(plaintext);
-
-		// Make the plaintext look like a file by adding a single newline char to the end of the string.
-		const single_newline = new Uint8Array(1);
-		// utf8 newline code is the value 10(decimal).
-		single_newline[0] = 10;
-		// Merge the two Uint8Arrays.
-		const plaintextbytes = concatBuffer(inputbytes, single_newline);
-
-		// Prepare inputs for digest.
-		//const iter = 10000;
-		//const digest_hash = 'SHA-256';
-		// Generate random salt.
-		//let salt = new Uint8Array(8);
-		let salt;
-		// Turning off dev site functionality while testing crypto.
-		// This also illuminated that we need to decrypt password in checkPasslock because enc data will be different with a different random salt which all enc data should get.
-		salt = window.crypto.getRandomValues(new Uint8Array(8));
-		// Salt is used when hashing, IV (Initialization Vector) for encryption.
-
-		const encoded_pass = new TextEncoder().encode(pass);
-		// Import password into a subtlecrypto-usable key object.
-		const keyMaterial = await getKeyMaterial(encoded_pass);
-		// Derives input bits used for the PBKDF2 cryptoKey object AND the IV.
-		const derived_bits = await window.crypto.subtle.deriveBits(
-			{
-				name: "PBKDF2",
-				//name: key_derivation_algo,
-				salt,
-				iterations: iter,
-				hash: digest_hash,
-			},
-			keyMaterial,
-			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
+	async function encryptOpenSSL(cleartext, password) {
+		// Encode cleartext in utf8 and store in Uint8Array cleartextUint8.
+		const cleartextUint8 = new TextEncoder().encode(cleartext);
+		// Replicate Linux command line's version of OpenSSL by appending a single newline, effectively changing cleartext input to a Linux file.
+		const singleNewlineUint8 = new Uint8Array(1);
+		// utf8 newline code is the value 10 (decimal).
+		singleNewlineUint8[0] = 10;
+		// Merge the two Uint8Arrays placing cleartextUint8 first.
+		const cleartextAsFileUint8 = concatBuffer(cleartextUint8, singleNewlineUint8);
+		// Cryptographic salt used in PBKDF2 algorithm which derives both the key and iv used in main encrypt() call.
+		const saltCBCUint8 = window.crypto.getRandomValues(new Uint8Array(8));
+		// Encode password in utf8 and store in Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Import raw password bytes into a subtlecrypto-usable key object designated for the PBKDF2 algorithm.
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
+			"raw",			// format
+			passwordUint8,	// keyData
+			"PBKDF2",		// algorithm
+			false,			// extractable?
+			["deriveBits"],	// allowed usages
 		);
-		const derivedKeyBuffer = new Uint8Array(derived_bits);
-
+		// Create the key and iv used in the AES-CBC main encrypt() call.
+		const keyAndIVBits = await window.crypto.subtle.deriveBits(
+			{						// This is a Pbkdf2Params object which specifies which derivation algorithm to use.
+				name: "PBKDF2",		// Name of this algorithm.
+				salt: saltCBCUint8,	// Specify which cryptographic salt to use.
+				iterations: 10000,	// Number of times to execute hash function. Higher value = more time to execute = stronger crypto.
+				hash: "SHA-256",	// digest algorithm
+			},
+			keyForPBKDF2,			// Base key used for bit derivation.
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,	// Number of bits to derive.
+		);
+		// Cast ArrayBuffer into a Uint8Array.
+		const keyAndIvBitsUint8 = new Uint8Array(keyAndIVBits);
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
-		const ivbytes = derivedKeyBuffer.slice(32);
-
-		// Import the PBKDF2 derived key bits into a key object made specifically 
-		// for use with the aes-cbc 256 algorithm.
-		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		let key = await window.crypto.subtle.importKey(
-			'raw', 
-			keyBytes, 
-			{
-				//name: 'AES-CBC', 
-				name: digest_algorithm,
-				length: 256
-			}, 
-			false, 
-			['encrypt']
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
+		// Now that cryptographically strong bits have been generated, import them into a cryptoKey object specified for the AES-CBC encryption call below.
+		const keyCBC = await window.crypto.subtle.importKey(
+			"raw",					// input format 
+			keyBytesUint8,			// input data
+			{						// object defining type of key to import
+				name: "AES-CBC",	// algorithm identifier
+			},
+			false,					// Can this key's data be extracted?
+			['encrypt']				// allowed usages
 		);
-		// Main Function Digest
-		// MDN syntax: encrypt(algorithm, key, data)
-		//const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
-		const encrypted_result = await window.crypto.subtle.encrypt({ name: digest_algorithm, iv: ivbytes }, key, plaintextbytes);
-		// Combine (OpenSSL hardcoded) constant salt, random salt, and encrypted result as array buffers, then convert to base64.
-		const saltedLiteral = "Salted__";	// OpenSSL hardcoded.
-		const saltbytes = new TextEncoder().encode(saltedLiteral);
-		const two_salts = concatBuffer(saltbytes, salt);
+		// 'Main' AES-CBC encrypt() digest.
+		const ciphertext = await window.crypto.subtle.encrypt(
+			{						// object specifying algorithm, parameters
+				name: "AES-CBC",	// algorithm name
+				iv: ivBytesUint8	// A cryptographically strong IV is used.
+			},
+			keyCBC,					// CryptoKey object used in the encryption.
+			cleartextAsFileUint8	// Cleartext data to be encrypted.
+		);
+		// Compile output to match OpenSSL Linux command line functionality. *Thoroughly explained/mapped in Cryptographic Functions section description.
+		const saltedLiteral = "Salted__";	// OpenSSL uses to designate next 8 bytes as salt.
+		const saltLiteralUint8 = new TextEncoder().encode(saltedLiteral);
+		const twoSaltsUint8 = concatBuffer(saltLiteralUint8, saltCBCUint8);
 		// Merge salts with encoded ciphertext.
-		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
-		const encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
-		return encrypted_output_buf.toBase64();
-	}// encOpenSSL()
+		// OpenSSL Output = Salted__ + CBC Salt + Ciphertext
+		const openSSLOutputUint8 = concatBuffer(twoSaltsUint8, ciphertext);
+		// All crypto functions output base64-packed data for data integrity checks, uniformity.
+		return openSSLOutputUint8.toBase64();
+	}// encryptOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Purpose:
@@ -2720,88 +2722,70 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Outputs:
 	//
 	// Our implementation of OpenSSL's decrypt function.
-	// Inputs: ciphertext64 is base64. pass is plaintext.
-	// Output: decrypted plaintext.
-	//async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash=, digest_algorithm) {
-	async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
-		
-		// Convert input base 64 to binary.
-		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
-		// ciphertext is now in a form that is ready to give to the encryption function.
-		// Prepare inputs for digest.
-		//const digest_hash = 'SHA-256';
-		//const iter = 10000;
-		// Salt has been preserved from encrypt. Pull digits from their place in the ciphertext.
-		const salta = ciphertextbytes.slice(8,16);
-		const salt = new Uint8Array(salta);
-
-		// Use the key derivation function PBKDF2 to derive bits that will 
-		// be used to create the cryptoKey object needed for the main digest.
-		const encoded_pass = new TextEncoder().encode(pass);
-		const keyMaterial = await getKeyMaterial(encoded_pass);
-		const derived_bits = await window.crypto.subtle.deriveBits(
-			{
-				name: "PBKDF2",
-				salt,
-				iterations: iter,
-				hash: digest_hash,
-			},
-			keyMaterial,
-			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
+	// Inputs: ciphertext64 is base64. password is cleartext.
+	// Output: decrypted cleartext.
+	async function decryptOpenSSL(ciphertext64, password) {
+		// Convert base64 input into Uint8Array.
+		const twoSaltsAndCiphertextUint8 = Uint8Array.fromBase64(ciphertext64);
+		// Salt has been packed with ciphertext. Slice those bytes out of the input Uint8Array.
+		const saltCBCUint8 = twoSaltsAndCiphertextUint8.slice(8,16);
+		// Encode password in utf8 and store in Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Import raw password bytes into a subtlecrypto-usable key object designated for the PBKDF2 algorithm.
+		// This keyForPBKDF2 will be used to derive the key used in encryption, allowing decrypt execution.
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
+			"raw",			// format
+			passwordUint8,	// keyData
+			"PBKDF2",		// algorithm
+			false,			// extractable?
+			["deriveBits"],	// allowed usages
 		);
-		const derivedKeyBuffer = new Uint8Array(derived_bits);
-
+		// Create the key and iv used in the AES-CBC main decrypt() call.
+		const keyAndIVBits = await window.crypto.subtle.deriveBits(
+			{						// This is a Pbkdf2Params object which specifies which derivation algorithm to use.
+				name: "PBKDF2",		// Name of this algorithm.
+				salt: saltCBCUint8,	// Specify which cryptographic salt to use.
+				iterations: 10000,	// Number of times to execute hash function. Higher value = more time to execute = stronger crypto.
+				hash: "SHA-256",	// digest algorithm
+			},
+			keyForPBKDF2,			// Base key used for bit derivation.
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,	// Number of bits to derive.
+		);
+		// Convert ArrayBuffer into Uint8Array.
+		const keyAndIvBitsUint8 = new Uint8Array(keyAndIVBits);
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
-		const ivbytes = derivedKeyBuffer.slice(32);
-
-		// Extract the encrypted phrase (data) from OpenSSL input
-		const cipherbytesphrase = ciphertextbytes.slice(16);
-
-		// Import the PBKDF2 derived key bits into a key object made specifically 
-		// for use with the aes-cbc 256 algorithm.
-		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		let key = await window.crypto.subtle.importKey(
-			'raw', 
-			keyBytes, 
-			{
-				//name: 'AES-CBC', 
-				name: digest_algorithm, 
-				length: 256
-			}, 
-			false, 
-			['decrypt']
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
+		// Extract ciphertext payload from function input.
+		const ciphertextUint8 = twoSaltsAndCiphertextUint8.slice(16);
+		// Now that cryptographically strong bits have been generated, import them into a cryptoKey object specified for the AES-CBC decryption call below.
+		const keyCBC = await window.crypto.subtle.importKey(
+			"raw",					// input format 
+			keyBytesUint8,			// input data
+			{						// object defining type of key to import
+				name: "AES-CBC",	// algorithm identifier
+			},
+			false,					// Can this key's data be extracted?
+			['decrypt']				// allowed usages
 		);
-
-		// MDN syntax: decrypt(algorithm, key, data)
-		const decrypted_result = await window.crypto.subtle.decrypt({ name: digest_algorithm, iv: ivbytes }, key, cipherbytesphrase);
-		// Convert bytes to string.
-		let decrypted_string = new TextDecoder().decode(decrypted_result);
-		// Pop single newline added in enc (openssl emulation).
-		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
-		return decrypted_string;
-	}// decOpenSSL()
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:
-	// Inputs:
-	// Outputs:
-	//
-	// Process plaintext password into a Key Object usable by subtlecrypto functions.
-	// Input: Plaintext password.
-	// Output: Subtlecrypto usable Key Object.
-	function getKeyMaterial(encoded_pass) {
-		// importKey(format, keyData, algorithm, extractable, keyUsages)
-		return window.crypto.subtle.importKey(
-			"raw",
-			encoded_pass,	// plaintext -> binary
-			"PBKDF2",
-			//algo,
-			false,
-			["deriveBits", "deriveKey"],
+		//const decryptedCleartext = await window.crypto.subtle.decrypt({ name: digest_algorithm, iv: ivBytesUint8 }, key, ciphertextUint8);
+		// 'Main' AES-CBC encrypt() digest.
+		const decryptedCleartextBuffer = await window.crypto.subtle.decrypt(
+			{						// object specifying algorithm, parameters
+				name: "AES-CBC",	// algorithm name
+				iv: ivBytesUint8	// A cryptographically strong IV is used.
+			},
+			keyCBC,					// CryptoKey object used in the decryption.
+			ciphertextUint8			// Ciphertext data to be decrypted.
 		);
-	}// getKeyMaterial()
+		// Interpret bytes from the ArrayBuffer decryptedCleartext as utf8 string and place that string into variable cleartextString.
+		let cleartextString = new TextDecoder().decode(decryptedCleartextBuffer);
+		// The output of this function will go to a Browser input textarea, so remove newline used to replicate OpenSSL Linux command line behavior.
+		// (This newline allows decryption to work on the command line if CMD Line option is chosen instead of Browser.)
+		cleartextString = cleartextString.substring(0, cleartextString.length - 1);
+		return cleartextString;
+	}// decryptOpenSSL()
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2963,7 +2947,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		const keyMaterial = await window.crypto.subtle.importKey(
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
 			"PBKDF2",			// Key derivation algorithm to be used.
@@ -2980,30 +2964,29 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				iterations: 10000,				// strength
 				hash: 'SHA-256',				// 
 			},
-			keyMaterial,						//
-			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 96 for random IV as specified NIST SP800-38D Section 8.2.
+			keyForPBKDF2,						//
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 96 for random IV as specified NIST SP800-38D Section 8.2.
 		);
 		// Split the derived bits into key and iv for the encrypt call.
-		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
 		// Take first 256 bits derived from deriveBits above for the cryptoKey.
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
 		// 256 bits for key, 96 bits for IV for GCM.
 		// |-keyBytes-| |-IV-| (where X is 32 bit chunk)
 		//  xxxx xxxx 	 x x x  			
 		//
 		// AES-CTR parameters described here:
 		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
-		const ivBytes = derivedKeyBuffer.slice(32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-GCM 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let keyGCM = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytes, 				// keydata: input data
+			keyBytesUint8, 				// keydata: input data
 			{						// algorithm to use to importKey
 				name: 'AES-GCM', 
-				length: 256			// Length in bits of input.
 			}, 
 			false,					// extractable boolean 
 			['encrypt']				// keyUsages
@@ -3015,7 +2998,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
 		// MDN syntax: encrypt(algorithm, key, data)
 		const inputTypeUint8 = new TextEncoder().encode(inputType);
-        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, cleartextUint8);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytesUint8, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, cleartextUint8);
 
         //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
@@ -3045,7 +3028,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		const keyMaterial = await window.crypto.subtle.importKey(
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
 			"PBKDF2",			// Key derivation algorithm to be used.
@@ -3061,24 +3044,23 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				iterations: 10000,				// exectute hash function this maniy times
 				hash: 'SHA-256',				// digest algorithm
 			},
-			keyMaterial,						// input data as cryptoKey object
-			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			keyForPBKDF2,						// input data as cryptoKey object
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 
-		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
 		// 96 IV bits for GCM
-		const ivBytes = derivedKeyBuffer.slice(32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let keyGCM = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytes, 				// keydata: input data
+			keyBytesUint8, 				// keydata: input data
 			{						// algorithm to use to importKey
 				name: 'AES-GCM', 
-				length: 256			// Length in bits of input.
 			}, 
 			false,					// extractable boolean 
 			['decrypt']				// keyUsages
@@ -3087,7 +3069,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// MDN syntax: decrypt(algorithm, key, data)
 		//const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
 		const outputTypeUint8 = new TextEncoder().encode(outputType);
-        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, encodedCiphertextUint8);
+        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytesUint8, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, encodedCiphertextUint8);
 
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
@@ -3130,7 +3112,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		const keyMaterial = await window.crypto.subtle.importKey(
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
 			"PBKDF2",			// Key derivation algorithm to be used.
@@ -3147,13 +3129,13 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				iterations: 10000,				// strength
 				hash: 'SHA-256',				// 
 			},
-			keyMaterial,						//
-			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			keyForPBKDF2,						//
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 		// Split the derived bits into key and iv for the encrypt call.
-		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
 		// Take first 256 bits derived from deriveBits above for the cryptoKey.
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
 		// Here using same derivation method as for AES-CBC's Initialization Vector.
 		// AES-CTR uses a nonce and a counter block which seems to do a similar thing to an IV. 
 		// Take the rest of the bits (should be 128)
@@ -3165,17 +3147,16 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		//
 		// AES-CTR parameters described here:
 		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
-		const nonceAndCounterBytes = derivedKeyBuffer.slice(32);
+		const nonceAndCounterBytes = keyAndIvBitsUint8.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytes, 				// keydata: input data
+			keyBytesUint8, 				// keydata: input data
 			{						// algorithm to use to importKey
 				name: 'AES-CTR', 
-				length: 256			// Length in bits of input.
 			}, 
 			false,					// extractable boolean 
 			['encrypt']				// keyUsages
@@ -3216,7 +3197,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		const keyMaterial = await window.crypto.subtle.importKey(
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
 			"PBKDF2",			// Key derivation algorithm to be used.
@@ -3232,24 +3213,23 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				iterations: 10000,				// exectute hash function this maniy times
 				hash: 'SHA-256',				// digest algorithm
 			},
-			keyMaterial,						// input data as cryptoKey object
-			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			keyForPBKDF2,						// input data as cryptoKey object
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 
-		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
 		// 64 nonce bytes with 64 counter block bytes.
-		const nonceAndCounterBytes = derivedKeyBuffer.slice(32);
+		const nonceAndCounterBytes = keyAndIvBitsUint8.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytes, 				// keydata: input data
+			keyBytesUint8, 				// keydata: input data
 			{						// algorithm to use to importKey
 				name: 'AES-CTR', 
-				length: 256			// Length in bits of input.
 			}, 
 			false,					// extractable boolean 
 			['decrypt']				// keyUsages
@@ -3290,7 +3270,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Output:	A Fully Encrypted Datapiece ready for database storage.
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData) {
 		// OpenSSL Encrypt (base 64 encoded)
-		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
+		const opensslEncrypted = await encryptOpenSSL(cleartextData, opensslPass);
 		checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
 
 		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
@@ -3323,7 +3303,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData) {
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
-		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
+		const cleartext = await decryptOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
 		return cleartext;
 	}// decryptTriple()
 
@@ -3463,7 +3443,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//////////////////////////////////////////
 
 	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
-	// Inputs: plaintext.
+	// Inputs: cleartext.
 	// Output: hexadecimal.
 	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
 		// Convert to lowercase.
@@ -5754,17 +5734,17 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Our implementation of OpenSSL's encrypt function.
 	// Inputs: Plaintext.
 	// Output: OpenSSL encrypted base64 string.
-	async function encOpenSSL(plaintext, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
-		// Prepare plaintext for encryption.
-		// Encode plaintext in utf8 and store in Uint8Array inputbytes.
-		const inputbytes = new TextEncoder().encode( plaintext );
+	async function encryptOpenSSL(cleartext, pass, iter=10000, digest_hash="SHA-256" , digest_algorithm="AES-CBC") {
+		// Prepare cleartext for encryption.
+		// Encode cleartext in utf8 and store in Uint8Array cleartextUint8.
+		const cleartextUint8 = new TextEncoder().encode( cleartext );
 
-		// Make the plaintext look like a file by adding a single newline char to the end of the string.
-		const single_newline = new Uint8Array(1);
+		// Make the cleartext look like a file by adding a single newline char to the end of the string.
+		const singleNewlineUint8 = new Uint8Array(1);
 		// utf8 newline code is the value 10(decimal).
-		single_newline[0] = 10;
+		singleNewlineUint8[0] = 10;
 		// Merge the two Uint8Arrays.
-		const plaintextbytes = concatBuffer(inputbytes, single_newline);
+		const cleartextAsFileUint8 = concatBuffer(cleartextUint8, singleNewlineUint8);
 
 		// Prepare inputs for digest.
 		//const iter = 10000;
@@ -5775,11 +5755,11 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		salt = window.crypto.getRandomValues(new Uint8Array(8));
 		// Salt is used when hashing, IV (Initialization Vector) for encryption.
 
-		const encoded_pass = new TextEncoder().encode(pass);
+		const passwordUint8 = new TextEncoder().encode(pass);
 		// Import password into a subtlecrypto-usable key object.
-		const keyMaterial = await getKeyMaterial(encoded_pass);
+		const keyForPBKDF2 = await getKeyMaterial(passwordUint8);
 		// Derives input bits used for the PBKDF2 cryptoKey object AND the IV.
-		const derived_bits = await window.crypto.subtle.deriveBits(
+		const keyAndIVBits = await window.crypto.subtle.deriveBits(
 			{
 				name: "PBKDF2",
 				//name: key_derivation_algo,
@@ -5787,22 +5767,22 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				iterations: iter,
 				hash: digest_hash,
 			},
-			keyMaterial,
+			keyForPBKDF2,
 			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
 		);
-		const derivedKeyBuffer = new Uint8Array(derived_bits);
+		const keyAndIvBitsUint8 = new Uint8Array(keyAndIVBits);
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
-		const ivbytes = derivedKeyBuffer.slice(32);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
-			keyBytes, 
+			keyBytesUint8, 
 			{
 				//name: 'AES-CBC', 
 				name: digest_algorithm,
@@ -5813,66 +5793,66 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		);
 		// Main Function Digest
 		// MDN syntax: encrypt(algorithm, key, data)
-		//const encrypted_result = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivbytes }, key, plaintextbytes);
-		const encrypted_result = await window.crypto.subtle.encrypt({ name: digest_algorithm, iv: ivbytes }, key, plaintextbytes);
+		//const ciphertext = await window.crypto.subtle.encrypt({ name: "AES-CBC", iv: ivBytesUint8 }, key, cleartextAsFileUint8);
+		const ciphertext = await window.crypto.subtle.encrypt({ name: digest_algorithm, iv: ivBytesUint8 }, key, cleartextAsFileUint8);
 		// Data Flow Window
-		const log_encrypted_result = new Uint8Array(encrypted_result);
+		const log_ciphertext = new Uint8Array(ciphertext);
 		// Combine (OpenSSL hardcoded) constant salt, random salt, and encrypted result as array buffers, then convert to base64.
 		const saltedLiteral = "Salted__";	// OpenSSL hardcoded.
 		const saltbytes = new TextEncoder().encode(saltedLiteral);
 		const two_salts = concatBuffer(saltbytes, salt);
 		// Merge salts with encoded ciphertext.
 		// encrypted_output_buf = Salted__(binary) + <random salt bytes> + <data cipherbytes>
-		const encrypted_output_buf = concatBuffer(two_salts, encrypted_result);
+		const encrypted_output_buf = concatBuffer(two_salts, ciphertext);
 		return encrypted_output_buf.toBase64();
-	}//encOpenSSL()
+	}//encryptOpenSSL()
 
 	// Our implementation of OpenSSL's decrypt function.
-	// Inputs: ciphertext64 is base64. pass is plaintext.
-	// Output: decrypted plaintext.
-	async function decOpenSSL(ciphertext64, pass, iter=10000, digest_hash="SHA-256", digest_algorithm="AES-CBC") {
+	// Inputs: ciphertext64 is base64. pass is cleartext.
+	// Output: decrypted cleartext.
+	async function decryptOpenSSL(ciphertext64, pass, iter=10000, digest_hash="SHA-256", digest_algorithm="AES-CBC") {
 
 		// Convert input base 64 to binary.
-		const ciphertextbytes = Uint8Array.fromBase64(ciphertext64);
+		const twoSaltsAndCiphertextUint8 = Uint8Array.fromBase64(ciphertext64);
 		// ciphertext is now in a form that is ready to give to the encryption function.
 
 		// Prepare inputs for digest.
 		//const digest_hash = 'SHA-256';
 		//const iter = 10000;
 		// Salt has been preserved from encrypt. Pull digits from their place in the ciphertext.
-		const salta = ciphertextbytes.slice(8,16);
+		const salta = twoSaltsAndCiphertextUint8.slice(8,16);
 		const salt = new Uint8Array(salta);
 
 		// Use the key derivation function PBKDF2 to derive bits that will 
 		// be used to create the cryptoKey object needed for the main digest.
-		const encoded_pass = new TextEncoder().encode(pass);
-		const keyMaterial = await getKeyMaterial(encoded_pass);
-		const derived_bits = await window.crypto.subtle.deriveBits(
+		const passwordUint8 = new TextEncoder().encode(pass);
+		const keyForPBKDF2 = await getKeyMaterial(passwordUint8);
+		const keyAndIVBits = await window.crypto.subtle.deriveBits(
 			{
 				name: "PBKDF2",
 				salt,
 				iterations: iter,
 				hash: digest_hash,
 			},
-			keyMaterial,
+			keyForPBKDF2,
 			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,
 		);
-		const derivedKeyBuffer = new Uint8Array(derived_bits);
+		const keyAndIvBitsUint8 = new Uint8Array(keyAndIVBits);
 
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
-		const ivbytes = derivedKeyBuffer.slice(32);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
 
 		// Extract the encrypted phrase (data) from OpenSSL input
-		const cipherbytesphrase = ciphertextbytes.slice(16);
+		const ciphertextUint8 = twoSaltsAndCiphertextUint8.slice(16);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw', 
-			keyBytes, 
+			keyBytesUint8, 
 			{
 				//name: 'AES-CBC', 
 				name: digest_algorithm, 
@@ -5883,23 +5863,23 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		);
 
 		// MDN syntax: decrypt(algorithm, key, data)
-		const decrypted_result = await window.crypto.subtle.decrypt({ name: digest_algorithm, iv: ivbytes }, key, cipherbytesphrase);
-		const log_decrypted_result = new Uint8Array(decrypted_result);
+		const decryptedCleartext = await window.crypto.subtle.decrypt({ name: digest_algorithm, iv: ivBytesUint8 }, key, ciphertextUint8);
+		const log_decryptedCleartext = new Uint8Array(decryptedCleartext);
 		// Convert bytes to string.
-		let decrypted_string = new TextDecoder().decode( decrypted_result );
+		let cleartextString = new TextDecoder().decode( decryptedCleartext );
 		// Pop single newline added in enc (openssl emulation).
-		decrypted_string = decrypted_string.substring(0, decrypted_string.length - 1);
-		return decrypted_string;
-	}//decOpenSSL()
+		cleartextString = cleartextString.substring(0, cleartextString.length - 1);
+		return cleartextString;
+	}//decryptOpenSSL()
 
-	// Process plaintext password into a Key Object usable by subtlecrypto functions.
+	// Process cleartext password into a Key Object usable by subtlecrypto functions.
 	// Input: Plaintext password.
 	// Output: Subtlecrypto usable Key Object.
-	function getKeyMaterial(encoded_pass) {
+	function getKeyMaterial(passwordUint8) {
 		// importKey(format, keyData, algorithm, extractable, keyUsages)
 		return window.crypto.subtle.importKey(
 			"raw",
-			encoded_pass,	// plaintext -> binary
+			passwordUint8,	// cleartext -> binary
 			"PBKDF2",
 			//algo,
 			false,
@@ -6028,7 +6008,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		const keyMaterial = await window.crypto.subtle.importKey(
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
 			"PBKDF2",			// Key derivation algorithm to be used.
@@ -6045,27 +6025,27 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				iterations: 10000,				// strength
 				hash: 'SHA-256',				// 
 			},
-			keyMaterial,						//
-			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 96 for random IV as specified NIST SP800-38D Section 8.2.
+			keyForPBKDF2,						//
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 96 for random IV as specified NIST SP800-38D Section 8.2.
 		);
 		// Split the derived bits into key and iv for the encrypt call.
-		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
 		// Take first 256 bits derived from deriveBits above for the cryptoKey.
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
 		// 256 bits for key, 96 bits for IV for GCM.
 		// |-keyBytes-| |-IV-| (where X is 32 bit chunk)
 		//  xxxx xxxx 	 x x x  			
 		//
 		// AES-CTR parameters described here:
 		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
-		const ivBytes = derivedKeyBuffer.slice(32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-GCM 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let keyGCM = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytes, 				// keydata: input data
+			keyBytesUint8, 				// keydata: input data
 			{						// algorithm to use to importKey
 				name: 'AES-GCM', 
 				length: 256			// Length in bits of input.
@@ -6080,7 +6060,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
 		// MDN syntax: encrypt(algorithm, key, data)
 		const inputTypeUint8 = new TextEncoder().encode(inputType);
-        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, cleartextUint8);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytesUint8, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, cleartextUint8);
 
         //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
@@ -6106,7 +6086,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		const keyMaterial = await window.crypto.subtle.importKey(
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
 			"PBKDF2",			// Key derivation algorithm to be used.
@@ -6122,21 +6102,21 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				iterations: 10000,				// exectute hash function this maniy times
 				hash: 'SHA-256',				// digest algorithm
 			},
-			keyMaterial,						// input data as cryptoKey object
-			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			keyForPBKDF2,						// input data as cryptoKey object
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 
-		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
 		// 96 IV bits for GCM
-		const ivBytes = derivedKeyBuffer.slice(32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let keyGCM = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytes, 				// keydata: input data
+			keyBytesUint8, 				// keydata: input data
 			{						// algorithm to use to importKey
 				name: 'AES-GCM', 
 				length: 256			// Length in bits of input.
@@ -6148,7 +6128,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// MDN syntax: decrypt(algorithm, key, data)
 		//const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
 		const outputTypeUint8 = new TextEncoder().encode(outputType);
-        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, encodedCiphertextUint8);
+        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytesUint8, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, encodedCiphertextUint8);
 
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
@@ -6191,7 +6171,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		const keyMaterial = await window.crypto.subtle.importKey(
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
 			"PBKDF2",			// Key derivation algorithm to be used.
@@ -6208,13 +6188,13 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				iterations: 10000,				// strength
 				hash: 'SHA-256',				// 
 			},
-			keyMaterial,						//
-			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			keyForPBKDF2,						//
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 		// Split the derived bits into key and iv for the encrypt call.
-		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
 		// Take first 256 bits derived from deriveBits above for the cryptoKey.
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
 		// Here using same derivation method as for AES-CBC's Initialization Vector.
 		// AES-CTR uses a nonce and a counter block which seems to do a similar thing to an IV. 
 		// Take the rest of the bits (should be 128)
@@ -6226,14 +6206,14 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		//
 		// AES-CTR parameters described here:
 		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
-		const nonceAndCounterBytes = derivedKeyBuffer.slice(32);
+		const nonceAndCounterBytes = keyAndIvBitsUint8.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytes, 				// keydata: input data
+			keyBytesUint8, 				// keydata: input data
 			{						// algorithm to use to importKey
 				name: 'AES-CTR', 
 				length: 256			// Length in bits of input.
@@ -6273,7 +6253,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		const keyMaterial = await window.crypto.subtle.importKey(
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
 			"PBKDF2",			// Key derivation algorithm to be used.
@@ -6289,21 +6269,21 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				iterations: 10000,				// strength
 				hash: 'SHA-256',				// 
 			},
-			keyMaterial,						//
-			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytes and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			keyForPBKDF2,						//
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
 
-		const derivedKeyBuffer = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
-		const keyBytes = derivedKeyBuffer.slice(0, 32);
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
 		// 64 nonce bytes with 64 counter block bytes.
-		const nonceAndCounterBytes = derivedKeyBuffer.slice(32);
+		const nonceAndCounterBytes = keyAndIvBitsUint8.slice(32);
 
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytes, 				// keydata: input data
+			keyBytesUint8, 				// keydata: input data
 			{						// algorithm to use to importKey
 				name: 'AES-CTR', 
 				length: 256			// Length in bits of input.
@@ -6342,7 +6322,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Encrypt stack used in the case user chooses Browser.
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData) {
 		// OpenSSL Encrypt (base 64 encoded)
-		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
+		const opensslEncrypted = await encryptOpenSSL(cleartextData, opensslPass);
 		checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Obfuscation Step 1 Encrypt
 		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
@@ -6365,13 +6345,13 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData) {
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
-		const cleartext = await decOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
+		const cleartext = await decryptOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
 		return cleartext;
 	}// decryptTriple()
 
 
 	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
-	// Inputs: plaintext.
+	// Inputs: cleartext.
 	// Output: hexadecimal.
 	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
 		// Convert to lowercase.
