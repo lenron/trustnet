@@ -987,51 +987,58 @@
 
 	// Base 64 encoding as standardized in RFC 4648: https://datatracker.ietf.org/doc/html/rfc4648#section-4
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	// Single Record (TOTAL_RECORD_LENGTH) in bytes:
-	//        43	       1024
-	// |--fingerprint--||--Data--|
-
-	// Hand calculated constants.
-	const FINGERPRINT_BYTE_LENGTH = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
+	// User input limits.
 	const BROWSERINPUT_LENGTH_LIMIT = 686; // User input size limit in bytes for Triple Cipher.
 	const CMDINPUT_LENGTH_LIMIT = 710; // Limit for Double Cipher.
+	// PBKDF2 number-of-bits-to-derive constants.
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384; // 256 bits for key + 128 for IV
 	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352; // 256 bits for key + 96 for IV
 	const KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR = 384; // 256 bits for key + 128 for (nonce + counter)
-	const MAX_POINTER_VALUE = 999; // For offline database.
-	const PASSLOCK_LENGTH = 36; // Length of a typical UUID.
+	const PASSLOCK_LENGTH = 36; // Length of a typical UUID, used to check validity of passlocks.
 	// JS native timeout function uses miliseconds.
-	const FIVE_SECONDS_INTHOUSANDTHS = 5000;
-	const TEN_SECONDS_INTHOUSANDTHS = 10000;
-	const FOUR_MINUTES_THIRTY_SECONDS_INTHOUSANDTHS = 270000;
-	const FIVE_MINUTES_INTHOUSANDTHS = 300000;
+	const FIVE_SECONDS_THOUSANDTHS = 5000;
+	const TEN_SECONDS_THOUSANDTHS = 10000;
+	const FOUR_MINUTES_THIRTY_SECONDS_THOUSANDTHS = 270000;
+	const FIVE_MINUTES_THOUSANDTHS = 300000;
 	// GCM 'tag' or 'sig' or 'signature' or 'checksum' used by GCM enc/dec function to validate data.
-	const GCM_TAGLENGTH = 120; // 120 bits is 8 less than default but still valid spec recommendation.
+	const GCM_TAGLENGTH_BITS = 120; // 120 bits is 8 less than default but still valid spec recommendation.
 	const SALT_SIZE_BYTES = 18; // Chosen by balancing space with cryptographic strength.
-	// Used for derivations.
-	const FINGERPRINT_LENGTH = 43;
+	// Offline databse holds 1000 records, 0-999.
+	const MAX_POINTER_VALUE = 999; // For offline database.
+	const FINGERPRINT_LENGTH_BASE64 = 43;
+	const FINGERPRINT_LENGTH_BYTES = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
 	// Triple encrypted data size 1024 chosen for beauty, proxmixity to 1000.
-	const TRIPLE_ENCRYPTED_DATA_LENGTH = 1024;
-	// Used for offline database ordering.
+	const FULLY_ENCRYPTED_DATA_LENGTH_BASE64 = 1024;
+	const FULLY_ENCRYPTED_DATA_LENGTH_BYTES = FULLY_ENCRYPTED_DATA_LENGTH_BASE64 * (3/4);  // 786
+	// Single Record (TOTAL_RECORD_LENGTH_BASE64) in base64:
+	//        43	       1024
+	// |--fingerprint--||--Data--|
+	// TOTAL_RECORD_LENGTH_BASE64 used for offline database ordering.
 	// fingerprint length + data record length (in base64) = 1067
-	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + TRIPLE_ENCRYPTED_DATA_LENGTH; // 1067
-	const BYTE_LENGTH_EQUIVALENT_1024_BASE64 = TRIPLE_ENCRYPTED_DATA_LENGTH * (3/4);  // 786
+	const TOTAL_RECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + FULLY_ENCRYPTED_DATA_LENGTH_BASE64; // 1067
 	// Cryptographic salt, tag length derivations.
-	const AESCTR_SALT_SIZE_B64 = SALT_SIZE_BYTES * (4/3); // 24
-	const GCM_SIG_SIZE_BYTES = GCM_TAGLENGTH / 8; // 120 bits / 8 = 15 bytes
-	const GCM_SIG_SIZE_B64 = GCM_SIG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to b64 = 24
-	const GCM_SALT_SIZE_B64 = AESCTR_SALT_SIZE_B64; // Currently using same salt of 24 base64 / 18 bytes.
-	// The final of 3 encryptions, AESCTR output is triple encrypted output.
-	const AESCTR_OUTPUT_LIMIT_B64 = TRIPLE_ENCRYPTED_DATA_LENGTH; // Triple encrypted size chosen as 1024 for beauty, close to 1000.
+	const AESCTR_SALT_SIZE_BASE64 = SALT_SIZE_BYTES * (4/3); // 24
+	const GCM_SIG_SIZE_BYTES = GCM_TAGLENGTH_BITS / 8; // 120 bits / 8 = 15 bytes
+	const GCM_SIG_SIZE_BASE64 = GCM_SIG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to base64 = 24
+	const GCM_SALT_SIZE_BASE64 = AESCTR_SALT_SIZE_BASE64; // Currently using same salt length of 24 base64 / 18 bytes.
+	// The final of 3 encryptions, AESCTR output length === triple encrypted output length.
+	const AESCTR_OUTPUT_LIMIT_BASE64 = FULLY_ENCRYPTED_DATA_LENGTH_BASE64; // Triple encrypted size chosen as 1024 for beauty, proximity to 1000.
 	// Not sure if it makes sense to derive this. Should be 1000.
-	const OBF1000_OUTPUT_LIMIT_B64 = TRIPLE_ENCRYPTED_DATA_LENGTH - AESCTR_SALT_SIZE_B64; // OBF1000 outputs 1000 chars or error.
+	const OBF1000_OUTPUT_LIMIT_BASE64 = FULLY_ENCRYPTED_DATA_LENGTH_BASE64 - AESCTR_SALT_SIZE_BASE64; // OBF1000 outputs 1000 chars or error.
 	// OpenSSL output is limited by the data length that will decrypt safely when fed into OBF1000.
 	// Although because of CBC blocking, the effective limit is 704, which is the output size with an input size of 686, our main site user input limit.
 	// This gives us a bit of 'room' or unused space that feels like will make our Triple Cipher even less likely to lose data.
 	// Output in base64 is (1000 - 20 - 24) * (4/3) convert to bytes - 7 Bytes for 7 byte set. Anything above this value will result in error.
-	const OBF1000_MAX_INPUT_BYTES = (OBF1000_OUTPUT_LIMIT_B64 - GCM_SIG_SIZE_B64 - GCM_SALT_SIZE_B64) * 3 / 4 - 7;
+	const OBF1000_MAX_INPUT_BYTES = (OBF1000_OUTPUT_LIMIT_BASE64 - GCM_SIG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64) * 3 / 4 - 7;
+console.log("OBF1000_MAX_INPUT_BYTES: ", OBF1000_MAX_INPUT_BYTES );
 	// Use both to size the OBF1000 data + payload array and limit size of input.
-	const OBF1000_MAX_INPUT_LIMIT_B64 = OBF1000_MAX_INPUT_BYTES * 4 / 3;
+	const OPENSSL_OUTPUT_LIMIT_BASE64 = OBF1000_MAX_INPUT_BYTES * 4 / 3;
+console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
+
+
+	//////////////////////////////////////////////////////////////
+	//                The onload Function                       //
+	//////////////////////////////////////////////////////////////
 
 	// Automatically run this function on page load.
 	window.onload = async function() {
@@ -1138,7 +1145,7 @@
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
 				hideAllCopiedEncryptCommandInform();
-			}, FIVE_SECONDS_INTHOUSANDTHS); 
+			}, FIVE_SECONDS_THOUSANDTHS); 
 		} catch (error) {
 			console.error(error.message);
 		}
@@ -1169,7 +1176,7 @@
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
 				hideAllCopiedDecryptCommandInform();
-			}, FIVE_SECONDS_INTHOUSANDTHS); 
+			}, FIVE_SECONDS_THOUSANDTHS); 
 		} catch (error) {
 			console.error(error.message);
 		}
@@ -1290,7 +1297,7 @@
 
 	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
 	let showPageFlag = 'true';
-	function goBackProgrammaticallyXandDontTriggerPopstateShowPage(numPlaces) {
+	function goBackProgrammaticallyXandDontFireShowPage(numPlaces) {
 		showPageFlag = 'false';
 		//console.log('going back X places:', numPlaces);
 		//console.log("Current history stack", window.history);
@@ -1405,9 +1412,7 @@
 
 
 	///////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////
 	//                       Offline Database Creation                               //
-	///////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////
 
 	// Object to gather set of records to be stored in a new offline database (Option 1).
@@ -1433,14 +1438,14 @@
 		console.log("inputID " +  inputId);
 		console.log(passlockedData);
 		// All user passwords should be ready at this point. Compute Fingerprint.
-		const fingerprint = await getFpForAccess();
+		const fingerprint = await computeFpForAccess();
 		const encryptedData = await serverLoad(fingerprint);
 		// Change history 'pointer' to top of flow once job/operation executed.
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
+		goBackProgrammaticallyXandDontFireShowPage(3);
 		// Check that data is valid.
 		if (encryptedData === "TOO_MANY_ACCESS_FAILURES") {
 			showPage('too_many_access_failures');
-		} else if (encryptedData.length !== TRIPLE_ENCRYPTED_DATA_LENGTH || !checkBase64Chars(encryptedData)) {
+		} else if (encryptedData.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(encryptedData)) {
 			showPage('failed_to_access_for_new_offline_database_creation');
 		} else {
 			// Push fp, data to recordListForNewOfflineDBase collector object.
@@ -1486,8 +1491,8 @@
 
 	function storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, encryptedData, offlineDatabase) {
 		// Multiplying moves us to record at pointer.
-		const recordStart = pointer * TOTAL_RECORD_LENGTH;
-		const recordEnd = recordStart + TOTAL_RECORD_LENGTH;
+		const recordStart = pointer * TOTAL_RECORD_LENGTH_BASE64;
+		const recordEnd = recordStart + TOTAL_RECORD_LENGTH_BASE64;
 		// Compile replacement database. 
 		return offlineDatabase.substring(0, recordStart) + fingerprint + encryptedData + offlineDatabase.substring(recordEnd);
 	}// storeFingerprintAndDataToOfflineDBase()
@@ -1548,13 +1553,13 @@
 
 	function getRandData() {
 		// Pick a value that will convert into 1024 base64 chars.
-		const randarray = window.crypto.getRandomValues(new Uint8Array(BYTE_LENGTH_EQUIVALENT_1024_BASE64));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(FULLY_ENCRYPTED_DATA_LENGTH_BYTES));
 		return randarray.toBase64();
 	}// getRandData()
 
 	function getRandFingerprint() {
 		// 32 bytes is the output of SHA-256
-		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_BYTE_LENGTH));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_LENGTH_BYTES));
 		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
 		return randarray.toBase64({omitPadding: true});
 	}// getRandFingerprint()
@@ -1563,7 +1568,7 @@
 	function getRandDatabase() {
 		// Each record has 43 base64 chars for fingerprint and 1024 chars for the data.
 		// There are 1000 records, so 1000*(1024+43) = 1,067,000 base64 chars.
-		const TOTAL_BASE64_CHARS = 1000 * (TRIPLE_ENCRYPTED_DATA_LENGTH + FINGERPRINT_LENGTH);
+		const TOTAL_BASE64_CHARS = 1000 * (FULLY_ENCRYPTED_DATA_LENGTH_BASE64 + FINGERPRINT_LENGTH_BASE64);
 		// So we need 1067000 base64 chars * (3 raw bytes/4 base 64 chars) = 800250 raw bytes from subtle crypto.
 		const TOTAL_RAW_BYTES_NEEDED = TOTAL_BASE64_CHARS * (3/4);
 //hconsole.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
@@ -1611,10 +1616,10 @@
 		return randnum[0];
 	}// randInt()
 
-	// Returns true if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
+	// Returns true if input has precisely FINGERPRINT_LENGTH_BASE64 (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint) {
-		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
-		const regex = new RegExp(`^[A-Za-z0-9+/=]{${FINGERPRINT_LENGTH}}$`);
+		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH_BASE64 can be passed in.
+		const regex = new RegExp(`^[A-Za-z0-9+/=]{${FINGERPRINT_LENGTH_BASE64}}$`);
 		if (regex.test(fingerprint)) {
 			return true;
 		}else{
@@ -1622,9 +1627,9 @@
 		}
 	}// checkFingerprintIsValid()
 
-	// Returns true if input has precisely TRIPLE_ENCRYPTED_DATA_LENGTH (1024) base64 chars.
+	// Returns true if input has precisely FULLY_ENCRYPTED_DATA_LENGTH_BASE64 (1024) base64 chars.
 	function checkDataIsValid(data) {
-		const regex = new RegExp(`^[A-Za-z0-9+/=]{${TRIPLE_ENCRYPTED_DATA_LENGTH}}$`);
+		const regex = new RegExp(`^[A-Za-z0-9+/=]{${FULLY_ENCRYPTED_DATA_LENGTH_BASE64}}$`);
 		if (regex.test(data)) {
 			return true;
 		}else{
@@ -1647,9 +1652,11 @@
 			console.log("DATA IS VALID!");
 		}
 	}
+
 	//////////////////////////////////////////////////////////////
-	//                   Passlock Functions                     //
+	//     Passlock and User-Crypto Interface Functions         //
 	//////////////////////////////////////////////////////////////
+
 	// Global browser_id variable to be used for accessing passlock, 
 	let browserId = null;
 	// Keep track of running timeout.
@@ -1762,13 +1769,13 @@
 			// Delete passlock.
 			resetPasslock();
 			//console.log("5 mintue Timeout elapsed! Data session expired!");
-		}, FIVE_MINUTES_INTHOUSANDTHS); // Five minutes.
+		}, FIVE_MINUTES_THOUSANDTHS); // Five minutes.
 		//console.log("Starting passlock timeout! timeoutId: " + timeoutId);
 		// Set warning timeout to 30 seconds before hard timeout.
 		warningTimeoutId = setTimeout(() => {
 			// Show warning overlay so user can click to extend timeout.
 			document.getElementById("timeout_warning_overlay").style.display = "flex";
-		}, FOUR_MINUTES_THIRTY_SECONDS_INTHOUSANDTHS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
+		}, FOUR_MINUTES_THIRTY_SECONDS_THOUSANDTHS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
 		//}, 1000); // set for 1 second for debug.
 		//console.log("Setting Timeout Warning timeout! warningTimeoutId: " + warningTimeoutId);
 	}// setTimeoutAndWarning()
@@ -1855,7 +1862,7 @@
 		return cleartextSet;
 	}// passlockDecryptSet()
 
-	async function getFpAndDataForStore() {
+	async function computeFpAndDataForStore() {
 		// Get cleartext passwords for encryption.
 		const cleartextSet = await passlockDecryptSet();
 		const fingerprintAndData = {};
@@ -1868,11 +1875,11 @@
 			fingerprintAndData['data'] = await encryptDouble(cleartextSet['obf1000Pass'], cleartextSet['ctrPass'], cleartextSet['data']);
 		}
 		return fingerprintAndData;
-	}// getFpAndDataForStore()
+	}// computeFpAndDataForStore()
 
 	async function attemptCMDStore() {
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(7);
-		const fingerprintAndData = await getFpAndDataForStore();
+		goBackProgrammaticallyXandDontFireShowPage(7);
+		const fingerprintAndData = await computeFpAndDataForStore();
 		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 	}// attemptCMDStore()
@@ -1887,15 +1894,15 @@
 		// This ugly conditional is necessary for back functionality.
 		if (fromWrapper === 'true') {
 			// Got here from edit, use go back value for Access flow.
-			goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
+			goBackProgrammaticallyXandDontFireShowPage(3);
 			showPageFlag = 'true';
 		} else {
 			// Got here from Store flow.
-			goBackProgrammaticallyXandDontTriggerPopstateShowPage(9);
+			goBackProgrammaticallyXandDontFireShowPage(9);
 		}
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
-		const fingerprintAndData = await getFpAndDataForStore();
+		const fingerprintAndData = await computeFpAndDataForStore();
 		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], inputId);
 	}// attemptBrowserStore()
@@ -1913,21 +1920,21 @@
 		document.getElementById("save_button").style.display = "inline";
 	}// editData()
 
-	async function getFpForAccess() {
+	async function computeFpForAccess() {
 		// Get cleartext passwords for encryption.
 		const cleartextSet = await passlockDecryptSet();
 		const fingerprint = await computeFingerprint(cleartextSet['codeword'], cleartextSet['obf1000Pass'], cleartextSet['ctrPass']);
 		return fingerprint;
-	}// getFpForAccess()
+	}// computeFpForAccess()
 
 	async function attemptCMDAccess() {
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
-		const fingerprint = await getFpForAccess();
+		goBackProgrammaticallyXandDontFireShowPage(3);
+		const fingerprint = await computeFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
 		const encryptedData = await serverLoad(fingerprint);
 		if (encryptedData === "TOO_MANY_ACCESS_FAILURES") {
 			showPage('too_many_access_failures');
-		} else if (encryptedData.length !== TRIPLE_ENCRYPTED_DATA_LENGTH || !checkBase64Chars(encryptedData)) {
+		} else if (encryptedData.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(encryptedData)) {
 			showPage('failed_to_access');
 		}else{
 			showPage('access_file');
@@ -1956,16 +1963,16 @@
 	}// decryptAndDownloadFile()
 
 	async function attemptBrowserAccess(inputId) {
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(4);
+		goBackProgrammaticallyXandDontFireShowPage(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
-		const fingerprint = await getFpForAccess();
+		const fingerprint = await computeFpForAccess();
 		const encryptedData = await serverLoad(fingerprint);
 		// Report outcome of Access attempt.
 		if (encryptedData === "TOO_MANY_ACCESS_FAILURES") {
 			showPage('too_many_access_failures');
 			resetPasslock();
-		}else if (encryptedData.length !== TRIPLE_ENCRYPTED_DATA_LENGTH || !checkBase64Chars(encryptedData)) {
+		}else if (encryptedData.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(encryptedData)) {
 			showPage('failed_to_access');
 			resetPasslock();
 		}else{
@@ -2010,7 +2017,7 @@
 	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
 	// Output: functionality.
 	async function attemptDelete() {
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(4);
+		goBackProgrammaticallyXandDontFireShowPage(4);
 		// Load from server
 		const fingerprint = getStoredFp();
 		const deleteResponse = await serverDelete(fingerprint);
@@ -2058,6 +2065,8 @@
 	//////////////////////////////////////////////////////////////
 	//			Server Communication Functions				    //
 	//////////////////////////////////////////////////////////////
+	// Fetch based.
+	//
 
 	// Check if we're online or not and inform user.
 	async function updateOnlineStatus() {
@@ -2091,7 +2100,7 @@
 			console.log("response FAILED");
 			return "offline";
 		});
-		if ( fetchResponseObject.ok ) {
+		if (fetchResponseObject.ok) {
 			//console.log("Response from checkOnline() fetch() call = OK!");
 			return "online";
 		} else {
@@ -2227,7 +2236,7 @@
 			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND") {
 				console.log("serverLoad Error: " + responseObj.access_response);
 				return responseObj.access_response;
-			} else if (responseObj.access_response.length === TRIPLE_ENCRYPTED_DATA_LENGTH && checkBase64Chars(responseObj.access_response)) { // Data looks good.
+			} else if (responseObj.access_response.length === FULLY_ENCRYPTED_DATA_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.access_response;
 			} else {
@@ -2502,9 +2511,92 @@
 	}// serverDelete()
 
 
-	//////////////////////////////////////////////////////////////
-	//				Cryptographic Functions					    //
-	//////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//	       Data Pipeline / Cryptographic Functions		                                                                     //
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// We provide a 686- or 710-byte-size 'data locker' encrypted using 3 or 2 core cryptographic ciphers                        //
+	// and packed with additional security (if using the optional Offline Database) in order to implement our custom 			 //
+	// PGO Cipher and Security method offered on our website: (Pretty Good Obscurity).  										 //
+	// 																															 //
+	// Crypto explained below.																									 //
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Triple Cipher - 686 byte Input Limit
+	// User Input (Browser) ==> OpenSSL ==> OBF-1000 ==> AES-CTR ==> Database Storage
+	//
+	// User Input (Browser)
+	//    |<--------------686 byte check (input can be any unicode where a single char can need multiple bytes) - BROWSERINPUT_LENGTH_LIMIT
+	// OpenSSL (AES-CBC)
+	//    |<--------------946.6 base64 check - OPENSSL_OUTPUT_LIMIT_BASE64
+	// OBF-1000 (AES-GCM)
+	//    |<--------------1000 base64 check - OBF1000_OUTPUT_LIMIT_BASE64
+	// AES-CTR
+	//    |<--------------1024 base64 check - AESCTR_OUTPUT_LIMIT_BASE64
+	// Triple Encrypted 
+	//    |<--------------1024 base64 check - FULLY_ENCRYPTED_DATA_LENGTH_BASE64
+	// Database Storage (Server or Offline)
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Double Cipher - 710 byte Input Limit
+	// User Input (File Upload) ==> OBF-1000 ==> AES-CTR ==> Database Storage
+	//
+	// User Input (File Upload)
+	//    |<--------------710 byte check - CMDINPUT_LENGTH_LIMIT
+	// OBF-1000 (AES-GCM)
+	//    |<--------------1000 base64 check - OBF1000_OUTPUT_LIMIT_BASE64
+	// AES-CTR
+	//    |<--------------1024 base64 check - AESCTR_OUTPUT_LIMIT_BASE64
+	// Double Encrypted
+	//    |<--------------1024 base64 check - FULLY_ENCRYPTED_DATA_LENGTH_BASE64
+	// Database Storage (Server or Offline)
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Fully Encrypted Datapiece
+	//
+	// Triple Cipher:
+	//  |----------------------------------------------Fully Encrypted Datapiece----------------------------------------------------------------|
+	//     __________________________________________________________________________________________________________________________________
+	//    /_________________________________________________________________________________________________________________________ AES-CTR \
+	//   //             ___________________________________________________________________________          OBF-1000  		        \         \
+	//  //             /       OpenSSL          ___________________________                        \	     						 \         \
+	// // 7ByteHeader / Salted__ + Random Salt / Browser Cleartext Payload \ newline + CBC Blocking \      Random Filler     +  Salt  \  Salt   \
+	// |---7 Bytes---||-----8----||-----8-----||------Up to 686 Bytes-------||--1--||---1 to 16---||-(710 - OpenSSL Output)-||---18---||---18---|
+	// 
+	// Double Cipher:
+	// |--------------------------Fully Encrypted Datapiece--------------------------------|
+	//    ______________________________________________________________________________
+	//   /_______________________________________________________________________AES-CTR\
+	//  //             __________________________                  OBF-1000      \       \
+	// // 7ByteHeader /   File Upload Payload	 \      Random Filler     +  Salt \  Salt \
+	// |---7 Bytes---||-----Up to 710 Bytes------||--(710 - upload size)--||--18--||--18--|					
+	// 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// OpenSSL
+	// 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// OBF-1000 
+	// 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// AES-CTR
+	// 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// These functions make up the cryptographic core of PGO. We are using each of the 3 available ciphers in the subtle crypto library.
+	// Subtle crypto was chosen because of its wide availability and decades of 'experience', open source math functions that have been used over and over and thus vetted.
+	//
+	// OpenSSL was chosen for its wide availability.
+	// OBF-1000 blocks output to 1000 base64 characters.
+	//
+	// AES-CBC was chosen for its top security cipher.
+	// AES-GCM was chosen for its ability to validate data.
+	// AES-CTR stream cipher was chosen to be implemented without validation in order to make it unclear to an attacker if they crack the first level of cipher.
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:	
+	// Inputs:
+	// Outputs:
+	//
 	// Our implementation of OpenSSL's encrypt function.
 	// Inputs: Plaintext.
 	// Output: OpenSSL encrypted base64 string.
@@ -2581,6 +2673,11 @@
 		return encrypted_output_buf.toBase64();
 	}// encOpenSSL()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Our implementation of OpenSSL's decrypt function.
 	// Inputs: ciphertext64 is base64. pass is plaintext.
 	// Output: decrypted plaintext.
@@ -2645,6 +2742,11 @@
 		return decrypted_string;
 	}// decOpenSSL()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Process plaintext password into a Key Object usable by subtlecrypto functions.
 	// Input: Plaintext password.
 	// Output: Subtlecrypto usable Key Object.
@@ -2661,6 +2763,11 @@
 	}// getKeyMaterial()
 
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Default triple indicates this will be used in PGO triple stack.
 	async function encryptOBF1000(cleartext, password, inputType='triple') {
 		// Create byte array to hold cleartext data.
@@ -2687,6 +2794,11 @@
 		return gcmEncrypted64;
 	}// encryptOBF1000()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Default triple indicates this will be used in PGO triple stack.
 	async function decryptOBF1000(ciphertext64, password, outputType='triple') {
 		// Always output base64 for base encryption in 1000 wrapping context.
@@ -2708,6 +2820,11 @@
 		return decryptedCleartext;
 	}// decryptOBF1000()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	function addSaltedLiteral(inputDataUint8) {
 		// Get length of input data in number of bytes.
 		const dataLength = inputDataUint8.length;
@@ -2724,6 +2841,11 @@
 		return dataBytesWithSalt;
 	}// addSaltedLiteral()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	function unwrap7Byte(inputData64) {
 		inputDataUint8 = Uint8Array.fromBase64(inputData64);
 		// Slice off set of bytes that represent data length.
@@ -2736,8 +2858,15 @@
 		return dataBytes;
 	}// unwrap7Byte()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Input is a Uint8Array holding only the payload data.
 	// Output: 7Byte set + Data Payload + Random Filler
+	// Function Purpose: 
+	// Big Picture:
 	function wrap7Byte(inputDataUint8) {
 		// Get data payload length for 7byte calculation and to derive filler size.
 		const dataLength = inputDataUint8.length;
@@ -2765,7 +2894,11 @@
 		return dataWith7ByteSetAndRandFiller;
 	}// wrap7Byte()
 
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Replacing obf1000 with standard that natively offers authentication.
 	async function encryptGCM(cleartext, password, inputType='base64') {
 		//console.log("encryptOBF1000 called with inputType: " + inputType);
@@ -2841,7 +2974,7 @@
 		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
 		// MDN syntax: encrypt(algorithm, key, data)
 		const inputTypeUint8 = new TextEncoder().encode(inputType);
-        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH}, keyGCM, cleartextUint8);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, cleartextUint8);
 
         //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
@@ -2855,7 +2988,11 @@
 		return encrypted64;
 	}// encryptGCM()
 
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	async function decryptGCM(saltAndCiphertext, password, outputType='base64') {
 		// Convert password into bytes.
 		const passwordUint8 = new TextEncoder().encode(password);
@@ -2909,7 +3046,7 @@
 		// MDN syntax: decrypt(algorithm, key, data)
 		//const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
 		const outputTypeUint8 = new TextEncoder().encode(outputType);
-        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH}, keyGCM, encodedCiphertextUint8);
+        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, encodedCiphertextUint8);
 
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
@@ -2924,9 +3061,11 @@
 		return decryptedDecoded;
 	}// decryptGCM()
 
-
-
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 	// Output always packed into base64.
 	async function encryptAESCTR(cleartext, password, inputType='base64') {
@@ -3013,6 +3152,11 @@
 		return encrypted64;
 	}// encryptAESCTR()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Default usage sets output to base64.
 	// Input always packed as base64.
 	async function decryptAESCTR(saltAndCiphertext, password, outputType='base64') {
@@ -3085,39 +3229,43 @@
 		return decryptedDecoded;
 	}// decryptAESCTR()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose: Encryption stack for File Upload / CMD Line Input.
+	// Input:	Payload data (presumably encrypted) from user-uploaded file that's been converted to base64, 2 cleartext passwords.
+	// Output:	A Fully Encrypted Datapiece ready for database storage.
+	async function encryptDouble(obf1000Pass, ctrPass, fileDataBase64) {
+		const obf1000Encrypted = await encryptOBF1000(fileDataBase64, obf1000Pass);
+		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
 
-	// Encrypt stack used in the case user chooses command line.
-	async function encryptDouble(obf1000Pass, ctrPass, fileData) {
-		// Obfuscation Step 1 Encrypt
-		const obf1000Encrypted = await encryptOBF1000(fileData, obf1000Pass);
-		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_B64);
-		// Obfuscation Step 2 Encrypt
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
-		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_B64);
+		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_BASE64);
+
 		return ctrEncrypted;
 	}// encryptDouble()
 
-	// Encrypt stack used in the case user chooses Browser.
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:	Encrypt user data with the 3 PGO ciphers, converting cleartext to a Fully Encrypted piece of data ready for database storage.
+	// Input:	Cleartext user data from Browser textarea input, 3 cleartext passwords.
+	// Output:	A Fully Encrypted Datapiece ready for database storage.
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData) {
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
-		console.log("opensslEncrypted LENGTH: ", opensslEncrypted.length);
-		checkLengthAndBase64(opensslEncrypted, OBF1000_MAX_INPUT_LIMIT_B64);
-		console.log("OBF1000_MAX_INPUT_LIMIT_B64: ", OBF1000_MAX_INPUT_LIMIT_B64);
+		checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
 
-		// Obfuscation Step 1 Encrypt
 		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
-		console.log("obf1000Encrypted LENGTH: ", obf1000Encrypted.length);
-		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_B64);
+		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
 
-		// Obfuscation Step 2 Encrypt
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
-		console.log("ctrEncrypted LENGTH: ", ctrEncrypted.length);
-		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_B64);
+		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_BASE64);
 
 		return ctrEncrypted;
 	}// encryptTriple()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Decrypt stack used in the case user chooses Command Line.
 	async function decryptDouble(obf1000Pass, ctrPass, encryptedData) {
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
@@ -3125,6 +3273,11 @@
 		return obf1000Decrypted;
 	}// decryptDouble()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:
+	// Inputs:
+	// Outputs:
+	//
 	// Decrypt stack used in the case user chooses Browser.
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData) {
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
@@ -3134,32 +3287,9 @@
 	}// decryptTriple()
 
 
-	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
-	// Inputs: plaintext.
-	// Output: hexadecimal.
-	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
-		// Convert to lowercase.
-		const codewordLower = codeword.toLowerCase();
-		// Take SHA-256 hash of codeword, obf1_pass, obf2_pass
-		const enc = new TextEncoder();
-		const codewordBuf = enc.encode(codewordLower);
-		const obf1000PassBuff = enc.encode(obf1000Pass);
-		const ctrPassBuff = enc.encode(ctrPass);
-		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
-		const uint8 = new Uint8Array(codewordHash);
-		const cwh_b64 = uint8.toBase64();
-		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1000PassBuff);
-		const obf2pHash = await crypto.subtle.digest('SHA-256', ctrPassBuff);
-		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
-		const codeword_and_obf1pHash = concatBuffer(codewordHash, obf1pHash)
-		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
-		// SHA-256 hash the result.
-		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
-		const fingerprint = new Uint8Array(fingerprintHash);
-		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
-		const b64 = fingerprint.toBase64({omitPadding: true});
-		return b64;
-	}// computeFingerprint()
+	/////////////////////////////////////////////////////////////////////////
+	//					Check Functions									   //
+	/////////////////////////////////////////////////////////////////////////
 
 	// Return true if input only contains uuid chars which are used for passlock and browserID.
 	function checkUUIDChars(input) {
@@ -3234,12 +3364,10 @@
 		}
 	}// checkInputLengthUpload()
 
-	////////////////////////////////////////////////////////
+
 	////////////////////////////////////////////////////////
 	//				7Byte Functions                       //
 	////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////
-
 
 	// Find set of bytes that compute to an exact value.
 	function find7ByteSetForValue(targetValue) {
@@ -3289,23 +3417,36 @@
 		return Math.abs(eval(mathExpression));
 	}// eval7ByteValue()
 
-	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
-	// Inputs: pass is plaintext, length is an integer 
-	// Output: Uint8Array
-	async function getPassHash(passwordBytes, outputLength) {
-		// Take initial SHA256.
-		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
-		let	sha_result;
-		// Loop until we have more than the input length number of bytes of data.
-		do{
-			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
-			// Append SHA256 of Hash(n-1)
-			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
-		} while(sha_cumulative.length < outputLength);
-		// Truncate array to size <length>
-		sha_cumulative = sha_cumulative.slice(0, outputLength);
-		return sha_cumulative;
-	}// getPassHash()
+	//////////////////////////////////////////
+	//		Misc Functions					//
+	//////////////////////////////////////////
+
+	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
+	// Inputs: plaintext.
+	// Output: hexadecimal.
+	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
+		// Convert to lowercase.
+		const codewordLower = codeword.toLowerCase();
+		// Take SHA-256 hash of codeword, obf1_pass, obf2_pass
+		const enc = new TextEncoder();
+		const codewordBuf = enc.encode(codewordLower);
+		const obf1000PassBuff = enc.encode(obf1000Pass);
+		const ctrPassBuff = enc.encode(ctrPass);
+		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
+		const uint8 = new Uint8Array(codewordHash);
+		const cwh_b64 = uint8.toBase64();
+		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1000PassBuff);
+		const obf2pHash = await crypto.subtle.digest('SHA-256', ctrPassBuff);
+		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
+		const codeword_and_obf1pHash = concatBuffer(codewordHash, obf1pHash)
+		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
+		// SHA-256 hash the result.
+		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
+		const fingerprint = new Uint8Array(fingerprintHash);
+		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
+		const b64 = fingerprint.toBase64({omitPadding: true});
+		return b64;
+	}// computeFingerprint()
 
 	// Concatenates ArrayBuffers.
 	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
@@ -4246,44 +4387,44 @@
 	//        43	       1024
 	// |--fingerprint--||--Data--|
 	// Constant declarations.
-	const FINGERPRINT_LENGTH = 43;
-	const FINGERPRINT_BYTE_LENGTH = 32;
+	const FINGERPRINT_LENGTH_BASE64 = 43;
+	const FINGERPRINT_LENGTH_BYTES = 32;
 
 	// List everything that is contributing to that length.
 	// 24 b64 chars for CTR salt + 24 b64 chars for GCM salt + 20 b64 chars for GCM sig + 
 	// 
-	const TRIPLE_ENCRYPTED_DATA_LENGTH = 1024;
-	const TOTAL_RECORD_LENGTH = FINGERPRINT_LENGTH + TRIPLE_ENCRYPTED_DATA_LENGTH;
+	const FULLY_ENCRYPTED_DATA_LENGTH_BASE64 = 1024;
+	const TOTAL_RECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + FULLY_ENCRYPTED_DATA_LENGTH_BASE64;
 	const BROWSERINPUT_LENGTH_LIMIT = 686; // Should derive programmatically.
 	const CMDINPUT_LENGTH_LIMIT = 710; // Should derive perogrammatically.
-	//const BYTE_LENGTH_EQUIVALENT_1024_BASE64 = 768; // This number of bytes converts to exactly 1024 base64 chars.
-	const BYTE_LENGTH_EQUIVALENT_1024_BASE64 = TRIPLE_ENCRYPTED_DATA_LENGTH * (3/4); 
+	//const FULLY_ENCRYPTED_DATA_LENGTH_BYTES = 768; // This number of bytes converts to exactly 1024 base64 chars.
+	const FULLY_ENCRYPTED_DATA_LENGTH_BYTES = FULLY_ENCRYPTED_DATA_LENGTH_BASE64 * (3/4); 
 	//const BYTE_LENGTH_EQUIVALENT_1000_BASE64 = 750; // This number of bytes converts to exactly 1000 base64 chars.
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384; // 256 bits for key + 128 for IV
 	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352; // 256 bits for key + 96 for IV
 	const KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR = 384; // 256 bits for key + 128 for (nonce + counter)
 	const MAX_POINTER_VALUE = 999; // For offline database.
 	const PASSLOCK_LENGTH = 36; // Length of a typical UUID.
-	const FIVE_SECONDS_INTHOUSANDTHS = 5000;
-	const TEN_SECONDS_INTHOUSANDTHS = 10000;
-	const FOUR_MINUTES_THIRTY_SECONDS_INTHOUSANDTHS = 270000;
-	const FIVE_MINUTES_INTHOUSANDTHS = 300000;
+	const FIVE_SECONDS_THOUSANDTHS = 5000;
+	const TEN_SECONDS_THOUSANDTHS = 10000;
+	const FOUR_MINUTES_THIRTY_SECONDS_THOUSANDTHS = 270000;
+	const FIVE_MINUTES_THOUSANDTHS = 300000;
 
 	// 1024 total limit
 	const SALT_SIZE_BYTES = 18; // Chosen by balancing space with cryptographic strength.
-	const AESCTR_SALT_SIZE_B64 = SALT_SIZE_BYTES * (4/3);
-	const GCM_TAGLENGTH = 120; // 120 bits is 8 less than default but still under spec recommendation.
-	const GCM_SIG_SIZE_BYTES = GCM_TAGLENGTH / 8; // 120 bits / 8 = 15 bytes
-	const GCM_SIG_SIZE_B64 = GCM_SIG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to b64.
+	const AESCTR_SALT_SIZE_BASE64 = SALT_SIZE_BYTES * (4/3);
+	const GCM_TAGLENGTH_BITS = 120; // 120 bits is 8 less than default but still under spec recommendation.
+	const GCM_SIG_SIZE_BYTES = GCM_TAGLENGTH_BITS / 8; // 120 bits / 8 = 15 bytes
+	const GCM_SIG_SIZE_BASE64 = GCM_SIG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to b64.
 
-	const GCM_SALT_SIZE_B64 = AESCTR_SALT_SIZE_B64; // Currently using same salt of 24 base64 / 18 bytes.
-	const AESCTR_OUTPUT_LIMIT_B64 = TRIPLE_ENCRYPTED_DATA_LENGTH;
+	const GCM_SALT_SIZE_BASE64 = AESCTR_SALT_SIZE_BASE64; // Currently using same salt of 24 base64 / 18 bytes.
+	const AESCTR_OUTPUT_LIMIT_BASE64 = FULLY_ENCRYPTED_DATA_LENGTH_BASE64;
 	// 1024 - 24 base64 CTR salt
-	const OBF1000_OUTPUT_LIMIT_B64 = TRIPLE_ENCRYPTED_DATA_LENGTH - AESCTR_SALT_SIZE_B64;
+	const OBF1000_OUTPUT_LIMIT_BASE64 = FULLY_ENCRYPTED_DATA_LENGTH_BASE64 - AESCTR_SALT_SIZE_BASE64;
 	// - 24 base64 GCM salt
 	// - 20 base64 GCM sig
-	const OPENSSL_OUTPUT_LIMIT_B64 = OBF1000_OUTPUT_LIMIT_B64 - GCM_SIG_SIZE_B64 - GCM_SALT_SIZE_B64;
-	const SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL_BYTES = OPENSSL_OUTPUT_LIMIT_B64 * 3 / 4; // 
+	const OPENSSL_OUTPUT_LIMIT_BASE64 = OBF1000_OUTPUT_LIMIT_BASE64 - GCM_SIG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64;
+	const SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL_BYTES = OPENSSL_OUTPUT_LIMIT_BASE64 * 3 / 4; // 
 
 
 
@@ -4385,7 +4526,7 @@
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
 				hideAllCopiedEncryptCommandInform();
-			}, FIVE_SECONDS_INTHOUSANDTHS); 
+			}, FIVE_SECONDS_THOUSANDTHS); 
 		} catch (error) {
 			console.error(error.message);
 		}
@@ -4416,7 +4557,7 @@
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
 				hideAllCopiedDecryptCommandInform();
-			}, FIVE_SECONDS_INTHOUSANDTHS); 
+			}, FIVE_SECONDS_THOUSANDTHS); 
 		} catch (error) {
 			console.error(error.message);
 		}
@@ -4536,7 +4677,7 @@
 
 	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
 	let showPageFlag = 'true';
-	function goBackProgrammaticallyXandDontTriggerPopstateShowPage(numPlaces) {
+	function goBackProgrammaticallyXandDontFireShowPage(numPlaces) {
 		showPageFlag = 'false';
 		console.log('going back X places:', numPlaces);
 		console.log("Current history stack", window.history);
@@ -4652,13 +4793,13 @@
 	}
 
 	function getRandData() {
-		const randarray = window.crypto.getRandomValues(new Uint8Array(BYTE_LENGTH_EQUIVALENT_1024_BASE64));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(FULLY_ENCRYPTED_DATA_LENGTH_BYTES));
 		return randarray.toBase64();
 	}
 
 	function getRandFingerprint() {
 		// 32 bytes is the output of SHA-256
-		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_BYTE_LENGTH));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_LENGTH_BYTES));
 		return randarray.toBase64({omitPadding: true});
 	}
 
@@ -4690,10 +4831,10 @@
 		return randnum[0];
 	}
 // !@#
-	// Returns true if input has precisely FINGERPRINT_LENGTH (43) base64 chars.
+	// Returns true if input has precisely FINGERPRINT_LENGTH_BASE64 (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint) {
-		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH can be passed in.
-		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${FINGERPRINT_LENGTH}}$\`);
+		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH_BASE64 can be passed in.
+		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${FINGERPRINT_LENGTH_BASE64}}$\`);
 		if (regex.test(fingerprint)) {
 			return true;
 		}else{
@@ -4701,9 +4842,9 @@
 		}
 	}
 
-	// Returns true if input has precisely TRIPLE_ENCRYPTED_DATA_LENGTH (1024) base64 chars.
+	// Returns true if input has precisely FULLY_ENCRYPTED_DATA_LENGTH_BASE64 (1024) base64 chars.
 	function checkDataIsValid(data) {
-		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${TRIPLE_ENCRYPTED_DATA_LENGTH}}$\`);
+		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${FULLY_ENCRYPTED_DATA_LENGTH_BASE64}}$\`);
 		if (regex.test(data)) {
 			return true;
 		}else{
@@ -4721,8 +4862,8 @@
 	// Used for store when fingerprint does not exist. Pointer needed for this function. 
 	function storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, encryptedData, offlineDatabase) {
 		// Multiplying moves us to record at pointer.
-		const recordStart = pointer * TOTAL_RECORD_LENGTH;
-		const recordEnd = recordStart + TOTAL_RECORD_LENGTH;
+		const recordStart = pointer * TOTAL_RECORD_LENGTH_BASE64;
+		const recordEnd = recordStart + TOTAL_RECORD_LENGTH_BASE64;
 		// Compile replacement database. 
 		return offlineDatabase.substring(0, recordStart) + fingerprint + encryptedData + offlineDatabase.substring(recordEnd);
 	}
@@ -4736,7 +4877,7 @@
 			fingerprint = getRandFingerprint();
 			newData = getRandData();
 		}
-		const recordEnd = fingerprintStartIndex + TOTAL_RECORD_LENGTH;
+		const recordEnd = fingerprintStartIndex + TOTAL_RECORD_LENGTH_BASE64;
 		return offlineDatabase.substring(0, fingerprintStartIndex) + fingerprint + newData + offlineDatabase.substring(recordEnd);
 	}
 
@@ -4873,8 +5014,8 @@
 	// Retrieve one 1000-char data record from an offline database. 
 	function getRecordOfflineDBase(fingerprint, offlineDatabase) {
 		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
-		const fingerprintEndIndex = fingerprintStartIndex + FINGERPRINT_LENGTH;
-		const dataEndIndex = fingerprintEndIndex + TRIPLE_ENCRYPTED_DATA_LENGTH;
+		const fingerprintEndIndex = fingerprintStartIndex + FINGERPRINT_LENGTH_BASE64;
+		const dataEndIndex = fingerprintEndIndex + FULLY_ENCRYPTED_DATA_LENGTH_BASE64;
 		// Get the data between fingerprintEndIndex and dataEndIndex.
 		return offlineDatabase.substring(fingerprintEndIndex, dataEndIndex);
 	}
@@ -5006,8 +5147,8 @@
 	}
 
 	async function attemptCMDStoreOffline() {
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(7);
-		//const fingerprintAndData = await getFpAndDataForStore();
+		goBackProgrammaticallyXandDontFireShowPage(7);
+		//const fingerprintAndData = await computeFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const encryptedData = await encryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['data']);
 		let storeResponse;
@@ -5038,14 +5179,14 @@
 	async function attemptBrowserStoreOffline(inputId, fromWrapper) {
 		if (fromWrapper === 'true') {
 			// Got here from edit, use go back value for Access flow.
-			goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
+			goBackProgrammaticallyXandDontFireShowPage(3);
 			showPageFlag = 'true';
 		} else {
 			// Got here from Store flow.
-			goBackProgrammaticallyXandDontTriggerPopstateShowPage(9);
+			goBackProgrammaticallyXandDontFireShowPage(9);
 		}
 		extractInputDataOffline(inputId);
-		//const fingerprintAndData = await getFpAndDataForStore();
+		//const fingerprintAndData = await computeFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const encryptedData = await encryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], offlineData['data']);
 		let storeResponse;
@@ -5087,12 +5228,12 @@
 	}
 
 	async function attemptCMDAccessOffline() {
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(3);
+		goBackProgrammaticallyXandDontFireShowPage(3);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		// Add additional parameter?
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 
-		if (encryptedData === 'miss' || encryptedData.length !== TRIPLE_ENCRYPTED_DATA_LENGTH || !checkBase64Chars(encryptedData)) {
+		if (encryptedData === 'miss' || encryptedData.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(encryptedData)) {
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_file');
@@ -5102,14 +5243,14 @@
 	}
 
 	async function attemptSyncToOnline(inputId) {
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(2);
+		goBackProgrammaticallyXandDontFireShowPage(2);
 		// Get ctrPass - pass2.
 		extractInputDataOffline(inputId);
 		// First load encrypted data from offline database.
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 
-		if (encryptedData === 'miss' || encryptedData.length !== TRIPLE_ENCRYPTED_DATA_LENGTH || !checkBase64Chars(encryptedData)) {
+		if (encryptedData === 'miss' || encryptedData.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(encryptedData)) {
 			showPage('offlinefailed_to_access'); // Access fail is valid here?
 		}else{
 			//showPage('offlineaccess_file');
@@ -5157,7 +5298,7 @@
 	}// decryptAndDownloadFileOffline()
 
 	async function attemptBrowserAccessOffline(inputId) {
-		goBackProgrammaticallyXandDontTriggerPopstateShowPage(4);
+		goBackProgrammaticallyXandDontFireShowPage(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		extractInputDataOffline(inputId);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
@@ -5165,7 +5306,7 @@
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const encryptedData = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
-		if (encryptedData === 'miss' || encryptedData.length !== TRIPLE_ENCRYPTED_DATA_LENGTH || !checkBase64Chars(encryptedData)) {
+		if (encryptedData === 'miss' || encryptedData.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(encryptedData)) {
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_cleartext');
@@ -5207,9 +5348,7 @@
 	}//attemptDeleteOffline()
 
 	//////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////
 	//			Server Communication Functions				    //
-	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////
 
 	// Check if we're online or not and inform user.
@@ -5306,7 +5445,7 @@
 			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND") {
 				console.log("serverLoad Error: " + responseObj.access_response);
 				return responseObj.access_response;
-			} else if (responseObj.access_response.length === TRIPLE_ENCRYPTED_DATA_LENGTH && checkBase64Chars(responseObj.access_response)) { // Data looks good.
+			} else if (responseObj.access_response.length === FULLY_ENCRYPTED_DATA_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.access_response;
 			} else {
@@ -5405,7 +5544,7 @@
 			const responseObj = await fetchResponseObject.json();
 			//console.log(responseObj);
 			//console.log("Load responseObj.data: " + responseObj.data);
-			if (responseObj.data.length === TRIPLE_ENCRYPTED_DATA_LENGTH && checkBase64Chars(responseObj.data)) { // Data looks good.
+			if (responseObj.data.length === FULLY_ENCRYPTED_DATA_LENGTH_BASE64 && checkBase64Chars(responseObj.data)) { // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.data;
 			}else{
@@ -5472,9 +5611,9 @@
 		let fp_end;
 		let data_end;
 		for(let i=0; i < offline_dbase_pointer; i++ ) {
-			fp_start = i * TOTAL_RECORD_LENGTH;
-			fp_end = fp_start + FINGERPRINT_LENGTH;
-			data_end = fp_end + TRIPLE_ENCRYPTED_DATA_LENGTH;
+			fp_start = i * TOTAL_RECORD_LENGTH_BASE64;
+			fp_end = fp_start + FINGERPRINT_LENGTH_BASE64;
+			data_end = fp_end + FULLY_ENCRYPTED_DATA_LENGTH_BASE64;
 
 			offline_dbase_json_flat += '{"fingerprint":"' + offline_dbase.substring(fp_start, fp_end) + '",';
 			offline_dbase_json_flat += '"data":"' + offline_dbase.substring(fp_end, data_end) + '"},';
@@ -5570,6 +5709,7 @@
 	//////////////////////////////////////////////////////////////
 	//				Cryptographic Functions					    //
 	//////////////////////////////////////////////////////////////
+
 	// Our implementation of OpenSSL's encrypt function.
 	// Inputs: Plaintext.
 	// Output: OpenSSL encrypted base64 string.
@@ -5899,7 +6039,7 @@
 		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
 		// MDN syntax: encrypt(algorithm, key, data)
 		const inputTypeUint8 = new TextEncoder().encode(inputType);
-        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH}, keyGCM, cleartextUint8);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytes, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, cleartextUint8);
 
         //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
 		const encryptedUint8 = new Uint8Array(encryptedBuffer);
@@ -5967,7 +6107,7 @@
 		// MDN syntax: decrypt(algorithm, key, data)
 		//const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
 		const outputTypeUint8 = new TextEncoder().encode(outputType);
-        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH}, keyGCM, encodedCiphertextUint8);
+        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytes, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, encodedCiphertextUint8);
 
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
@@ -6148,13 +6288,13 @@
 
 
 	// Encrypt stack used in the case user chooses command line.
-	async function encryptDouble(obf1000Pass, ctrPass, fileData) {
+	async function encryptDouble(obf1000Pass, ctrPass, fileDataBase64) {
 		// Obfuscation Step 1 Encrypt
-		const obf1000Encrypted = await encryptOBF1000(fileData, obf1000Pass);
-		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_B64);
+		const obf1000Encrypted = await encryptOBF1000(fileDataBase64, obf1000Pass);
+		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
 		// Obfuscation Step 2 Encrypt
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
-		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_B64);
+		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_BASE64);
 		return ctrEncrypted;
 	}// encryptDouble()
 
@@ -6162,13 +6302,13 @@
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData) {
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encOpenSSL(cleartextData, opensslPass);
-		checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_B64);
+		checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Obfuscation Step 1 Encrypt
 		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
-		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_B64);
+		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
 		// Obfuscation Step 2 Encrypt
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
-		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_B64);
+		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_BASE64);
 		return ctrEncrypted;
 	}// encryptTriple()
 
@@ -6340,23 +6480,6 @@
 		return Math.abs(eval(mathExpression));
 	}
 
-	// Create a SHA-256 hash of the pass, then rehash and append to size: length.
-	// Inputs: pass is plaintext, length is an integer 
-	// Output: binary byte array (Uint8Array).
-	async function getPassHash(passwordBytes, outputLength) {
-		// Take initial SHA256.
-		let sha_cumulative = await crypto.subtle.digest('SHA-256', passwordBytes);
-		let	sha_result;
-		// Loop until we have more than the input length number of bytes of data.
-		do{
-			sha_result = await crypto.subtle.digest('SHA-256', sha_cumulative);
-			// Append SHA256 of Hash(n-1)
-			sha_cumulative = concatBuffer(sha_cumulative, sha_result);
-		} while(sha_cumulative.length < outputLength);
-		// Truncate array to size <outputLength>
-		sha_cumulative = sha_cumulative.slice(0, outputLength);
-		return sha_cumulative;
-	}//getPassHash()
 
 	// Concatenates ArrayBuffers.
 	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
