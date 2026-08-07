@@ -2558,7 +2558,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// PGO Multi Encrypted Datarecord - PMED
 	// PGO Multi Encrypted Datapiece - PMED - PME-Datapiece
 	// PGO Multi-Cipher
-	// PGO Multicipher Encrypted Datarecord
+	// PGO Multicipher Encrypted Datarecord - PGOMED - pmed
 	// 
 	// Double Cipher:
 	//     ________________________________________________________________________________________________________________________
@@ -2585,6 +2585,22 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
 	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted-----------------------------------------------------------------|
 	// |----------------------------------------------------------Fully Encrypted Datapiece----------------------------------------------------------------|
+	// 
+	// Triple Cipher:
+	//	*Note: Literal string 'Salted_' is removed in the Triple Encrypt process.
+	//       ___________________________________________________________________________________________________________________________
+	//      / AES-CTR __________________________________________________________________________________________________________________\ 
+	//     /         / OBF-1000 _____________________________________________________________________________________________           \\
+	//    /         /          /             _______________________________________________________________      AES-GCM    \           \\
+	//   /         /          /             / OpenSSL   ____________________________________________________\                 \           \\ 
+	//  /         /          /             /           /___________________________        AES-CBC          \\                 \           \\
+	// / CTR Salt/ GCM Salt / 7ByteHeader /  CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
+	// |---18---||----18---||---7 Bytes--||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
+	//                                    |------------------------------------------710 Bytes----------------------------------||-----15-----|
+	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
+	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted-----------------------------------||---GCM Tag--|
+	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted----------------------------------------------------|
+	// |----------------------------------------------------------Fully Encrypted Datapiece---------------------------------------------------|
 	// 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OpenSSL
@@ -2657,28 +2673,24 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//		  Usage:	 Output cipher used in next step of encryptTriple(), readying data for database storage.
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: 
-	//
+	// Base Functionality: Replicate OpenSSL command line functionality of command: openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
 	//		Details:	
 	//
-	//	Inputs structure:	cleartext64: 
-	//						password:	 human readable (utf8) cleartext
+	//	Inputs structure:	password:	 human readable cleartext
+	//						cleartext:	 User input from Browser textarea
 	//
-	//	Output structure:	
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
+	//	Output structure:	Salted__ + Random Salt + CBC encrypted ciphertext
 	//
-	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
+	// Big Picture: First step in pmed encryption. Constitutes entire OpenSSL step in 3-step encryption of a pmed.
 	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
-	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
+	//	source:		 cleartext: User input
+	//				 password:  User input
 	//	
-	//
+	//	destination: encryptOBF1000()
 	//
 	async function encryptOpenSSL(cleartext, password) {
 		// Encode cleartext in utf8 and store in Uint8Array cleartextUint8.
+		// Convert JS string into utf8 bytes and place in Uint8Array.
 		const cleartextUint8 = new TextEncoder().encode(cleartext);
 		// Replicate Linux command line's version of OpenSSL by appending a single newline, effectively changing cleartext input to a Linux file.
 		const singleNewlineUint8 = new Uint8Array(1);
@@ -2762,25 +2774,20 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//		  Usage:		Final step in decryptTriple() or used to decrypt passlock data.
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: 
-	//
+	// Base Functionality: Replicate OpenSSL command line functionality of command: openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt
 	//		Details:	
 	//
-	//	Inputs structure:	cleartext64: 
-	//						password:	 human readable (utf8) cleartext
+	//	Inputs structure:	password:	 human readable cleartext
+	//						ciphertext64:	Salted__ + Random Salt + CBC encrypted ciphertext
 	//
-	//	Output structure:	
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
+	//	Output structure:	decrypted cleartext
 	//
-	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
+	// Big Picture: Last step in pmed decryption. Constitutes entire OpenSSL step in 3-step decryption of a pmed.
 	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
-	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
+	//	source:		 ciphertext64: decryptOBF1000()
+	//				 password:  User input
 	//	
-	//
+	//	destination: Show user cleartext that they have just decrypted.
 	//
 	async function decryptOpenSSL(ciphertext64, password) {
 		// Convert base64 input into Uint8Array.
@@ -2859,26 +2866,26 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Output Structure: 1000 base64 characters of ciphertext encrypted using AES-GCM algorithm.
 	//		  Usage:	 Next step in pipeline is AES-CTR encryption step.
 	//
+	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: 
+	// Base Functionality: Produce 1000 base64 chars of AES-GCM ciphertext from cleartext, password input data. The input data will be padded with random filler if necessary.
+	//		Details:	First adds 7ByteHeader, Random Filler if needed, then encrypts with AES-GCM.
 	//
-	//		Details:	
+	//	Inputs structure:	password:	 human readable cleartext
+	//						cleartext64: Salted__ + Random Salt + CBC encrypted ciphertext
+	//									 |-8 Bytes-||--8 Bytes--||---Up to 696 Bytes-----|
+	//						
+	//	Output structure:	|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//				OR:
+	//						|--18 Bytes GCM Salt--||---------(Number of Input Bytes) Bytes Ciphertext----------||-15 Byte GCM Tag-|
 	//
-	//	Inputs structure:	cleartext64: 
-	//						password:	 human readable (utf8) cleartext
+	// Big Picture:		Takes input from encryptOpenSSL() and passes output to encryptAESCTR().
+	//					This step provides the cryptographic blocking for the pmed.
 	//
-	//	Output structure:	
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
-	//
-	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
-	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
-	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
+	//	source:			encryptOpenSSL()
+	//	destination:	encryptAESCTR()
 	//	
-	//
+	//	usage:			encryptDouble(), encryptTriple()
 	//
 	async function encryptOBF1000(cleartext64, password, inputType='triple') {
 		// Create byte array to hold cleartext data.
@@ -2923,33 +2930,22 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                                           |--7 Bytes-|  |--------710 Bytes-------------|
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// OBF-1000 Internal Function
+	// OBF-1000 Internal Function - both source and destination.
 	//
-	// Base Functionality: 
-	//
+	// Base Functionality: Add a 7ByteHeader representing the length of the data and also pad with random filler to satisfy output length of 1000 base64 chars.
 	//		Details:	
 	//
-	//	Inputs structure:	cleartext64: 
-	//						password:	 human readable (utf8) cleartext
+	//	Inputs structure:	inputDataUint8: Uint8Array containing data to be encrypted.
+	//						If this is a PGO-Multi-Encrypted, it will be OpenSSL output sans salted literal: Salted__ which is removed by encryptOBF1000.
 	//
-	//	Output structure:	
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
-	//
-	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
-	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
-	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
-	//	
-	//
+	//	Output structure:	 7ByteHeader + Input Data Payload + Random Filler 
+	//						 |--7 Bytes--||------------710 Bytes-------------| 	
 	//
 	function wrapWith7ByteAndFiller(inputDataUint8) {
 		// Get data payload length for 7byte calculation and to derive filler size.
 		const dataLength = inputDataUint8.length;
 		// Get a 7Byte set that represents the payload dataLength.
-		const sevenByteSetUint8 = find7ByteSetForValue(dataLength);
+		const sevenByteHeaderUint8 = find7ByteSetForValue(dataLength);
 		// The randomly generated filler 'fills up' the remaining space when data payload length is less than 710.
 		// This is calculated using the following relation where 710 is the maximum data length:
 		// 710 = Data Payload Length + Random Filler Length
@@ -2961,7 +2957,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// This array can be no larger than 717 bytes to meet the 1000 base64 char output limit.
 		let dataWith7ByteSetAndRandFiller = new Uint8Array(OBF1000_MAX_INPUT_BYTES + 7);
 		// 7Byte set goes at the front of the final array.
-		dataWith7ByteSetAndRandFiller.set(sevenByteSetUint8, 0);
+		dataWith7ByteSetAndRandFiller.set(sevenByteHeaderUint8, 0);
 		// Next comes payload data.
 		dataWith7ByteSetAndRandFiller.set(inputDataUint8, 7);
 		// Remaining space gets the randomly generated filler.
@@ -2989,26 +2985,26 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Output Structure: 'Cleartext' in the form of OpenSSL ciphertext (Salted__ + CBC Salt + CBC Ciphertext) that is ready to be decryptOpenSSL()'d
 	//		  Usage:	 Next step in pipeline is OpenSSL decryption step.
 	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: 
 	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Decrypt AES-GCM ciphertext, remove 7ByteHeader and Random Filler, replace Salted__ literal if using for pmed.
 	//		Details:	
 	//
-	//	Inputs structure:	cleartext64: 
-	//						password:	 human readable (utf8) cleartext
+	//	Inputs structure:	password:	 human readable cleartext
+	//						ciphertext64: 
+	//										|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//								OR:
+	//										|--18 Bytes GCM Salt--||---------(Number of Input Bytes) Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//									 
+	//						
+	//	Output structure:	Salted__ + CBC Salt + CBC Ciphertext
 	//
-	//	Output structure:	
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
+	// Big Picture:			Middle step in pmed pipeline.	
 	//
-	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
-	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
-	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
+	//	source:			decryptAESCTR()
+	//	destination:	decryptOpenSSL()
 	//	
-	//
+	//	usage:			decryptDouble(), decryptTriple()
 	//
 	async function decryptOBF1000(ciphertext64, password, outputType='triple') {
 		// Always output base64 for base encryption in 1000 wrapping context.
@@ -3059,7 +3055,6 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Purpose:	Wrap encryptOBF1000() data payload with 7ByteHeader representing data payload length, and add random filler to fufill 1000 base64 char output blocking for encryptOBF1000().
 	//
-	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Purpose: Remove both the 7ByteHeader and Random Filler from input Uint8Array for decryptOBF1000()
 	//
@@ -3093,26 +3088,30 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// 					 GCM Salt + GCM Encrypted Payload + GCM Tag 
 	//					 |-18 bytes-||-----717 bytes----||-15 bytes-|
 	//
+	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: 
+	// Base Functionality: Produce AES-GCM ciphertext from cleartext, password input data.
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (the same CTR refers to) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//					With the packed salt, this key can be regenerated and used to decrypt the ciphertext.
 	//
-	//		Details:	
+	//	Inputs structure:	password:	 human readable cleartext
+	//						cleartext64: 7ByteHeader + OpenSSL Encrypted sans Salted__ + Random Filler
+	//									 |--7 Bytes--||---------------710 Bytes----------------------|
+	//						
+	//	Output structure:	|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//				OR:
+	//						|--18 Bytes GCM Salt--||---------(Number of Input Bytes) Bytes Ciphertext----------||-15 Byte GCM Tag-|
 	//
-	//	Inputs structure:	cleartext64: 
-	//						password:	 human readable (utf8) cleartext
+	// Big Picture:		Encryption step for OBF-1000. Takes 7ByteHeader + OpenSSL Encrypted sans Salted__ + Random Filler
+	//					from encryptOBF1000() function and encrypts it using AES-GCM.
 	//
-	//	Output structure:	
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
-	//
-	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
-	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
-	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
+	//	source:			Internal function of encryptOBF1000()
+	//	destination:	Same as output of encryptOBF1000() --> encryptAESCTR()
 	//	
-	//
+	//	usage:		encryptOBF1000()
 	//
 	async function encryptGCM(cleartext64, password, inputType='base64') {
 		// Create byte array to hold cleartext data.
@@ -3216,25 +3215,32 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//					 
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: 
+	// Base Functionality: Produce AES-GCM cleartext from ciphertext, password input data.
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (the same CTR refers to) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//					With the packed salt, this key can be regenerated and used to decrypt the ciphertext.
 	//
-	//		Details:	
-	//
-	//	Inputs structure:	cleartext64: 
-	//						password:	 human readable (utf8) cleartext
+	//	Inputs structure:
+	//		password:	    human readable cleartext
+	//		saltAndCiphertext: 
+	//						|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//				OR:
+	//						|--18 Bytes GCM Salt--||---------(Number of Input Bytes) Bytes Ciphertext----------||-15 Byte GCM Tag-|
 	//
 	//	Output structure:	
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
+	//						Decrypted Cleartext that should be in the form:
+	//						7ByteHeader + OpenSSL Encrypted sans Salted__ + Random Filler
+	//						|--7 Bytes--||---------------710 Bytes----------------------|
 	//
-	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
+	// Big Picture:		Decryption step for OBF-1000.
+	//					Output is ready for unwrap7ByteHeaderAndFiller() step which will remove 7ByteHeader and Random Filler.
 	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
-	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
-	//	
+	//	source:				Internal function for decryptOBF1000()
+	//	destination:		unwrap7ByteHeaderAndFiller() inside decryptOBF1000()
 	//
+	//	usage:		decryptOBF1000()
 	//
 	async function decryptGCM(saltAndCiphertext, password, outputType='base64') {
 		// Convert password into bytes.
@@ -3312,7 +3318,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//					This will produce completely different ciphertext for every encryption run even while using the same password.
 	//
 	//	Inputs structure:	cleartext64: 1000 base64 chars string (if used in encryptDouble(), encryptTriple())
-	//						password:	 human readable (utf8) cleartext
+	//						password:	 human readable cleartext
 	//
 	//	Output structure:	If used for PGO-Double or PGO-Triple encrypt:
 	//						|---24 base64 chars of CTR Salt---||----1000 base64 chars of AES-CTR ciphertext----|
@@ -3328,18 +3334,18 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
 	//				 password:    Cleartext entered into Browser by user - Password 2
 	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
+	//
+	//	usage:		- Encrypts Offline Database for encrypted side.
+	//				- Final, outer layer in Fully Encrypted Datapiece
 	//	
-	//
-	//
-	async function encryptAESCTR(cleartext, password, inputType='base64') {
+	async function encryptAESCTR(cleartext64, password, inputType='base64') {
 		console.log("encryptAESCTR called with inputType: " + inputType);
 		let cleartextUint8;
 		// Select input processing type based on function input parameter.
 		if (inputType === 'base64') {// Default usage.
-			
-			cleartextUint8 = Uint8Array.fromBase64(cleartext);
+			cleartextUint8 = Uint8Array.fromBase64(cleartext64);
 		}else if (inputType === 'utf8') {
-			cleartextUint8 = new TextEncoder().encode(cleartext);
+			cleartextUint8 = new TextEncoder().encode(cleartext64);
 		}else{
 			throw new Error("Invalid encryptAESCTR inputType parameter!");
 		}
@@ -3394,11 +3400,11 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let key = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytesUint8, 				// keydata: input data
+			keyBytesUint8, 			// keydata: input data
 			{						// algorithm to use to importKey
 				name: 'AES-CTR', 
 			}, 
-			false,					// extractable boolean 
+			false,					// Set data held by this CryptoKey as extractable? 
 			['encrypt']				// keyUsages
 		);
 		// MDN syntax: encrypt(algorithm, key, data)
@@ -3408,67 +3414,37 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const saltAndData = concatBuffer(randSalt, encryptedUint8);
 		// This function outputs base64.
 		const encrypted64 = saltAndData.toBase64();
-		//console.log("ciphertext:" + encrypted64 + " password:" + password);
-		//console.log("length:" + encrypted64.length);
-		//console.log("salt: " + randSalt);
 		return encrypted64;
 	}// encryptAESCTR()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:
-	// Inputs:
-	// Outputs:
-	//
-	// Default usage sets output to base64.
-	// Input always packed as base64.
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: Produces AES-CTR encrypted ciphertext from the cleartext and password input parameters.
+	// Base Functionality: Decrypts AES-CTR encrypted ciphertext using the cleartext and password input parameters.
 	//
 	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
 	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (the same CTR refers to) which are needed for the encrypt() call.
 	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
 	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//					With the packed salt, this key can be regenerated and used to decrypt the ciphertext.
 	//
-	//	Inputs structure:	cleartext64: 1000 base64 chars string (if used in encryptDouble(), encryptTriple())
-	//						password:	 human readable (utf8) cleartext
-	//
-	//	Output structure:	If used for PGO-Double or PGO-Triple encrypt:
+	//	Inputs structure:	password:	 human readable cleartext
+	//						saltAndCiphertext: 1024 base64 char string (if used in decryptDouble(), decryptTriple()) 
+	//						Consisting of 24 base64 chars of salt and 1000 base64 chars of ciphertext:
 	//						|---24 base64 chars of CTR Salt---||----1000 base64 chars of AES-CTR ciphertext----|
 	//						|-----------------------------Fully Encrypted Datapiece----------------------------|
 	//
+	//	Output structure:	If used for PGO-Double or PGO-Triple decrypt:
+	//						|----1000 base64 chars of cleartext----|
+	//
 	//						Otherwise:
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
+	//						|----(InputSize - 24) base64 chars of cleartext----|
 	//
-	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
+	// Big Picture: First step in decryptTriple() decryptDouble(). This function constitutes the entirety of the AES-CTR step for PGO Multi-Encrypted Datapiece.
 	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
+	//	source:		 saltAndCiphertext: A database, either Server or Offline.
 	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
+	//	destination: AES-CTR 'cleartext' will be passed to decryptOBF1000() for the next step in decryption.
 	//	
-	//
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: 
-	//
-	//		Details:	
-	//
-	//	Inputs structure:	cleartext64: 
-	//						password:	 human readable (utf8) cleartext
-	//
-	//	Output structure:	
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
-	//
-	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
-	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
-	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
-	//	
-	//
+	//	usage:		- Decrypts outer layer, first level of decrypt run by decryptDouble() decryptTriple()
 	//
 	async function decryptAESCTR(saltAndCiphertext, password, outputType='base64') {
 		// Convert password into bytes.
@@ -3478,11 +3454,6 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
 		// Cast array returned by slice into a (usable) Uint8Array.
 		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
-
-		//console.log("decryptAESCTR called with outputType: " + outputType);
-		//console.log("ciphertext:" + saltAndCiphertext + " password:" + password);
-		//console.log("salt: " + packedSalt);
-
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -3543,6 +3514,23 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Purpose: Encryption stack for File Upload / CMD Line Input.
 	// Input:	Payload data (presumably encrypted) from user-uploaded file that's been converted to base64, 2 cleartext passwords.
 	// Output:	A Fully Encrypted Datapiece ready for database storage.
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Produce a pmed from user File Upload / CMD Line input.
+	//		Details:	
+	//
+	//	Inputs structure:	obf1000Pass:	human readable cleartext
+	//						ctrPass:		human readable cleartext
+	//						fileDataBase64:	base64 encoding of the raw bytes of a user uploaded file
+	//	Output structure:	base64 pmed
+	//
+	// Big Picture:			When using the CMD Line option to upload a file, this function is used to 'double encrypt' user file data and produce a pmed ready for database storage.
+	//						
+	//
+	//	source:				User input via passlock system.
+	//	destination:		Database storage.
+	//
+	//
 	async function encryptDouble(obf1000Pass, ctrPass, fileDataBase64) {
 		const obf1000Encrypted = await encryptOBF1000(fileDataBase64, obf1000Pass);
 		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
@@ -3557,6 +3545,23 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Purpose:	Encrypt user data with the 3 PGO ciphers, converting cleartext to a Fully Encrypted piece of data ready for database storage.
 	// Input:	Cleartext user data from Browser textarea input, 3 cleartext passwords.
 	// Output:	A Fully Encrypted Datapiece ready for database storage.
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Produce a pmed from user Browser input.
+	//		Details:	
+	//
+	//	Inputs structure:	opensslPass:	human readable cleartext
+	//						obf1000Pass:	human readable cleartext
+	//						ctrPass:		human readable cleartext
+	//						cleartextData:	human readable cleartext
+	//	Output structure:	base64 pmed
+	//
+	// Big Picture:			Using the Browser option, this function 'triple encrypts' user data into a pmed, ready for database storage.
+	//
+	//	source:				user input via passlock system
+	//	destination:		database storage
+	//
+	//
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, cleartextData) {
 		// OpenSSL Encrypt (base 64 encoded)
 		const opensslEncrypted = await encryptOpenSSL(cleartextData, opensslPass);
@@ -3572,11 +3577,21 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// encryptTriple()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:
-	// Inputs:
-	// Outputs:
+	// Base Functionality: Decrypt a pmed into a base64 ready to convert into a file for user download.
+	//		Details:	
 	//
-	// Decrypt stack used in the case user chooses Command Line.
+	//	Inputs structure:	obf1000Pass:	human readable cleartext
+	//						ctrPass:		human readable cleartext
+	//						encryptedData:	base64 pmed
+	//
+	//	Output structure:	base64
+	//
+	// Big Picture:			Using the Browser option, this function 'double decrypts' a pmed from database into human readable cleartext.
+	//
+	//	source:				database storage
+	//	destination:		convert into file for user download 
+	//
+	//
 	async function decryptDouble(obf1000Pass, ctrPass, encryptedData) {
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
@@ -3584,11 +3599,22 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// decryptDouble()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:
-	// Inputs:
-	// Outputs:
+	// Base Functionality: Decrypt a pmed into human readable cleartext.
+	//		Details:	
 	//
-	// Decrypt stack used in the case user chooses Browser.
+	//	Inputs structure:	opensslPass:	human readable cleartext
+	//						obf1000Pass:	human readable cleartext
+	//						ctrPass:		human readable cleartext
+	//						encryptedData:	base64 pmed
+	//
+	//	Output structure:	human readable cleartext
+	//
+	// Big Picture:			Using the Browser option, this function 'triple decrypts' a pmed from database into human readable cleartext.
+	//
+	//	source:				database storage
+	//	destination:		user viewport
+	//
+	//
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, encryptedData) {
 		const ctrDecrypted = await decryptAESCTR(encryptedData, ctrPass);
 		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
@@ -6255,7 +6281,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Length of the data with salt bytes removed.
 		const dataLength = inputDataUint8.length;
 		// Find a 7Byte set that represents dataLength.
-		const sevenByteSetUint8 = find7ByteSetForValue(dataLength);
+		const sevenByteHeaderUint8 = find7ByteSetForValue(dataLength);
 		// Leave space for 7Byte set.
 		const fillerLengthInBytes = SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL_BYTES - 7 - dataLength;
 		// Compile set of random bytes for filler.
@@ -6263,7 +6289,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Compile Byte Stack
 		let dataWith7ByteSetAndRandFiller = new Uint8Array(SIZEOF_7BYTESET_WITH_DATA_AND_RANDOMFILL_BYTES);
 		// Prepend 7Byte set.
-		dataWith7ByteSetAndRandFiller.set(sevenByteSetUint8, 0);
+		dataWith7ByteSetAndRandFiller.set(sevenByteHeaderUint8, 0);
 		// Next fill in data.
 		dataWith7ByteSetAndRandFiller.set(inputDataUint8, 7);
 		// Set remaining space to random data.
