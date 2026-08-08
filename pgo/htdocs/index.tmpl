@@ -2711,7 +2711,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			["deriveBits"],	// allowed usages
 		);
 		// Create the key and iv used in the AES-CBC main encrypt() call.
-		const keyAndIVBits = await window.crypto.subtle.deriveBits(
+		const keyAndIVBitsBuffer = await window.crypto.subtle.deriveBits(
 			{						// This is a Pbkdf2Params object which specifies which derivation algorithm to use.
 				name: "PBKDF2",		// Name of this algorithm.
 				salt: saltCBCUint8,	// Specify which cryptographic salt to use.
@@ -2722,7 +2722,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,	// Number of bits to derive.
 		);
 		// Cast ArrayBuffer into a Uint8Array.
-		const keyAndIvBitsUint8 = new Uint8Array(keyAndIVBits);
+		const keyAndIvBitsUint8 = new Uint8Array(keyAndIVBitsBuffer);
 		// OpenSSL derives the key and IV using the same PBKDF2 digest.
 		// The first 256 bits are used as key, the last 128 are used for IV.
 		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
@@ -2903,10 +2903,10 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		}else{
 			throw new Error("Invalid encryptGCM inputType parameter!");
 		}
-		// Add 7byte prepend (representing length of filler) and random filler postpend of that length.
+		// Add 7byte prepend (representing length of data) and random filler padding.
 		const wrappedCleartextUint8 = wrapWith7ByteAndFiller(cleartextUint8);
 		const wrappedCleartextBase64 = wrappedCleartextUint8.toBase64();
-		// Now that the payload data is wrapped with a prepended 7Byte set and random data padded, we can GCM encrypt the whole thing.
+		// Now that the payload data is wrapped with a prepended 7Byte set and random filler padded, we can GCM encrypt the whole thing.
 		const gcmEncrypted64 = await encryptGCM(wrappedCleartextBase64, password, 'base64');
 		// Output length will trigger error if not 1000 in upstream function if Triple Encrypting.
 		return gcmEncrypted64;
@@ -3126,13 +3126,12 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		}
 		// Convert password text into Uint8Array.
 		const passwordUint8 = new TextEncoder().encode(password);
-		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
+		// Compute a new Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
 		// This increases our Triple Encrypted Data Record size to 1024.
-		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
-		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
@@ -3145,12 +3144,11 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
 			{									// PBKDF2 parameters object
 				name: "PBKDF2",					// key derivation algorithm
-				//name: key_derivation_algo,
 				salt: randSalt,					// salt (MDN suggests at least 16 bytes for security)
 				iterations: 10000,				// strength
-				hash: 'SHA-256',				// 
+				hash: 'SHA-256',				// digest algorithm
 			},
-			keyForPBKDF2,						//
+			keyForPBKDF2,						// base key used for bit derivation
 			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 96 for random IV as specified NIST SP800-38D Section 8.2.
 		);
 		// Split the derived bits into key and iv for the encrypt call.
@@ -3170,9 +3168,9 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let keyGCM = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytesUint8, 				// keydata: input data
-			{						// algorithm to use to importKey
-				name: 'AES-GCM', 
+			keyBytesUint8, 			// keydata: input data
+			{						// object defining type of key to import
+				name: 'AES-GCM',	// algorithm identifier 
 			}, 
 			false,					// extractable boolean 
 			['encrypt']				// keyUsages
@@ -3184,18 +3182,22 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
 		// MDN syntax: encrypt(algorithm, key, data)
 		const inputTypeUint8 = new TextEncoder().encode(inputType);
-        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytesUint8, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, cleartextUint8);
-
-        //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
-		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+        const ciphertextBuffer = await window.crypto.subtle.encrypt(
+			{									// object specifying algorithm, parameters for the encrypt call
+				name:'AES-GCM',					// algorithm name
+				iv:ivBytesUint8,				// A cryptographically strong IV is used.
+				additionalData:inputTypeUint8,	// Decrypt will error if additionalData is not the same as encrypt.
+				tagLength:GCM_TAGLENGTH_BITS	// number of bits making up tag length (120)
+			},
+			keyGCM,								// CryptoKey object used to encrypt.
+			cleartextUint8						// Cleartext data to be encrypted.
+		);
+		const ciphertextUint8 = new Uint8Array(ciphertextBuffer);
 		// Wrap salt with encoded data so it can be used in the decrypt.
-		const saltAndData = concatBuffer(randSalt, encryptedUint8);
+		const saltAndDataUint8 = concatBuffer(randSalt, ciphertextUint8);
 		// This function outputs base64.
-		const encrypted64 = saltAndData.toBase64();
-		//console.log("ciphertext:" + encrypted64 + " password:" + password);
-		//console.log("length:" + encrypted64.length);
-		//console.log("salt: " + randSalt);
-		return encrypted64;
+		const ciphertext64 = saltAndDataUint8.toBase64();
+		return ciphertext64;
 	}// encryptGCM()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3203,7 +3205,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	// Input + Output Usage: Internal function of decryptOBF1000()
 	//
-	// Input Structure:	saltAndCiphertext:	
+	// Input Structure:	saltAndCiphertext64:	
 	//                  					 GCM Salt + GCM Encrypted Payload + GCM Tag 
 	//				                     	 |-18 bytes-||-----717 bytes----||-15 bytes-|
 	//
@@ -3224,7 +3226,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	//	Inputs structure:
 	//		password:	    human readable cleartext
-	//		saltAndCiphertext: 
+	//		saltAndCiphertext64: 
 	//						|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
 	//				OR:
 	//						|--18 Bytes GCM Salt--||---------(Number of Input Bytes) Bytes Ciphertext----------||-15 Byte GCM Tag-|
@@ -3242,17 +3244,17 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	//	usage:		decryptOBF1000()
 	//
-	async function decryptGCM(saltAndCiphertext, password, outputType='base64') {
+	async function decryptGCM(saltAndCiphertext64, password, outputType='base64') {
 		// Convert password into bytes.
 		const passwordUint8 = new TextEncoder().encode(password);
-		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
+		// Convert base64 into bytes.
+		const saltAndCiphertextUint8 = Uint8Array.fromBase64(saltAndCiphertext64);
 		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
-		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		const packedSaltUint8 = new Uint8Array(saltAndCiphertextUint8.slice(0,SALT_SIZE_BYTES));
 		// Cast array returned by slice into a (usable) Uint8Array.
-		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextUint8.slice(SALT_SIZE_BYTES));
 
-		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
-		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		// Import key needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
 			passwordUint8,		// keyData, arbitrarily long set of bytes.
@@ -3265,37 +3267,43 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
 			{									// PBKDF2 parameters object
 				name: "PBKDF2",					// key derivation algorithm
-				salt: packedSalt,					// salt (at least 16 bytes for security;
-				iterations: 10000,				// exectute hash function this maniy times
+				salt: packedSaltUint8,			// salt
+				iterations: 10000,				// exectute hash function this many times
 				hash: 'SHA-256',				// digest algorithm
 			},
 			keyForPBKDF2,						// input data as cryptoKey object
-			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,		// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
 		);
-
+		// Convert Array buffer data into Uint8Array.
 		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		// Take 256 bits (32 bytes) of data for the key.
 		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
-		// 96 IV bits for GCM
+		// 96 IV bits for this GCM usage
 		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
-
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
-		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
 		let keyGCM = await window.crypto.subtle.importKey(
 			'raw',					// input data format
-			keyBytesUint8, 				// keydata: input data
-			{						// algorithm to use to importKey
-				name: 'AES-GCM', 
+			keyBytesUint8, 			// keydata: input data
+			{						// object defining type of key to import
+				name: 'AES-GCM',	// algorithm identifier 
 			}, 
 			false,					// extractable boolean 
 			['decrypt']				// keyUsages
 		);
-
-		// MDN syntax: decrypt(algorithm, key, data)
-		//const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
+		// decrypt() function parameter needs to be in Uint8Array format.
 		const outputTypeUint8 = new TextEncoder().encode(outputType);
-        const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:ivBytesUint8, additionalData:outputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, encodedCiphertextUint8);
-
+		// 'Main' Subtle Crypto encrypt() call for AES-GCM algorithm.
+        const decryptedBuffer = await window.crypto.subtle.decrypt(
+			{									// object specifying algorithm, parameters for the encrypt call
+				name: 'AES-GCM',				// algorithm name
+				iv: ivBytesUint8,				// IV to use
+				additionalData: outputTypeUint8,// Will error if additionalData is different than was used for encrypt.
+				tagLength: GCM_TAGLENGTH_BITS	// 120 - number of tag bits
+			},
+			keyGCM,								// CryptoKey object used to encrypt.
+			encodedCiphertextUint8				// Ciphertext data to be decrypted.
+		);
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
 		let decryptedDecoded;
 		// Select output data type based on function parameter.
@@ -3351,10 +3359,10 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		}
 		// Convert password text into Uint8Array.
 		const passwordUint8 = new TextEncoder().encode(password);
-		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
+		// Compute anew Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
 		// This increases our Triple Encrypted Data Record size to 1024.
-		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -3408,13 +3416,13 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			['encrypt']				// keyUsages
 		);
 		// MDN syntax: encrypt(algorithm, key, data)
-        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
-		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+        const ciphertextBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
+		const ciphertextUint8 = new Uint8Array(ciphertextBuffer);
 		// Wrap salt with encoded data so it can be used in the decrypt.
-		const saltAndData = concatBuffer(randSalt, encryptedUint8);
+		const saltAndDataUint8 = concatBuffer(randSalt, ciphertextUint8);
 		// This function outputs base64.
-		const encrypted64 = saltAndData.toBase64();
-		return encrypted64;
+		const ciphertext64 = saltAndDataUint8.toBase64();
+		return ciphertext64;
 	}// encryptAESCTR()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3446,14 +3454,14 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//	
 	//	usage:		- Decrypts outer layer, first level of decrypt run by decryptDouble() decryptTriple()
 	//
-	async function decryptAESCTR(saltAndCiphertext, password, outputType='base64') {
+	async function decryptAESCTR(saltAndCiphertext64, password, outputType='base64') {
 		// Convert password into bytes.
 		const passwordUint8 = new TextEncoder().encode(password);
-		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
+		const saltAndCiphertextUint8 = Uint8Array.fromBase64(saltAndCiphertext64);
 		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
-		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		const packedSaltUint8 = new Uint8Array(saltAndCiphertextUint8.slice(0,SALT_SIZE_BYTES));
 		// Cast array returned by slice into a (usable) Uint8Array.
-		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextUint8.slice(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -3469,7 +3477,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
 			{									// PBKDF2 parameters object
 				name: "PBKDF2",					// key derivation algorithm
-				salt: packedSalt,					// salt (at least 16 bytes for security;
+				salt: packedSaltUint8,					// salt (at least 16 bytes for security;
 				iterations: 10000,				// exectute hash function this maniy times
 				hash: 'SHA-256',				// digest algorithm
 			},
@@ -6316,10 +6324,10 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		}
 		// Convert password text into Uint8Array.
 		const passwordUint8 = new TextEncoder().encode(password);
-		// Compute anew Uint8Array(18)) random salt that will be prepended to the data for use with decrypt.
+		// Compute anew Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
 		// This increases our Triple Encrypted Data Record size to 1024.
-		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -6375,29 +6383,29 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
 		// MDN syntax: encrypt(algorithm, key, data)
 		const inputTypeUint8 = new TextEncoder().encode(inputType);
-        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytesUint8, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, cleartextUint8);
+        const ciphertextBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv:ivBytesUint8, additionalData:inputTypeUint8, tagLength:GCM_TAGLENGTH_BITS}, keyGCM, cleartextUint8);
 
-        //const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
-		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+        //const ciphertextBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
+		const ciphertextUint8 = new Uint8Array(ciphertextBuffer);
 		// Wrap salt with encoded data so it can be used in the decrypt.
-		const saltAndData = concatBuffer(randSalt, encryptedUint8);
+		const saltAndDataUint8 = concatBuffer(randSalt, ciphertextUint8);
 		// This function outputs base64.
-		const encrypted64 = saltAndData.toBase64();
-		//console.log("ciphertext:" + encrypted64 + " password:" + password);
-		//console.log("length:" + encrypted64.length);
+		const ciphertext64 = saltAndDataUint8.toBase64();
+		//console.log("ciphertext:" + ciphertext64 + " password:" + password);
+		//console.log("length:" + ciphertext64.length);
 		//console.log("salt: " + randSalt);
-		return encrypted64;
+		return ciphertext64;
 	}// encryptGCM()
 
 
-	async function decryptGCM(saltAndCiphertext, password, outputType='base64') {
+	async function decryptGCM(saltAndCiphertext64, password, outputType='base64') {
 		// Convert password into bytes.
 		const passwordUint8 = new TextEncoder().encode(password);
-		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
+		const saltAndCiphertextUint8 = Uint8Array.fromBase64(saltAndCiphertext64);
 		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
-		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		const packedSaltUint8 = new Uint8Array(saltAndCiphertextUint8.slice(0,SALT_SIZE_BYTES));
 		// Cast array returned by slice into a (usable) Uint8Array.
-		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextUint8.slice(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -6413,7 +6421,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
 			{									// PBKDF2 parameters object
 				name: "PBKDF2",					// key derivation algorithm
-				salt: packedSalt,					// salt (at least 16 bytes for security;
+				salt: packedSaltUint8,					// salt (at least 16 bytes for security;
 				iterations: 10000,				// exectute hash function this maniy times
 				hash: 'SHA-256',				// digest algorithm
 			},
@@ -6482,7 +6490,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Compute a random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
 		// This increases our Triple Encrypted Data Record size to 1024.
-		const randSalt = await window.crypto.getRandomValues(new Uint8Array(18));
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -6538,33 +6546,25 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		);
 
 		// MDN syntax: encrypt(algorithm, key, data)
-        const encryptedBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
-		const encryptedUint8 = new Uint8Array(encryptedBuffer);
+        const ciphertextBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
+		const ciphertextUint8 = new Uint8Array(ciphertextBuffer);
 		// Wrap salt with encoded data so it can be used in the decrypt.
-		const saltAndData = concatBuffer(randSalt, encryptedUint8);
+		const saltAndDataUint8 = concatBuffer(randSalt, ciphertextUint8);
 		// This function outputs base64.
-		const encrypted64 = saltAndData.toBase64();
-		//console.log("ciphertext:" + encrypted64 + " password:" + password);
-		//console.log("length:" + encrypted64.length);
-		//console.log("salt: " + randSalt);
-		return encrypted64;
+		const ciphertext64 = saltAndDataUint8.toBase64();
+		return ciphertext64;
 	}//encryptAESCTR()
 
 	// Default usage sets output to base64.
 	// Input always packed as base64.
-	async function decryptAESCTR(saltAndCiphertext, password, outputType='base64') {
+	async function decryptAESCTR(saltAndCiphertext64, password, outputType='base64') {
 		// Convert password into bytes.
 		const passwordUint8 = new TextEncoder().encode(password);
-		const saltAndCiphertextBytes = Uint8Array.fromBase64(saltAndCiphertext);
+		const saltAndCiphertextUint8 = Uint8Array.fromBase64(saltAndCiphertext64);
 		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
-		const packedSalt = new Uint8Array(saltAndCiphertextBytes.slice(0,18));
+		const packedSaltUint8 = new Uint8Array(saltAndCiphertextUint8.slice(0,SALT_SIZE_BYTES));
 		// Cast array returned by slice into a (usable) Uint8Array.
-		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextBytes.slice(18));
-
-		//console.log("decryptAESCTR called with outputType: " + outputType);
-		//console.log("ciphertext:" + saltAndCiphertext + " password:" + password);
-		//console.log("salt: " + packedSalt);
-
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextUint8.slice(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
@@ -6580,7 +6580,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
 			{									// PBKDF2 parameters object
 				name: "PBKDF2",					// key derivation algorithm
-				salt: packedSalt,					// salt (at least 16 bytes for security;
+				salt: packedSaltUint8,					// salt (at least 16 bytes for security;
 				iterations: 10000,				// strength
 				hash: 'SHA-256',				// 
 			},
