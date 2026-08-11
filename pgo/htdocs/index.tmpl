@@ -1884,7 +1884,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 	}// attemptCMDStore()
 
-
+	// Looks like this is only needed for Access->Edit?
 	async function attemptBrowserStoreBackWrapper(inputId) {
 		console.log('back wrapper hit.');
 		await attemptBrowserStore(inputId, 'true');
@@ -2516,7 +2516,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// We provide a 686- or 710-byte-size 'data locker' encrypted using 3 or 2 core cryptographic ciphers                        //
 	// and packed with additional security (if using the optional Offline Database) in order to implement our custom 			 //
-	// PGO Cipher and Security method offered on our website: (Pretty Good Obscurity).  										 //
+	// Multi Cipher and Security method offered on our website: 						  										 //
 	// 																															 //
 	// Crypto explained below.																									 //
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2526,12 +2526,16 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	// User Input (File Upload)
 	//    |<--------------710 byte check - CMDINPUT_LENGTH_LIMIT
+	//    V
 	// OBF-1000 (AES-GCM)
 	//    |<--------------1000 base64 check - OBF1000_OUTPUT_LIMIT_BASE64
+	//    V
 	// AES-CTR
 	//    |<--------------1024 base64 check - AESCTR_OUTPUT_LIMIT_BASE64
-	// Double Encrypted
+	//    V
+	// Multi Encrypted Datarecord
 	//    |<--------------1024 base64 check - FULLY_ENCRYPTED_DATA_LENGTH_BASE64
+	//    V
 	// Database Storage (Server or Offline)
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2541,25 +2545,123 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	// User Input (Browser)
 	//    |<--------------686 byte check (input can be any unicode where a single char can need multiple bytes) - BROWSERINPUT_LENGTH_LIMIT
+	//    V
 	// OpenSSL (AES-CBC)
-	//    |<--------------946.6 base64 check - OPENSSL_OUTPUT_LIMIT_BASE64
+	//    |<--------------710 bytes / 946.6 base64 check - OPENSSL_OUTPUT_LIMIT_BASE64
+	//    V
 	// OBF-1000 (AES-GCM)
-	//    |<--------------1000 base64 check - OBF1000_OUTPUT_LIMIT_BASE64
+	//    |<--------------750 bytes / 1000 base64 check - OBF1000_OUTPUT_LIMIT_BASE64
+	//    V
 	// AES-CTR
 	//    |<--------------1024 base64 check - AESCTR_OUTPUT_LIMIT_BASE64
-	// Triple Encrypted 
+	//    V
+	// Multi Encrypted Datarecord 
 	//    |<--------------1024 base64 check - FULLY_ENCRYPTED_DATA_LENGTH_BASE64
+	//    V
 	// Database Storage (Server or Offline)
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// I'm not sure what to call the final double or triple encrypted piece of data?
-	// Ideas:
-	// Fully Encrypted Datapiece - FED
-	// PGO Multi Encrypted Datarecord - PMED
-	// PGO Multi Encrypted Datapiece - PMED - PME-Datapiece
-	// PGO Multi-Cipher
-	// PGO Multicipher Encrypted Datarecord - PGOMED - pmed
-	// 
+	// Triple Cipher Waterfall - BROWSER STORE Functionality / Datapath
+	//
+	//
+	//               User Input
+	//                   |
+	//                   V
+	//     <-----store_data_textarea.value---->   <--------------686 byte check - BROWSERINPUT_LENGTH_LIMIT - textarea.oninput()
+	//     |--------Up to 686-----------------|
+	//                   |
+	//                   V
+	//              To Javascript
+	//                   |
+	//                   V
+	//     <------OpenSSL Cleartext---->
+	//     |--------Up to 686----------|
+	//                   |
+	//                   V
+	//             To OpenSSL
+	//                   |
+	//                   V
+	//             +1 Newline Byte 
+	//                   |
+	//                   V
+	//     <-------CBC Cleartext----------->
+	//     |----Cleartext-------||-Newline-|
+	//     |-------Up to 686----||----1----|
+	//                   |
+	//                   V
+	//               CBC Encrypt
+	//                   |
+	//                   V
+	//     <---------------CBC Ciphertext---------------->
+	//     |------Cleartext--||-Newline-||-CBC Blocking--|
+	//     |-------Up to 686----||----1----||--1 to 16---|
+	//                   |
+	//                   V
+	//               +2 Salts
+	//                   |
+	//                   V
+	//     <---------------OpenSSL Output------------->
+	//     |-Salted__-||-CBC Salt-|<--CBC Ciphertext-->
+	//     |-----8----||------8---||--Up to 704-------|
+	//     |-----------Up to 710----------------------|
+	//                   |
+	//                   V
+	//             To OBF-1000
+	//                   |
+	//                   V
+	//               -8 bytes Salted__
+	//                   |
+	//                   V
+	//               +7 bytes 7ByteHeader
+	//                   |
+	//                   V
+	//               +(710 - OpenSSL Output byte length) bytes Random Filler
+	//                   |
+	//                   V
+	//     <--------------GCM Cleartext----------------------------------->
+	//     |-7ByteHeader-||-CBC Salt-|<-CBC Ciphertext->|--Random Filler--|
+	//     |-----7-------||-------------------710-------------------------|
+	//     |---------------------------717 -------------------------------|
+	//                   |
+	//                   V
+	//               GCM Encrypt
+	//                   |
+	//                   V
+	//     <--------------OBF-1000 Outupt----------------------->
+	//     |-GCM Salt-||----------GCM Encrypt Output------------|
+	//     |-GCM Salt-|<-------GCM Ciphertext-------->|-GCM Tag-|
+	//     |---18-----||-----------717---------------||---15----|
+	//     |---------------------750----------------------------|
+	//                   |
+	//                   V
+	//             To AES-CTR
+	//                   |
+	//                   V
+	//     <------CTR Cleartext----------------->
+	//     <------OBF-1000 Output--------------->
+	//     |-------------------750 -------------|
+	//                   |
+	//                   V
+	//               CTR Encrypt
+	//                   |
+	//                   V
+	//     <-------------AES-CTR Outupt------------------------->
+	//     |-CTR Salt-||----------CTR Ciphertext----------------|
+	//     |---18-----||-----------750--------------------------|
+	//     |---------------------768----------------------------|
+	//                   |
+	//                   V
+	//              To Database Storage
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Double Cipher:
 	//     ________________________________________________________________________________________________________________________
 	//    / AES-CTR _______________________________________________________________________________________________________________\ 
@@ -2569,9 +2671,10 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// |---18---||----18---||---7 Bytes--||------------------------------------------710 Bytes-------------------------||------15-----|
 	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted--------------------------||---GCM Tag---|
 	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted--------------------------------------------|
-	// |----------------------------------------------Fully Encrypted Datapiece-------------------------------------------------------|
+	// |----------------------------------------------Multi Encrypted Datarecord-------------------------------------------------------|
 	// 
 	// Triple Cipher:
+	//           ||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
 	//       ________________________________________________________________________________________________________________________________________
 	//      / AES-CTR _______________________________________________________________________________________________________________________________\ 
 	//     /         / OBF-1000 __________________________________________________________________________________________________________           \\
@@ -2579,15 +2682,19 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//   /         /          /             /      OpenSSL           ____________________________________________________\                 \           \\ 
 	//  /         /          /             /                        /___________________________        AES-CBC          \\                 \           \\
 	// / CTR Salt/ GCM Salt / 7ByteHeader / Salted__  +   CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
+	// 
 	// |---18---||----18---||---7 Bytes--||-----8----||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
+	//
+	//
+	//
 	//                                    |------------------------------------------710 Bytes-----------------------------------------------||-----15-----|
 	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
 	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
 	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted-----------------------------------------------------------------|
-	// |----------------------------------------------------------Fully Encrypted Datapiece----------------------------------------------------------------|
+	// |----------------------------------------------------------Multi Encrypted Datarecord----------------------------------------------------------------|
 	// 
 	// Triple Cipher:
-	//	*Note: Literal string 'Salted_' is removed in the Triple Encrypt process.
+	//	*Note: Literal string 'Salted__' is removed in the Triple Encrypt process.
 	//       ___________________________________________________________________________________________________________________________
 	//      / AES-CTR __________________________________________________________________________________________________________________\ 
 	//     /         / OBF-1000 _____________________________________________________________________________________________           \\
@@ -2595,12 +2702,13 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//   /         /          /             / OpenSSL   ____________________________________________________\                 \           \\ 
 	//  /         /          /             /           /___________________________        AES-CBC          \\                 \           \\
 	// / CTR Salt/ GCM Salt / 7ByteHeader /  CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
-	// |---18---||----18---||---7 Bytes--||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
+	// 
+	// |---18---||----18---||---7 Bytes--||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16-----|
 	//                                    |------------------------------------------710 Bytes----------------------------------||-----15-----|
 	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
 	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted-----------------------------------||---GCM Tag--|
 	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted----------------------------------------------------|
-	// |----------------------------------------------------------Fully Encrypted Datapiece---------------------------------------------------|
+	// |----------------------------------------------------------Multi Encrypted Datarecord---------------------------------------------------|
 	// 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OpenSSL
@@ -2644,7 +2752,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
 	// 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// These functions make up the cryptographic core of PGO. We are using each of the 3 available ciphers in the subtle crypto library.
+	// These functions make up the cryptographic core of <webstie>. We are using each of the 3 available ciphers in the subtle crypto library.
 	// Subtle crypto was chosen because of its wide availability and decades of 'experience', open source math functions that have been used over and over and thus vetted.
 	//
 	// OpenSSL was chosen for its wide availability.
@@ -2660,9 +2768,9 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//			Specifically the command: openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
 	//			This uses an 8 byte salt and the key derivation function PBKDF2 to generate both the key and the IV to run 
 	//			the Subtle Crypto encrypt() with AES-CBC encryption.
-	// Inputs:	A cleartext datapiece from Browser textarea input and a password from Browser UI password 3.
+	// Inputs:	A cleartext string from Browser textarea input and a password from Browser UI password 3.
 	// Outputs:	A base64 packed cipher that perfectly matches the output of the command above.
-	//			This matches the OpenSSL datapiece spec shown in this section's description.
+	//			This matches the OpenSSL spec shown in this section's description.
 	//
 	// Input Structure:	cleartext:	A string containing up to 686 Bytes of user cleartext data.
 	//					password:	A string containing an arbitrarily long user cleartext password.
@@ -2936,7 +3044,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//		Details:	
 	//
 	//	Inputs structure:	inputDataUint8: Uint8Array containing data to be encrypted.
-	//						If this is a PGO-Multi-Encrypted, it will be OpenSSL output sans salted literal: Salted__ which is removed by encryptOBF1000.
+	//						If this is a Multi Encrypted Datarecord, it will be OpenSSL output sans salted literal: Salted__ which is removed by encryptOBF1000.
 	//
 	//	Output structure:	 7ByteHeader + Input Data Payload + Random Filler 
 	//						 |--7 Bytes--||------------710 Bytes-------------| 	
@@ -3128,7 +3236,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const passwordUint8 = new TextEncoder().encode(password);
 		// Compute a new Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
-		// This increases our Triple Encrypted Data Record size to 1024.
+		// This increases our Multi Encrypted Datarecord Data Record size to 1024.
 		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
@@ -3321,30 +3429,27 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Base Functionality: Produces AES-CTR encrypted ciphertext from the cleartext and password input parameters.
 	//
 	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
-	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (the same CTR refers to) which are needed for the encrypt() call.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (CTR is short for Counter) which are needed for the encrypt() call.
 	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
 	//					This will produce completely different ciphertext for every encryption run even while using the same password.
 	//
-	//	Inputs structure:	cleartext64: 1000 base64 chars string (if used in encryptDouble(), encryptTriple())
+	//	Inputs structure:	cleartext64: 1000 base64 chars string
 	//						password:	 human readable cleartext
 	//
-	//	Output structure:	If used for PGO-Double or PGO-Triple encrypt:
+	//	Output structure:	
 	//						|---24 base64 chars of CTR Salt---||----1000 base64 chars of AES-CTR ciphertext----|
-	//						|-----------------------------Fully Encrypted Datapiece----------------------------|
-	//
-	//						Otherwise:
-	//						|---24 base64 chars of CTR Salt---||----Number equal to input length in base64 chars of AES-CTR ciphertext----|
+	//						|---------------1024 base64 chars Multicipher Encrypted Datarecord (MED)-----------|
 	//
 	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
-	// 				Functions as the outer encryption layer of security for a PGO Fully Encrypted Datapiece.
-	//				Chosen to run encryption deliberately without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
+	// 				Functions as the outer encryption layer of security for a Multi Encrypted Datarecord.
+	//				AES-CTR runs without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
 	//
-	//	source:		 cleartext64: Output of the OBF-1000 Step of the PGO Multi-Encrypted stack.
-	//				 password:    Cleartext entered into Browser by user - Password 2
-	//	destination: Output constitutes a Fully Encrypted Datapiece with next destination a database, either Server or Offline.
+	//				input source:	cleartext64: Output of the OBF-1000 Step of the Multicipher Encryption.
+	//				 				password:    Cleartext entered into Browser by user - Password 2
 	//
-	//	usage:		- Encrypts Offline Database for encrypted side.
-	//				- Final, outer layer in Fully Encrypted Datapiece
+	//				output destination: Output constitutes a Multicipher Encrypted Datarecord ready for storage in the online or offline database.
+	//
+	//				additional usage:	This function is also used in encrypting the offline database.	
 	//	
 	async function encryptAESCTR(cleartext64, password, inputType='base64') {
 		console.log("encryptAESCTR called with inputType: " + inputType);
@@ -3361,7 +3466,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const passwordUint8 = new TextEncoder().encode(password);
 		// Compute anew Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
-		// This increases our Triple Encrypted Data Record size to 1024.
+		// This increases our Multi Encrypted Datarecord Data Record size to 1024.
 		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
@@ -3438,15 +3543,15 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//						saltAndCiphertext: 1024 base64 char string (if used in decryptDouble(), decryptTriple()) 
 	//						Consisting of 24 base64 chars of salt and 1000 base64 chars of ciphertext:
 	//						|---24 base64 chars of CTR Salt---||----1000 base64 chars of AES-CTR ciphertext----|
-	//						|-----------------------------Fully Encrypted Datapiece----------------------------|
+	//						|-----------------------------Multi Encrypted Datarecord----------------------------|
 	//
-	//	Output structure:	If used for PGO-Double or PGO-Triple decrypt:
+	//	Output structure:	If used for Double or Triple decrypt:
 	//						|----1000 base64 chars of cleartext----|
 	//
 	//						Otherwise:
 	//						|----(InputSize - 24) base64 chars of cleartext----|
 	//
-	// Big Picture: First step in decryptTriple() decryptDouble(). This function constitutes the entirety of the AES-CTR step for PGO Multi-Encrypted Datapiece.
+	// Big Picture: First step in decryptTriple() decryptDouble(). This function constitutes the entirety of the AES-CTR step for Multi Encrypted Datarecord.
 	//
 	//	source:		 saltAndCiphertext: A database, either Server or Offline.
 	//				 password:    Cleartext entered into Browser by user - Password 2
@@ -3521,7 +3626,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Purpose: Encryption stack for File Upload / CMD Line Input.
 	// Input:	Payload data (presumably encrypted) from user-uploaded file that's been converted to base64, 2 cleartext passwords.
-	// Output:	A Fully Encrypted Datapiece ready for database storage.
+	// Output:	A Multi Encrypted Datarecord ready for database storage.
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Produce a pmed from user File Upload / CMD Line input.
@@ -3550,9 +3655,9 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// encryptDouble()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Encrypt user data with the 3 PGO ciphers, converting cleartext to a Fully Encrypted piece of data ready for database storage.
+	// Purpose:	Encrypt user data with the 3 ciphers, converting cleartext to a Multi Encrypted Datarecord ready for database storage.
 	// Input:	Cleartext user data from Browser textarea input, 3 cleartext passwords.
-	// Output:	A Fully Encrypted Datapiece ready for database storage.
+	// Output:	A Multi Encrypted Datarecord ready for database storage.
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Produce a pmed from user Browser input.
@@ -6326,7 +6431,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const passwordUint8 = new TextEncoder().encode(password);
 		// Compute anew Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
 		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
-		// This increases our Triple Encrypted Data Record size to 1024.
+		// This increases our Multi Encrypted Datarecord Data Record size to 1024.
 		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
 
 		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
