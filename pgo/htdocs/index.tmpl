@@ -293,7 +293,7 @@
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
-				<a href="https://<TMPL_VAR NAME=origin>" id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-<TMPL_VAR NAME=titletext></a>
+				<a href="https://<TMPL_VAR NAME=origin>" id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
@@ -2994,28 +2994,16 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//	destination:	encryptAESCTR()
 	//	
 	//	usage:			encryptDouble(), encryptTriple()
-	//
-	async function encryptOBF1000(cleartext64, password, inputType='triple') {
-		// Create byte array to hold cleartext data.
-		let cleartextUint8 = new Uint8Array;
-		// Compose data based on function parameter.
-		if (inputType === 'base64') { // Default usage.
-			cleartextUint8 = Uint8Array.fromBase64(cleartext64);
-		}else if (inputType === 'utf8') {
-			cleartextUint8 = new TextEncoder().encode(cleartext64);
-		}else if (inputType === 'triple') { // Default usage.
-			// Extract salt for triple stack usage.
-			cleartextWithSalt = Uint8Array.fromBase64(cleartext64);
-			// Slice off the 8 bytes from OpenSSL that convert to: Salted__
-			cleartextUint8 = cleartextWithSalt.slice(8);
-		}else{
-			throw new Error("Invalid encryptGCM inputType parameter!");
-		}
+	async function encryptOBF1000(cleartext64, password) {
+		// Construct byte array with base64 input data.
+		const cleartextWithSaltUint8 = Uint8Array.fromBase64(cleartext64);
+		// Slice off the 8 bytes from OpenSSL that convert to: Salted__
+		const cleartextUint8 = cleartextWithSaltUint8.slice(8);
 		// Add 7byte prepend (representing length of data) and random filler padding.
 		const wrappedCleartextUint8 = wrapWith7ByteAndFiller(cleartextUint8);
 		const wrappedCleartextBase64 = wrappedCleartextUint8.toBase64();
 		// Now that the payload data is wrapped with a prepended 7Byte set and random filler padded, we can GCM encrypt the whole thing.
-		const gcmEncrypted64 = await encryptGCM(wrappedCleartextBase64, password, 'base64');
+		const gcmEncrypted64 = await encryptGCM(wrappedCleartextBase64, password);
 		// Output length will trigger error if not 1000 in upstream function if Triple Encrypting.
 		return gcmEncrypted64;
 	}// encryptOBF1000()
@@ -3114,25 +3102,14 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//	
 	//	usage:			decryptDouble(), decryptTriple()
 	//
-	async function decryptOBF1000(ciphertext64, password, outputType='triple') {
+	async function decryptOBF1000(ciphertext64, password){
 		// Always output base64 for base encryption in 1000 wrapping context.
-		const gcmDecrypted64 = await decryptGCM(ciphertext64, password, 'base64');
+		const gcmDecrypted64 = await decryptGCM(ciphertext64, password);
 		gcmDecryptedUint8 = Uint8Array.fromBase64(gcmDecrypted64);
 		const unwrappedCleartextUint8 = unwrap7ByteAndFiller(gcmDecryptedUint8);
-
-		let decryptedCleartext;
-		// Select output data type based on function parameter.
-		if (outputType === 'base64') {// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
-			decryptedCleartext = unwrappedCleartextUint8.toBase64();
-		}else if (outputType === 'utf8') {
-			decryptedCleartext = new TextDecoder().decode(unwrappedCleartextUint8);
-		}else if (outputType === 'triple') {// Default usage.
-			saltAddedCleartextUint8 = addSaltedLiteral(unwrappedCleartextUint8);
-			decryptedCleartext = saltAddedCleartextUint8.toBase64();
-		}else{
-			throw new Error("Invalid decryptAESGCM outputType parameter!");
-		}
-		return decryptedCleartext;
+		// Add back Salted__ which was removed on encryptOBF1000().
+		saltAddedCleartextUint8 = addSaltedLiteral(unwrappedCleartextUint8);
+		return saltAddedCleartextUint8.toBase64();
 	}// decryptOBF1000()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3221,17 +3198,8 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//	
 	//	usage:		encryptOBF1000()
 	//
-	async function encryptGCM(cleartext64, password, inputType='base64') {
-		// Create byte array to hold cleartext data.
-		let cleartextUint8 = new Uint8Array;
-		// Compose data based on function parameter.
-		if (inputType === 'base64') { // Default usage.
-			cleartextUint8 = Uint8Array.fromBase64(cleartext64);
-		}else if (inputType === 'utf8') {
-			cleartextUint8 = new TextEncoder().encode(cleartext64);
-		}else{
-			throw new Error("Invalid encryptGCM inputType parameter!");
-		}
+	async function encryptGCM(cleartext64, password) {
+		const cleartextUint8 = Uint8Array.fromBase64(cleartext64);
 		// Convert password text into Uint8Array.
 		const passwordUint8 = new TextEncoder().encode(password);
 		// Compute a new Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
@@ -3283,18 +3251,11 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			false,					// extractable boolean 
 			['encrypt']				// keyUsages
 		);
-
-		// AesGcmParams object.
-		// {name, iv, additionalData, tagLength}
-		// tagLength defaults to 128 (16 bytes)
-		// think we should add inputType usage variable so there will be an error with mismatched input/output types?
-		// MDN syntax: encrypt(algorithm, key, data)
-		const inputTypeUint8 = new TextEncoder().encode(inputType);
+		// 'Main' Subtle Crypto encrypt() call for AES-GCM algorithm.
         const ciphertextBuffer = await window.crypto.subtle.encrypt(
 			{									// object specifying algorithm, parameters for the encrypt call
 				name:'AES-GCM',					// algorithm name
 				iv:ivBytesUint8,				// A cryptographically strong IV is used.
-				additionalData:inputTypeUint8,	// Decrypt will error if additionalData is not the same as encrypt.
 				tagLength:GCM_TAGLENGTH_BITS	// number of bits making up tag length (120)
 			},
 			keyGCM,								// CryptoKey object used to encrypt.
@@ -3352,7 +3313,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	//	usage:		decryptOBF1000()
 	//
-	async function decryptGCM(saltAndCiphertext64, password, outputType='base64') {
+	async function decryptGCM(saltAndCiphertext64, password) {
 		// Convert password into bytes.
 		const passwordUint8 = new TextEncoder().encode(password);
 		// Convert base64 into bytes.
@@ -3399,30 +3360,18 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			false,					// extractable boolean 
 			['decrypt']				// keyUsages
 		);
-		// decrypt() function parameter needs to be in Uint8Array format.
-		const outputTypeUint8 = new TextEncoder().encode(outputType);
-		// 'Main' Subtle Crypto encrypt() call for AES-GCM algorithm.
+		// 'Main' Subtle Crypto decrypt() call for AES-GCM algorithm.
         const decryptedBuffer = await window.crypto.subtle.decrypt(
 			{									// object specifying algorithm, parameters for the encrypt call
 				name: 'AES-GCM',				// algorithm name
 				iv: ivBytesUint8,				// IV to use
-				additionalData: outputTypeUint8,// Will error if additionalData is different than was used for encrypt.
 				tagLength: GCM_TAGLENGTH_BITS	// 120 - number of tag bits
 			},
 			keyGCM,								// CryptoKey object used to encrypt.
 			encodedCiphertextUint8				// Ciphertext data to be decrypted.
 		);
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
-		let decryptedDecoded;
-		// Select output data type based on function parameter.
-		if (outputType === 'base64') {// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
-			decryptedDecoded = decryptedUint8.toBase64();
-		}else if (outputType === 'utf8') {
-			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
-		}else{
-			throw new Error("Invalid decryptAESGCM outputType parameter!");
-		}
-		return decryptedDecoded;
+		return decryptedUint8.toBase64();
 	}// decryptGCM()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3451,17 +3400,9 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	//				additional usage:	This function is also used in encrypting the offline database.	
 	//	
-	async function encryptAESCTR(cleartext64, password, inputType='base64') {
-		console.log("encryptAESCTR called with inputType: " + inputType);
-		let cleartextUint8;
-		// Select input processing type based on function input parameter.
-		if (inputType === 'base64') {// Default usage.
-			cleartextUint8 = Uint8Array.fromBase64(cleartext64);
-		}else if (inputType === 'utf8') {
-			cleartextUint8 = new TextEncoder().encode(cleartext64);
-		}else{
-			throw new Error("Invalid encryptAESCTR inputType parameter!");
-		}
+	async function encryptAESCTR(cleartext64, password) {
+
+		const cleartextUint8 = Uint8Array.fromBase64(cleartext64);
 		// Convert password text into Uint8Array.
 		const passwordUint8 = new TextEncoder().encode(password);
 		// Compute anew Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
@@ -3483,7 +3424,6 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
 			{									// PBKDF2 parameters object
 				name: "PBKDF2",					// key derivation algorithm
-				//name: key_derivation_algo,
 				salt: randSalt,					// salt (MDN suggests at least 16 bytes for security)
 				iterations: 10000,				// strength
 				hash: 'SHA-256',				// 
@@ -3511,7 +3451,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		let key = await window.crypto.subtle.importKey(
+		let keyCTR = await window.crypto.subtle.importKey(
 			'raw',					// input data format
 			keyBytesUint8, 			// keydata: input data
 			{						// algorithm to use to importKey
@@ -3520,14 +3460,21 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			false,					// Set data held by this CryptoKey as extractable? 
 			['encrypt']				// keyUsages
 		);
-		// MDN syntax: encrypt(algorithm, key, data)
-        const ciphertextBuffer = await window.crypto.subtle.encrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, cleartextUint8);
+		// 'Main' Subtle Crypto encrypt() call for AES-CTR algorithm.
+        const ciphertextBuffer = await window.crypto.subtle.encrypt(
+			{									// Object specifying algorithm, parameters for encrypt()
+				name: 'AES-CTR',				// algorithm name
+				counter: nonceAndCounterBytes,	// nonce and counter are wrapped together
+				length: 64						// length of nonce and counter
+			},
+			keyCTR,								// CryptoKey object used to encrypt
+			cleartextUint8						// cleartext data to be encrypted
+		);
 		const ciphertextUint8 = new Uint8Array(ciphertextBuffer);
 		// Wrap salt with encoded data so it can be used in the decrypt.
 		const saltAndDataUint8 = concatBuffer(randSalt, ciphertextUint8);
 		// This function outputs base64.
-		const ciphertext64 = saltAndDataUint8.toBase64();
-		return ciphertext64;
+		return saltAndDataUint8.toBase64();
 	}// encryptAESCTR()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3559,7 +3506,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//	
 	//	usage:		- Decrypts outer layer, first level of decrypt run by decryptDouble() decryptTriple()
 	//
-	async function decryptAESCTR(saltAndCiphertext64, password, outputType='base64') {
+	async function decryptAESCTR(saltAndCiphertext64, password) {
 		// Convert password into bytes.
 		const passwordUint8 = new TextEncoder().encode(password);
 		const saltAndCiphertextUint8 = Uint8Array.fromBase64(saltAndCiphertext64);
@@ -3598,7 +3545,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Import the PBKDF2 derived key bits into a key object made specifically 
 		// for use with the aes-cbc 256 algorithm.
 		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
-		let key = await window.crypto.subtle.importKey(
+		let keyGCM = await window.crypto.subtle.importKey(
 			'raw',					// input data format
 			keyBytesUint8, 				// keydata: input data
 			{						// algorithm to use to importKey
@@ -3607,20 +3554,19 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			false,					// extractable boolean 
 			['decrypt']				// keyUsages
 		);
-
-		// MDN syntax: decrypt(algorithm, key, data)
-		const decryptedBuffer = await window.crypto.subtle.decrypt({name:'AES-CTR', counter:nonceAndCounterBytes, length:64}, key, encodedCiphertextUint8);
+		// 'Main' Subtle Crypto decrypt() call for AES-CTR algorithm.
+		const decryptedBuffer = await window.crypto.subtle.decrypt(
+			{									// Object specifying algorithm, parameters for decrypt()
+				name: 'AES-CTR',				// algorithm name
+				counter: nonceAndCounterBytes,	// nonce and counter are passed in together
+				length: 64						// length of nonce and counter
+			},
+			keyGCM,								// CryptoKey object used to decrypt
+			encodedCiphertextUint8				// ciphertext data to be decrypted
+		);
 		const decryptedUint8 = new Uint8Array(decryptedBuffer);
-		let decryptedDecoded;
-		// Select output data type based on function parameter.
-		if (outputType === 'base64') {// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
-			decryptedDecoded = decryptedUint8.toBase64();
-		}else if (outputType === 'utf8') {
-			decryptedDecoded = new TextDecoder().decode(decryptedUint8);
-		}else{
-			throw new Error("Invalid decryptAESCTR outputType parameter!");
-		}
-		return decryptedDecoded;
+		//return decryptedDecoded;
+		return decryptedUint8.toBase64();
 	}// decryptAESCTR()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
