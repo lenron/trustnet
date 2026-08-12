@@ -980,7 +980,7 @@
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	// User input limits.
 	const BROWSERINPUT_LENGTH_LIMIT = 686; // User input size limit in bytes for Triple Cipher.
-	const CMDINPUT_LENGTH_LIMIT = 710; // Limit for Double Cipher.
+	const CMDINPUT_LENGTH_LIMIT = 704; // Limit for Double Cipher.
 	// PBKDF2 number-of-bits-to-derive constants.
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384; // 256 bits for key + 128 for IV
 	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352; // 256 bits for key + 96 for IV
@@ -2503,74 +2503,34 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//	       Data Pipeline / Cryptographic Functions		                                                                     //
+	//	                Core Cryptographic Functions		                                                                     //
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// We provide a 686- or 710-byte-size 'data locker' encrypted using 3 or 2 core cryptographic ciphers                        //
-	// and packed with additional security (if using the optional Offline Database) in order to implement our custom 			 //
-	// Multi Cipher and Security method offered on our website: 						  										 //
+	// We provide a free 'data locker' up to 686 bytes, which is encrypted using 3 core cryptographic ciphers:
+	//		AES-CBC
+	//		AES-GCM
+	//		AES-CTR             
+	// This produces a Multi Encrypted Datarecord (MED) that is stored in our online database or in a user-controlled offline database.
 	// 																															 //
 	// Crypto explained below.																									 //
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Double Cipher - 710 byte Input Limit
-	//
-	// User Input (File Upload) ==> OBF-1000 ==> AES-CTR ==> Database Storage
-	//
-	// User Input (File Upload)
-	//    |<--------------710 byte check - CMDINPUT_LENGTH_LIMIT
-	//    V
-	// OBF-1000 (AES-GCM)
-	//    |<--------------1000 base64 check - OBF1000_OUTPUT_LIMIT_BASE64
-	//    V
-	// AES-CTR
-	//    |<--------------1024 base64 check - AESCTR_OUTPUT_LIMIT_BASE64
-	//    V
-	// Multi Encrypted Datarecord
-	//    |<--------------1024 base64 check - FULLY_ENCRYPTED_DATA_LENGTH_BASE64
-	//    V
-	// Database Storage (Server or Offline)
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Triple Cipher - 686 byte Input Limit
-	//
-	// User Input (Browser) ==> OpenSSL ==> OBF-1000 ==> AES-CTR ==> Database Storage
-	//
-	// User Input (Browser)
-	//    |<--------------686 byte check (input can be any unicode where a single char can need multiple bytes) - BROWSERINPUT_LENGTH_LIMIT
-	//    V
-	// OpenSSL (AES-CBC)
-	//    |<--------------710 bytes / 946.6 base64 check - OPENSSL_OUTPUT_LIMIT_BASE64
-	//    V
-	// OBF-1000 (AES-GCM)
-	//    |<--------------750 bytes / 1000 base64 check - OBF1000_OUTPUT_LIMIT_BASE64
-	//    V
-	// AES-CTR
-	//    |<--------------1024 base64 check - AESCTR_OUTPUT_LIMIT_BASE64
-	//    V
-	// Multi Encrypted Datarecord 
-	//    |<--------------1024 base64 check - FULLY_ENCRYPTED_DATA_LENGTH_BASE64
-	//    V
-	// Database Storage (Server or Offline)
-	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Triple Cipher Waterfall - BROWSER STORE Functionality / Datapath
 	//
 	//
-	//               User Input
-	//                   |
-	//                   V
-	//     <-----store_data_textarea.value---->   <--------------686 byte check - BROWSERINPUT_LENGTH_LIMIT - textarea.oninput()
-	//     |--------Up to 686-----------------|
+	//                                                   User Input:
+	//
+	//                [Cleartext]              [Password 1]     [Password 2]     [Password 3]
+	//              |---Up to 686---|
 	//                   |
 	//                   V
 	//              To Javascript
 	//                   |
-	//                   V
-	//     <------OpenSSL Cleartext---->
-	//     |--------Up to 686----------|
-	//                   |
-	//                   V
-	//             To OpenSSL
-	//                   |
+	//                   V                             ___________________________________________________________
+	//     <------OpenSSL Input-------->                                                                          |
+	//     |--------Up to 686----------|                                                                          |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//             To OpenSSL                                                                                     | 
+	//                   |                                                                                        |
 	//                   V
 	//             +1 Newline Byte 
 	//                   |
@@ -2580,33 +2540,37 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//     |-------Up to 686----||----1----|
 	//                   |
 	//                   V
-	//               CBC Encrypt
+	//               CBC Encrypt     <--------------------------------------------------------[Password 3]
 	//                   |
 	//                   V
 	//     <---------------CBC Ciphertext---------------->
 	//     |------Cleartext--||-Newline-||-CBC Blocking--|
-	//     |-------Up to 686----||----1----||--1 to 16---|
+	//     |----Up to 686----||----1----||--1 to 16------|
 	//                   |
 	//                   V
-	//               +2 Salts
+	//               +'Salted__' string
+	//                   |
+	//                   V
+	//               +CBC 8 byte Salt
 	//                   |
 	//                   V
 	//     <---------------OpenSSL Output------------->
 	//     |-Salted__-||-CBC Salt-|<--CBC Ciphertext-->
-	//     |-----8----||------8---||--Up to 704-------|
-	//     |-----------Up to 710----------------------|
+	//     |-----8----||------8---||--Up to 688-------|
+	//     |-----------Up to 704----------------------|
 	//                   |
 	//                   V
 	//             To OBF-1000
 	//                   |
 	//                   V
-	//               -8 bytes Salted__
+	//               -8 bytes 'Salted__' string
 	//                   |
 	//                   V
 	//               +7 bytes 7ByteHeader
 	//                   |
 	//                   V
-	//               +(710 - OpenSSL Output byte length) bytes Random Filler
+	//               +[710 - sizeof(OpenSSL Output)] bytes of Random Filler
+	//               +[710 - sizeof(User uploaded file data)] bytes of Random Filler
 	//                   |
 	//                   V
 	//     <--------------GCM Cleartext----------------------------------->
@@ -2615,7 +2579,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//     |---------------------------717 -------------------------------|
 	//                   |
 	//                   V
-	//               GCM Encrypt
+	//               GCM Encrypt <-----------------------------------------------------------[Password 1]
 	//                   |
 	//                   V
 	//     <--------------OBF-1000 Outupt----------------------->
@@ -2629,11 +2593,10 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                   |
 	//                   V
 	//     <------CTR Cleartext----------------->
-	//     <------OBF-1000 Output--------------->
 	//     |-------------------750 -------------|
 	//                   |
 	//                   V
-	//               CTR Encrypt
+	//               CTR Encrypt <-----------------------------------------------------------[Password 2]
 	//                   |
 	//                   V
 	//     <-------------AES-CTR Outupt------------------------->
@@ -2642,65 +2605,17 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//     |---------------------768----------------------------|
 	//                   |
 	//                   V
+	//              Converted to 1024 base64 chars
+	// 			this is our MultiEncrypted Datarecord (MED)
+	//                   |
+	//                   V
 	//              To Database Storage
-	//
-	//
-	//
-	//
-	//
-	//
+	//              
 	//
 	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Double Cipher:
-	//     ________________________________________________________________________________________________________________________
-	//    / AES-CTR _______________________________________________________________________________________________________________\ 
-	//   /         / OBF-1000 _____________________________________________________________________________________________________\\
-	//  /         /          /             ____________________________________________________________________________   AES-GCM  \\\
-	// / CTR Salt/ GCM Salt / 7ByteHeader /                              Data Payload + Random Filler                  \   GCM Tag  \\\ 
-	// |---18---||----18---||---7 Bytes--||------------------------------------------710 Bytes-------------------------||------15-----|
-	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted--------------------------||---GCM Tag---|
-	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted--------------------------------------------|
-	// |----------------------------------------------Multi Encrypted Datarecord-------------------------------------------------------|
-	// 
-	// Triple Cipher:
-	//           ||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
-	//       ________________________________________________________________________________________________________________________________________
-	//      / AES-CTR _______________________________________________________________________________________________________________________________\ 
-	//     /         / OBF-1000 __________________________________________________________________________________________________________           \\
-	//    /         /          /             ____________________________________________________________________________      AES-GCM    \           \\
-	//   /         /          /             /      OpenSSL           ____________________________________________________\                 \           \\ 
-	//  /         /          /             /                        /___________________________        AES-CBC          \\                 \           \\
-	// / CTR Salt/ GCM Salt / 7ByteHeader / Salted__  +   CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
-	// 
-	// |---18---||----18---||---7 Bytes--||-----8----||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
-	//
-	//
-	//
-	//                                    |------------------------------------------710 Bytes-----------------------------------------------||-----15-----|
-	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
-	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
-	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted-----------------------------------------------------------------|
-	// |----------------------------------------------------------Multi Encrypted Datarecord----------------------------------------------------------------|
-	// 
-	// Triple Cipher:
-	//	*Note: Literal string 'Salted__' is removed in the Triple Encrypt process.
-	//       ___________________________________________________________________________________________________________________________
-	//      / AES-CTR __________________________________________________________________________________________________________________\ 
-	//     /         / OBF-1000 _____________________________________________________________________________________________           \\
-	//    /         /          /             _______________________________________________________________      AES-GCM    \           \\
-	//   /         /          /             / OpenSSL   ____________________________________________________\                 \           \\ 
-	//  /         /          /             /           /___________________________        AES-CBC          \\                 \           \\
-	// / CTR Salt/ GCM Salt / 7ByteHeader /  CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
-	// 
-	// |---18---||----18---||---7 Bytes--||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16-----|
-	//                                    |------------------------------------------710 Bytes----------------------------------||-----15-----|
-	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
-	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted-----------------------------------||---GCM Tag--|
-	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted----------------------------------------------------|
-	// |----------------------------------------------------------Multi Encrypted Datarecord---------------------------------------------------|
-	// 
+	//---------------------------Function Overview----------------------------------------- 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OpenSSL
 	//    ____________________________________________________________________________ 
@@ -2805,7 +2720,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const keyForPBKDF2 = await window.crypto.subtle.importKey(
 			"raw",			// format
 			passwordUint8,	// keyData
-			"PBKDF2",		// algorithm
+			"PBKDF2",	    // algorithm
 			false,			// extractable?
 			["deriveBits"],	// allowed usages
 		);
@@ -2818,7 +2733,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				hash: "SHA-256",	// digest algorithm
 			},
 			keyForPBKDF2,			// Base key used for bit derivation.
-			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,	// Number of bits to derive.
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,	// Number of bits to derive = 384
 		);
 		// Cast ArrayBuffer into a Uint8Array.
 		const keyAndIvBitsUint8 = new Uint8Array(keyAndIVBitsBuffer);
@@ -2845,6 +2760,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			keyCBC,					// CryptoKey object used in the encryption.
 			cleartextAsFileUint8	// Cleartext data to be encrypted.
 		);
+		const ciphertextUint8 = new Uint8Array(ciphertext);
 		// Compile output to match OpenSSL Linux command line functionality. *Thoroughly explained/mapped in Cryptographic Functions section description.
 		const saltedLiteral = "Salted__";	// OpenSSL uses to designate next 8 bytes as salt.
 		// Convert string chars into bytes.
@@ -2853,6 +2769,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Merge salts with encoded ciphertext.
 		// OpenSSL Output = Salted__ + CBC Salt + Ciphertext
 		const openSSLOutputUint8 = concatBuffer(twoSaltsUint8, ciphertext);
+
 		// All crypto functions output base64-packed data for data integrity checks, uniformity.
 		return openSSLOutputUint8.toBase64();
 	}// encryptOpenSSL()
