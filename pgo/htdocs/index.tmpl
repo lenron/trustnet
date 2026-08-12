@@ -832,6 +832,11 @@
 				<h2>You've reached your limit of 100 stores today.</h2>
 			</div>
 
+			<!---------------------------File Upload - NO SALT - Error-----------------------!>
+			<div class="flow_pages" id="no_salt" style="display:none">
+				<h2>&#10060; The outer layer of encryption for a file upload MUST be encrypted with exact openssl command provided or it will NEVER DECRYPT PROPERLY!</h2>
+			</div>
+
 			<!---------------------------Store Fail-----------------------!>
 			<div class="flow_pages" id="store_failed" style="display:none">
 				<h2>&#10060; STORE ERROR</h2>
@@ -867,18 +872,6 @@
 				</div>
 			</div>
 
-			<!--------------------------FILL OFFLINE Use ENC Password Database?-----------------------!>
-<!--
-			<div class="flow_pages" id="offlineDatabase_pass_or_no" style="display:none; ">
-				<h2>TO ENCRYPT YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
-				<input autocomplete="off" type="password" value="" id="offlineDBasePass_input" style="">
-				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="createOfflineDBase('unencrypted'); showPage('home')">NO PASSWORD</button>
-					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="createOfflineDBase('encrypted'); showPage('home')">PASSWORD READY</button>
-				</div>
-			</div>
--->
-
 			<!---------------------------EXISTING DATA Codeword-----------------------!>
 			<div class="flow_pages passlock" id="newofflinedatabase_exisitingdata_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
@@ -889,7 +882,6 @@
 				<h2>ENTER CODEWORD</h2>
 				<input autocomplete="off" type="password" value="" id="existingdata_codeword_input" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
-					<!--<button class="" id='' style="flex-grow:1;" onclick="showPage('offline_dbase_2options')">BACK</button>-->
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initPasslockFlow('existingdata_codeword_input');saveThenShowPage('newofflinedatabase_existingdata_obf1000Pass')">CONTINUE</button>
 				</div>
 			</div>
@@ -956,7 +948,6 @@
 			<!---------------------------EXISTING DATA Failed to Access-----------------------!>
 			<div class="flow_pages" id="failed_to_access_for_new_offline_database_creation" style="display:none">
 				<h2>&#10060; FAILED TO ACCESS EXISTING DATA FOR OFFLINE DATABASE CREATION.</h2>
-				<!--<button class="" id='' style="flex-grow:1;" onclick="clearNewOfflineDBaseData(); showPage('home')">I'M DONE WITH THIS</button>-->
 				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
 			</div>
 
@@ -2997,6 +2988,21 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	async function encryptOBF1000(cleartext64, password) {
 		// Construct byte array with base64 input data.
 		const cleartextWithSaltUint8 = Uint8Array.fromBase64(cleartext64);
+		// Check for Salted__ header bytes and error if they are not found.
+		// Get byte form of salted literal.
+		const saltedLiteral = "Salted__";
+		//const saltedLiteralUint8 = new TextEncoder().encode(saltedLiteral);
+
+		const saltHeaderUint8 = cleartextWithSaltUint8.slice(0,8);
+		const saltToCheck = new TextDecoder().decode(saltHeaderUint8);
+		if (saltedLiteral !== saltToCheck) {
+			showPage('no_salt');
+			throw new Error("OBF-1000 input doesn't look like OpenSSL output!");
+		}
+		if (saltedLiteral === saltToCheck) {
+			console.log("SALT: ", saltToCheck);
+		}
+
 		// Slice off the 8 bytes from OpenSSL that convert to: Salted__
 		const cleartextUint8 = cleartextWithSaltUint8.slice(8);
 		// Add 7byte prepend (representing length of data) and random filler padding.
