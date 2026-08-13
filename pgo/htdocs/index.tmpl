@@ -2734,15 +2734,22 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                                           V
 	//                   Encrypt Offline Database using [Offline Database Password]
 	//                  
-	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Offline Database Store
+	// Offline Database Structure - EMPTY
 	//
-	//
-	//                [Plaintext]       [Password 3]     [Password 1]     [Password 2]    [Codeword]    [Offline Database Password]
-	//
-	//
-	//
+	//                                                                       ___________
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |-----1000 rows of [Fingerprint + Multi Encrypted Datarecord]
+	//                                                           |                      |
+	//                                                          ...                     |
+	//                                                           |                      |
+	//                                                           V                      |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>___________|
 	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2756,7 +2763,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//  # of rows-->|          <43 random base64 chars> <1024 random base64 chars>           |
 	//  = Pointer   |          <43 random base64 chars> <1024 random base64 chars>           |
 	//              |          <43 random base64 chars> <1024 random base64 chars>           |
-	//              |______ * <43 base64 Fingerprint chars> <1024 base64 MED chars>          |-----1000 [Fingerprint + Multi Encrypted Datarecord]
+	//              |______ * <43 base64 Fingerprint chars> <1024 base64 MED chars>          |-----1000 rows of [Fingerprint + Multi Encrypted Datarecord]
 	//                      ^                                         |                      |
 	//   Pointer____________|                                        ...                     |
 	//                                                                |                      |
@@ -2764,21 +2771,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                         <43 random base64 chars> <1024 random base64 chars>           |
 	//                         <43 random base64 chars> <1024 random base64 chars>___________|
 	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Offline Database Structure - EMPTY
-	//                                                                       ___________
-	//                    <43 random base64 chars> <1024 random base64 chars>           |
-	//                    <43 random base64 chars> <1024 random base64 chars>           |
-	//                    <43 random base64 chars> <1024 random base64 chars>           |
-	//                    <43 random base64 chars> <1024 random base64 chars>           |
-	//                    <43 random base64 chars> <1024 random base64 chars>           |
-	//                    <43 random base64 chars> <1024 random base64 chars>           |-----1000 [Fingerprint + Multi Encrypted Datarecord]
-	//                                                           |                      |
-	//                                                          ...                     |
-	//                                                           |                      |
-	//                                                           V                      |
-	//                    <43 random base64 chars> <1024 random base64 chars>           |
-	//                    <43 random base64 chars> <1024 random base64 chars>___________|
+	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//---------------------------Function Overview----------------------------------------- 
