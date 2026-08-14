@@ -835,6 +835,7 @@
 			<!---------------------------File Upload - NO SALT - Error-----------------------!>
 			<div class="flow_pages" id="no_salt" style="display:none">
 				<h2>&#10060; The outer layer of encryption for a file upload MUST be encrypted with exact openssl command provided or it will NEVER DECRYPT PROPERLY!</h2>
+				<h2>openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc</h2>
 			</div>
 
 			<!---------------------------Store Fail-----------------------!>
@@ -2512,18 +2513,57 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// This produces a Multi Encrypted Datarecord (MED) that is stored in our online database or in a user-controlled offline database.
 	// 																															 //
 	// Crypto explained below.																									 //
+	//              
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Double Cipher Waterfall - FILE UPLOAD STORE
-	// {Double Encrypt}
+	// Triple Cipher - BROWSER STORE
+	// {Triple Encrypt}
 	//
 	//
-	//                                   User Input:
+	//                                                   User Input:
 	//
-	//    [Plaintext - OpenSSL encrypted on command line by user]              [Password 1]     [Password 2]
-	//               [File Upload]                                              [OBF-1000]        [AES-CTR]
-	//             |---Up to 704---|
+	//                [Plaintext]              [Password 1]     [Password 2]     [Password 3]
+	//                [Plaintext]               [OBF-1000]       [AES-CTR]         [OpenSSL]
+	//             |---Up to 686---|
 	//                   |
 	//                   V
+	//              To Javascript
+	//                   |
+	//                   V                             ___________________________________________________________
+	//     <------OpenSSL Input-------->                                                                          |
+	//     |--------Up to 686----------|                                                                          |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//             To OpenSSL                                                                                     | 
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//             +1 Newline Byte                                                                                |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <-------CBC Plaintext----------->                                                                      |
+	//     |----Plaintext-------||-Newline-|                                                                      |
+	//     |-------Up to 686----||----1----|                                                                      |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               CBC Encrypt <----------------------[Password 3]                                              |-----OpenSSL
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <---------------CBC Ciphertext---------------->                                                        |
+	//     |------Plaintext--||-Newline-||-CBC Blocking--|                                                        |
+	//     |----Up to 686----||----1----||--1 to 16------|                                                        |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +'Salted__' string                                                                           |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +CBC 8 byte Salt                                                                             |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <---------------OpenSSL Output------------->                                                           |
+	//     |-Salted__-||-CBC Salt-|<--CBC Ciphertext-->                                                           |
+	//     |-----8----||------8---||--Up to 688-------|                                                           |
+	//     |-----------Up to 704----------------------|                                                           |
+	//                   |                             ___________________________________________________________|
+	//                   V                            
 	//             To OBF-1000                         ___________________________________________________________ 
 	//                   |                                                                                        |
 	//                   V                                                                                        |
@@ -2575,55 +2615,17 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//     Multi Encrypted Datarecord ready for Database Storage
 	//              
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Triple Cipher Waterfall - BROWSER STORE Functionality / Datapath
-	// {Triple Encrypt}
+	// Double Cipher - FILE UPLOAD STORE
+	// {Double Encrypt}
 	//
 	//
-	//                                                   User Input:
+	//                                   User Input:
 	//
-	//                [Plaintext]              [Password 1]     [Password 2]     [Password 3]
-	//                [Plaintext]               [OBF-1000]       [AES-CTR]         [OpenSSL]
-	//             |---Up to 686---|
+	//    [Plaintext - OpenSSL encrypted on command line by user]              [Password 1]     [Password 2]
+	//               [File Upload]                                              [OBF-1000]        [AES-CTR]
+	//             |---Up to 704---|
 	//                   |
 	//                   V
-	//              To Javascript
-	//                   |
-	//                   V                             ___________________________________________________________
-	//     <------OpenSSL Input-------->                                                                          |
-	//     |--------Up to 686----------|                                                                          |
-	//                   |                                                                                        |
-	//                   V                                                                                        |
-	//             To OpenSSL                                                                                     | 
-	//                   |                                                                                        |
-	//                   V                                                                                        |
-	//             +1 Newline Byte                                                                                |
-	//                   |                                                                                        |
-	//                   V                                                                                        |
-	//     <-------CBC Plaintext----------->                                                                      |
-	//     |----Plaintext-------||-Newline-|                                                                      |
-	//     |-------Up to 686----||----1----|                                                                      |
-	//                   |                                                                                        |
-	//                   V                                                                                        |
-	//               CBC Encrypt <----------------------[Password 3]                                              |-----OpenSSL
-	//                   |                                                                                        |
-	//                   V                                                                                        |
-	//     <---------------CBC Ciphertext---------------->                                                        |
-	//     |------Plaintext--||-Newline-||-CBC Blocking--|                                                        |
-	//     |----Up to 686----||----1----||--1 to 16------|                                                        |
-	//                   |                                                                                        |
-	//                   V                                                                                        |
-	//               +'Salted__' string                                                                           |
-	//                   |                                                                                        |
-	//                   V                                                                                        |
-	//               +CBC 8 byte Salt                                                                             |
-	//                   |                                                                                        |
-	//                   V                                                                                        |
-	//     <---------------OpenSSL Output------------->                                                           |
-	//     |-Salted__-||-CBC Salt-|<--CBC Ciphertext-->                                                           |
-	//     |-----8----||------8---||--Up to 688-------|                                                           |
-	//     |-----------Up to 704----------------------|                                                           |
-	//                   |                             ___________________________________________________________|
-	//                   V                            
 	//             To OBF-1000                         ___________________________________________________________ 
 	//                   |                                                                                        |
 	//                   V                                                                                        |
@@ -2771,22 +2773,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                                       ||
 	//                                       ||
 	//                                       \/
-	//                             Packed into JSON Object
-	//                                       |
-	//                                       V
-	//                                    fetch()
-	//                                       |
-	//                                       V
-	//                                  POST request
-	//                                       |
-	//                                       V
-	//                                 Open Internet
-	//                                       |
-	//                                       V
-	//                                Server Ingress
-	//                                       |
-	//                                       V
-	//                          Data Integrity Check (length & base64)
+	//                              Sent to Online Server
 	//                                       |
 	//                                       V
 	//                          Stored as key-value pair in MariaDB
@@ -2811,23 +2798,33 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 7Byte Header, functionality
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Section to describe how both Offline Databases are 'rolled' and pointers are chosen.
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Offline Database Structure - Store
 	//
-	//          * Pointer is an integer that points to the row to be replaced upon next Store.
+	//          (*) Pointer is an integer that points to the row to be replaced upon next Store.
+	//              [The Unencrypted Database Pointer is a randomly chosen integer between 0-999]
+	//              [The Encrypted Database Pointer starts at 0 and is Triple Encrypted with the Encrypted Database Password]
 	//
-	//               ______                                                       ___________
-	//              |          <43 random base64 chars> <1024 random base64 chars>           |
-	//              |          <43 random base64 chars> <1024 random base64 chars>           |
-	//  # of rows-->|          <43 random base64 chars> <1024 random base64 chars>           |
-	//  = Pointer   |          <43 random base64 chars> <1024 random base64 chars>           |
-	//              |          <43 random base64 chars> <1024 random base64 chars>           |
-	//              |______ * <43 base64 Fingerprint chars> <1024 base64 MED chars>          |-----1000 rows of [Fingerprint + Multi Encrypted Datarecord]
-	//                      ^                                         |                      |
-	//   Pointer____________|                                        ...                     |
-	//                                                                |                      |
-	//                                                                V                      |
-	//                         <43 random base64 chars> <1024 random base64 chars>           |
-	//                         <43 random base64 chars> <1024 random base64 chars>___________|
+	//               _____                                                       ________
+	//              |          <43 random base64 chars> <1024 random base64 chars>       |
+	//              |          <43 random base64 chars> <1024 random base64 chars>       |
+	//  # of rows-->|          <43 random base64 chars> <1024 random base64 chars>       |
+	//  = Pointer   |          <43 random base64 chars> <1024 random base64 chars>       |
+	//              |          <43 random base64 chars> <1024 random base64 chars>       |
+	//              |_____ (*) <43 base64 Fingerprint chars> <1024 base64 MED chars>     |-----1000 rows of [Fingerprint + Multi Encrypted Datarecord]
+	//                      ^                                         |                  |
+	//   Pointer____________|                                        ...                 |
+	//                                                                |                  |
+	//                                                                V                  |
+	//                         <43 random base64 chars> <1024 random base64 chars>       |
+	//                         <43 random base64 chars> <1024 random base64 chars>_______|
 	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2838,11 +2835,11 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                              V                  V                                V             V
 	//              [Offline Database]                [Pointer]                   [Fingerprint]    [Multi Encrypted Datarecord]
 	//         [1,067,000 base64 chars]  [Integer representing row location]    [43 base64 chars]    [1024 base64 chars - MED]
-	//                    |                                 |                        |                        |
-	//                    |                                 |                        |          ______________|
-	//                    |                                 |                        |         |
-	//                    V                                 V                        V         V
-	//       {Perform Store by replacing row indicated by pointer with Fingerprint and MED to be stored} - As described above.
+	//                    |                                  |                        |                        |
+	//                    |                                  |                        |          ______________|
+	//                    |                                  |                        |         |
+	//                    V                                  V                        V         V
+	//    {Store the Fingerprint and the MED in the Offline Database at the location of the Pointer (replacing the random junk data there)}
 	//                    |                                  |
 	//                    |                                  V
 	//     [Offline Database - Data is now Stored]    {Increment Pointer}
@@ -2859,11 +2856,11 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//             |                                             |                 |                             |           |
 	//             V                                             V                 V                             V           V
 	//   [Offline Database Password]    [AES-CTR Encrypted Offline Database] [Triple Encrypted Pointer]    [Fingerprint]  [Multi Encrypted Datarecord]
-	//       [plaintext string]              [1,067,024 base64 chars]        [1024 base64 chars - MED]   [43 base64 chars]  [1024 base64 chars - MED]
+	//       [plaintext string]              [1,067,024* base64 chars]        [1024 base64 chars]       [43 base64 chars]  [1024 base64 chars - MED]
 	//             |                                |                                  |                        |                        |
 	//             |                                V                                  |                        |                        |
 	//             |----------------------> {AES-CTR Decrypt}                          V                        |                        |
-	//             |--------------------------------|------------->{Triple Decrypt (use same pass for all)}     |                        |
+	//             |--------------------------------|------>{Triple Decrypt (use same pass for all 3 ciphers)}  |                        |
 	//             |                                |                                  |                        |                        |
 	//             |                                |                                  V                        |                        |
 	//             |                                |                         [Decrypted Pointer]               |                        |
@@ -2873,7 +2870,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//             |                    [1,067,000 base64 chars]                       |         |             __________________________|  
 	//             |                                |                                  |         |            |
 	//             |                                V                                  V         V            V
-	//             |            {Perform Store by replacing row indicated by pointer with Fingerprint and MED to be stored} - As described above.
+	//             |        {Store the Fingerprint and the MED in the Offline Database at the location of the Pointer (replacing the random junk data there)}
 	//             |                                |                                  |                      
 	//             |                                V                                  V                      
 	//             |            [Offline Database - Data is now Stored]        {Increment Pointer}
@@ -2881,12 +2878,12 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//             |                                |                                  |                      
 	//             |                                V                                  |                      
 	//             |----------------------> {AES-CTR Encrypt}                          V
-	//             |--------------------------------|------------->{Triple Encrypt (use same pass for all)}
+	//             |--------------------------------|------------->{Triple Encrypt (use same pass for all 3 ciphers)}
 	//                                              |                                  |
 	//                                              V                                  V
 	//                                    Store to HTML Object               Store to HTML Object
 	//                  
-	//                  
+	//  * There are 24 extra chars in the Encrypted Offline Database to hold the salt which is used to encrypt it.                
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//---------------------------Function Overview----------------------------------------- 
@@ -2980,6 +2977,14 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted----------------------------------------------------|
 	// |----------------------------------------------------------Multi Encrypted Datarecord---------------------------------------------------|
 	// 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 7Byte Header, functionality
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Section to describe how both Offline Databases are 'rolled' and pointers are chosen.
+	//
+	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// These functions make up the cryptographic core of <webstie>. We are using each of the 3 available ciphers in the subtle crypto library.
 	// Subtle crypto was chosen because of its wide availability and decades of 'experience', open source math functions that have been used over and over and thus vetted.
