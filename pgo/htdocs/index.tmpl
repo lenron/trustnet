@@ -2513,6 +2513,68 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// 																															 //
 	// Crypto explained below.																									 //
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Double Cipher Waterfall - FILE UPLOAD STORE
+	// {Double Encrypt}
+	//
+	//
+	//                                   User Input:
+	//
+	//    [Plaintext - OpenSSL encrypted on command line by user]              [Password 1]     [Password 2]
+	//               [File Upload]                                              [OBF-1000]        [AES-CTR]
+	//             |---Up to 704---|
+	//                   |
+	//                   V
+	//             To OBF-1000                         ___________________________________________________________ 
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               -8 bytes 'Salted__' string                                                                   |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +7 bytes 7ByteHeader                                                                         |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +[710 - sizeof(OpenSSL Output)] bytes of Random Filler                                       |
+	//               +[710 - sizeof(User uploaded file data)] bytes of Random Filler                              |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <--------------GCM Plaintext----------------------------------->                                       |
+	//     |-7ByteHeader-||-CBC Salt-|<-CBC Ciphertext->|--Random Filler--|                                       |------OBF-1000
+	//     |-----7-------||-------------------710-------------------------|                                       |
+	//     |---------------------------717 -------------------------------|                                       |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               GCM Encrypt <------------------------[Password 1]                                            |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <--------------OBF-1000 Outupt----------------------->                                                 |
+	//     |-GCM Salt-||----------GCM Encrypt Output------------|                                                 |
+	//     |-GCM Salt-|<-------GCM Ciphertext-------->|-GCM Tag-|                                                 |
+	//     |---18-----||-----------717---------------||---15----|                                                 |
+	//     |---------------------750----------------------------|                                                 |
+	//                   |                             ___________________________________________________________|
+	//                   V
+	//             To AES-CTR
+	//                   |                             ___________________________________________________________
+	//                   V                                                                                        |
+	//     <------CTR Plaintext----------------->                                                                 |
+	//     |-------------------750 -------------|                                                                 |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               CTR Encrypt <------------------------[Password 2]                                            |------AES-CTR
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <-------------AES-CTR Outupt------------------------->                                                 |
+	//     |-CTR Salt-||----------CTR Ciphertext----------------|                                                 |
+	//     |---18-----||-----------750--------------------------|                                                 |
+	//     |---------------------768----------------------------|                                                 |
+	//                   |                             ___________________________________________________________|
+	//                   V
+	//          Convert to 1024 base64 chars
+	//                   |
+	//                   V
+	//     Multi Encrypted Datarecord ready for Database Storage
+	//              
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Triple Cipher Waterfall - BROWSER STORE Functionality / Datapath
 	// {Triple Encrypt}
 	//
@@ -2521,7 +2583,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	//                [Plaintext]              [Password 1]     [Password 2]     [Password 3]
 	//                [Plaintext]               [OBF-1000]       [AES-CTR]         [OpenSSL]
-	//              |---Up to 686---|
+	//             |---Up to 686---|
 	//                   |
 	//                   V
 	//              To Javascript
@@ -2542,7 +2604,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//     |-------Up to 686----||----1----|                                                                      |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//               CBC Encrypt     <------------------------[Password 3]                                        |-----OpenSSL
+	//               CBC Encrypt <----------------------[Password 3]                                              |-----OpenSSL
 	//                   |                                                                                        |
 	//                   V                                                                                        |
 	//     <---------------CBC Ciphertext---------------->                                                        |
@@ -2598,7 +2660,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//     |-------------------750 -------------|                                                                 |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//               CTR Encrypt <---------------------------[Password 2]                                         |------AES-CTR
+	//               CTR Encrypt <------------------------[Password 2]                                            |------AES-CTR
 	//                   |                                                                                        |
 	//                   V                                                                                        |
 	//     <-------------AES-CTR Outupt------------------------->                                                 |
@@ -2641,38 +2703,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//              Fingerprint ready for Database Storage
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Online Database Storage
-	//
-	//                            After Computation:
-	//
-	//             [43 base64 Fingerprint]   [1024 base64 Multi Encrypted Datarecord]
-	//                        |                                 |
-	//                        |______________  _________________|
-	//                                       ||
-	//                                       ||
-	//                                       \/
-	//                                   Packed into JSON Object
-	//                                       |
-	//                                       V
-	//                                   fetch()
-	//                                       |
-	//                                       V
-	//                                   POST request
-	//                                       |
-	//                                       V
-	//                                   Open Internet
-	//                                       |
-	//                                       V
-	//                                   Server Ingress
-	//                                       |
-	//                                       V
-	//                                   Data Integrity Check (length & base64)
-	//                                       |
-	//                                       V
-	//                                   Stored as key-value pair in MariaDB
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Offline Database Storage - Unencrypted
+	// Database Storage - Triple - Browser Input
 	//
 	//                                          User Input:
 	//
@@ -2680,7 +2711,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                [Plaintext]    [Password 3]     [Password 1]     [Password 2]    [Codeword]
 	//                     |               |               |                |              |
 	//                     |               |               |                |              V
-	//                     |   ____________|               |                |          toLowerCase()
+	//                     |   ____________|               |                |         toLowerCase()
 	//                     |  |  __________________________|__              |              |
 	//                     |  | |  ___________________________|_____________|              |
 	//                     |  | | |                           |  |                         |
@@ -2697,42 +2728,69 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                                        ||
 	//                                        ||
 	//                                        \/
-	//                  Store [Fingerprint][MED] in Unencrypted Offline Database at current pointer position 
+	//                                   To database
 	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Offline Database Storage - Encrypted
+	// Database Storage - Double - File Upload Input
 	//
 	//                                          User Input:
 	//
-	//                                    [OpenSSL]       [OBF-1000]        [AES-CTR]
-	//                [Plaintext]       [Password 3]     [Password 1]     [Password 2]    [Codeword]    [Offline Database Password]
-	//                     |                  |               |                |              |                     |
-	//                     |                  |               |                |              V                     |
-	//                     |   _______________|               |                |          toLowerCase()             |
-	//                     |  |  _____________________________|                |              |                     |
-	//                     |  | |  ___________________________|________________|              |                     |
-	//                     |  | | |                           |  |                            |                     |
-	//                     |  | | |                           |  |   _________________________|                     |
-	//                     |  | | |                           |  |  |                                               |
-	//                     |  | | |                           |  |  |                                               |
-	//                     V  V V V                           V  V  V                                               |
-	//                  {Triple Encrypt}                 {Compute Fingerprint}                                      |
-	//                         |                                 |                                                  |
-	//                         V                                 V                                                  |
-	//    [1024 base64 Multi Encrypted Datarecord]      [43 base64 Fingerprint]                                     |
-	//                         |                                 |                                                  |
-	//                         |______________  _________________|                                                  |
-	//                                        ||      ______________________________________________________________|
-	//                                        ||     |                                            
-	//                                        \/     V
-	//                   Decrypt Offline Database using [Offline Database Password]
-	//                                           |
-	//                                           V
-	//                  Store [Fingerprint][MED] in Encrypted Offline Database at current pointer position 
-	//                                           |
-	//                                           V
-	//                   Encrypt Offline Database using [Offline Database Password]
+	//                                [OBF-1000]          [AES-CTR]
+	//                [Plaintext]    [Password 1]        [Password 2]    [Codeword]
+	//                     |              |                   |              |
+	//                     |              |                   |              V
+	//                     |              |                   |         toLowerCase()
+	//                     |    __________|____               |              |
+	//                     |   |  _____________|______________|              |
+	//                     |   | |             |              |   ___________|
+	//                     |   | |             |___________   |  |
+	//                     |   | |                         |  |  |
+	//                     |   | |                         |  |  |
+	//                     V   V V                         V  V  V
+	//                  {Double Encrypt}                 {Compute Fingerprint}
+	//                         |                                 |
+	//                         V                                 V
+	//    [1024 base64 Multi Encrypted Datarecord]      [43 base64 Fingerprint]
+	//                         |                                 |
+	//                         |______________  _________________|
+	//                                        ||
+	//                                        ||
+	//                                        \/
+	//                                   To database
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Online Database Storage
+	//
+	//                            Data to be Stored:
+	//
+	//             [43 base64 Fingerprint]   [1024 base64 Multi Encrypted Datarecord]
+	//                        |                                 |
+	//                        |______________  _________________|
+	//                                       ||
+	//                                       ||
+	//                                       \/
+	//                             Packed into JSON Object
+	//                                       |
+	//                                       V
+	//                                    fetch()
+	//                                       |
+	//                                       V
+	//                                  POST request
+	//                                       |
+	//                                       V
+	//                                 Open Internet
+	//                                       |
+	//                                       V
+	//                                Server Ingress
+	//                                       |
+	//                                       V
+	//                          Data Integrity Check (length & base64)
+	//                                       |
+	//                                       V
+	//                          Stored as key-value pair in MariaDB
+	//
 	//                  
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Offline Database Structure - EMPTY
@@ -2772,6 +2830,63 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                         <43 random base64 chars> <1024 random base64 chars>___________|
 	//
 	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Offline Database Storage - Unencrypted Database
+	//
+	//                            From HTML Object Storage                             Data to be stored
+	//                              |                  |                                |             |
+	//                              V                  V                                V             V
+	//              [Offline Database]                [Pointer]                   [Fingerprint]    [Multi Encrypted Datarecord]
+	//         [1,067,000 base64 chars]  [Integer representing row location]    [43 base64 chars]    [1024 base64 chars - MED]
+	//                    |                                 |                        |                        |
+	//                    |                                 |                        |          ______________|
+	//                    |                                 |                        |         |
+	//                    V                                 V                        V         V
+	//       {Perform Store by replacing row indicated by pointer with Fingerprint and MED to be stored} - As described above.
+	//                    |                                  |
+	//                    |                                  V
+	//     [Offline Database - Data is now Stored]    {Increment Pointer}
+	//          [1,067,000 base64 chars]                     |
+	//                    |                                  |
+	//                    V                                  V
+	//          Store to HTML Object               Store to HTML Object
+	//                  
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Offline Database Storage - Encrypted Database
+	//
+	//        User Input                                      From HTML Object Storage                          Data to be stored
+	//             |                                             |                 |                             |           |
+	//             V                                             V                 V                             V           V
+	//   [Offline Database Password]    [AES-CTR Encrypted Offline Database] [Triple Encrypted Pointer]    [Fingerprint]  [Multi Encrypted Datarecord]
+	//       [plaintext string]              [1,067,024 base64 chars]        [1024 base64 chars - MED]   [43 base64 chars]  [1024 base64 chars - MED]
+	//             |                                |                                  |                        |                        |
+	//             |                                V                                  |                        |                        |
+	//             |----------------------> {AES-CTR Decrypt}                          V                        |                        |
+	//             |--------------------------------|------------->{Triple Decrypt (use same pass for all)}     |                        |
+	//             |                                |                                  |                        |                        |
+	//             |                                |                                  V                        |                        |
+	//             |                                |                         [Decrypted Pointer]               |                        |
+	//             |                                |                [Integer representing row location]        |                        |
+	//             |                                |                                  |          ______________|                        |    
+	//             |    [Decrypted Offline Database - Ready to perform Store]          |         |                                       |             
+	//             |                    [1,067,000 base64 chars]                       |         |             __________________________|  
+	//             |                                |                                  |         |            |
+	//             |                                V                                  V         V            V
+	//             |            {Perform Store by replacing row indicated by pointer with Fingerprint and MED to be stored} - As described above.
+	//             |                                |                                  |                      
+	//             |                                V                                  V                      
+	//             |            [Offline Database - Data is now Stored]        {Increment Pointer}
+	//             |                    [1,067,000 base64 chars]                       |
+	//             |                                |                                  |                      
+	//             |                                V                                  |                      
+	//             |----------------------> {AES-CTR Encrypt}                          V
+	//             |--------------------------------|------------->{Triple Encrypt (use same pass for all)}
+	//                                              |                                  |
+	//                                              V                                  V
+	//                                    Store to HTML Object               Store to HTML Object
+	//                  
+	//                  
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//---------------------------Function Overview----------------------------------------- 
@@ -2815,6 +2930,55 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// *Cryptographically strong randomly generated salt here is used to generate the key (and the nonce and counter bytes) which is then used in the AES-CTR encryption, 
 	// ensuring a crypto strong new key is generated and used with each newly rolled encryption cipher.
 	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
+	// 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Double Cipher:
+	//     ________________________________________________________________________________________________________________________
+	//    / AES-CTR _______________________________________________________________________________________________________________\ 
+	//   /         / OBF-1000 _____________________________________________________________________________________________________\\
+	//  /         /          /             ____________________________________________________________________________   AES-GCM  \\\
+	// / CTR Salt/ GCM Salt / 7ByteHeader /                              Data Payload + Random Filler                  \   GCM Tag  \\\ 
+	// |---18---||----18---||---7 Bytes--||------------------------------------------710 Bytes-------------------------||------15-----|
+	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted--------------------------||---GCM Tag---|
+	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted--------------------------------------------|
+	// |----------------------------------------------Multi Encrypted Datarecord-------------------------------------------------------|
+	// 
+	// Triple Cipher:
+	//           ||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
+	//       ________________________________________________________________________________________________________________________________________
+	//      / AES-CTR _______________________________________________________________________________________________________________________________\ 
+	//     /         / OBF-1000 __________________________________________________________________________________________________________           \\
+	//    /         /          /             ____________________________________________________________________________      AES-GCM    \           \\
+	//   /         /          /             /      OpenSSL           ____________________________________________________\                 \           \\ 
+	//  /         /          /             /                        /___________________________        AES-CBC          \\                 \           \\
+	// / CTR Salt/ GCM Salt / 7ByteHeader / Salted__  +   CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
+	// 
+	// |---18---||----18---||---7 Bytes--||-----8----||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
+	//
+	//
+	//
+	//                                    |------------------------------------------710 Bytes-----------------------------------------------||-----15-----|
+	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
+	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
+	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted-----------------------------------------------------------------|
+	// |----------------------------------------------------------Multi Encrypted Datarecord----------------------------------------------------------------|
+	// 
+	// Triple Cipher:
+	//	*Note: Literal string 'Salted__' is removed in the Triple Encrypt process.
+	//       ___________________________________________________________________________________________________________________________
+	//      / AES-CTR __________________________________________________________________________________________________________________\ 
+	//     /         / OBF-1000 _____________________________________________________________________________________________           \\
+	//    /         /          /             _______________________________________________________________      AES-GCM    \           \\
+	//   /         /          /             / OpenSSL   ____________________________________________________\                 \           \\ 
+	//  /         /          /             /           /___________________________        AES-CBC          \\                 \           \\
+	// / CTR Salt/ GCM Salt / 7ByteHeader /  CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
+	// 
+	// |---18---||----18---||---7 Bytes--||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16-----|
+	//                                    |------------------------------------------710 Bytes----------------------------------||-----15-----|
+	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
+	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted-----------------------------------||---GCM Tag--|
+	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted----------------------------------------------------|
+	// |----------------------------------------------------------Multi Encrypted Datarecord---------------------------------------------------|
 	// 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// These functions make up the cryptographic core of <webstie>. We are using each of the 3 available ciphers in the subtle crypto library.
