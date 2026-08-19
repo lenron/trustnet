@@ -2515,8 +2515,34 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Crypto explained below.																									 //
 	//              
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 7Byte Header, functionality
+	// 7Byte Header
 	//
+	//    Why needed:
+	//               The 7Byte header is used to store the length of input data for OBF-1000 (sans Salted__ string literal).
+	//               This value is also used to determine how much random filler data was used to pad out to 1000 base64 chars of output.
+	//               
+	//               We use this obscure method for storing the length of the input in order to obfuscate often used constant values.
+	//               If a simple int were used, short pieces of data would often have the same constants used to compute ciphertext which is a cryptographic security flaw.
+	//               This method was devised in order to store the length value in a way that is statistically random.
+	//
+	//   Functionality:
+	//               7 bytes are randomly selected and placed into an array. They are then converted into either a value or a mathematical symbol based on the structure:
+	//               
+	//               number, symbol, number, symbol, number, symbol, number
+	//               
+	//               Order matters so index 0 gets converted to a number, index 1 gets converted to a mathematical symbol, index 2 --> number, index 3 --> symbol, etc.
+	//               The symbol a byte converts to depends on whether it's even or odd: even-->(+) odd-->(-)
+	//
+	//   Example:    For the Target Value: 24 an array was found: 162, 8, 116, 9, 181, 43, 73
+	//               162 --> number
+	//               8   --> even --> (+)
+	//               116 --> number
+	//               9   --> odd --> (-)
+	//               181 --> number
+	//               43  --> odd --> (-)
+	//               73  --> number
+	//
+	//               absoluteValue(162 + 116 - 181 - 73) = 24
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Multi Encrypted Datarecord - Breakdown
@@ -4007,7 +4033,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//				7Byte Functions                       //
 	////////////////////////////////////////////////////////
 
-	// Find set of bytes that compute to an exact value.
+	// Find set of bytes that compute to targetValue.
 	function find7ByteSetForValue(targetValue) {
 		let computedValue;
 		let sevenByteUint8;
@@ -4016,6 +4042,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
 			computedValue = eval7ByteValue(sevenByteUint8);
 		}while(computedValue != targetValue);
+console.log("TARGET VALUE: ", targetValue);
 		return sevenByteUint8;
 	}// find7ByteSetForValue()
 
@@ -4051,7 +4078,8 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				}
 			}
 		}
-		//console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
+		console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
+		console.log(sevenByteUint8);
 		return Math.abs(eval(mathExpression));
 	}// eval7ByteValue()
 
