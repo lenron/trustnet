@@ -2515,14 +2515,44 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Crypto explained below.																									 //
 	//              
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 7Byte Header, functionality
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Multi Encrypted Datarecord - Breakdown
+	//
+	//     
+	//     |----------------------------------Multi Encrypted Datarecord (MED)---768 Bytes (1024 base 64 chars)---------------------------------------------------| 
+	//                 |-----------------------------------------CTR Plaintext---750 Bytes (1000 base 64 chars)---------------------------------------------------| 
+	//                             |-----------------------------GCM Plaintext---717 Bytes-------------------------------------------------------------| 
+	//     |-CTR Salt-||-GCM Salt-||-7ByteHeader-||-CBC Salt-||-----------CBC Plaintext-----------||-Newline-||-CBC Blocking--||-----Random Filler-----||-GCM Tag-|
+	//     |----18----||----18----||------7------||----8-----||--Browser Input---Up to 686 Bytes--||----1----||----1 to 16----||-[ 710 - File Input  ]-||---15----|
+	//                                            |-----------------File Input---Up to 710 Bytes------------------------------| 
+	//     
+	//     Browser Input = CBC Plaintext
+	//     File Input = OpenSSL Output = OBF-1000 Input = GCM Plaintext
+	//     OBF-1000 Output = AES-CTR Input = CTR Plaintext
+	//     
+	//     
+	//     CBC Plaintext = Browser Input
+	//     GCM Plaintext != File Input = OpenSSL Output = OBF-1000 Input
+	//     GCM Plaintext 
+	//     CTR Plaintext = OBF-1000 Output = AES-CTR Input
+	//     
+	//     
+	//     ***Salted__ string literal removed in OBF-1000 step. Crypto best practices are to not have a constant in your cipher input which is why the decision was made.
+	//     The added benefit here is extra space for storage.
+	//     
+	//     
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Triple Cipher - BROWSER STORE
 	// {Triple Encrypt}
 	//
 	//
 	//                                                   User Input:
 	//
-	//                [Plaintext]              [Password 1]     [Password 2]     [Password 3]
 	//                [Plaintext]               [OBF-1000]       [AES-CTR]         [OpenSSL]
+	//                [Plaintext]              [Password 1]     [Password 2]     [Password 3]
 	//             |---Up to 686---|
 	//                   |
 	//                   V
@@ -2798,12 +2828,31 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 7Byte Header, functionality
+	// Offline Database
 	//
+	//                    Each of the two offline databases are created by randomly generating 1,067,000 base64 chars. These constitute 1000 'locations' where 
+	//                    a row of 1067 chars of junk data can be replaced with 1067 chars of 'real' data: a fingerprint and a Multi Encrypted Datarecord.
+	//
+	//                    Each offline database is stored in its own HTML DOM object. Data that is stored and changes that are made will initially only be reflected
+	//                    in non-persistent active memory and must be 'stored to disk' manually (for browser security reasons) in order for it to
+	//                    persist through reboots and be available for access using all major browsers.
+	//
+	//                    
+	//
+	//
+	// Unencrypted: The unencrypted offline database's pointer is initialized as a randomly chosen value 0-999.
+	//              This choice is to obscure the location of user data. A pointer always initialized to 0 would give an attacker a good place to start.
+	//              
+	// Encrypted:   The encrypted offline database's pointer is initialized to 0 but is triple encrypted to obscure the user's data location.
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Section to describe how both Offline Databases are 'rolled' and pointers are chosen.
+	// Offline Database Pointers
 	//
+	// Unencrypted: The unencrypted offline database's pointer is initialized as a randomly chosen value 0-999.
+	//              This choice is to obscure the location of user data. A pointer always initialized to 0 would give an attacker a good place to start.
+	//              
+	// Encrypted:   The encrypted offline database's pointer is initialized to 0 but is triple encrypted to obscure the user's data location.
+	//              
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Offline Database Structure - Store
@@ -2927,63 +2976,6 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// *Cryptographically strong randomly generated salt here is used to generate the key (and the nonce and counter bytes) which is then used in the AES-CTR encryption, 
 	// ensuring a crypto strong new key is generated and used with each newly rolled encryption cipher.
 	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
-	// 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Double Cipher:
-	//     ________________________________________________________________________________________________________________________
-	//    / AES-CTR _______________________________________________________________________________________________________________\ 
-	//   /         / OBF-1000 _____________________________________________________________________________________________________\\
-	//  /         /          /             ____________________________________________________________________________   AES-GCM  \\\
-	// / CTR Salt/ GCM Salt / 7ByteHeader /                              Data Payload + Random Filler                  \   GCM Tag  \\\ 
-	// |---18---||----18---||---7 Bytes--||------------------------------------------710 Bytes-------------------------||------15-----|
-	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted--------------------------||---GCM Tag---|
-	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted--------------------------------------------|
-	// |----------------------------------------------Multi Encrypted Datarecord-------------------------------------------------------|
-	// 
-	// Triple Cipher:
-	//           ||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
-	//       ________________________________________________________________________________________________________________________________________
-	//      / AES-CTR _______________________________________________________________________________________________________________________________\ 
-	//     /         / OBF-1000 __________________________________________________________________________________________________________           \\
-	//    /         /          /             ____________________________________________________________________________      AES-GCM    \           \\
-	//   /         /          /             /      OpenSSL           ____________________________________________________\                 \           \\ 
-	//  /         /          /             /                        /___________________________        AES-CBC          \\                 \           \\
-	// / CTR Salt/ GCM Salt / 7ByteHeader / Salted__  +   CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
-	// 
-	// |---18---||----18---||---7 Bytes--||-----8----||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
-	//
-	//
-	//
-	//                                    |------------------------------------------710 Bytes-----------------------------------------------||-----15-----|
-	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
-	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted------------------------------------------------||---GCM Tag--|
-	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted-----------------------------------------------------------------|
-	// |----------------------------------------------------------Multi Encrypted Datarecord----------------------------------------------------------------|
-	// 
-	// Triple Cipher:
-	//	*Note: Literal string 'Salted__' is removed in the Triple Encrypt process.
-	//       ___________________________________________________________________________________________________________________________
-	//      / AES-CTR __________________________________________________________________________________________________________________\ 
-	//     /         / OBF-1000 _____________________________________________________________________________________________           \\
-	//    /         /          /             _______________________________________________________________      AES-GCM    \           \\
-	//   /         /          /             / OpenSSL   ____________________________________________________\                 \           \\ 
-	//  /         /          /             /           /___________________________        AES-CBC          \\                 \           \\
-	// / CTR Salt/ GCM Salt / 7ByteHeader /  CBC Salt //          Cleartext        \ newline* + CBC Blocking \\ + Random Filler \  GCM Tag  \\ 
-	// 
-	// |---18---||----18---||---7 Bytes--||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16-----|
-	//                                    |------------------------------------------710 Bytes----------------------------------||-----15-----|
-	//                                                |-CBC Salt--||------------------AES-CBC Encrypted--------------------|
-	//           |-GCM Salt||-----------------------------------------------AES-GCM Encrypted-----------------------------------||---GCM Tag--|
-	// |CTR Salt||-------------------------------------------------------AES-CTR Encrypted----------------------------------------------------|
-	// |----------------------------------------------------------Multi Encrypted Datarecord---------------------------------------------------|
-	// 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 7Byte Header, functionality
-	//
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Section to describe how both Offline Databases are 'rolled' and pointers are chosen.
-	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// These functions make up the cryptographic core of <webstie>. We are using each of the 3 available ciphers in the subtle crypto library.
