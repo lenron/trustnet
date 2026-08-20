@@ -2518,31 +2518,54 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// 7Byte Header
 	//
 	//    Why needed:
-	//               The 7Byte header is used to store the length of input data for OBF-1000 (sans Salted__ string literal).
-	//               This value is also used to determine how much random filler data was used to pad out to 1000 base64 chars of output.
+	//               The 7Byte header is used to store the length of input data for OBF-1000 (not including the Salted__ string literal which is removed).
 	//               
-	//               We use this obscure method for storing the length of the input in order to obfuscate often used constant values.
-	//               If a simple int were used, short pieces of data would often have the same constants used to compute ciphertext which is a cryptographic security flaw.
-	//               This method was devised in order to store the length value in a way that is statistically random.
+	//               We use this method for storing the length of the input in order to obfuscate often used constant values like 0.
+	//               If a simple int were used in the same place e.g. as 3 digits, shorter length strings (presumably the most likely to be stored)
+	//               would often end up as something like: 027, 098, 129, etc. resulting in a design with a potential vulnerability with the often repeated 0,1,2.
+	//               
+	//               The seven byte header method was devised in order to store the length value in a way that is statistically random.
+	//
+	//   Probabilistic Integrity:
+	//                            <Something on the probability, etc. of the seven byte set and how it's rolled.>
 	//
 	//   Functionality:
-	//               7 bytes are randomly selected and placed into an array. They are then converted into either a value or a mathematical symbol based on the structure:
+	//               7 bytes are randomly selected, computed using the below formula until a set is found that computes to the target input value.
 	//               
-	//               number, symbol, number, symbol, number, symbol, number
+	//                        index:   0       1       2       3       4       5      6
+	//                                 |       |       |       |       |       |      |
+	//                                 V       V       V       V       V       V      V
+	//               absoluteValue( number, symbol, number, symbol, number, symbol, number )
+	//
+	//     Example:                 [ 162      8      116      9      181     43     73 ]
+	//                                 |       |       |       |       |       |      |
+	//                                 V       V       V       V       V       V      V
+	//                        index:   0       1       2       3       4       5      6
+	//                                 |       |       |       |       |       |      |
+	//                                 V       V       V       V       V       V      V
+	//               absoluteValue( number, symbol, number, symbol, number, symbol, number )
+	//                                 |       |       |       |       |       |      |
+	//                                 V       V       V       V       V       V      V
+	//               absoluteValue(   162     (+)     116     (-)     181     (-)    73 )
+	//
+	//                           absoluteValue(162 + 116 - 181 - 73)
+	//               
+	//                                absoluteValue( 24 ) = [24]
 	//               
 	//               Order matters so index 0 gets converted to a number, index 1 gets converted to a mathematical symbol, index 2 --> number, index 3 --> symbol, etc.
 	//               The symbol a byte converts to depends on whether it's even or odd: even-->(+) odd-->(-)
 	//
-	//   Example:    For the Target Value: 24 an array was found: 162, 8, 116, 9, 181, 43, 73
-	//               162 --> number
-	//               8   --> even --> (+)
-	//               116 --> number
-	//               9   --> odd --> (-)
-	//               181 --> number
-	//               43  --> odd --> (-)
-	//               73  --> number
+	//   Example:    For the Target Value: 24 an array was found:
 	//
-	//               absoluteValue(162 + 116 - 181 - 73) = 24
+	//                             [162, 8, 116, 9, 181, 43, 73]            162 --> number
+	//                               |   |   |   |   |   |   |              8   --> even --> (+)
+	//                               V   V   V   V   V   V   V              116 --> number
+	//                      index:   0   1   2   3   4   5   6              9   --> odd --> (-)
+	//                               |   |   |   |   |   |   |              181 --> number
+	//                               V   V   V   V   V   V   V              43  --> odd --> (-)
+	//               absoluteValue( 162,(+),116,(-),181,(-),73 )            73  --> number
+	//
+	//               absoluteValue( 162 + 116 - 181 - 73 ) = 24
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Multi Encrypted Datarecord - Breakdown
@@ -2561,8 +2584,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//     
 	//     
 	//     CBC Plaintext = Browser Input
-	//     GCM Plaintext != File Input = OpenSSL Output = OBF-1000 Input
-	//     GCM Plaintext 
+	//     GCM Plaintext != File Input = OpenSSL Output = OBF-1000 Input //     GCM Plaintext 
 	//     CTR Plaintext = OBF-1000 Output = AES-CTR Input
 	//     
 	//     
@@ -2836,6 +2858,16 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	//                  
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Offline Database
+	//
+	//                    Each of the two offline databases are created by randomly generating 1,067,000 base64 chars. These constitute 1000 'locations' where 
+	//                    a row of 1067 chars of junk data can be replaced with 1067 chars of 'real' data: a fingerprint and a Multi Encrypted Datarecord.
+	//
+	//                    Each offline database is stored in its own HTML DOM object. Data that is stored and changes that are made will initially only be reflected
+	//                    in non-persistent active memory and must be 'stored to disk' manually (for browser security reasons) in order for it to
+	//                    persist through reboots and be available for access using all major browsers.
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Offline Database Structure - EMPTY
 	//
 	//                                                                       ___________
@@ -2852,33 +2884,6 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                    <43 random base64 chars> <1024 random base64 chars>           |
 	//                    <43 random base64 chars> <1024 random base64 chars>___________|
 	//
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Offline Database
-	//
-	//                    Each of the two offline databases are created by randomly generating 1,067,000 base64 chars. These constitute 1000 'locations' where 
-	//                    a row of 1067 chars of junk data can be replaced with 1067 chars of 'real' data: a fingerprint and a Multi Encrypted Datarecord.
-	//
-	//                    Each offline database is stored in its own HTML DOM object. Data that is stored and changes that are made will initially only be reflected
-	//                    in non-persistent active memory and must be 'stored to disk' manually (for browser security reasons) in order for it to
-	//                    persist through reboots and be available for access using all major browsers.
-	//
-	//                    
-	//
-	//
-	// Unencrypted: The unencrypted offline database's pointer is initialized as a randomly chosen value 0-999.
-	//              This choice is to obscure the location of user data. A pointer always initialized to 0 would give an attacker a good place to start.
-	//              
-	// Encrypted:   The encrypted offline database's pointer is initialized to 0 but is triple encrypted to obscure the user's data location.
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Offline Database Pointers
-	//
-	// Unencrypted: The unencrypted offline database's pointer is initialized as a randomly chosen value 0-999.
-	//              This choice is to obscure the location of user data. A pointer always initialized to 0 would give an attacker a good place to start.
-	//              
-	// Encrypted:   The encrypted offline database's pointer is initialized to 0 but is triple encrypted to obscure the user's data location.
-	//              
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Offline Database Structure - Store
@@ -2903,7 +2908,13 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Offline Database Storage - Unencrypted Database
+	// Unencrypted Database Pointer
+	//
+	// Unencrypted: The unencrypted offline database's pointer is initialized as a randomly chosen value 0-999.
+	//              This choice is to obscure the location of user data. A pointer always initialized to 0 would give an attacker a good place to start.
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Unencrypted Database - Diagram
 	//
 	//                            From HTML Object Storage                             Data to be stored
 	//                              |                  |                                |             |
@@ -2923,7 +2934,10 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                    V                                  V
 	//          Store to HTML Object               Store to HTML Object
 	//                  
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Encrypted Database Pointer
 	//
+	// Encrypted:   The encrypted offline database's pointer is initialized to 0 but is triple encrypted to obscure the user's data location.
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Offline Database Storage - Encrypted Database
 	//
