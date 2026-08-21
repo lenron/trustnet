@@ -2511,8 +2511,8 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//		AES-GCM
 	//		AES-CTR             
 	// This produces a Multi Encrypted Datarecord (MED) that is stored in our online database or in a user-controlled offline database.
-	// 																															 //
-	// Crypto explained below.																									 //
+	// 
+	//
 	//              
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 7Byte Header
@@ -2867,6 +2867,9 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//                    in non-persistent active memory and must be 'stored to disk' manually (for browser security reasons) in order for it to
 	//                    persist through reboots and be available for access using all major browsers.
 	//
+	//                    When storing to disk is needed, the standalone.html browser file that holds the offline database will show a
+	//                    button reading: SAVE DATA TO DISK. This is triggered by changing any record (by storing or modifying) in the offline database.
+	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Offline Database Structure - EMPTY
 	//
@@ -2939,7 +2942,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//
 	// Encrypted:   The encrypted offline database's pointer is initialized to 0 but is triple encrypted to obscure the user's data location.
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Offline Database Storage - Encrypted Database
+	// Encrypted Database - Diagram
 	//
 	//        User Input                                      From HTML Object Storage                          Data to be stored
 	//             |                                             |                 |                             |           |
@@ -3030,7 +3033,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Built to perfectly replicate OpenSSL behavior on Linux command line, which I think it probably does.
+	// Purpose:	Built to precisely replicate OpenSSL behavior on Linux command line, which I think it probably does.
 	//			Specifically the command: openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
 	//			This uses an 8 byte salt and the key derivation function PBKDF2 to generate both the key and the IV to run 
 	//			the Subtle Crypto encrypt() with AES-CBC encryption.
