@@ -507,7 +507,7 @@
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS DATA</button>
 					<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="saveThenShowPage('store_codeword')">STORE DATA</button>
-					<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="deleteCheckShow('overlay_delete_cmd')">DELETE DATA</button>
+					<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showDeleteOverlay('overlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
 			<!---------------------------END CMD LINE Access Flow-----------------------!>
@@ -533,7 +533,7 @@
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
 					<button class="" id='editdata_button' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="editData()">EDIT DATA</button>
-					<button class="" id='delete_button' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="deleteCheckShow('overlay_delete_browser')">DELETE DATA</button>
+					<button class="" id='delete_button' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showDeleteOverlay('overlay_delete_browser')">DELETE DATA</button>
 				</div>
 			</div>
 			<!---------------------------END BROWSER Access Flow-----------------------!>
@@ -977,7 +977,7 @@
 	//		Global Flags & Page Load Function					//
 	//////////////////////////////////////////////////////////////
 
-	// Base 64 encoding as standardized in RFC 4648: https://datatracker.ietf.org/doc/html/rfc4648#section-4
+	// Base64 encoding as standardized in RFC 4648: https://datatracker.ietf.org/doc/html/rfc4648#section-4
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	// User input limits.
 	const BROWSERINPUT_LENGTH_LIMIT = 686; // User input size limit in bytes for Triple Cipher.
@@ -1022,10 +1022,8 @@
 	// This gives us a bit of 'room' or unused space that feels like will make our Triple Cipher even less likely to lose data.
 	// Output in base64 is (1000 - 20 - 24) * (4/3) convert to bytes - 7 Bytes for 7 byte set. Anything above this value will result in error.
 	const OBF1000_MAX_INPUT_BYTES = (OBF1000_OUTPUT_LIMIT_BASE64 - GCM_SIG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64) * 3 / 4 - 7;
-console.log("OBF1000_MAX_INPUT_BYTES: ", OBF1000_MAX_INPUT_BYTES );
 	// Use both to size the OBF1000 data + payload array and limit size of input.
 	const OPENSSL_OUTPUT_LIMIT_BASE64 = OBF1000_MAX_INPUT_BYTES * 4 / 3;
-console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 
 	//////////////////////////////////////////////////////////////
@@ -1036,6 +1034,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	window.onload = async function() {
 		// Initial server online check.
 		await updateOnlineStatus();
+		// Request filtering security.
 		serverCountUniqueVisitors();
 	}
 
@@ -1062,56 +1061,51 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}
 
 	//////////////////////////////////////////////////////////////
-	//		UI & flowwalker Handler Functions					//
+	//           	UI Manipulation Functions	         		//
 	//////////////////////////////////////////////////////////////
 
-	// Change text colors when editing record.
-	function showEnabledColors() {
+	// Change UI to show Edit button, activate textarea input.
+	function showEditEnabledUI() {
 		document.getElementById('access_data_outputdisplay').disabled = false;
 		document.getElementById('access_data_outputdisplay').style.color = '#<TMPL_VAR NAME=page_type_color>'; // Our 'normal' green.
-		document.getElementById('access_data_outputdisplay').style.backgroundColor = '#272727'; // Normal background
-	}// showEnabledColors()
+	}// showEditEnabledUI()
 
-	// Change text colors when editing is disabled.
-	function showDisabledColors() {
+	// Change UI to hide Edit button, deactivate textarea input.
+	function showEditDisabledUI() {
 		document.getElementById('access_data_outputdisplay').disabled = true;
 		document.getElementById('access_data_outputdisplay').style.color = 'gray';
-		//document.getElementById('access_data_outputdisplay').style.backgroundColor = '#434343';
-	}// showDisabledColors()
+	}// showEditDisabledUI()
 
 	// Show overlay where user can DELETE record.
-	function deleteCheckShow(targetId) {
-		//console.log("deleteCheck SHOW hit. targetId: " + targetId);
+	function showDeleteOverlay(targetId) {
 		document.getElementById(targetId).style.display = "flex";
-	}// deleteCheckShow()
+	}// showDeleteOverlay()
 
-	// Hide Overlay
+	// Hides DELETE overlay.
 	function deleteCheckHide(targetId) {
-		//console.log("deleteCheck HIDE hit. targetId: " + targetId);
 		document.getElementById(targetId).style.display = "none";
 	}// deleteCheckHide()
 
-	// Warning shown on 'password check' part of flow if second time user enters password doesn't match first.
-	function showPassWarnings() {
-		// Show all password warnings.
-		pass_check_elements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < pass_check_elements.length; i++) {
-			pass_check_elements[i].style.display = "inline";
+	// Inform user that RE-ENTERED data on a password check step was different.
+	function showPassCheckFailWarnings() {
+		// Show all password warnings on all html pages.
+		passCheckElements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < passCheckElements.length; i++) {
+			passCheckElements[i].style.display = "inline";
 		}
-	}// showPassWarnings()
+	}// showPassCheckFailWarnings()
 
-	function hidePassWarnings() {
-		// Show all password warnings.
-		pass_check_elements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < pass_check_elements.length; i++) {
-			pass_check_elements[i].style.display = "none";
+	// Disable all password warnings.
+	function hidePassCheckFailWarnings() {
+		passCheckElements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < passCheckElements.length; i++) {
+			passCheckElements[i].style.display = "none";
 		}
-	}// hidePassWarnings()
+	}// hidePassCheckFailWarnings()
 
 	// Replaces all upper case letters with lower case as user types them into the frontend UI.
-	// Runs on all user input to codeword inputs.
 	function codewordToLowerCase(events) {
-		// .toLowerCase needs a string to run.
+		// .toLowerCase() needs a string to run.
 		let userinput = '';
 		// event.target.value returns the value of whichever input the user is currently typing in.
 		userinput = event.target.value;
@@ -1119,10 +1113,14 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		event.target.value = userinput.toLowerCase();
 	}// codewordToLowerCase()
 
-	// Attach encrypt function listeners to access and store divs.
+	/////////////////////////////////////////////////////////////////
+	//                  Copy to Click Functions                    //
+	/////////////////////////////////////////////////////////////////
+
+	// Make it so that when this div is clicked, copyEncryptOpenSslCmdToClipboard() is executed.
 	document.getElementById("encrypt_click_access").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
 	document.getElementById("encrypt_click_store").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
-	// Attach decrypt function listeners to access and store divs.
+	// Make it so that when this div is clicked, copyDecryptOpenSslCmdToClipboard() is executed.
 	document.getElementById("decrypt_click_access").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
 	document.getElementById("decrypt_click_store").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
 
@@ -1133,28 +1131,14 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc");
 			console.log("OpenSSL encrypt command copied to clipboard.");
 			// Display message indicating command was copied to clipboard.
-			showAllCopiedEncryptCommandInform();
+			showEncryptCommandCopied();
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
-				hideAllCopiedEncryptCommandInform();
+				hideEncryptCommandCopied();
 			}, FIVE_SECONDS_THOUSANDTHS); 
 		} catch (error) {
 			console.error(error.message);
 		}
-	}
-
-	function showAllCopiedEncryptCommandInform() {
-		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
-		}
-	}
-
-	function hideAllCopiedEncryptCommandInform() {
-		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'none'; // Or 'inline', 'flex', etc.
-		}   
 	}
 
 	// Copy command line OpenSSL command to clipboard as user clicks div.
@@ -1164,31 +1148,50 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt");
 			console.log("OpenSSL decrypt command copied to clipboard.");
 			// Display message indicating command was copied to clipboard.
-			showAllCopiedDecryptCommandInform();
+			showDecryptCommandCopied();
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
-				hideAllCopiedDecryptCommandInform();
+				hideDecryptCommandCopied();
 			}, FIVE_SECONDS_THOUSANDTHS); 
 		} catch (error) {
 			console.error(error.message);
 		}
 	}
 
-	function showAllCopiedDecryptCommandInform() {
-		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+	// Show immediate UI change so user knows their clipboard was modified.
+	function showEncryptCommandCopied() {
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
 		for (const element of messageElements) {
-			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
+			element.style.display = 'inline';
 		}
 	}
-	function hideAllCopiedDecryptCommandInform() {
-		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+
+	// Show immediate UI change so user knows their clipboard was modified.
+	function hideEncryptCommandCopied() {
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
 		for (const element of messageElements) {
-			element.style.display = 'none'; // Or 'inline', 'flex', etc.
+			element.style.display = 'none';
 		}   
 	}
 
-	// Detect when user presses 'Enter' on their keyboard.
-	// Then on current page click button if it contains class 'activatable_by_enter'
+	// Show immediate UI change so user knows their clipboard was modified.
+	function showDecryptCommandCopied() {
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements) {
+			element.style.display = 'inline';
+		}
+	}
+
+	// Show immediate UI change so user knows their clipboard was modified.
+	function hideDecryptCommandCopied() {
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements) {
+			element.style.display = 'none';
+		}   
+	}
+
+	// Detect when user hits ENTER on their keyboard,
+	// then click any button on the currently visible UI which holds the class: activatable_by_enter
 	window.addEventListener("keydown", function(event) {
 		if (event.key === "Enter") {
 			// If focused element is an input, enter clicks the button with activatable_by_enter.
@@ -1197,7 +1200,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				if (buttonObj !== null) {
 					buttonObj.click();
 				}else{
-					console.log("We hit a null page: " + currentPage);
+					//console.log("Enter clicked but no activatable_by_enter class found: " + currentPage);
 				}
 				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
 				// Prevent strange behavior where "the default action is performed on the newly focused element".
@@ -1207,46 +1210,44 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 				// Focused element isn't an Input, do nothng I guess?
 			}
 		}
-	});// Listener for Enter
+	});// activatable_by_enter page listener
 
 	// Reset state variables, etc. that could be security concern.
 	function securityReset() {
-		// Reset Browser Access edit buttons.
-		//document.getElementById("editdata_button").style.display = "inline";
-		//document.getElementById("delete_button").style.display = "inline";
+		// Reset EDIT functionality buttons.
 		document.getElementById("editdata_button").style.display = "<TMPL_VAR NAME=hide_readonly_store_buttons>";
 		document.getElementById("delete_button").style.display = "<TMPL_VAR NAME=hide_readonly_store_buttons>";
 		document.getElementById("save_button").style.display = "none";
-		// Keep access plaintext display disabled.
-		showDisabledColors();
-		// Hide running byte total.
+		// Return Access Success page to default input disabled state.
+		showEditDisabledUI();
+		// Clear data input running byte total.
 		document.getElementById("browserdata_length_label").innerHTML = '';
 		document.getElementById("editdata_length_label").innerHTML = '';
 		document.getElementById("uploaddata_length_label").innerHTML = '';
-		// Clear Store Upload file input.
+		// Clear Store Upload file input (clears data from previously uploaded file).
 		document.getElementById('store_upload_input').value = null;
-		// Hide Store Upload commit button
+		// Hide Store Upload commit button shown upon user uploading a file.
 		document.getElementById("store_upload_commit_button").style.display = "none";
-		// Hide READY TO COMMIT message.
+		// Hide READY TO COMMIT message shown upon user uploading a file.
 		document.getElementById("store_upload_readytocommit").style.display = "none";
-		// Delete plaintext outdisplay which is shown at the end of the Browser Access Flow.
+		// Clear Accessed, decrypted user data.
 		document.getElementById("access_data_outputdisplay").value = '';
 		// Clear fingerprint held for delete.
 		document.getElementById("fingerprint_holder").value = '';
 		// Check if we're online and inform user if we are or not.
 		updateOnlineStatus();
-		// Hide pass check warnings (passlock flow).
-		hidePassWarnings();
+		// Hide password RE-Entry check warnings (passlock flow).
+		hidePassCheckFailWarnings();
 		// Reset delete overlay
 		deleteCheckHide('overlay_delete_cmd');
 		deleteCheckHide('overlay_delete_browser');
 	}// securityReset()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//							Back functionality															  //
+	//							Browser Back functionality										     		  //
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// Listen for the popstate event which should be fired by user activating browser back button.
+	// Listen for the popstate event which is usually fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
 	window.addEventListener('popstate', (event) => {
@@ -1265,10 +1266,8 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 
 	// Save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
 	function saveCurrentStateToHistorySoBackWillWork() {
-		//console.log("Current history stack", window.history);
 		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
-		const state = {page:currentPage}; // Create JS object with attribute page that has value currentPage.
-		//console.log("pushing state:", state['page']);
+		const state = {page: currentPage}; // Create JS object with attribute page that has value currentPage.
 		// First, state is js object that can contain more data than just the page if needed.
 		// Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
 		// Last, window.location should be url of current page.
@@ -1276,8 +1275,9 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		history.replaceState(state, '', window.location);
 		// My current theory is under the hood function isn't expecting a manual removal of a state so we have to work around their garbage collection?
 		// Create new (empty) entry in the history stack.
+		// This function is needed for custom back to work even though we're not sure why exactly it's needed besides it breaking when this is removed.
 		history.pushState({}, '', '');
-	}
+	}// saveCurrentStateToHistorySoBackWillWork()
 
 	// Need to save the state whenever user is on their way to a new page.
 	// Create record in history before moving to new page. This enables history's back function to return to the page.
@@ -1285,7 +1285,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	function saveThenShowPage(target) {
 		saveCurrentStateToHistorySoBackWillWork();
 		showPage(target);
-	}
+	}// saveThenShowPage()
 
 	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
 	let showPageFlag = 'true';
@@ -1822,7 +1822,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
-			showPassWarnings();
+			showPassCheckFailWarnings();
 			// Re-iterated password doesn't match original.
 			throw Error("Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
@@ -1904,7 +1904,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Turn on textarea so user can edit.
 		document.getElementById('access_data_outputdisplay').focus();
 		// 
-		showEnabledColors();
+		showEditEnabledUI();
 		// Hide both existing buttons
 		document.getElementById("editdata_button").style.display = "none";
 		document.getElementById("delete_button").style.display = "none";
@@ -2510,7 +2510,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//		AES-CBC
 	//		AES-GCM
 	//		AES-CTR             
-	// This produces a Multi Encrypted Datarecord (MED) that is stored in our online database or in a user-controlled offline database.
+	// This produces a Multi Encrypted Datarecord (MED) that is stored in either our online database or in a user-controlled offline database.
 	// 
 	//
 	//              
@@ -2571,26 +2571,15 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Multi Encrypted Datarecord - Breakdown
 	//
 	//     
-	//     |----------------------------------Multi Encrypted Datarecord (MED)---768 Bytes (1024 base 64 chars)---------------------------------------------------| 
-	//                 |-----------------------------------------CTR Plaintext---750 Bytes (1000 base 64 chars)---------------------------------------------------| 
-	//                             |-----------------------------GCM Plaintext---717 Bytes-------------------------------------------------------------| 
-	//     |-CTR Salt-||-GCM Salt-||-7ByteHeader-||-CBC Salt-||-----------CBC Plaintext-----------||-Newline-||-CBC Blocking--||-----Random Filler-----||-GCM Tag-|
-	//     |----18----||----18----||------7------||----8-----||--Browser Input---Up to 686 Bytes--||----1----||----1 to 16----||-[ 710 - File Input  ]-||---15----|
-	//                                            |-----------------File Input---Up to 710 Bytes------------------------------| 
-	//     
-	//     Browser Input = CBC Plaintext
-	//     File Input = OpenSSL Output = OBF-1000 Input = GCM Plaintext
-	//     OBF-1000 Output = AES-CTR Input = CTR Plaintext
-	//     
-	//     
-	//     CBC Plaintext = Browser Input
-	//     GCM Plaintext != File Input = OpenSSL Output = OBF-1000 Input //     GCM Plaintext 
-	//     CTR Plaintext = OBF-1000 Output = AES-CTR Input
-	//     
+	//     |----------------------------------Multi Encrypted Datarecord (MED)---768 Bytes (1024 base 64 chars)------------------------------------------------------| 
+	//                 |-----------------------------------------CTR Plaintext---750 Bytes (1000 base 64 chars)------------------------------------------------------| 
+	//                             |-----------------------------GCM Plaintext---717 Bytes----------------------------------------------------------------| 
+	//     |-CTR Salt-||-GCM Salt-||-7ByteHeader-|***|-CBC Salt-||-----------CBC Plaintext-----------||-Newline-||-CBC Blocking--||-----Random Filler-----||-GCM Tag-|
+	//     |----18----||----18----||------7------|   |----8-----||--Browser Input---Up to 686 Bytes--||----1----||----1 to 16----||-[ 710 - File Input  ]-||---15----|
+	//                                               |-----------------File Input---Up to 710 Bytes------------------------------| 
 	//     
 	//     ***Salted__ string literal removed in OBF-1000 step. Crypto best practices are to not have a constant in your cipher input which is why the decision was made.
 	//     The added benefit here is extra space for storage.
-	//     
 	//     
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Triple Cipher - BROWSER STORE
@@ -3033,37 +3022,24 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Built to precisely replicate OpenSSL behavior on Linux command line, which I think it probably does.
-	//			Specifically the command: openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
-	//			This uses an 8 byte salt and the key derivation function PBKDF2 to generate both the key and the IV to run 
-	//			the Subtle Crypto encrypt() with AES-CBC encryption.
-	// Inputs:	A plaintext string from Browser textarea input and a password from Browser UI password 3.
-	// Outputs:	A base64 packed cipher that perfectly matches the output of the command above.
-	//			This matches the OpenSSL spec shown in this section's description.
-	//
-	// Input Structure:	plaintext:	A string containing up to 686 Bytes of user plaintext data.
-	//					password:	A string containing an arbitrarily long user plaintext password.
-	//		 Usage:	Takes input from Browser textarea input for encryptTriple(). 
-	//				Used to passlock user data as they move through HTML interface.
-	//
-	// Output Structure: A base64 string encoding of the compiled byte structure: Salted__ + CBC Salt + Ciphertext
-	//		  Usage:	 Output cipher used in next step of encryptTriple(), readying data for database storage.
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Replicate OpenSSL command line functionality of command: openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
-	//		Details:	
 	//
-	//	Inputs structure:	password:	 human readable plaintext
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (CTR is short for Counter) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//
+	//	Inputs structure:	password:	 human readable plaintext string
 	//						plaintext:	 User input from Browser textarea
 	//
 	//	Output structure:	Salted__ + Random Salt + CBC encrypted ciphertext
 	//
-	// Big Picture: First step in pmed encryption. Constitutes entire OpenSSL step in 3-step encryption of a pmed.
+	// Big Picture: First step in Multi Encrypted Datarecord encryption. Constitutes entire OpenSSL step in 3-step encryption of a Multi Encrypted Datarecord.
 	//
-	//	source:		 plaintext: User input
-	//				 password:  User input
+	//	            source:		 plaintext: User input
+	//				             password:  User input
 	//	
-	//	destination: encryptOBF1000()
+	//             	destination: encryptOBF1000()
 	//
 	async function encryptOpenSSL(plaintext, password) {
 		// Encode plaintext in utf8 and store in Uint8Array plaintextUint8.
@@ -3138,35 +3114,24 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// encryptOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Decrypts ciphertext from encryptOpenSSL() as well as from command line executions of the form:  openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
-	// 			Function meant to perfectly replicate functionality of this command: openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt
-	// Usage:	Used in decryptTriple(), passlock decryption.
-	// Inputs:	Ciphertext, password as the last step in a decryptTriple() or for passlock decryption.
-	// Outputs: Plaintext that is passed to Browser textarea for user or for passlock decryption.
-	//
-	// Input Structure:	ciphertext64:	A base64 encoded string containing up to 686 Bytes of user plaintext data. Or passlock encrypted data.
-	//					password:		A string containing an arbitrarily long user plaintext password. Or a UUID format passlock.
-	//		 Usage:	For use in decryptTriple() pipeline, takes output from decryptOBF1000().
-	//				Used to decrypt passlock user data after all data is collected and ready for enc/dec in Store or Access.
-	//
-	// Output Structure:	Plaintext string with newline removed.
-	//		  Usage:		Final step in decryptTriple() or used to decrypt passlock data.
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Replicate OpenSSL command line functionality of command: openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt
-	//		Details:	
 	//
-	//	Inputs structure:	password:	 human readable plaintext
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (CTR is short for Counter) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//
+	//	Inputs structure:	password:	 human readable plaintext string
 	//						ciphertext64:	Salted__ + Random Salt + CBC encrypted ciphertext
 	//
 	//	Output structure:	decrypted plaintext
 	//
-	// Big Picture: Last step in pmed decryption. Constitutes entire OpenSSL step in 3-step decryption of a pmed.
+	// Big Picture: Last step in Multi Encrypted Datarecord decryption. Constitutes entire OpenSSL step in 3-step decryption of a Multi Encrypted Datarecord.
 	//
-	//	source:		 ciphertext64: decryptOBF1000()
-	//				 password:  User input
+	//	            source:		 ciphertext64: decryptOBF1000()
+	//				             password:  User input
 	//	
-	//	destination: Show user plaintext that they have just decrypted.
+	//	            destination: Show user plaintext that they have just decrypted.
 	//
 	async function decryptOpenSSL(ciphertext64, password) {
 		// Convert base64 input into Uint8Array.
@@ -3232,47 +3197,30 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// decryptOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Produce exactly 1000 base64 characters of ciphertext encrypted by AES-GCM which includes a validataion tag.
-	//
-	// Input Structure:	plaintext64:	base64 string 
-	//					password:		human readable string 
-	//					inputType:	3 cases: base64:	base64 string
-	//										 utf8:		human readable string
-	//										 triple:	base64 string for use in pipeline functions, indicates to strip Salted Literal placed by OpenSSL encrypt.
-	//
-	//		 Usage:		Main data pipeline functions: encryptDouble(), encryptTriple()
-	//
-	// Output Structure: 1000 base64 characters of ciphertext encrypted using AES-GCM algorithm.
-	//		  Usage:	 Next step in pipeline is AES-CTR encryption step.
-	//
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Produce 1000 base64 chars of AES-GCM ciphertext from plaintext, password input data. The input data will be padded with random filler if necessary.
 	//		Details:	First adds 7ByteHeader, Random Filler if needed, then encrypts with AES-GCM.
 	//
-	//	Inputs structure:	password:	 human readable plaintext
+	//	Inputs structure:	password:	 human readable plaintext string
 	//						plaintext64: Salted__ + Random Salt + CBC encrypted ciphertext
 	//									 |-8 Bytes-||--8 Bytes--||---Up to 696 Bytes-----|
 	//						
 	//	Output structure:	|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
-	//				OR:
-	//						|--18 Bytes GCM Salt--||---------(Number of Input Bytes) Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//                      Note: Salted__ string literal is removed for Multi Encrypted Datarecord security.
 	//
 	// Big Picture:		Takes input from encryptOpenSSL() and passes output to encryptAESCTR().
-	//					This step provides the cryptographic blocking for the pmed.
+	//					This step provides the cryptographic blocking for the Multi Encrypted Datarecord.
 	//
-	//	source:			encryptOpenSSL()
-	//	destination:	encryptAESCTR()
+	//               	source:			encryptOpenSSL()
+	//              	destination:	encryptAESCTR()
 	//	
-	//	usage:			encryptDouble(), encryptTriple()
+	//              	usage:			encryptDouble(), encryptTriple()
+	//	
 	async function encryptOBF1000(plaintext64, password) {
 		// Construct byte array with base64 input data.
 		const plaintextWithSaltUint8 = Uint8Array.fromBase64(plaintext64);
 		// Check for Salted__ header bytes and error if they are not found.
 		// Get byte form of salted literal.
 		const saltedLiteral = "Salted__";
-		//const saltedLiteralUint8 = new TextEncoder().encode(saltedLiteral);
-
 		const saltHeaderUint8 = plaintextWithSaltUint8.slice(0,8);
 		const saltToCheck = new TextDecoder().decode(saltHeaderUint8);
 		if (saltedLiteral !== saltToCheck) {
@@ -3286,7 +3234,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		// Slice off the 8 bytes from OpenSSL that convert to: Salted__
 		const plaintextUint8 = plaintextWithSaltUint8.slice(8);
 		// Add 7byte prepend (representing length of data) and random filler padding.
-		const wrappedPlaintextUint8 = wrapWith7ByteAndFiller(plaintextUint8);
+		const wrappedPlaintextUint8 = wrap7ByteAndFiller(plaintextUint8);
 		const wrappedPlaintextBase64 = wrappedPlaintextUint8.toBase64();
 		// Now that the payload data is wrapped with a prepended 7Byte set and random filler padded, we can GCM encrypt the whole thing.
 		const gcmEncrypted64 = await encryptGCM(wrappedPlaintextBase64, password);
@@ -3295,27 +3243,59 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// encryptOBF1000()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Wrap encryptOBF1000() data payload with 7ByteHeader representing data payload length, and add random filler to fufill 1000 base64 char output blocking for encryptOBF1000().
-	//
-	// Input is a Uint8Array holding only the payload data.
-	// Output: 7Byte set + Data Payload + Random Filler
-	// Function Purpose: 
-	// Big Picture:
-	//
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose: Adds both the 7ByteHeader and Random Filler to a Uint8Array for encryptOBF1000()
-	//
-	// Input + Output: Internal function of encryptOBF1000()
-	// Input Structure: Uint8Array
-	// Output Structure: Uint8Array composed of: 7ByteHeader + Input Uint8Array + Random Filler
-	//                                           |--7 Bytes-|  |--------710 Bytes-------------|
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// OBF-1000 Internal Function - both source and destination.
-	//
-	// Base Functionality: Add a 7ByteHeader representing the length of the data and also pad with random filler to satisfy output length of 1000 base64 chars.
+	// Base Functionality: Decrypt AES-GCM ciphertext, remove 7ByteHeader and Random Filler, replace Salted__ literal if using for Multi Encrypted Datarecord.
 	//		Details:	
+	//
+	//	Inputs structure:	password:	 human readable plaintext string
+	//						ciphertext64: 
+	//										|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//						
+	//	Output structure:	Salted__ + CBC Salt + CBC Ciphertext
+	//
+	// Big Picture:			Middle step in Multi Encrypted Datarecord pipeline.	
+	//
+	//	                    source:			decryptAESCTR()
+	//	                    destination:	decryptOpenSSL()
+	//	
+	//	                    usage:			decryptDouble(), decryptTriple()
+	//
+	async function decryptOBF1000(ciphertext64, password){
+		// Always output base64 for base encryption in 1000 wrapping context.
+		const gcmDecrypted64 = await decryptGCM(ciphertext64, password);
+		gcmDecryptedUint8 = Uint8Array.fromBase64(gcmDecrypted64);
+		const unwrappedPlaintextUint8 = unwrap7ByteAndFiller(gcmDecryptedUint8);
+		// Add back Salted__ which was removed on encryptOBF1000().
+		saltAddedPlaintextUint8 = addSaltedLiteral(unwrappedPlaintextUint8);
+		return saltAddedPlaintextUint8.toBase64();
+	}// decryptOBF1000()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:	Add salted literal back in decryptOBF1000() that was stripped in encryptOBF1000() to maintain OpenSSL ciphertext integrity.
+	// Usage:   decryptOBF1000()
+	//
+	// Input Structure:	Uint8Array of freshly GCM decrypted and 7Byte unwrapped bytes.
+	//
+	// Output Structure:	(Salted__)Bytes + Input Uint8Array
+	//
+	function addSaltedLiteral(inputDataUint8) {
+		// Get length of input data in number of bytes.
+		const dataLength = inputDataUint8.length;
+		const saltedOffset  = dataLength + 8;
+		// Create new array that is the input length +8 for the salt.
+		let dataBytesWithSalt = new Uint8Array(saltedOffset);
+		// Get byte form of salted literal.
+		const saltedLiteral = "Salted__";
+		const saltBytes = new TextEncoder().encode(saltedLiteral);
+		// Prepend with salted literal.
+		dataBytesWithSalt.set(saltBytes, 0);
+		// Finally, fill in data behind salted literal.
+		dataBytesWithSalt.set(inputDataUint8, 8);
+		return dataBytesWithSalt;
+	}// addSaltedLiteral()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Add a 7ByteHeader representing the length of the data and also pad with random filler to satisfy output length of 1000 base64 chars.
+	//  OBF-1000 Internal Function - both source and destination.
 	//
 	//	Inputs structure:	inputDataUint8: Uint8Array containing data to be encrypted.
 	//						If this is a Multi Encrypted Datarecord, it will be OpenSSL output sans salted literal: Salted__ which is removed by encryptOBF1000.
@@ -3323,7 +3303,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//	Output structure:	 7ByteHeader + Input Data Payload + Random Filler 
 	//						 |--7 Bytes--||------------710 Bytes-------------| 	
 	//
-	function wrapWith7ByteAndFiller(inputDataUint8) {
+	function wrap7ByteAndFiller(inputDataUint8) {
 		// Get data payload length for 7byte calculation and to derive filler size.
 		const dataLength = inputDataUint8.length;
 		// Get a 7Byte set that represents the payload dataLength.
@@ -3348,84 +3328,8 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		//dataWith7ByteSetAndRandFiller64 = dataWith7ByteSetAndRandFiller.toBase64();
 		//return dataWith7ByteSetAndRandFiller64;
 		return dataWith7ByteSetAndRandFiller;
-	}// wrapWith7ByteAndFiller()
+	}// wrap7ByteAndFiller()
 
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Decrypt OBF-1000 ciphertext as the middle step in the decryptDouble(), decryptTriple() data pipeline decrypts.
-	// Inputs:
-	// Outputs:
-	//
-	// Input Structure:	ciphertext64:	1000 base64 char string 
-	//					password:		human readable string 
-	//					inputType:	3 cases: base64:	base64 string
-	//										 utf8:		human readable string
-	//										 triple:	base64 string for use in pipeline functions, indicates to re-add Salted Literal expected in OpenSSL decrypt.
-	//
-	//		 Usage:		Main data pipeline functions: decryptDouble(), decryptTriple()
-	//
-	// Output Structure: 'Plaintext' in the form of OpenSSL ciphertext (Salted__ + CBC Salt + CBC Ciphertext) that is ready to be decryptOpenSSL()'d
-	//		  Usage:	 Next step in pipeline is OpenSSL decryption step.
-	//
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: Decrypt AES-GCM ciphertext, remove 7ByteHeader and Random Filler, replace Salted__ literal if using for pmed.
-	//		Details:	
-	//
-	//	Inputs structure:	password:	 human readable plaintext
-	//						ciphertext64: 
-	//										|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
-	//								OR:
-	//										|--18 Bytes GCM Salt--||---------(Number of Input Bytes) Bytes Ciphertext----------||-15 Byte GCM Tag-|
-	//									 
-	//						
-	//	Output structure:	Salted__ + CBC Salt + CBC Ciphertext
-	//
-	// Big Picture:			Middle step in pmed pipeline.	
-	//
-	//	source:			decryptAESCTR()
-	//	destination:	decryptOpenSSL()
-	//	
-	//	usage:			decryptDouble(), decryptTriple()
-	//
-	async function decryptOBF1000(ciphertext64, password){
-		// Always output base64 for base encryption in 1000 wrapping context.
-		const gcmDecrypted64 = await decryptGCM(ciphertext64, password);
-		gcmDecryptedUint8 = Uint8Array.fromBase64(gcmDecrypted64);
-		const unwrappedPlaintextUint8 = unwrap7ByteAndFiller(gcmDecryptedUint8);
-		// Add back Salted__ which was removed on encryptOBF1000().
-		saltAddedPlaintextUint8 = addSaltedLiteral(unwrappedPlaintextUint8);
-		return saltAddedPlaintextUint8.toBase64();
-	}// decryptOBF1000()
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Add salted literal back in decryptOBF1000() that was stripped in encryptOBF1000() to maintain OpenSSL ciphertext integrity.
-	//
-	// Input Structure:	Uint8Array of freshly GCM decrypted and 7Byte unwrapped bytes.
-	//		 Usage:		decryptOBF1000()
-	//
-	// Output Structure:	(Salted__)Bytes + Input Uint8Array
-	//		  Usage:		decryptOBF1000()
-	//
-	function addSaltedLiteral(inputDataUint8) {
-		// Get length of input data in number of bytes.
-		const dataLength = inputDataUint8.length;
-		const saltedOffset  = dataLength + 8;
-		// Create new array that is the input length +8 for the salt.
-		let dataBytesWithSalt = new Uint8Array(saltedOffset);
-		// Get byte form of salted literal.
-		const saltedLiteral = "Salted__";
-		const saltBytes = new TextEncoder().encode(saltedLiteral);
-		// Prepend with salted literal.
-		dataBytesWithSalt.set(saltBytes, 0);
-		// Finally, fill in data behind salted literal.
-		dataBytesWithSalt.set(inputDataUint8, 8);
-		return dataBytesWithSalt;
-	}// addSaltedLiteral()
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Wrap encryptOBF1000() data payload with 7ByteHeader representing data payload length, and add random filler to fufill 1000 base64 char output blocking for encryptOBF1000().
-	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Purpose: Remove both the 7ByteHeader and Random Filler from input Uint8Array for decryptOBF1000()
 	//
@@ -3446,43 +3350,27 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// unwrap7ByteAndFiller()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Perform encryption on 7ByteHeader and Random Filler wrapped data payload for encryptOBF1000().
-	//
-	// Input + Output Usage: Internal function of encryptOBF1000()
-	//
-	// Input Structure:	plaintext64:	base64(7ByteHeader + Output Uint8Array + Random Filler)
-	//					password:		human readable string 
-	//					inputType:	2 cases: base64:	base64 string
-	//										 utf8:		human readable string
-	//
-	// Output Structure: 1000 base64 characters of the following after converting from bytes:
-	// 					 GCM Salt + GCM Encrypted Payload + GCM Tag 
-	//					 |-18 bytes-||-----717 bytes----||-15 bytes-|
-	//
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Produce AES-GCM ciphertext from plaintext, password input data.
+	//
 	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
 	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (the same CTR refers to) which are needed for the encrypt() call.
 	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
 	//					This will produce completely different ciphertext for every encryption run even while using the same password.
 	//					With the packed salt, this key can be regenerated and used to decrypt the ciphertext.
 	//
-	//	Inputs structure:	password:	 human readable plaintext
+	//	Inputs structure:	password:	 human readable plaintext string
 	//						plaintext64: 7ByteHeader + OpenSSL Encrypted sans Salted__ + Random Filler
 	//									 |--7 Bytes--||---------------710 Bytes----------------------|
 	//						
 	//	Output structure:	|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
-	//				OR:
-	//						|--18 Bytes GCM Salt--||---------(Number of Input Bytes) Bytes Ciphertext----------||-15 Byte GCM Tag-|
 	//
 	// Big Picture:		Encryption step for OBF-1000. Takes 7ByteHeader + OpenSSL Encrypted sans Salted__ + Random Filler
 	//					from encryptOBF1000() function and encrypts it using AES-GCM.
 	//
-	//	source:			Internal function of encryptOBF1000()
-	//	destination:	Same as output of encryptOBF1000() --> encryptAESCTR()
+	//	                source:			Internal function of encryptOBF1000()
+	//	                destination:	Same as output of encryptOBF1000() --> encryptAESCTR()
 	//	
-	//	usage:		encryptOBF1000()
+	//	                usage:		encryptOBF1000()
 	//
 	async function encryptGCM(plaintext64, password) {
 		const plaintextUint8 = Uint8Array.fromBase64(plaintext64);
@@ -3556,23 +3444,8 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// encryptGCM()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Perform decryption before 7ByteHeader and Random Filler are unwrapped from data payload which is an OpenSSL ciphertext output.
-	//
-	// Input + Output Usage: Internal function of decryptOBF1000()
-	//
-	// Input Structure:	saltAndCiphertext64:	
-	//                  					 GCM Salt + GCM Encrypted Payload + GCM Tag 
-	//				                     	 |-18 bytes-||-----717 bytes----||-15 bytes-|
-	//
-	//					password:			human readable string 
-	//					outputType:			base64:		base64 string
-	//										utf8:		human readable string
-	//
-	// Output Structure: base64 or utf8(7ByteHeader + Output Uint8Array + Random Filler)
-	//					 
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Produce AES-GCM plaintext from ciphertext, password input data.
+	//
 	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
 	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (the same CTR refers to) which are needed for the encrypt() call.
 	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
@@ -3580,11 +3453,9 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//					With the packed salt, this key can be regenerated and used to decrypt the ciphertext.
 	//
 	//	Inputs structure:
-	//		password:	    human readable plaintext
-	//		saltAndCiphertext64: 
+	//	                	password:	    human readable plaintext string
+	//		                saltAndCiphertext64: 
 	//						|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
-	//				OR:
-	//						|--18 Bytes GCM Salt--||---------(Number of Input Bytes) Bytes Ciphertext----------||-15 Byte GCM Tag-|
 	//
 	//	Output structure:	
 	//						Decrypted Plaintext that should be in the form:
@@ -3594,10 +3465,10 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	// Big Picture:		Decryption step for OBF-1000.
 	//					Output is ready for unwrap7ByteHeaderAndFiller() step which will remove 7ByteHeader and Random Filler.
 	//
-	//	source:				Internal function for decryptOBF1000()
-	//	destination:		unwrap7ByteHeaderAndFiller() inside decryptOBF1000()
+	//	                source:				Internal function for decryptOBF1000()
+	//              	destination:		unwrap7ByteHeaderAndFiller() inside decryptOBF1000()
 	//
-	//	usage:		decryptOBF1000()
+	//              	usage:		decryptOBF1000()
 	//
 	async function decryptGCM(saltAndCiphertext64, password) {
 		// Convert password into bytes.
@@ -3669,7 +3540,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//					This will produce completely different ciphertext for every encryption run even while using the same password.
 	//
 	//	Inputs structure:	plaintext64: 1000 base64 chars string
-	//						password:	 human readable plaintext
+	//						password:	 human readable plaintext string
 	//
 	//	Output structure:	
 	//						|---24 base64 chars of CTR Salt---||----1000 base64 chars of AES-CTR ciphertext----|
@@ -3763,6 +3634,7 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		return saltAndDataUint8.toBase64();
 	}// encryptAESCTR()
 
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Decrypts AES-CTR encrypted ciphertext using the plaintext and password input parameters.
 	//
@@ -3772,26 +3644,23 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	//					This will produce completely different ciphertext for every encryption run even while using the same password.
 	//					With the packed salt, this key can be regenerated and used to decrypt the ciphertext.
 	//
-	//	Inputs structure:	password:	 human readable plaintext
-	//						saltAndCiphertext: 1024 base64 char string (if used in decryptDouble(), decryptTriple()) 
-	//						Consisting of 24 base64 chars of salt and 1000 base64 chars of ciphertext:
-	//						|---24 base64 chars of CTR Salt---||----1000 base64 chars of AES-CTR ciphertext----|
-	//						|-----------------------------Multi Encrypted Datarecord----------------------------|
+	//	Inputs structure:	password:	 human readable plaintext string
+	//						saltAndCiphertext: 1024 base64 char string
 	//
-	//	Output structure:	If used for Double or Triple decrypt:
+	//						|---24 base64 chars of CTR Salt---||----1000 base64 chars of AES-CTR ciphertext----|
+	//						|-----------------------------Multi Encrypted Datarecord---------------------------|
+	//
+	//	Output structure:
 	//						|----1000 base64 chars of plaintext----|
 	//
-	//						Otherwise:
-	//						|----(InputSize - 24) base64 chars of plaintext----|
+	// Big Picture: Final step in decryptTriple() decryptDouble(). This function constitutes the entirety of the AES-CTR step.
+	// 				Functions as the outer encryption layer of security for a Multi Encrypted Datarecord.
 	//
-	// Big Picture: First step in decryptTriple() decryptDouble(). This function constitutes the entirety of the AES-CTR step for Multi Encrypted Datarecord.
+	//				input source:	saltAndCiphertext: A database, either Server or Offline.
+	//				 				password:    Plaintext entered into Browser by user - Password 2
 	//
-	//	source:		 saltAndCiphertext: A database, either Server or Offline.
-	//				 password:    Plaintext entered into Browser by user - Password 2
-	//	destination: AES-CTR 'plaintext' will be passed to decryptOBF1000() for the next step in decryption.
+	//				output destination: AES-CTR 'plaintext' will be passed to decryptOBF1000() for the next step in decryption.
 	//	
-	//	usage:		- Decrypts outer layer, first level of decrypt run by decryptDouble() decryptTriple()
-	//
 	async function decryptAESCTR(saltAndCiphertext64, password) {
 		// Convert password into bytes.
 		const passwordUint8 = new TextEncoder().encode(password);
@@ -3856,25 +3725,18 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// decryptAESCTR()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose: Encryption stack for File Upload / CMD Line Input.
-	// Input:	Payload data (presumably encrypted) from user-uploaded file that's been converted to base64, 2 plaintext passwords.
-	// Output:	A Multi Encrypted Datarecord ready for database storage.
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: Produce a pmed from user File Upload / CMD Line input.
+	// Base Functionality: Produce a Multi Encrypted Datarecord from user File Upload / CMD Line input.
 	//		Details:	
 	//
-	//	Inputs structure:	obf1000Pass:	human readable plaintext
-	//						ctrPass:		human readable plaintext
+	//	Inputs structure:	obf1000Pass:	human readable plaintext string
+	//						ctrPass:		human readable plaintext string
 	//						fileDataBase64:	base64 encoding of the raw bytes of a user uploaded file
-	//	Output structure:	base64 pmed
+	//	Output structure:	base64 Multi Encrypted Datarecord
 	//
-	// Big Picture:			When using the CMD Line option to upload a file, this function is used to 'double encrypt' user file data and produce a pmed ready for database storage.
-	//						
+	// Big Picture:			When using the CMD Line option to upload a file, this function is used to 'double encrypt' user file data and produce a Multi Encrypted Datarecord ready for database storage.
 	//
-	//	source:				User input via passlock system.
-	//	destination:		Database storage.
-	//
+	//	                    source:				User input via passlock system.
+	//	                    destination:		Database storage.
 	//
 	async function encryptDouble(obf1000Pass, ctrPass, fileDataBase64) {
 		const obf1000Encrypted = await encryptOBF1000(fileDataBase64, obf1000Pass);
@@ -3887,25 +3749,19 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// encryptDouble()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Encrypt user data with the 3 ciphers, converting plaintext to a Multi Encrypted Datarecord ready for database storage.
-	// Input:	Plaintext user data from Browser textarea input, 3 plaintext passwords.
-	// Output:	A Multi Encrypted Datarecord ready for database storage.
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: Produce a pmed from user Browser input.
+	// Base Functionality: Produce a Multi Encrypted Datarecord from user Browser input.
 	//		Details:	
 	//
-	//	Inputs structure:	opensslPass:	human readable plaintext
-	//						obf1000Pass:	human readable plaintext
-	//						ctrPass:		human readable plaintext
-	//						plaintextData:	human readable plaintext
-	//	Output structure:	base64 pmed
+	//	Inputs structure:	opensslPass:	human readable plaintext string
+	//						obf1000Pass:	human readable plaintext string
+	//						ctrPass:		human readable plaintext string
+	//						plaintextData:	human readable plaintext string
+	//	Output structure:	base64 Multi Encrypted Datarecord
 	//
-	// Big Picture:			Using the Browser option, this function 'triple encrypts' user data into a pmed, ready for database storage.
+	// Big Picture:			Using the Browser option, this function 'triple encrypts' user data into a Multi Encrypted Datarecord, ready for database storage.
 	//
-	//	source:				user input via passlock system
-	//	destination:		database storage
-	//
+	//                      source:				user input via passlock system
+	//	                    destination:		database storage
 	//
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, plaintextData) {
 		// OpenSSL Encrypt (base 64 encoded)
@@ -3922,20 +3778,19 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// encryptTriple()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: Decrypt a pmed into a base64 ready to convert into a file for user download.
+	// Base Functionality: Decrypt a Multi Encrypted Datarecord into a base64 ready to convert into a file for user download.
 	//		Details:	
 	//
-	//	Inputs structure:	obf1000Pass:	human readable plaintext
-	//						ctrPass:		human readable plaintext
-	//						multiEncryptedDatarecord:	base64 pmed
+	//	Inputs structure:	obf1000Pass:	human readable plaintext string
+	//						ctrPass:		human readable plaintext string
+	//						multiEncryptedDatarecord:	base64 Multi Encrypted Datarecord
 	//
 	//	Output structure:	base64
 	//
-	// Big Picture:			Using the Browser option, this function 'double decrypts' a pmed from database into human readable plaintext.
+	// Big Picture:			Using the Browser option, this function 'double decrypts' a Multi Encrypted Datarecord from database into human readable plaintext string.
 	//
-	//	source:				database storage
-	//	destination:		convert into file for user download 
-	//
+	//                      source:        database storage
+	//                      destination:   convert into file for user download 
 	//
 	async function decryptDouble(obf1000Pass, ctrPass, multiEncryptedDatarecord) {
 		const ctrDecrypted = await decryptAESCTR(multiEncryptedDatarecord, ctrPass);
@@ -3944,21 +3799,20 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 	}// decryptDouble()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: Decrypt a pmed into human readable plaintext.
+	// Base Functionality: Decrypt a Multi Encrypted Datarecord into human readable plaintext string.
 	//		Details:	
 	//
-	//	Inputs structure:	opensslPass:	human readable plaintext
-	//						obf1000Pass:	human readable plaintext
-	//						ctrPass:		human readable plaintext
-	//						multiEncryptedDatarecord:	base64 pmed
+	//	Inputs structure:	opensslPass:	human readable plaintext string
+	//						obf1000Pass:	human readable plaintext string
+	//						ctrPass:		human readable plaintext string
+	//						multiEncryptedDatarecord:	base64 Multi Encrypted Datarecord
 	//
-	//	Output structure:	human readable plaintext
+	//	Output structure:	human readable plaintext string
 	//
-	// Big Picture:			Using the Browser option, this function 'triple decrypts' a pmed from database into human readable plaintext.
+	// Big Picture:			Using the Browser option, this function 'triple decrypts' a Multi Encrypted Datarecord from database into human readable plaintext string.
 	//
-	//	source:				database storage
-	//	destination:		user viewport
-	//
+	//	                    source:				database storage
+	//	                    destination:		user viewport
 	//
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, multiEncryptedDatarecord) {
 		const ctrDecrypted = await decryptAESCTR(multiEncryptedDatarecord, ctrPass);
@@ -3966,6 +3820,92 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		const plaintext = await decryptOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
 		return plaintext;
 	}// decryptTriple()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality:  Produce a 'Fingerprint' which will be used as the Key in the Key-Value pair for storing a Multi Encrypted Datarecord.
+	//                      This is achieved by SHA-256 hashing inputs, concatenating them, and finally returning a hash of that concatenation.
+	//
+	//	Inputs structure:	codeword:    human readable plaintext string
+	//						obf1000Pass: human readable plaintext string
+	//						ctrPass:     human readable plaintext string
+	//
+	//	Output structure:	43 base64 char string
+	//
+	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
+		// Convert codeword to lowercase.
+		const codewordLower = codeword.toLowerCase();
+		// Create a new TextEncoder object.
+		const enc = new TextEncoder();
+		// Convert human readable plaintext string to Uint8Array.
+		const codewordUint8 = enc.encode(codewordLower);
+		const obf1000PassUint8 = enc.encode(obf1000Pass);
+		const ctrPassUint8 = enc.encode(ctrPass);
+		// Compute SHA-256 hash.
+		const codewordHash = await crypto.subtle.digest('SHA-256', codewordUint8);
+		const obf1000PassHash = await crypto.subtle.digest('SHA-256', obf1000PassUint8);
+		const ctrPassHash = await crypto.subtle.digest('SHA-256', ctrPassUint8);
+		// Concatenate: fingerprint = codewordHash + obf1000PassHash + ctrPassHash
+		const codeword_and_obf1000PassHash = concatBuffer(codewordHash, obf1000PassHash)
+		const concatenatedHashes = concatBuffer(codeword_and_obf1000PassHash, ctrPassHash)
+		// SHA-256 hash the result.
+		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
+		const fingerprint = new Uint8Array(fingerprintHash);
+		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
+		const b64 = fingerprint.toBase64({omitPadding: true});
+		return b64;
+	}// computeFingerprint()
+
+	////////////////////////////////////////////////////////
+	//				7Byte Functions                       //
+	////////////////////////////////////////////////////////
+
+	// Find set of bytes that compute to targetValue.
+	function find7ByteSetForValue(targetValue) {
+		let computedValue;
+		let sevenByteUint8;
+		do{
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
+			computedValue = eval7ByteValue(sevenByteUint8);
+		}while(computedValue != targetValue);
+		return sevenByteUint8;
+	}// find7ByteSetForValue()
+
+	// What is this for?
+	// Find set of bytes that compute to a value in the input range.
+	function find7ByteSetInRange(targetMin, targetMax) {
+		let computedValue;
+		let sevenByteUint8;
+		do{
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
+			computedValue = eval7ByteValue(sevenByteUint8);
+		}while(computedValue < targetMin || computedValue > targetMax);
+		return sevenByteUint8;
+	}// find7ByteSetInRange()
+
+	// Convert 7Byte array into mathematical expression then evaluate it.
+	function eval7ByteValue(sevenByteUint8) {
+		// Start with empty expression.
+		let mathExpression = "";
+		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
+		for(let i=0; i < 7; i++) {
+			if (i % 2 === 0) {
+				// Even index bytes -->  numbers
+				mathExpression += sevenByteUint8[i];
+			}else{
+				// Odd index bytes --> symbols
+				if (sevenByteUint8[i] % 2 === 0) {
+					// Even bytes convert to (+)
+					mathExpression += "+";
+				}else{
+					// Odd bytes convert to (-)
+					mathExpression += "-";
+				}
+			}
+		}
+		return Math.abs(eval(mathExpression));
+	}// eval7ByteValue()
 
 
 	/////////////////////////////////////////////////////////////////////////
@@ -4045,105 +3985,27 @@ console.log("OPENSSL_OUTPUT_LIMIT_BASE64: ", OPENSSL_OUTPUT_LIMIT_BASE64);
 		}
 	}// checkInputLengthUpload()
 
-
-	////////////////////////////////////////////////////////
-	//				7Byte Functions                       //
-	////////////////////////////////////////////////////////
-
-	// Find set of bytes that compute to targetValue.
-	function find7ByteSetForValue(targetValue) {
-		let computedValue;
-		let sevenByteUint8;
-		do{
-			// Roll 7 random bytes.
-			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
-			computedValue = eval7ByteValue(sevenByteUint8);
-		}while(computedValue != targetValue);
-console.log("TARGET VALUE: ", targetValue);
-		return sevenByteUint8;
-	}// find7ByteSetForValue()
-
-	// Find set of bytes that compute to a value in the input range.
-	function find7ByteSetInRange(targetMin, targetMax) {
-		let computedValue;
-		let sevenByteUint8;
-		do{
-			// Roll 7 random bytes.
-			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
-			computedValue = eval7ByteValue(sevenByteUint8);
-		}while(computedValue < targetMin || computedValue > targetMax);
-		return sevenByteUint8;
-	}// find7ByteSetInRange()
-
-	// Convert 7Byte array into mathematical expression then evaluate it.
-	function eval7ByteValue(sevenByteUint8) {
-		// Start with empty expression.
-		let mathExpression = "";
-		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
-		for(let i=0; i < 7; i++) {
-			if (i % 2 === 0) {
-				// Even index bytes -->  numbers
-				mathExpression += sevenByteUint8[i];
-			}else{
-				// Odd index bytes --> symbols
-				if (sevenByteUint8[i] % 2 === 0) {
-					// Even bytes convert to (+)
-					mathExpression += "+";
-				}else{
-					// Odd bytes convert to (-)
-					mathExpression += "-";
-				}
-			}
-		}
-		console.log("Evaluating 7Byte as the mathematical expression: absoluteValue(" + mathExpression + ")");
-		console.log(sevenByteUint8);
-		return Math.abs(eval(mathExpression));
-	}// eval7ByteValue()
-
 	//////////////////////////////////////////
 	//		Misc Functions					//
 	//////////////////////////////////////////
 
-	// SHA-256 hash inputs, concatenate them, then return a hash of that concatenation.
-	// Inputs: plaintext.
-	// Output: hexadecimal.
-	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
-		// Convert to lowercase.
-		const codewordLower = codeword.toLowerCase();
-		// Take SHA-256 hash of codeword, obf1_pass, obf2_pass
-		const enc = new TextEncoder();
-		const codewordBuf = enc.encode(codewordLower);
-		const obf1000PassBuff = enc.encode(obf1000Pass);
-		const ctrPassBuff = enc.encode(ctrPass);
-		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
-		const uint8 = new Uint8Array(codewordHash);
-		const cwh_b64 = uint8.toBase64();
-		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1000PassBuff);
-		const obf2pHash = await crypto.subtle.digest('SHA-256', ctrPassBuff);
-		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
-		const codeword_and_obf1pHash = concatBuffer(codewordHash, obf1pHash)
-		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
-		// SHA-256 hash the result.
-		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
-		const fingerprint = new Uint8Array(fingerprintHash);
-		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
-		const b64 = fingerprint.toBase64({omitPadding: true});
-		return b64;
-	}// computeFingerprint()
-
-	// Concatenates ArrayBuffers.
-	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
-	// Output: return = buffer1 concatenated with buffer2 in order buffer1, then buffer2.
-	// There doesn't appear to be a native array merge for typed arrays like Uint8Array (their length is fixed).
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality:  Concatenate ArrayBuffers-like objects.
+	//
+	//	Inputs structure:	buffer1:    Array, Buffer, or TypedArray
+	//						buffer2:    Array, Buffer, or TypedArray
+	//
+	//	Output structure:	Uint8Array of concatenated data.
+	//
 	function concatBuffer(buffer1, buffer2) {
 		// Create new uint8array with size of buffer1 length + buffer 2 length.
-		let tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+		let concatenatedUint8 = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
 		// Set left part of the array to buffer 1.
-		tmp.set(new Uint8Array(buffer1), 0);
+		concatenatedUint8.set(new Uint8Array(buffer1), 0);
 		// Set right part of the array to buffer 2.
-		tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+		concatenatedUint8.set(new Uint8Array(buffer2), buffer1.byteLength);
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
-		return tmp;
+		return concatenatedUint8;
 	}// concatBuffer()
 
 	// Generates standalone html file from static code held in multiline string below:
@@ -4661,7 +4523,7 @@ console.log("TARGET VALUE: ", targetValue);
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_codeword')">STORE DATA</button>
 					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_codeword')">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1" onclick="deleteCheckShow('offlineoverlay_delete_cmd')">DELETE DATA</button>
+					<button class="" id='' style="flex-grow:1" onclick="showDeleteOverlay('offlineoverlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
 			<!---------------------------END CMD LINE Access Flow-----------------------!>
@@ -4688,7 +4550,7 @@ console.log("TARGET VALUE: ", targetValue);
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
 					<button class="" id='offline_editdata_button' style="flex-grow:1" onclick="editDataOffline()">EDIT DATA</button>
-					<button class="" id='offline_delete_button' style="flex-grow:1" onclick="deleteCheckShow('offlineoverlay_delete_browser')">DELETE DATA</button>
+					<button class="" id='offline_delete_button' style="flex-grow:1" onclick="showDeleteOverlay('offlineoverlay_delete_browser')">DELETE DATA</button>
 				</div>
 			</div>
 			<!---------------------------END BROWSER Access Flow-----------------------!>
@@ -5129,55 +4991,48 @@ console.log("TARGET VALUE: ", targetValue);
 		showPage('enter_offlinedbase_pass');
 	}
 
-/*
-	// later
-	document.getElementById("faq").onclick = function() {
-		location.href = "/obf/faq";
-		// faq();
-	}
-*/
 	//////////////////////////////////////////////////////////////
 	//		UI & flowwalker Handler Functions					//
 	//////////////////////////////////////////////////////////////
 
 	// Change text colors when editing record.
-	function showEnabledColors() {
+	function showEditEnabledUI() {
 		document.getElementById('offlineaccess_data_outputdisplay').disabled = false;
 		//document.getElementById('offlineaccess_data_outputdisplay').style.color = '#54c597'; // Our 'normal' green.
 		document.getElementById('offlineaccess_data_outputdisplay').style.color = 'red'; // Offline Red
 		document.getElementById('offlineaccess_data_outputdisplay').style.backgroundColor = '#272727'; // Normal background
 	}
 
-	function showDisabledColors() {
+	function showEditDisabledUI() {
 		document.getElementById('offlineaccess_data_outputdisplay').disabled = true;
 		document.getElementById('offlineaccess_data_outputdisplay').style.color = 'gray';
 		//document.getElementById('offlineaccess_data_outputdisplay').style.backgroundColor = '#434343';
 	}
 
 	// Show Overlay
-	function deleteCheckShow(targetId) {
-		//console.log("deleteCheck SHOW hit. targetId: " + targetId);
+	function showDeleteOverlay(targetId) {
 		document.getElementById(targetId).style.display = "flex";
 	}
+
 	// Hide Overlay
 	function deleteCheckHide(targetId) {
 		//console.log("deleteCheck HIDE hit. targetId: " + targetId);
 		document.getElementById(targetId).style.display = "none";
 	}
 
-	function showPassWarnings() {
+	function showPassCheckFailWarnings() {
 		// Show all password warnings.
-		pass_check_elements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < pass_check_elements.length; i++) {
-			pass_check_elements[i].style.display = "inline";
+		passCheckElements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < passCheckElements.length; i++) {
+			passCheckElements[i].style.display = "inline";
 		}
 	}
 
-	function hidePassWarnings() {
+	function hidePassCheckFailWarnings() {
 		// Show all password warnings.
-		pass_check_elements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < pass_check_elements.length; i++) {
-			pass_check_elements[i].style.display = "none";
+		passCheckElements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < passCheckElements.length; i++) {
+			passCheckElements[i].style.display = "none";
 		}
 	}
 
@@ -5205,24 +5060,24 @@ console.log("TARGET VALUE: ", targetValue);
 			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc");
 			console.log("OpenSSL encrypt command copied to clipboard.");
 			// Display message indicating command was copied to clipboard.
-			showAllCopiedEncryptCommandInform();
+			showEncryptCommandCopied();
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
-				hideAllCopiedEncryptCommandInform();
+				hideEncryptCommandCopied();
 			}, FIVE_SECONDS_THOUSANDTHS); 
 		} catch (error) {
 			console.error(error.message);
 		}
 	}
 
-	function showAllCopiedEncryptCommandInform() {
+	function showEncryptCommandCopied() {
 		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
 		for (const element of messageElements) {
 			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
 		}
 	}
 
-	function hideAllCopiedEncryptCommandInform() {
+	function hideEncryptCommandCopied() {
 		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
 		for (const element of messageElements) {
 			element.style.display = 'none'; // Or 'inline', 'flex', etc.
@@ -5236,24 +5091,24 @@ console.log("TARGET VALUE: ", targetValue);
 			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt");
 			console.log("OpenSSL decrypt command copied to clipboard.");
 			// Display message indicating command was copied to clipboard.
-			showAllCopiedDecryptCommandInform();
+			showDecryptCommandCopied();
 			// Undisplay message in 5 seconds after showing it.
 			setTimeout(() => {
-				hideAllCopiedDecryptCommandInform();
+				hideDecryptCommandCopied();
 			}, FIVE_SECONDS_THOUSANDTHS); 
 		} catch (error) {
 			console.error(error.message);
 		}
 	}
 
-	function showAllCopiedDecryptCommandInform() {
+	function showDecryptCommandCopied() {
 		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
 		for (const element of messageElements) {
 			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
 		}
 	}
 
-	function hideAllCopiedDecryptCommandInform() {
+	function hideDecryptCommandCopied() {
 		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
 		for (const element of messageElements) {
 			element.style.display = 'none'; // Or 'inline', 'flex', etc.
@@ -5287,7 +5142,7 @@ console.log("TARGET VALUE: ", targetValue);
 		document.getElementById("offline_delete_button").style.display = "inline";
 		document.getElementById("offline_save_button").style.display = "none";
 		// Keep access plaintext display disabled.
-		showDisabledColors();
+		showEditDisabledUI();
 		// Hide running byte total.
 		document.getElementById("offlinebrowserdata_length_label").innerHTML = '';
 		document.getElementById("offlineeditdata_length_label").innerHTML = '';
@@ -5305,7 +5160,7 @@ console.log("TARGET VALUE: ", targetValue);
 		// Check if we're online and inform user if we are or not.
 		updateOnlineStatus();
 		// Hide pass check warnings (passlock flow).
-		hidePassWarnings();
+		hidePassCheckFailWarnings();
 		// Reset delete overlay
 		deleteCheckHide('offlineoverlay_delete_cmd');
 		deleteCheckHide('offlineoverlay_delete_browser');
@@ -5822,7 +5677,7 @@ console.log("TARGET VALUE: ", targetValue);
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
-			showPassWarnings();
+			showPassCheckFailWarnings();
 			// Re-iterated password doesn't match original.
 			throw Error("Offline Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
@@ -5901,7 +5756,7 @@ console.log("TARGET VALUE: ", targetValue);
 		document.getElementById('offlineaccess_data_outputdisplay').disabled = false;
 		// Turn on textarea so user can edit.
 		document.getElementById('offlineaccess_data_outputdisplay').focus();
-		showEnabledColors();
+		showEditEnabledUI();
 		// Hide both existing buttons
 		document.getElementById("offline_editdata_button").style.display = "none";
 		document.getElementById("offline_delete_button").style.display = "none";
@@ -6568,7 +6423,7 @@ console.log("TARGET VALUE: ", targetValue);
 			throw new Error("Invalid encryptGCM inputType parameter!");
 		}
 		// Add 7byte prepend (representing length of filler) and random filler postpend of that length.
-		const wrappedPlaintextUint8 = wrapWith7ByteAndFiller(plaintextUint8);
+		const wrappedPlaintextUint8 = wrap7ByteAndFiller(plaintextUint8);
 		const wrappedPlaintextBase64 = wrappedPlaintextUint8.toBase64();
 		// Always use base64 for 1000 wrapping for base encryption.
 		const gcmEncrypted64 = await encryptGCM(wrappedPlaintextBase64, password, 'base64');
@@ -6624,7 +6479,7 @@ console.log("TARGET VALUE: ", targetValue);
 		return dataBytes;
 	}// unwrap7ByteAndFiller()
 
-	function wrapWith7ByteAndFiller(inputDataUint8) {
+	function wrap7ByteAndFiller(inputDataUint8) {
 		// Length of the data with salt bytes removed.
 		const dataLength = inputDataUint8.length;
 		// Find a 7Byte set that represents dataLength.
@@ -6644,7 +6499,7 @@ console.log("TARGET VALUE: ", targetValue);
 		dataWith7ByteSetAndRandFiller.set(randFillerUint8, dataOffset);
 		dataWith7ByteSetAndRandFiller64 = dataWith7ByteSetAndRandFiller.toBase64();
 		return dataWith7ByteSetAndRandFiller64;
-	}// wrapWith7ByteAndFiller()
+	}// wrap7ByteAndFiller()
 
 
 	// Replacing obf1000 with standard that natively offers authentication.
@@ -7012,17 +6867,15 @@ console.log("TARGET VALUE: ", targetValue);
 		const codewordLower = codeword.toLowerCase();
 		// Take SHA-256 hash of codeword, obf1_pass, obf2_pass
 		const enc = new TextEncoder();
-		const codewordBuf = enc.encode(codewordLower);
-		const obf1000PassBuff = enc.encode(obf1000Pass);
-		const ctrPassBuff = enc.encode(ctrPass);
-		const codewordHash = await crypto.subtle.digest('SHA-256', codewordBuf);
-		const uint8 = new Uint8Array(codewordHash);
-		const cwh_b64 = uint8.toBase64();
-		const obf1pHash = await crypto.subtle.digest('SHA-256', obf1000PassBuff);
-		const obf2pHash = await crypto.subtle.digest('SHA-256', ctrPassBuff);
+		const codewordUint8 = enc.encode(codewordLower);
+		const obf1000PassUint8 = enc.encode(obf1000Pass);
+		const ctrPassUint8 = enc.encode(ctrPass);
+		const codewordHash = await crypto.subtle.digest('SHA-256', codewordUint8);
+		const obf1000PassHash = await crypto.subtle.digest('SHA-256', obf1000PassUint8);
+		const ctrPassHash = await crypto.subtle.digest('SHA-256', ctrPassUint8);
 		// Concatenate: fingerprint = cw_hash + obf1p_hash + obf2p_hash
-		const codeword_and_obf1pHash = concatBuffer(codewordHash, obf1pHash)
-		const concatenatedHashes = concatBuffer(codeword_and_obf1pHash, obf2pHash)
+		const codeword_and_obf1000PassHash = concatBuffer(codewordHash, obf1000PassHash)
+		const concatenatedHashes = concatBuffer(codeword_and_obf1000PassHash, ctrPassHash)
 		// SHA-256 hash the result.
 		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
 		const fingerprint = new Uint8Array(fingerprintHash);
@@ -7162,13 +7015,13 @@ console.log("TARGET VALUE: ", targetValue);
 	// There doesn't appear to be a native array merge for typed arrays like Uint8Array (their length is fixed).
 	function concatBuffer(buffer1, buffer2) {
 		// Create new uint8array with size of buffer1 length + buffer 2 length.
-		let tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+		let concatenatedUint8 = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
 		// Set left part of the array to buffer 1.
-		tmp.set(new Uint8Array(buffer1), 0);
+		concatenatedUint8.set(new Uint8Array(buffer1), 0);
 		// Set right part of the array to buffer 2.
-		tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+		concatenatedUint8.set(new Uint8Array(buffer2), buffer1.byteLength);
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
-		return tmp;
+		return concatenatedUint8;
 	}//concatBuffer()
 
 	function clearSaveToDiskReminder() {
