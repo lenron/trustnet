@@ -518,7 +518,7 @@
 				<label>result:</label>
 				<div class="overlay_container" style="position:relative">
 					<label id="editdata_length_label" style="color:black"></label>
-					<textarea disabled value="" id="access_data_outputdisplay" oninput="checkTextInputLength('access_data_outputdisplay')" style="color:gray" rows="8" cols="50"></textarea>
+					<textarea disabled value="" id="access_data_outputdisplay" oninput="checkDataInputLength('access_data_outputdisplay')" style="color:gray" rows="8" cols="50"></textarea>
 					<div class="deletecheck" id="overlay_delete_browser" style="">
 						<h2>Are you sure you want to delete this data?</h2> 
 						<div class="button_pair" id="" style="display:flex">
@@ -689,7 +689,7 @@
 			<div class="flow_pages" id="store_upload" style="display:none">
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
-				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. 526 byte limit</h2>
+				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. Please limit data size to 687 bytes BEFORE encrypting with OpenSSL.</h2>
 				<h2 id="store_upload_readytocommit" style="color:orange; display:none">READY TO COMMIT</h2>
 				<label id="uploaddata_length_label" style="color:black"></label>
 				<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
@@ -805,7 +805,7 @@
 					<label>STORE DATA</label>
 					<label id="browserdata_length_label" style="color:black"></label>
 				</div>
-				<textarea class="browser_input" id="store_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('store_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
+				<textarea class="browser_input" id="store_data_textarea" rows="8" cols="45" oninput="checkDataInputLength('store_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('store_opensslpass_browsercheck')">BACK</button>
 					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStore('store_data_textarea', 'false')">ENCRYPT DATA AND COMMIT TO SERVER</button>
@@ -974,7 +974,7 @@
 <script>
 
 	//////////////////////////////////////////////////////////////
-	//		Global Flags & Page Load Function					//
+	//             Constants & base64 map                       //
 	//////////////////////////////////////////////////////////////
 
 	// Base64 encoding as standardized in RFC 4648: https://datatracker.ietf.org/doc/html/rfc4648#section-4
@@ -1000,23 +1000,23 @@
 	const FINGERPRINT_LENGTH_BASE64 = 43;
 	const FINGERPRINT_LENGTH_BYTES = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
 	// Triple encrypted data size 1024 chosen for beauty, proxmixity to 1000.
-	const FULLY_ENCRYPTED_DATA_LENGTH_BASE64 = 1024;
-	const FULLY_ENCRYPTED_DATA_LENGTH_BYTES = FULLY_ENCRYPTED_DATA_LENGTH_BASE64 * (3/4);  // 786
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 = 1024;
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 * (3/4);  // 786
 	// Single Record (TOTAL_RECORD_LENGTH_BASE64) in base64:
 	//        43	       1024
 	// |--fingerprint--||--Data--|
 	// TOTAL_RECORD_LENGTH_BASE64 used for offline database ordering.
 	// fingerprint length + data record length (in base64) = 1067
-	const TOTAL_RECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + FULLY_ENCRYPTED_DATA_LENGTH_BASE64; // 1067
+	const TOTAL_RECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64; // 1067
 	// Cryptographic salt, tag length derivations.
 	const AESCTR_SALT_SIZE_BASE64 = SALT_SIZE_BYTES * (4/3); // 24
 	const GCM_SIG_SIZE_BYTES = GCM_TAGLENGTH_BITS / 8; // 120 bits / 8 = 15 bytes
 	const GCM_SIG_SIZE_BASE64 = GCM_SIG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to base64 = 24
 	const GCM_SALT_SIZE_BASE64 = AESCTR_SALT_SIZE_BASE64; // Currently using same salt length of 24 base64 / 18 bytes.
 	// The final of 3 encryptions, AESCTR output length === triple encrypted output length.
-	const AESCTR_OUTPUT_LIMIT_BASE64 = FULLY_ENCRYPTED_DATA_LENGTH_BASE64; // Triple encrypted size chosen as 1024 for beauty, proximity to 1000.
+	const AESCTR_OUTPUT_LIMIT_BASE64 = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64; // Triple encrypted size chosen as 1024 for beauty, proximity to 1000.
 	// Not sure if it makes sense to derive this. Should be 1000.
-	const OBF1000_OUTPUT_LIMIT_BASE64 = FULLY_ENCRYPTED_DATA_LENGTH_BASE64 - AESCTR_SALT_SIZE_BASE64; // OBF1000 outputs 1000 chars or error.
+	const OBF1000_OUTPUT_LIMIT_BASE64 = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 - AESCTR_SALT_SIZE_BASE64; // OBF1000 outputs 1000 chars or error.
 	// OpenSSL output is limited by the data length that will decrypt safely when fed into OBF1000.
 	// Although because of CBC blocking, the effective limit is 704, which is the output size with an input size of 686, our main site user input limit.
 	// This gives us a bit of 'room' or unused space that feels like will make our Triple Cipher even less likely to lose data.
@@ -1059,59 +1059,6 @@
 		serverSendContactMessage(contactMessage);
 		showPage('contact_thanks');
 	}
-
-	//////////////////////////////////////////////////////////////
-	//           	UI Manipulation Functions	         		//
-	//////////////////////////////////////////////////////////////
-
-	// Change UI to show Edit button, activate textarea input.
-	function showEditEnabledUI() {
-		document.getElementById('access_data_outputdisplay').disabled = false;
-		document.getElementById('access_data_outputdisplay').style.color = '#<TMPL_VAR NAME=page_type_color>'; // Our 'normal' green.
-	}// showEditEnabledUI()
-
-	// Change UI to hide Edit button, deactivate textarea input.
-	function showEditDisabledUI() {
-		document.getElementById('access_data_outputdisplay').disabled = true;
-		document.getElementById('access_data_outputdisplay').style.color = 'gray';
-	}// showEditDisabledUI()
-
-	// Show overlay where user can DELETE record.
-	function showDeleteOverlay(targetId) {
-		document.getElementById(targetId).style.display = "flex";
-	}// showDeleteOverlay()
-
-	// Hides DELETE overlay.
-	function deleteCheckHide(targetId) {
-		document.getElementById(targetId).style.display = "none";
-	}// deleteCheckHide()
-
-	// Inform user that RE-ENTERED data on a password check step was different.
-	function showPassCheckFailWarnings() {
-		// Show all password warnings on all html pages.
-		passCheckElements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < passCheckElements.length; i++) {
-			passCheckElements[i].style.display = "inline";
-		}
-	}// showPassCheckFailWarnings()
-
-	// Disable all password warnings.
-	function hidePassCheckFailWarnings() {
-		passCheckElements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < passCheckElements.length; i++) {
-			passCheckElements[i].style.display = "none";
-		}
-	}// hidePassCheckFailWarnings()
-
-	// Replaces all upper case letters with lower case as user types them into the frontend UI.
-	function codewordToLowerCase(events) {
-		// .toLowerCase() needs a string to run.
-		let userinput = '';
-		// event.target.value returns the value of whichever input the user is currently typing in.
-		userinput = event.target.value;
-		// event.target.value can also be used to set. This allows us to use a genral function in several places working independently.
-		event.target.value = userinput.toLowerCase();
-	}// codewordToLowerCase()
 
 	/////////////////////////////////////////////////////////////////
 	//                  Copy to Click Functions                    //
@@ -1190,27 +1137,9 @@
 		}   
 	}
 
-	// Detect when user hits ENTER on their keyboard,
-	// then click any button on the currently visible UI which holds the class: activatable_by_enter
-	window.addEventListener("keydown", function(event) {
-		if (event.key === "Enter") {
-			// If focused element is an input, enter clicks the button with activatable_by_enter.
-			if (document.activeElement.tagName == "INPUT") {
-				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-				if (buttonObj !== null) {
-					buttonObj.click();
-				}else{
-					//console.log("Enter clicked but no activatable_by_enter class found: " + currentPage);
-				}
-				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
-				// Prevent strange behavior where "the default action is performed on the newly focused element".
-				event.preventDefault();
-				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
-			}else{
-				// Focused element isn't an Input, do nothng I guess?
-			}
-		}
-	});// activatable_by_enter page listener
+	//////////////////////////////////////////////////////////////
+	//                    Security Reset                        //
+	//////////////////////////////////////////////////////////////
 
 	// Reset state variables, etc. that could be security concern.
 	function securityReset() {
@@ -1238,10 +1167,22 @@
 		updateOnlineStatus();
 		// Hide password RE-Entry check warnings (passlock flow).
 		hidePassCheckFailWarnings();
+		// Hide all password length warnings.
+		hidePasswordLengthWarnings();
 		// Reset delete overlay
 		deleteCheckHide('overlay_delete_cmd');
 		deleteCheckHide('overlay_delete_browser');
 	}// securityReset()
+
+	// (Nothing currently turns these on)
+	// 
+	// Hide all password length warnings.
+	function hidePasswordLengthWarnings() {
+		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
+		for (let i = 0; i < pass_warn_elements.length; i++) {
+			pass_warn_elements[i].style.display = "none";
+		}
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							Browser Back functionality										     		  //
@@ -1282,9 +1223,9 @@
 	// Need to save the state whenever user is on their way to a new page.
 	// Create record in history before moving to new page. This enables history's back function to return to the page.
 	// So, manually create a history record of the page we're currently on before moving to new target page.
-	function saveThenShowPage(target) {
+	function saveThenShowPage(activateThisPage) {
 		saveCurrentStateToHistorySoBackWillWork();
-		showPage(target);
+		showPage(activateThisPage);
 	}// saveThenShowPage()
 
 	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
@@ -1296,42 +1237,42 @@
 		history.go(-numPlaces);
 	}
 
-	// Keep track of the page we're on. Start on home page.
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//							          Show Page                                                           //
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Pages are defined by the 'flow_pages' class which is held by HTML div that holds DOM elements needed for that page's functionality.
+	// Moving through the UI is accomplished by manipulating which 'page' is currently shown to the user;
+	// the page to be made active is shown while all others are hidden. 
+	// 
+	// Global variable to keep track of the page we're on. Start on home page.
 	let currentPage = 'home';
-	// Hide all other pages, then show target page. 
-	// Input: Target is the element ID of a page for flowing the user through site.
-	function showPage(target) {
+	// Hide all other pages, then show activateThisPage page. 
+	// Input: Target is the element ID of a div containing class: flow_pages
+	function showPage(activateThisPage) {
 		// This global variable keeps track of the page the user is currently on. Needed for activatable-by-enter and harnessing browser back.
-		currentPage = target;
-		// Security Reset.
+		currentPage = activateThisPage;
+		// Reset UI warnings and clear all HTML input data as user moves through the interface.
 		securityReset();
-		// Hide all password warnings.
-		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
-		for (let i = 0; i < pass_warn_elements.length; i++) {
-			pass_warn_elements[i].style.display = "none";
-		}
-
-		let flow_page_divs;
-		// Fill flow_page_divs array with set of objects (hopefully divs in this case) that contain the flow_pages class.
-		flow_page_divs = document.getElementsByClassName('flow_pages');
-		// hide all flow_page_divs
+		// Fill flow_page_divs array with set of objects (divs) that contain the flow_pages class.
+		let flow_page_divs = document.getElementsByClassName('flow_pages');
+		// Hide all of the flow pages.
 		for (let i = 0; i < flow_page_divs.length; i++) {
 			flow_page_divs[i].style.display = "none";
 		}
-		// show target 
-		document.getElementById(target).style.display = "flex";
-		// focus input or textbox
-		let inputs_array = document.getElementById(target).getElementsByTagName('input');
-		let textareas_array = document.getElementById(target).getElementsByTagName('textarea');
+		// Show the page -- make visible by changing display style from none to flex.
+		document.getElementById(activateThisPage).style.display = "flex";
+		// Focus input or textbox (for convenience).
+		let inputs_array = document.getElementById(activateThisPage).getElementsByTagName('input');
+		let textareas_array = document.getElementById(activateThisPage).getElementsByTagName('textarea');
 		// There is only 1 input or 1 textarea per div in our setup.
 		// If we found more than zero inputs in the array, focus the first and only one.
 		if (inputs_array.length > 0) {
 			inputs_array[0].focus();
 		}else if (textareas_array.length > 0) {
-		// Otherwise, we should find 1 textarea to focus if we need to focus anything.
-			 textareas_array[0].focus();
+			// Otherwise, we should find 1 textarea to focus if we need to focus anything.
+			textareas_array[0].focus();
 		}else{
-			// If there's no input, focus the button with 'activatable_by_enter' class.
+			// If there's no input, focus the button with 'activatable_by_enter' class (used to select the 'default' option (BRWOSER) at UI branch.
 			const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
 			if (buttonObj !== null) {
 				document.getElementById(buttonObj.id).focus();
@@ -1339,21 +1280,114 @@
 		}
 	}// showPage()
 
-	// Catch File Ingest
-	// listener is placed inline of the html
-	async function catchUpload(event) {
-		const file = event.target.files[0];
-		const reader = new FileReader();
-		reader.readAsArrayBuffer(file);
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//							activatable_by_enter functionality								     		  //
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// To empower the user to move through the interface quickly, we implement a class: activatable_by_enter.
+	// The global variable currentPage holds the page currently in view of the user. When enter is clicked,
+	// the following anonymous function will utilize querySelector to search for DOM objects containing the
+	// activatable_by_enter class. The button containing this class will then be clicked.
+	// 
+	// In simple terms, users can hit enter while the input they're typing in is focused in order to move to the next page in the interface.
+	// 
+	// Globally detect when user hits ENTER on their keyboard.
+	window.addEventListener("keydown", function(event) {
+		if (event.key === "Enter") {
+			// If focused element is an input, enter clicks the button containing the class: activatable_by_enter
+			if (document.activeElement.tagName == "INPUT") {
+				// Select all DOM objects containing the class: activatable_by_enter
+				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
+				if (buttonObj !== null) {
+					// Click button that was selected.
+					buttonObj.click();
+				}else{
+					//console.log("Enter clicked but no activatable_by_enter class found: " + currentPage);
+				}
+				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
+				// Prevent strange behavior where "the default action is performed on the newly focused element".
+				event.preventDefault();
+				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
+			}else{
+				// Focused element isn't an Input, do nothng I guess?
+			}
+		}
+	});// activatable_by_enter page listener
 
+	//////////////////////////////////////////////////////////////
+	//           	UI Manipulation Functions	         		//
+	//////////////////////////////////////////////////////////////
+
+	// Change UI to show Edit button, activate textarea input.
+	function showEditEnabledUI() {
+		document.getElementById('access_data_outputdisplay').disabled = false;
+		document.getElementById('access_data_outputdisplay').style.color = '#<TMPL_VAR NAME=page_type_color>'; // Our 'normal' green.
+	}// showEditEnabledUI()
+
+	// Change UI to hide Edit button, deactivate textarea input.
+	function showEditDisabledUI() {
+		document.getElementById('access_data_outputdisplay').disabled = true;
+		document.getElementById('access_data_outputdisplay').style.color = 'gray';
+	}// showEditDisabledUI()
+
+	// Show overlay where user can DELETE record.
+	function showDeleteOverlay(targetId) {
+		document.getElementById(targetId).style.display = "flex";
+	}// showDeleteOverlay()
+
+	// Hides DELETE overlay.
+	function deleteCheckHide(targetId) {
+		document.getElementById(targetId).style.display = "none";
+	}// deleteCheckHide()
+
+	// Inform user that RE-ENTERED data on a password check step was different.
+	function showPassCheckFailWarnings() {
+		// Show all password warnings on all html pages.
+		passCheckElements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < passCheckElements.length; i++) {
+			passCheckElements[i].style.display = "inline";
+		}
+	}// showPassCheckFailWarnings()
+
+	// Disable all password warnings.
+	function hidePassCheckFailWarnings() {
+		passCheckElements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < passCheckElements.length; i++) {
+			passCheckElements[i].style.display = "none";
+		}
+	}// hidePassCheckFailWarnings()
+
+	// Replaces all upper case letters with lower case as user types them into the frontend UI.
+	function codewordToLowerCase(events) {
+		// .toLowerCase() needs a string to run.
+		let userinput = '';
+		// event.target.value returns the value of whichever input the user is currently typing in.
+		userinput = event.target.value;
+		// event.target.value can also be used to set. This allows us to use a genral function in several places working independently.
+		event.target.value = userinput.toLowerCase();
+	}// codewordToLowerCase()
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// catchUpload() is executed from the HTML UI when a user uploads a file.
+	// The file is interpreted as raw bytes before being converted to base64 and fed into UI data handling pipeline.
+	//
+	// Catch File Ingest
+	async function catchUpload(event) {
+		// Set incoming File object to variable file.
+		const file = event.target.files[0];
+		// Create a FileReader object: reader.
+		const reader = new FileReader();
+		// Read in file as raw bytes.
+		reader.readAsArrayBuffer(file);
+		// Fire an event (this async function) once the reader object has complted reading in the file.
 		reader.onload = async function(e) {
-			let buffer = e.target.result;
-			const buffer_uint8a = new Uint8Array(buffer);
-			let filedata = buffer_uint8a.toBase64();
-			//console.log("filedata: " + filedata);
+			// Access data that was just read into file reader.
+			let fileDataBuffer = e.target.result;
+			const fileDataUint8 = new Uint8Array(fileDataBuffer);
+			let filedata64 = fileDataUint8.toBase64();
 			// Input Data Length Check
-			if (checkInputLengthUpload(buffer)) {
-				passlockedData['data'] = await passlockEncrypt(filedata);
+			if (checkInputLengthUpload(fileDataBuffer)) {
+				// Feed data into passlock 'data pipeline'.
+				passlockedData['data'] = await passlockEncrypt(filedata64);
 				// Show button.
 				document.getElementById("store_upload_commit_button").style.display = "inline";
 				document.getElementById("store_upload_input").style.border = "";
@@ -1371,37 +1405,9 @@
 				document.getElementById("store_upload_warning").style.display = "inline";
 			}
 		}
-		console.log("File input contents: " + document.getElementById('store_upload_input').value);
+		// Clear file ingress data.
 		document.getElementById('store_upload_input').value = null;
-		console.log("File input contents: " + document.getElementById('store_upload_input').value);
 	}// catchUpload()
-
-	// Called on change of text area, checks length of that text area and shows warning if input data too long.
-	function checkTextInputLength(input_id) {
-		let input = document.getElementById(input_id).value;
-		if (checkInputLengthBrowser(input)) {
-			// Length OK, turn off warning
-			document.getElementById("text_input_warning").style.display = "none";
-			// display button
-			document.getElementById("text_input_continue").style.display = "inline";
-
-			// Length OK, turn off warning
-			document.getElementById("edit_input_warning").style.display = "none";
-			// display button
-			document.getElementById("save_button").style.display = "inline";
-		}else{
-			// Length NOT OK, turn ON warning
-			document.getElementById("text_input_warning").style.display = "inline";
-			// remove button
-			document.getElementById("text_input_continue").style.display = "none";
-
-			// Length NOT OK, turn ON warning
-			document.getElementById("edit_input_warning").style.display = "inline";
-			// remove button
-			document.getElementById("save_button").style.display = "none";
-		}
-	}// checkTextInputLength()
-
 
 	///////////////////////////////////////////////////////////////////////////////////
 	//                       Offline Database Creation                               //
@@ -1437,7 +1443,7 @@
 		// Check that data is valid.
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
 			showPage('too_many_access_failures');
-		} else if (multiEncryptedDatarecord.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
 			showPage('failed_to_access_for_new_offline_database_creation');
 		} else {
 			// Push fp, data to recordListForNewOfflineDBase collector object.
@@ -1545,7 +1551,7 @@
 
 	function getRandData() {
 		// Pick a value that will convert into 1024 base64 chars.
-		const randarray = window.crypto.getRandomValues(new Uint8Array(FULLY_ENCRYPTED_DATA_LENGTH_BYTES));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES));
 		return randarray.toBase64();
 	}// getRandData()
 
@@ -1560,10 +1566,10 @@
 	function getRandDatabase() {
 		// Each record has 43 base64 chars for fingerprint and 1024 chars for the data.
 		// There are 1000 records, so 1000*(1024+43) = 1,067,000 base64 chars.
-		const TOTAL_BASE64_CHARS = 1000 * (FULLY_ENCRYPTED_DATA_LENGTH_BASE64 + FINGERPRINT_LENGTH_BASE64);
+		const TOTAL_BASE64_CHARS = 1000 * (MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 + FINGERPRINT_LENGTH_BASE64);
 		// So we need 1067000 base64 chars * (3 raw bytes/4 base 64 chars) = 800250 raw bytes from subtle crypto.
 		const TOTAL_RAW_BYTES_NEEDED = TOTAL_BASE64_CHARS * (3/4);
-//hconsole.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
+		//console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
 		let randBytes = new Uint8Array(0);			// random raw bytes that will be converted to base64 database
 		//let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
 		let bytesStillNeeded = TOTAL_RAW_BYTES_NEEDED; // total number of random raw bytes we need to generate to make the database.
@@ -1608,6 +1614,82 @@
 		return randnum[0];
 	}// randInt()
 
+	/////////////////////////////////////////////////////////////////////////
+	//					Check Functions									   //
+	/////////////////////////////////////////////////////////////////////////
+
+	// Return true if input only contains uuid chars which are used for passlock and browserID.
+	function checkUUIDChars(input) {
+		const regex = new RegExp(/^[a-f0-9-]*$/);
+		if (regex.test(input)) {
+			return true;
+		}else{
+			return false;
+		}
+	}// checkUUIDChars()
+
+	// Return true if input only contains base64 chars, including padding char: '='
+	function checkBase64Chars(input) {
+		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
+		if (regex.test(input)) {
+			// Return true/valid
+			return true;
+		}else{
+			// Return false/invalid
+			return false;
+		}
+	}// checkBase64Chars()
+
+	function checkDataLength(data, length) {
+		// Return fail if data length surpasses length.
+		if (data.length > length) {
+			console.log("Data length Invalid!");
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	function checkLengthAndBase64(data, length){
+		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
+			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
+		} 
+	}
+
+	// Input: input is a string.
+	// Output: Returns false if the input length (in bytes) is over BROWSERINPUT_LENGTH_LIMIT: 686
+	function checkDataInputLengthWithRegex(input) {
+		// Get input size in bytes.
+		let size = new Blob([input]).size;
+		let difference = BROWSERINPUT_LENGTH_LIMIT - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		document.getElementById("browserdata_length_label").innerHTML = size_string;
+		document.getElementById("editdata_length_label").innerHTML = size_string;
+		if (size > BROWSERINPUT_LENGTH_LIMIT) {
+			return false; // Length Check Failed.
+		}else{
+			return true; // Length Check Passed.
+		}
+	}// checkDataInputLengthWithRegex()
+
+	// Input: input is a string.
+	// Output: Returns false if the input length (in bytes) is over 544.
+	function checkInputLengthUpload(input) {
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		let difference = CMDINPUT_LENGTH_LIMIT - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		//console.log("size_string: " + size_string);
+		document.getElementById("uploaddata_length_label").innerHTML = size_string;
+		if (size > CMDINPUT_LENGTH_LIMIT) {
+			return false; // Length Check Failed.
+		}else{
+			return true; // Length Check Passed.
+		}
+	}// checkInputLengthUpload()
+
 	// Returns true if input has precisely FINGERPRINT_LENGTH_BASE64 (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint) {
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH_BASE64 can be passed in.
@@ -1619,9 +1701,9 @@
 		}
 	}// checkFingerprintIsValid()
 
-	// Returns true if input has precisely FULLY_ENCRYPTED_DATA_LENGTH_BASE64 (1024) base64 chars.
+	// Returns true if input has precisely MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 (1024) base64 chars.
 	function checkDataIsValid(data) {
-		const regex = new RegExp(`^[A-Za-z0-9+/=]{${FULLY_ENCRYPTED_DATA_LENGTH_BASE64}}$`);
+		const regex = new RegExp(`^[A-Za-z0-9+/=]{${MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64}}$`);
 		if (regex.test(data)) {
 			return true;
 		}else{
@@ -1635,20 +1717,55 @@
 		}else{
 			console.log("FINGERPRINT IS VALID!");
 		}
-
 		if (!checkDataIsValid(multiEncryptedDatarecord)) {
-//console.log('encrypted data: ', multiEncryptedDatarecord);
-//console.log('encrypted data length', multiEncryptedDatarecord.length);
 			throw new Error('Attempt to store failed! DATA is invalid.');
 		}else{
 			console.log("DATA IS VALID!");
 		}
 	}
 
-	//////////////////////////////////////////////////////////////
-	//     Passlock and User-Crypto Interface Functions         //
-	//////////////////////////////////////////////////////////////
+	// Called on change of text area, checks length of that text area and shows warning if input data too long.
+	function checkDataInputLength(input_id) {
+		let input = document.getElementById(input_id).value;
+		if (checkDataInputLengthWithRegex(input)) {
+			// Length OK, turn off warning
+			document.getElementById("text_input_warning").style.display = "none";
+			// display button
+			document.getElementById("text_input_continue").style.display = "inline";
 
+			// Length OK, turn off warning
+			document.getElementById("edit_input_warning").style.display = "none";
+			// display button
+			document.getElementById("save_button").style.display = "inline";
+		}else{
+			// Length NOT OK, turn ON warning
+			document.getElementById("text_input_warning").style.display = "inline";
+			// remove button
+			document.getElementById("text_input_continue").style.display = "none";
+
+			// Length NOT OK, turn ON warning
+			document.getElementById("edit_input_warning").style.display = "inline";
+			// remove button
+			document.getElementById("save_button").style.display = "none";
+		}
+	}// checkDataInputLength()
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//							 Passlock and User Data Handling Functions                                    //
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Passwords and storage data in the clear is passed through this web browser interface.
+	// In order to minimize exposure to this data the passlock system is used to temporarily encrypt cleartext data
+	// as the user moves through the interface.
+	// 
+	// The passlock system was devised to solve this problem.
+	// Two randomly generated UUIDs are used: a browser ID and the passlock itself.
+	// The passlock is used to encrypt user passwords and data as they move through the interface.
+	// The browser ID is used to access the passlock from the server.
+	//
+	// The passlock cannot be stored in the browser (as that would enable an attacker to decrypt user data nullifying the passlock system),
+	// so after creation, it is stored on the server and retrieved using the browser ID as the user moves through the UI.
+	// 
+	// 
 	// Global browser_id variable to be used for accessing passlock, 
 	let browserId = null;
 	// Keep track of running timeout.
@@ -1926,7 +2043,7 @@
 		const multiEncryptedDatarecord = await serverLoad(fingerprint);
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
 			showPage('too_many_access_failures');
-		} else if (multiEncryptedDatarecord.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
 			showPage('failed_to_access');
 		}else{
 			showPage('access_file');
@@ -1964,7 +2081,7 @@
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
 			showPage('too_many_access_failures');
 			resetPasslock();
-		}else if (multiEncryptedDatarecord.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		}else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
 			showPage('failed_to_access');
 			resetPasslock();
 		}else{
@@ -2228,7 +2345,7 @@
 			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND") {
 				console.log("serverLoad Error: " + responseObj.access_response);
 				return responseObj.access_response;
-			} else if (responseObj.access_response.length === FULLY_ENCRYPTED_DATA_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
+			} else if (responseObj.access_response.length === MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.access_response;
 			} else {
@@ -2511,8 +2628,10 @@
 	//		AES-GCM
 	//		AES-CTR             
 	// This produces a Multi Encrypted Datarecord (MED) that is stored in either our online database or in a user-controlled offline database.
-	// 
 	//
+	// How this site works:
+	//     Data is stored as a key-value pair where the computed Fingerprint is the key and a Multi Encrypted Datarecord is the value.
+	//     So, in order to overwrite data the same sequence of passwords must be entered that was used to initially store it.
 	//              
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 7Byte Header
@@ -2568,15 +2687,17 @@
 	//               absoluteValue( 162 + 116 - 181 - 73 ) = 24
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Data is stored as a key-value pair where the computed Fingerprint is the key and a Multi Encrypted Datarecord is the value.
+	// So, in order to overwrite data the same sequence of passwords must be entered that was used to initially store it.
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Multi Encrypted Datarecord - Breakdown
-	//
 	//     
 	//     |----------------------------------Multi Encrypted Datarecord (MED)---768 Bytes (1024 base 64 chars)------------------------------------------------------| 
 	//                 |-----------------------------------------CTR Plaintext---750 Bytes (1000 base 64 chars)------------------------------------------------------| 
 	//                             |-----------------------------GCM Plaintext---717 Bytes----------------------------------------------------------------| 
 	//     |-CTR Salt-||-GCM Salt-||-7ByteHeader-|***|-CBC Salt-||-----------CBC Plaintext-----------||-Newline-||-CBC Blocking--||-----Random Filler-----||-GCM Tag-|
 	//     |----18----||----18----||------7------|   |----8-----||--Browser Input---Up to 686 Bytes--||----1----||----1 to 16----||-[ 710 - File Input  ]-||---15----|
-	//                                               |-----------------File Input---Up to 710 Bytes------------------------------| 
+	//                                               |-----------------File Input---Up to 704 Bytes------------------------------| 
 	//     
 	//     ***Salted__ string literal removed in OBF-1000 step. Crypto best practices are to not have a constant in your cipher input which is why the decision was made.
 	//     The added benefit here is extra space for storage.
@@ -3907,84 +4028,6 @@
 		return Math.abs(eval(mathExpression));
 	}// eval7ByteValue()
 
-
-	/////////////////////////////////////////////////////////////////////////
-	//					Check Functions									   //
-	/////////////////////////////////////////////////////////////////////////
-
-	// Return true if input only contains uuid chars which are used for passlock and browserID.
-	function checkUUIDChars(input) {
-		const regex = new RegExp(/^[a-f0-9-]*$/);
-		if (regex.test(input)) {
-			return true;
-		}else{
-			return false;
-		}
-	}// checkUUIDChars()
-
-	// Return true if input only contains base64 chars, including padding char: '='
-	function checkBase64Chars(input) {
-		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
-		if (regex.test(input)) {
-			// Return true/valid
-			return true;
-		}else{
-			// Return false/invalid
-			return false;
-		}
-	}// checkBase64Chars()
-
-	function checkDataLength(data, length) {
-		// Return fail if data length surpasses length.
-		if (data.length > length) {
-			console.log("Data length Invalid!");
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	function checkLengthAndBase64(data, length){
-		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
-			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
-		} 
-	}
-
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over 526.
-	function checkInputLengthBrowser(input) {
-		// show input size in bytes
-		let size = new Blob([input]).size;
-		let difference = BROWSERINPUT_LENGTH_LIMIT - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		//console.log("size_string: " + size_string);
-		document.getElementById("browserdata_length_label").innerHTML = size_string;
-		document.getElementById("editdata_length_label").innerHTML = size_string;
-		if (size > BROWSERINPUT_LENGTH_LIMIT) {
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}// checkInputLengthBrowser()
-
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over 544.
-	function checkInputLengthUpload(input) {
-		// show input size in bytes
-		let size = new Blob([input]).size;
-		let difference = CMDINPUT_LENGTH_LIMIT - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		//console.log("size_string: " + size_string);
-		document.getElementById("uploaddata_length_label").innerHTML = size_string;
-		if (size > CMDINPUT_LENGTH_LIMIT) {
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}// checkInputLengthUpload()
-
 	//////////////////////////////////////////
 	//		Misc Functions					//
 	//////////////////////////////////////////
@@ -4008,6 +4051,10 @@
 		return concatenatedUint8;
 	}// concatBuffer()
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Once the 2 offline databases (encrypted, unencrypted) and their corresponding pointers are ready,
+	// this function is called which will deposit those datas into the code for the offline database below.
+	// 
 	// Generates standalone html file from static code held in multiline string below:
 	function downloadStandalone(offlineDatabaseUnenc, offlineDatabaseUnencPointer, offlineDatabaseEnc, offlineDatabaseEncPointer) {
 // !@#$ = search for this spot (turn on/off syntax highlighting)
@@ -4535,7 +4582,7 @@
 				<label>result:</label>
 				<div class="overlay_container" style="position:relative; ">
 					<label id="offlineeditdata_length_label" style="color:black"></label>
-					<textarea disabled value="" id="offlineaccess_data_outputdisplay" oninput="checkTextInputLength('offlineaccess_data_outputdisplay')" style="color:gray; " rows="8" cols="50"></textarea>
+					<textarea disabled value="" id="offlineaccess_data_outputdisplay" oninput="checkDataInputLength('offlineaccess_data_outputdisplay')" style="color:gray; " rows="8" cols="50"></textarea>
 					<div class="deletecheck" id="offlineoverlay_delete_browser" style="display:none">
 						<h2>Are you sure you want to delete this data?</h2> 
 						<div class="button_pair" id="" style="display:flex">
@@ -4687,7 +4734,7 @@
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
-				<h2>RE-ENTER PASSWORD 1</h2>c
+				<h2>RE-ENTER PASSWORD 1</h2>
 				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword_cmdcheck')">BACK</button>
@@ -4717,7 +4764,7 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
-				<h2 id="offlinestore_upload_warning" style="color:red; display:none">FILE TOO LARGE. 526 byte limit</h2>
+				<h2 id="offlinestore_upload_warning" style="color:red; display:none">FILE TOO LARGE. Please limit data size to 687 bytes BEFORE encrypting with OpenSSL.</h2>
 				<h2 id="offlinestore_upload_readytocommit" style="color:orange; display:none">READY TO COMMIT</h2>
 				<label id="offlineuploaddata_length_label" style="color:black"></label>
 				<input autocomplete="off" onchange="catchUpload(event)" id="offlinestore_upload_input" style="border:none;" type="file">
@@ -4839,7 +4886,7 @@
 					<label>STORE DATA</label>
 					<label id="offlinebrowserdata_length_label" style="color:black"></label>
 				</div>
-				<textarea class="browser_input" id="offlinestore_data_textarea" rows="8" cols="45" oninput="checkTextInputLength('offlinestore_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
+				<textarea class="browser_input" id="offlinestore_data_textarea" rows="8" cols="45" oninput="checkDataInputLength('offlinestore_data_textarea')" placeholder="ENTER YOUR SECRET DATA"></textarea>
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_opensslpass_browsercheck')">BACK</button>
 					<button class="" id='text_input_continue' style="flex-grow:1" onclick="attemptBrowserStoreOffline('offlinestore_data_textarea', 'false')">ENCRYPT DATA AND COMMIT TO SERVER</button>
@@ -4938,12 +4985,12 @@
 	// List everything that is contributing to that length.
 	// 24 b64 chars for CTR salt + 24 b64 chars for GCM salt + 20 b64 chars for GCM sig + 
 	// 
-	const FULLY_ENCRYPTED_DATA_LENGTH_BASE64 = 1024;
-	const TOTAL_RECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + FULLY_ENCRYPTED_DATA_LENGTH_BASE64;
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 = 1024;
+	const TOTAL_RECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64;
 	const BROWSERINPUT_LENGTH_LIMIT = 686; // Should derive programmatically.
-	const CMDINPUT_LENGTH_LIMIT = 710; // Should derive perogrammatically.
-	//const FULLY_ENCRYPTED_DATA_LENGTH_BYTES = 768; // This number of bytes converts to exactly 1024 base64 chars.
-	const FULLY_ENCRYPTED_DATA_LENGTH_BYTES = FULLY_ENCRYPTED_DATA_LENGTH_BASE64 * (3/4); 
+	const CMDINPUT_LENGTH_LIMIT = 704; // Should derive perogrammatically.
+	//const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = 768; // This number of bytes converts to exactly 1024 base64 chars.
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 * (3/4); 
 	//const BYTE_LENGTH_EQUIVALENT_1000_BASE64 = 750; // This number of bytes converts to exactly 1000 base64 chars.
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384; // 256 bits for key + 128 for IV
 	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352; // 256 bits for key + 96 for IV
@@ -4963,9 +5010,9 @@
 	const GCM_SIG_SIZE_BASE64 = GCM_SIG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to b64.
 
 	const GCM_SALT_SIZE_BASE64 = AESCTR_SALT_SIZE_BASE64; // Currently using same salt of 24 base64 / 18 bytes.
-	const AESCTR_OUTPUT_LIMIT_BASE64 = FULLY_ENCRYPTED_DATA_LENGTH_BASE64;
+	const AESCTR_OUTPUT_LIMIT_BASE64 = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64;
 	// 1024 - 24 base64 CTR salt
-	const OBF1000_OUTPUT_LIMIT_BASE64 = FULLY_ENCRYPTED_DATA_LENGTH_BASE64 - AESCTR_SALT_SIZE_BASE64;
+	const OBF1000_OUTPUT_LIMIT_BASE64 = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 - AESCTR_SALT_SIZE_BASE64;
 	// - 24 base64 GCM salt
 	// - 20 base64 GCM sig
 	const OPENSSL_OUTPUT_LIMIT_BASE64 = OBF1000_OUTPUT_LIMIT_BASE64 - GCM_SIG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64;
@@ -5304,10 +5351,10 @@
 	}
 
 	// Called on change of text area, checks length of that text area and shows warning if input data too long.
-	function checkTextInputLength(input_id) {
+	function checkDataInputLength(input_id) {
 		//let input = document.getElementById("store_data").value;
 		let input = document.getElementById(input_id).value;
-		if (checkInputLengthBrowser(input)) {
+		if (checkDataInputLengthWithRegex(input)) {
 			// Length OK, turn off warning
 			document.getElementById("text_input_warning").style.display = "none";
 			// display button
@@ -5331,7 +5378,7 @@
 	}
 
 	function getRandData() {
-		const randarray = window.crypto.getRandomValues(new Uint8Array(FULLY_ENCRYPTED_DATA_LENGTH_BYTES));
+		const randarray = window.crypto.getRandomValues(new Uint8Array(MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES));
 		return randarray.toBase64();
 	}
 
@@ -5380,9 +5427,9 @@
 		}
 	}
 
-	// Returns true if input has precisely FULLY_ENCRYPTED_DATA_LENGTH_BASE64 (1024) base64 chars.
+	// Returns true if input has precisely MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 (1024) base64 chars.
 	function checkDataIsValid(data) {
-		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${FULLY_ENCRYPTED_DATA_LENGTH_BASE64}}$\`);
+		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64}}$\`);
 		if (regex.test(data)) {
 			return true;
 		}else{
@@ -5553,7 +5600,7 @@
 	function getRecordOfflineDBase(fingerprint, offlineDatabase) {
 		const fingerprintStartIndex = offlineDatabase.indexOf(fingerprint);
 		const fingerprintEndIndex = fingerprintStartIndex + FINGERPRINT_LENGTH_BASE64;
-		const dataEndIndex = fingerprintEndIndex + FULLY_ENCRYPTED_DATA_LENGTH_BASE64;
+		const dataEndIndex = fingerprintEndIndex + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64;
 		// Get the data between fingerprintEndIndex and dataEndIndex.
 		return offlineDatabase.substring(fingerprintEndIndex, dataEndIndex);
 	}
@@ -5771,7 +5818,7 @@
 		// Add additional parameter?
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
 
-		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_file');
@@ -5788,7 +5835,7 @@
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
 
-		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
 			showPage('offlinefailed_to_access'); // Access fail is valid here?
 		}else{
 			//showPage('offlineaccess_file');
@@ -5844,7 +5891,7 @@
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
-		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== FULLY_ENCRYPTED_DATA_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
 			showPage('offlinefailed_to_access');
 		}else{
 			showPage('offlineaccess_plaintext');
@@ -5983,7 +6030,7 @@
 			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND") {
 				console.log("serverLoad Error: " + responseObj.access_response);
 				return responseObj.access_response;
-			} else if (responseObj.access_response.length === FULLY_ENCRYPTED_DATA_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
+			} else if (responseObj.access_response.length === MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				return responseObj.access_response;
 			} else {
@@ -6051,92 +6098,6 @@
 		}
 	}// serverStore()
 
-
-/*
-	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
-	// This type of URI used instead of a direct link to the file for security.
-	// Input: fingerprint is hexadecimal.
-	// Output: POST message to server script which will attempt to load encrypted data from server database.
-	async function serverLoad(fingerprint) {
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exeload';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					fingerprint: fingerprint,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(\`Response status: \${fetchResponseObject.status}\`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
-			//console.log("Load responseObj.data: " + responseObj.data);
-			if (responseObj.data.length === FULLY_ENCRYPTED_DATA_LENGTH_BASE64 && checkBase64Chars(responseObj.data)) { // Data looks good.
-				console.log("serverLoad: Successfully loaded encrypted data.");
-				return responseObj.data;
-			}else{
-				console.log("serverLoad: Failed to load encrypted data.");
-				return "failed to load";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}//serverLoad()
-
-	// Stores data to fingerprint location.
-	// Returns "success" or "error".
-	async function serverStore(fingerprint, data) {
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exestore';
-		
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					fingerprint: fingerprint,
-					data: data,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(\`Response status: \${fetchResponseObject.status}\`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
-			//console.log("Store responseObj.response: " + responseObj.response);
-			if ( Number(responseObj.response) !== 1 ) { // there appears to be a problem.
-				throw Error("serverStore Error! Maybe a database error?");
-				return "error";
-			}else{
-				console.log("serverStore: Successfully stored encrypted data.");
-				return "success";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		// 500 Internal Server Errors will be caught here too.
-		}catch(error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}//serverStore()
-*/
 	// Create a json string containing every record in the offline dbase from 0 to pointer.
 	function convertOfflineDBaseToJSONString() {
 		const offline_dbase = document.getElementById("offline_dbase").innerHTML;
@@ -6151,7 +6112,7 @@
 		for(let i=0; i < offline_dbase_pointer; i++ ) {
 			fp_start = i * TOTAL_RECORD_LENGTH_BASE64;
 			fp_end = fp_start + FINGERPRINT_LENGTH_BASE64;
-			data_end = fp_end + FULLY_ENCRYPTED_DATA_LENGTH_BASE64;
+			data_end = fp_end + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64;
 
 			offline_dbase_json_flat += '{"fingerprint":"' + offline_dbase.substring(fp_start, fp_end) + '",';
 			offline_dbase_json_flat += '"data":"' + offline_dbase.substring(fp_end, data_end) + '"},';
@@ -6661,11 +6622,6 @@
 	}// decryptGCM()
 
 
-
-
-
-
-
 	// Default outputType is base64 because that is what our Triple Encrypt stack is set up for.
 	// Output always packed into base64.
 	async function encryptAESCTR(plaintext, password, inputType='base64') {
@@ -6926,7 +6882,7 @@
 
 	// Input: input is a string.
 	// Output: Returns false if the input length (in bytes) is over 526.
-	function checkInputLengthBrowser(input) {
+	function checkDataInputLengthWithRegex(input) {
 		// show input size in bytes
 		let size = new Blob([input]).size;
 		let difference = BROWSERINPUT_LENGTH_LIMIT - size;
@@ -6940,7 +6896,7 @@
 		}else{
 			return true; // Length Check Passed.
 		}
-	}//checkInputLengthBrowser()
+	}//checkDataInputLengthWithRegex()
 
 	// Input: input is a string.
 	// Output: Returns false if the input length (in bytes) is over 544.
