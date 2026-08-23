@@ -858,7 +858,7 @@
 				<div class="" id="" style="display:flex;">
 					<div class="informative_button_set" id="" style="flex-grow:1; display:flex; flex-direction:column;">
 						<!--<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">-->
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="clearNewOfflineDBaseList('newofflinedatabase_exisitingdata_codeword')">
+						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="clearNewOfflineDBaseListThenShow('newofflinedatabase_exisitingdata_codeword')">
 							<span style="">FILL WITH EXISTING DATA</span>
 							<span style="margin-top:4px; color:gray; font-size:15px;">Option 1</span>
 						</button>
@@ -974,14 +974,14 @@
 <script>
 
 	//////////////////////////////////////////////////////////////
-	//             Constants & base64 map                       //
+	//             Constants & Base64 Map                       //
 	//////////////////////////////////////////////////////////////
 
 	// Base64 encoding as standardized in RFC 4648: https://datatracker.ietf.org/doc/html/rfc4648#section-4
 	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	// User input limits.
-	const BROWSERINPUT_LENGTH_LIMIT = 686; // User input size limit in bytes for Triple Cipher.
-	const CMDINPUT_LENGTH_LIMIT = 704; // Limit for Double Cipher.
+	// Plaintext Data Payload size limits.
+	const BROWSERINPUT_LENGTH_LIMIT = 686; // Data payload size limit in bytes for Triple Cipher.
+	const CMDINPUT_LENGTH_LIMIT = 704; // Data payload size limit for CMD Line input.
 	// PBKDF2 number-of-bits-to-derive constants.
 	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384; // 256 bits for key + 128 for IV
 	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352; // 256 bits for key + 96 for IV
@@ -1018,7 +1018,7 @@
 	// Not sure if it makes sense to derive this. Should be 1000.
 	const OBF1000_OUTPUT_LIMIT_BASE64 = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 - AESCTR_SALT_SIZE_BASE64; // OBF1000 outputs 1000 chars or error.
 	// OpenSSL output is limited by the data length that will decrypt safely when fed into OBF1000.
-	// Although because of CBC blocking, the effective limit is 704, which is the output size with an input size of 686, our main site user input limit.
+	// Although because of CBC blocking, the effective limit is 704, which is the output size with an input size of 686, our main site Plaintext Data Payload byte size limit.
 	// This gives us a bit of 'room' or unused space that feels like will make our Triple Cipher even less likely to lose data.
 	// Output in base64 is (1000 - 20 - 24) * (4/3) convert to bytes - 7 Bytes for 7 byte set. Anything above this value will result in error.
 	const OBF1000_MAX_INPUT_BYTES = (OBF1000_OUTPUT_LIMIT_BASE64 - GCM_SIG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64) * 3 / 4 - 7;
@@ -1034,7 +1034,7 @@
 	window.onload = async function() {
 		// Initial server online check.
 		await updateOnlineStatus();
-		// Request filtering security.
+		// Count every time a unique visitor accesses this site.
 		serverCountUniqueVisitors();
 	}
 
@@ -1189,21 +1189,19 @@
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Harnessing the browser's back functionality is complexity rooted in browser security decisions and the
 	// functional opacity that brings. You are disallowed from things like deleting history records as a user moves
-	// through a custom interface so workarounds are needed.
+	// through a custom interface, so workarounds are needed. Because of the opacity of how this works in the browser,
+	// testing and tuning was required to get it to work - there was no straightforward theory available.
 	//
 	// The goal is to map the back button to the last page of the UI a user was on.
 	// This is achieved in 2 steps: creating a record in history for every page we want the user to be able to go back to.
 	// And making sure that the proper page is returned to upon a user activating browser back function.
 	//
-	// Because of the opacity of how this works in the browser, testing and tuning was required to get it to work.
+	// I would advise future programmers towards designs that do not require hacking browser back functionality.
 	//
 	// Listen for the popstate event which is usually fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
 	window.addEventListener('popstate', (event) => {
-		//console.log("popstate history stack", window.history);
-		//console.log('Navigated!', event.state); 
-		//console.log('popstate! going to page saved in state object:', event.state.page); 
 		// Use event.state or window.location to update content
 		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
 			showPage(event.state.page);
@@ -1214,11 +1212,11 @@
 		}
 	});
 
-	// Save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
+	// In order for custom back functionality to work, we have to manually save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
 	function saveCurrentStateToHistorySoBackWillWork() {
 		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
 		const state = {page: currentPage}; // Create JS object with attribute page that has value currentPage.
-		// First, state is js object that can contain more data than just the page if needed.
+		// First parameter for replaceState(), state is js object that can contain more data than just the page if needed.
 		// Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
 		// Last, window.location should be url of current page.
 		// Replace the current history entry with additional state data that we will use to return to with custom function.
@@ -1229,9 +1227,8 @@
 		history.pushState({}, '', '');
 	}// saveCurrentStateToHistorySoBackWillWork()
 
-	// Need to save the state whenever user is on their way to a new page.
-	// Create record in history before moving to new page. This enables history's back function to return to the page.
-	// So, manually create a history record of the page we're currently on before moving to new target page.
+	// Create record in history whenever user moves to a new page. This enables history's back function to return to that page.
+	// Used as a 'wrapper' solution to creating save states as the user moves through the UI.
 	function saveThenShowPage(activateThisPage) {
 		saveCurrentStateToHistorySoBackWillWork();
 		showPage(activateThisPage);
@@ -1239,10 +1236,14 @@
 
 	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
 	let showPageFlag = 'true';
+
+	// For overall security and because the passlock system wasn't designed for users to browser back into it,
+	// once a 'flow' completes, we move the history pointer so that if they do hit back, it will take them to the home page.
+	// Better security for this site would be to delete those records entirely but because of browser security design, this is disallowed.
 	function goBackProgrammaticallyXandDontFireShowPage(numPlaces) {
+		// Don't flicker between multiple pages as the history pointer is programmatically moved to the home page.
 		showPageFlag = 'false';
-		//console.log('going back X places:', numPlaces);
-		//console.log("Current history stack", window.history);
+		// Move the pointer back a variable number of places. Each case of this number was found by trial and error.
 		history.go(-numPlaces);
 	}
 
@@ -1575,7 +1576,7 @@
 	// 
 	// 
 	// 
-	// Global browser_id variable to be used for accessing passlock, 
+	// Global browserId variable to be used for accessing passlock, 
 	let browserId = null;
 	// Keep track of running timeout.
 	let timeoutId;
@@ -1626,7 +1627,7 @@
 		}
 	}// getPasslock()
 
-	// Generate a browser_id, passlock and save to server as a key-value pair.
+	// Generate a browserId, passlock and save to server as a key-value pair.
 	async function generatePasslock() {
 		// Generate new browserId (global variable).
 		browserId = self.crypto.randomUUID();
@@ -1648,7 +1649,7 @@
 		setTimeoutAndWarning();
 		// Reset old data and generate new passlock, browserId.
 		const passlock = await generatePasslock();
-		//console.log("new browser_id: " + browserId);
+		//console.log("new browserId: " + browserId);
 		//console.log("new passlock: " + passlock);
 
 		// Data will be stored at keyword's 'location'.
@@ -1984,74 +1985,81 @@
 	//			Server Communication Functions				    //
 	//////////////////////////////////////////////////////////////
 	// Server communication relies on fetch() to handle HTTP requests.
-	//
+	//////////////////////////////////////////////////////////////
 
-	// Check if we're online or not and inform user.
+	//////////////////////////////////////////////////////////////
+	// We need to set the origin differently depending if we're a standalone file or not.
+	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
+	// Returns the SERVER_URL to be used for server communication functions.
+	// 
+	// This function used by both online client and offline standalone.html file that houses the offline database.
+	// While the online client can find there the online database is to store using window.location.origin,
+	// the offline database needs to have that URL set manually by this function.
+	// 
+	// Figure out whether we are an online client of offline database housing standalone.html file
+	// and set the origin accordingly so that communication with the online server will work.
+	function getOnlineServerOrigin() {
+		// Get origin detected by the browser.
+		const browserDetectedOrigin = window.location.origin;
+		let onlineServerOrigin = '';
+		// If we're standalone, set address manually.
+		const regex = new RegExp(/^file/);
+		if (regex.test(browserDetectedOrigin)) {
+			// This is a standalone file; set origin manually.
+			onlineServerOrigin = 'https://obf.mkrsvr.org/';
+		}else{
+			// This an online client, empty in this context gets interpreted as 'this origin' by fetch() when used.
+			onlineServerOrigin = '';
+		}
+		return onlineServerOrigin;
+	}// getOnlineServerOrigin()
+
+	// Check if we're online by querying server.
+	async function checkOnline() {
+		// Get origin of the online server.
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exeonlinecheck';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				}
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				//throw new Error(`Response status: ${fetchResponseObject.status}`);
+				return 'offline';
+			}
+			// Looks like we're online!
+			return 'online';
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			// If we're in this error block we know that it is a communication/offline error. Yes this is arcane knowledge.
+			console.log("Fetch Error on Online Check: " + error.message);
+			console.log("response FAILED");
+			return "offline";
+		}
+	}// checkOnline()
+
+	// Check if we're online or not and inform user by changing UI label that is always visible as user moves through interface.
 	async function updateOnlineStatus() {
 		document.getElementById("offline_label").innerHTML = "ONLINE STATUS PENDING...";
 		// Check if we're online
 		const online_status = await checkOnline();
-
-		//console.log("Updating Online Status...");
-		if ( online_status === "online" ) {
+		if (online_status === "online") {
 			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
 		}else{
 			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
 		}
 	}// updateOnlineStatus()
 
-	// Check if we're online 
-	async function checkOnline() {
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exeonlinecheck';
-		
-		//console.log("Checking Online...");
-		const fetchResponseObject = await fetch(SERVER_URL, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'text/plain',
-			}
-		})
-		.catch((error) => {
-			// If we're in this error block we know that it is a communication/offline error. Yes this is arcane knowledge.
-			console.log("Fetch Error on Online Check: " + error.message);
-			console.log("response FAILED");
-			return "offline";
-		});
-		if (fetchResponseObject.ok) {
-			//console.log("Response from checkOnline() fetch() call = OK!");
-			return "online";
-		} else {
-			console.log("HTTP error. Status: " + fetchResponseObject.status);
-			return "offline";
-		}
-	}// checkOnline()
-
-	// We need to set the origin differently depending if we're a standalone file or not.
-	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
-	// Returns the SERVER_URL to be used for server communication functions.
-	function getServerOrigin() {
-		// Check origin.
-		const url_origin = window.location.origin;
-		let server_origin = '';
-		// If we're standalone, set address to chat.dance instead of a relative path.
-		const regex = new RegExp(/^file/);
-		if (regex.test(url_origin)) {
-			//console.log("We're a standalone file!");
-			//server_origin = 'https://chat.dance/obf/';
-			server_origin = 'https://obf.mkrsvr.org/';
-		}else{
-			//console.log("We're NOT a standalone file!");
-			//server_origin = '/obf/';
-			//server_origin = '/';
-			server_origin = '';
-		}
-		return server_origin;
-	}// getServerOrigin()
-
-	// 
+	// Count every time a unique visitor accesses this site.
 	async function serverCountUniqueVisitors() {
-		let SERVER_URL = getServerOrigin();
+		let SERVER_URL = getOnlineServerOrigin();
 		SERVER_URL += 'execountuniquevisitors';
 
 		try { // Catch a rejected promise so we can operate on it.
@@ -2085,9 +2093,9 @@
 		}
 	}// serverCountUniqueVisitors()
 
-	// Email owners with user contact message.
+	// Send contact message to site admin.
 	async function serverSendContactMessage(contactMessage) {
-		let SERVER_URL = getServerOrigin();
+		let SERVER_URL = getOnlineServerOrigin();
 		SERVER_URL += 'exesendcontactmessage';
 
 		try { // Catch a rejected promise so we can operate on it.
@@ -2121,13 +2129,13 @@
 		}
 	}// serverSendContactMessage()
 
-
 	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
-	// This type of URI used instead of a direct link to the file for security.
 	// Input: fingerprint is hexadecimal.
 	// Output: POST message to server script which will attempt to load encrypted data from server database.
+	//
+	// Accesses the Multi Encrypted Datarecord at fingerprint location from the online server and returns it. 
 	async function serverLoad(fingerprint) {
-		let SERVER_URL = getServerOrigin();
+		let SERVER_URL = getOnlineServerOrigin();
 		SERVER_URL += 'exeload';
 
 		try { // Catch a rejected promise so we can operate on it.
@@ -2149,8 +2157,6 @@
 			// Now that we've cleared the error check, we can proceed with processing the response.
 			// Make a copy of the json extraction.
 			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
-			//console.log("responseObj.access_response: " + responseObj.access_response);
 			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND") {
 				console.log("serverLoad Error: " + responseObj.access_response);
 				return responseObj.access_response;
@@ -2166,10 +2172,9 @@
 		}
 	}// serverLoad()
 
-	// Stores data to fingerprint location.
-	// Returns "success" or "error".
+	// Stores Multi Encrypted Datarecord to fingerprint location in the online database.
 	async function serverStore(fingerprint, data) {
-		let SERVER_URL = getServerOrigin();
+		let SERVER_URL = getOnlineServerOrigin();
 		SERVER_URL += 'exestore';
 		
 		try { // Catch a rejected promise so we can operate on it.
@@ -2192,9 +2197,7 @@
 			// Now that we've cleared the error check, we can proceed with processing the response.
 			// Make a copy of the json extraction.
 			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
 			console.log("Store responseObj.response: " + responseObj.store_response);
-			//if ( Number(responseObj.response) !== 1 ) { // there appears to be a problem.
 			if (responseObj.store_response === "TOTAL_STORES_OVER_50000") {
 				showPage("lockedout_50000"); // Shown for a split second before page reload.
 				window.location.reload(true);
@@ -2212,185 +2215,17 @@
 		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
 		// 500 Internal Server Errors will be caught here too.
 		}catch(error) { // Catch rejected promise.
-			//if (error instanceof TypeError) { // === "TOTAL_STORES_OVER_50000") {
-				//showPage("lockedout_50000");
-				//window.location.reload(true);
-				//throw new Error("CRITICAL ERROR: TOTAL_STORES_OVER_50000");
-			//}
 			console.error(error.message);
 		}
 	}// serverStore()
 
-	// Runs after Store or Access call completes as a security measure to ensure user passlocks exist only as long as necessary.
-	async function serverDeletePasslock(passedBrowserId) {
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exepasslockdelete';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					browser_id: passedBrowserId,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			// checkResponseObject(response_obj);
-			console.log("delete passlock response: ");
-			console.log(responseObj);
-			// Handle database query outcome.
-			//console.log("Store responseObj.response: " + responseObj.response);
-			//if ( Number(responseObj.response) !== 1 ) { // there appears to be a problem.
-			if (responseObj.response !== "passlock successfully deleted") { // there appears to be a problem.
-				//console.log("Error Deleting. browser_id: " + browserId);
-				throw Error("serverDeletePasslock() Failed to delete passlock!");
-				return "error";
-			}else{
-				console.log("Passlock successfully deleted from database.");
-				return "success";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverDeletePasslock()
-
-	async function serverExtendPasslock(browser_id) {
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exeextendpasslock';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					browser_id: browser_id,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const response_obj = await fetchResponseObject.json();
-			//checkResponseObject(response_obj, "Message specific to serverExtendPasslock");
-			console.log("extend passlock response: ");
-			console.log(response_obj);
-			// Handle database query outcome.
-			if (response_obj.response != 1) { // there appears to be a problem.
-				throw Error("serverExtendPasslock() database store error!");
-			}else{
-				console.log("Passlock successfully extended.");
-				return;
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverExtendPasslock()
-
-	async function serverSetPasslock(browser_id, passlock) {
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exesetpasslock';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					browser_id: browser_id,
-					passlock: passlock,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const response_obj = await fetchResponseObject.json();
-			//checkResponseObject(response_obj, "Message specific to serverSetPasslock");
-			//console.log("set passlock response: ");
-			//console.log(response_obj);
-			// Handle database query outcome.
-			if (response_obj.response != 1) { // there appears to be a problem.
-				throw Error("serverSetPasslock() database store error!");
-			}else{
-				//console.log("New passlock successfully stored to database.");
-				return;
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverSetPasslock()
-
-	// 
-	async function serverGetPasslock(browserId) {
-		let SERVER_URL = getServerOrigin();
-		SERVER_URL += 'exegetpasslock';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					browser_id: browserId,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
-			//console.log("responseObj.passlock: " + responseObj.passlock);
-			//console.log("responseObj.passlock.length: " + responseObj.passlock.length);
-			if (responseObj.passlock.length === PASSLOCK_LENGTH && checkUUIDChars(responseObj.passlock)) { // Data looks good.
-				//console.log("serverGetPasslock: Successfully retrieved existing passlock.");
-				return responseObj.passlock;
-			}else{
-				throw Error("serverGetPasslock: Failed to load passlock.");
-				//console.log("serverGetPasslock: Failed to load passlock.");
-				return "failed to get passlock";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverGetPasslock()
-
-
 	// Endpoint /obf/exedelete will attempt to delete.
 	// Input: fingerprint is hexadecimal.
 	// Output: POST message to server script that will attempt to Delete.
+	// 
+	// Deletes the Multi Encrypted Datarecord at fingerprint location.
 	async function serverDelete(fingerprint) {
-		let SERVER_URL = getServerOrigin();
+		let SERVER_URL = getOnlineServerOrigin();
 		SERVER_URL += 'exedelete';
 		
 		try { // Catch a rejected promise so we can operate on it.
@@ -2412,9 +2247,7 @@
 			// Now that we've cleared the error check, we can proceed with processing the response.
 			// Make a copy of the json extraction.
 			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
-			//console.log("Store responseObj.response: " + responseObj.response);
-			if ( Number(responseObj.response) !== 1 ) { // there appears to be a problem.
+			if (Number(responseObj.response) !== 1) { // there appears to be a problem.
 				throw Error("serverDelete Error! Data not deleted!");
 				return "error";
 			}else{
@@ -2429,34 +2262,207 @@
 	}// serverDelete()
 
 
+	// Attempts to delete active passlock from online database. After ~5 minutes the database will delete the passlock itself for added security.
+	// Runs after Store or Access call completes as a security measure to ensure user passlocks exist only as long as necessary.
+	async function serverDeletePasslock(passedBrowserId) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exepasslockdelete';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					// browser_id is the key which will be used to access data on server side.
+					browser_id: passedBrowserId,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			// checkResponseObject(response_obj);
+			console.log("delete passlock response: ");
+			console.log(responseObj);
+			// Handle database query outcome.
+			if (responseObj.response !== "passlock successfully deleted") { // there appears to be a problem.
+				throw Error("serverDeletePasslock() Failed to delete passlock!");
+				return "error";
+			}else{
+				console.log("Passlock successfully deleted from database.");
+				return "success";
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverDeletePasslock()
+
+	// Ask the server to extend time period before it auto-deletes a passlock.
+	// Called when user clicks 'EXTEND TIME' in last 30 seconds of passlock being active.
+	async function serverExtendPasslock(browserId) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exeextendpasslock';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					// browser_id is the key which will be used to access data on server side.
+					browser_id: browserId,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const response_obj = await fetchResponseObject.json();
+			// Handle database query outcome.
+			if (response_obj.response != 1) { // there appears to be a problem.
+				throw Error("serverExtendPasslock() database store error!");
+			}else{
+				console.log("Passlock successfully extended.");
+				return;
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverExtendPasslock()
+
+	// Send passlock to server, store as key value pair with browserId as key.
+	// Used when passlock is instantiated as user beings a UI flow.
+	// Passlock stored on server in case user walks away - added security.
+	async function serverSetPasslock(browserId, passlock) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exesetpasslock';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					// browser_id is the key which will be used to access data on server side.
+					browser_id: browserId,
+					passlock: passlock,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const response_obj = await fetchResponseObject.json();
+			// Handle database query outcome.
+			if (response_obj.response != 1) { // there appears to be a problem.
+				throw Error("serverSetPasslock() database store error!");
+			}else{
+				//console.log("New passlock successfully stored to database.");
+				return;
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverSetPasslock()
+
+	// Access passlock from server as user moves through UI.
+	// Passlock will then be used to either encrypt user plaintext data or decrypt when ready to execute a Store or Access.
+	async function serverGetPasslock(browserId) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exegetpasslock';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					// browser_id is the key which will be used to access data on server side.
+					browser_id: browserId,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(`Response status: ${fetchResponseObject.status}`);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			if (responseObj.passlock.length === PASSLOCK_LENGTH && checkUUIDChars(responseObj.passlock)) { // Data looks good.
+				//console.log("serverGetPasslock: Successfully retrieved existing passlock.");
+				return responseObj.passlock;
+			}else{
+				throw Error("serverGetPasslock: Failed to load passlock.");
+				return "failed to get passlock";
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverGetPasslock()
+
+
 	///////////////////////////////////////////////////////////////////////////////////
 	//                       Offline Database Creation                               //
 	///////////////////////////////////////////////////////////////////////////////////
+	// A new offline database is generated by producing a number of bytes and coverting them to 1,067,000 base64 chars.
 	// 
+	// Provided is the option to fill a new offline database with records from the online database.
+	// This will start a flow where users can Access a Multi Encrypted Datarecord + Fingerprint pair and place them
+	// in the new offline database so that data will be accessible (with the same set of passwords) in the offline database.
 	// 
+	// Also provided is the option to encrypt your offline database.
+	// The password provided will be used to AES-CTR encrypt the entire set of offline database chars.
+	// Data in the Encrypted offline database will then need to be Accessed by first entering the same password used at build time.
+	// 
+	// The Encrypted and Unencrypted offline databases are built to be used at the same time.
+	// The offline database home page asks for this password. If a user would like to use the encrypted side, enter the password used to encrypt at creation time.
+	// If the Unencrypted offline database is to be used, please choose NO PASSWORD.
+	// 
+
 
 	// Object to gather set of records to be stored in a new offline database (Option 1).
 	let recordListForNewOfflineDBase = {};
-	//let recordListForNewOfflineDBaseLength;
-	// Global for now. Rolling here isn't a security issue?
-	//let offlineDatabaseUnencPointerGlobal = randInt(0,998);
-	function clearNewOfflineDBaseList(inputId) {
-		clearNewOfflineDBaseData();
+
+	// Delete object used to gather fingerprints, MEDs for Option 1: fill with existing data.
+	// Then go to passed in page.
+	function clearNewOfflineDBaseListThenShow(inputId) {
+		console.log("Clearing temp stack of records that were to be added to new offline database.");
+		// Clear data held in list object.
+		recordListForNewOfflineDBase = {};
+		// Manually create save location then go to page.
 		saveThenShowPage(inputId);
 	}
 
-	function clearNewOfflineDBaseData() {
-		console.log("Clearing temp stack of records that were to be added to new offline database.");
-		recordListForNewOfflineDBase = {};
-	}// clearNewOfflineDBaseData()
-
-	//Getting offline records and storing them in global variable recordListForNewOfflineDBase for creation of offline database.
+	// Access online record and store it in temp list object which will be used to fill a new offline database.
 	async function getOnlineRecordForNewOfflineDBase(inputId) {
+		// Create location in history memory.
 		saveCurrentStateToHistorySoBackWillWork();
 		// Gather ctrPass from input box for the given html input ID and store in passlock object.
 		await extractInputData(inputId);
-		console.log("inputID " +  inputId);
-		console.log(passlockedData);
 		// All user passwords should be ready at this point. Compute Fingerprint.
 		const fingerprint = await computeFpForAccess();
 		const multiEncryptedDatarecord = await serverLoad(fingerprint);
@@ -2472,14 +2478,16 @@
 			recordListForNewOfflineDBase[fingerprint] = multiEncryptedDatarecord;
 			// Check if new offline database is full.
 			const recordListForNewOfflineDBaseLength = Object.keys(recordListForNewOfflineDBase).length;
+			// Compile string for UI depending on list length.
 			let numberAndRecordContent;
 			if (recordListForNewOfflineDBaseLength === 1) {
 				numberAndRecordContent = '1 RECORD';
 			} else {
 				numberAndRecordContent = recordListForNewOfflineDBaseLength + ' RECORDS';
 			}
+			// Set compiled string to UI object's innerHTML.
 			document.getElementById("numRecordsAdded").innerHTML = numberAndRecordContent;
-			//A given database only holds 1000 records so move on if we break that amount.
+			// A given database only holds 1000 records so move on if we break that amount.
 			if (recordListForNewOfflineDBaseLength == 1000) {
 				// No more room in offline dbase, no choice but to continue.
 				showPage('offlineDatabase_pass_or_no_filled');
@@ -2509,6 +2517,7 @@
 		return returnData;
 	}// fillNewOfflineDBase()
 
+	// Replace random junk data row with a fingerprint + MED.
 	function storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, multiEncryptedDatarecord, offlineDatabase) {
 		// Multiplying moves us to record at pointer.
 		const recordStart = pointer * TOTAL_RECORD_LENGTH_BASE64;
@@ -2521,11 +2530,10 @@
 	// Generate two sets of 1,067,000 random base64 chars for each offline database side (ENC and UNENC).
 	// ENC side will be 1,067,024 when encrypted to hold the prepended salt.
 	// Set up these databases with pointers that point to the next 'empty' 'location' in the set of random data where the record data of the offline database is hidden.
-	//async function createAndFillOfflineDBase(chosenDatabase) {
 	async function createAndFillOfflineDBase(chosenDatabase, inputId) {
 		saveCurrentStateToHistorySoBackWillWork();
 		let offlineDatabaseUnenc = '';
-		// Roll UNENC side pointer to a random number between 0 and 999 - number of records the user is adding to the offline database.
+		// Roll UNENC side pointer to a random number between [0 - number of records user is adding] and 999 to the offline database.
 		let recordListLength = Object.keys(recordListForNewOfflineDBase).length;
 		let offlineDatabaseUnencPointer;
 		//Set the pointer to 1000 if all 1000 records in the database are filled.
@@ -2556,27 +2564,28 @@
 			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
 			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseUnenc, offlineDatabaseUnencPointer);
 			// Get ENC password.
-			const encPassword = getRandData();
+			const encPassword = getRandMultiEncryptedDatarecord();
 			// Set ENC side. 
 			offlineDatabaseEnc = await encryptAESCTR(offlineDatabaseEnc, encPassword);
-			offlineDatabaseEncPointer = getRandData();
+			offlineDatabaseEncPointer = getRandMultiEncryptedDatarecord();
 			// Set UNENC side.
 			offlineDatabaseUnenc = filledOfflineDatabaseAndPointer['database'];
 			offlineDatabaseUnencPointer = filledOfflineDatabaseAndPointer['pointer'];
 		}
 		// Compile static standalone code with generated databases and push to user.
 		downloadStandalone(offlineDatabaseUnenc, offlineDatabaseUnencPointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
-		// Delete offline database gather object now that it has been used.
-		clearNewOfflineDBaseData();
-		showPage('home');
+		// Delete object used to gather fingerprints, MEDs for Option 1: fill with existing data.
+		clearNewOfflineDBaseListThenShow('home');
 	}// createAndFillNewOfflineDBase()
 
-	function getRandData() {
-		// Pick a value that will convert into 1024 base64 chars.
+	// Randomly generate a single Multi Encrypted Datarecord worth of junk data.
+	function getRandMultiEncryptedDatarecord() {
+		// This value that will convert to 1024 base64 chars.
 		const randarray = window.crypto.getRandomValues(new Uint8Array(MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES));
 		return randarray.toBase64();
-	}// getRandData()
+	}// getRandMultiEncryptedDatarecord()
 
+	// Randomly generate 43 base64 chars of junk data.
 	function getRandFingerprint() {
 		// 32 bytes is the output of SHA-256
 		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_LENGTH_BYTES));
@@ -2968,7 +2977,7 @@
 	//
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Online Database Storage
+	// Online Database Storage - A Fingerprint and a Multi Encrypted Datarecord are stored as a key-value pair in the database.
 	//
 	//                            Data to be Stored:
 	//
@@ -3168,7 +3177,7 @@
 	//					This will produce completely different ciphertext for every encryption run even while using the same password.
 	//
 	//	Inputs structure:	password:	 human readable plaintext string
-	//						plaintext:	 User input from Browser textarea
+	//						plaintext:	 Plaintext Data Payload from browser textarea
 	//
 	//	Output structure:	Salted__ + Random Salt + CBC encrypted ciphertext
 	//
@@ -3259,7 +3268,7 @@
 	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
 	//					This will produce completely different ciphertext for every encryption run even while using the same password.
 	//
-	//	Inputs structure:	password:	 human readable plaintext string
+	//	Inputs structure:	password:	    human readable plaintext string
 	//						ciphertext64:	Salted__ + Random Salt + CBC encrypted ciphertext
 	//
 	//	Output structure:	decrypted plaintext
@@ -3893,7 +3902,7 @@
 	//	Inputs structure:	opensslPass:	human readable plaintext string
 	//						obf1000Pass:	human readable plaintext string
 	//						ctrPass:		human readable plaintext string
-	//						plaintextData:	human readable plaintext string
+	//						plaintextData:	human readable plaintext string - a Plaintext Data Payload
 	//	Output structure:	base64 Multi Encrypted Datarecord
 	//
 	// Big Picture:			Using the Browser option, this function 'triple encrypts' user data into a Multi Encrypted Datarecord, ready for database storage.
