@@ -1569,6 +1569,11 @@
 	// The passlock cannot be stored in the browser (as that would enable an attacker to decrypt user data nullifying the passlock system),
 	// so after creation, it is stored on the server and retrieved using the browser ID as the user moves through the UI.
 	// 
+	// 'Passlocked' data, user data that has been encrypted by the UUID based passlock, is stored in the global object passlockedData.
+	// Each piece of user data is stored as a key-value pair with the name of the password or data as the key.
+	// Options are: codeword, obf1000Pass, obf12pass, opensslpass
+	// 
+	// 
 	// 
 	// Global browser_id variable to be used for accessing passlock, 
 	let browserId = null;
@@ -1721,11 +1726,11 @@
 
 	// Extract, encrypt, and store data at inputId to global passlockedData Object.
 	async function extractInputData(inputId) {
-		const pgoPasswordType = extractKeyword(inputId);
+		const passwordType = extractKeyword(inputId);
 		const plaintextData = extractPlaintextData(inputId);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
 		try {
-			passlockedData[pgoPasswordType] = await passlockEncrypt(plaintextData);
+			passlockedData[passwordType] = await passlockEncrypt(plaintextData);
 		} catch (error) {
 			showPage('passlock_error_deny');
 			//resetPasslock();
