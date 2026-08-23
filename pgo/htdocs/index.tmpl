@@ -1187,7 +1187,16 @@
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							Browser Back functionality										     		  //
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	// Harnessing the browser's back functionality is complexity rooted in browser security decisions and the
+	// functional opacity that brings. You are disallowed from things like deleting history records as a user moves
+	// through a custom interface so workarounds are needed.
+	//
+	// The goal is to map the back button to the last page of the UI a user was on.
+	// This is achieved in 2 steps: creating a record in history for every page we want the user to be able to go back to.
+	// And making sure that the proper page is returned to upon a user activating browser back function.
+	//
+	// Because of the opacity of how this works in the browser, testing and tuning was required to get it to work.
+	//
 	// Listen for the popstate event which is usually fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
@@ -1408,211 +1417,6 @@
 		// Clear file ingress data.
 		document.getElementById('store_upload_input').value = null;
 	}// catchUpload()
-
-	///////////////////////////////////////////////////////////////////////////////////
-	//                       Offline Database Creation                               //
-	///////////////////////////////////////////////////////////////////////////////////
-
-	// Object to gather set of records to be stored in a new offline database (Option 1).
-	let recordListForNewOfflineDBase = {};
-	//let recordListForNewOfflineDBaseLength;
-	// Global for now. Rolling here isn't a security issue?
-	//let offlineDatabaseUnencPointerGlobal = randInt(0,998);
-	function clearNewOfflineDBaseList(inputId) {
-		clearNewOfflineDBaseData();
-		saveThenShowPage(inputId);
-	}
-
-	function clearNewOfflineDBaseData() {
-		console.log("Clearing temp stack of records that were to be added to new offline database.");
-		recordListForNewOfflineDBase = {};
-	}// clearNewOfflineDBaseData()
-
-	//Getting offline records and storing them in global variable recordListForNewOfflineDBase for creation of offline database.
-	async function getOnlineRecordForNewOfflineDBase(inputId) {
-		saveCurrentStateToHistorySoBackWillWork();
-		// Gather ctrPass from input box for the given html input ID and store in passlock object.
-		await extractInputData(inputId);
-		console.log("inputID " +  inputId);
-		console.log(passlockedData);
-		// All user passwords should be ready at this point. Compute Fingerprint.
-		const fingerprint = await computeFpForAccess();
-		const multiEncryptedDatarecord = await serverLoad(fingerprint);
-		// Change history 'pointer' to top of flow once job/operation executed.
-		goBackProgrammaticallyXandDontFireShowPage(3);
-		// Check that data is valid.
-		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
-			showPage('too_many_access_failures');
-		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
-			showPage('failed_to_access_for_new_offline_database_creation');
-		} else {
-			// Push fp, data to recordListForNewOfflineDBase collector object.
-			recordListForNewOfflineDBase[fingerprint] = multiEncryptedDatarecord;
-			// Check if new offline database is full.
-			const recordListForNewOfflineDBaseLength = Object.keys(recordListForNewOfflineDBase).length;
-			let numberAndRecordContent;
-			if (recordListForNewOfflineDBaseLength === 1) {
-				numberAndRecordContent = '1 RECORD';
-			} else {
-				numberAndRecordContent = recordListForNewOfflineDBaseLength + ' RECORDS';
-			}
-			document.getElementById("numRecordsAdded").innerHTML = numberAndRecordContent;
-			//A given database only holds 1000 records so move on if we break that amount.
-			if (recordListForNewOfflineDBaseLength == 1000) {
-				// No more room in offline dbase, no choice but to continue.
-				showPage('offlineDatabase_pass_or_no_filled');
-			} else if (recordListForNewOfflineDBaseLength > 1000) {
-				showPage('too_many_records');
-			} else {
-				// Let user decide to add more or continue with offline dbase creation.
-				showPage('newofflinedatabase_existingdata_record_added');
-			}
-		}
-		resetPasslock();
-	}// getOnlineRecordForNewOfflineDBase();
-
-	// Default pointer parameter. Without pointer input, will assume start at beginning of database.
-	// Function should work with empty recordListForNewOfflineDBase set?
-	function fillNewOfflineDBase(offlineDatabase, pointer=0) {
-		console.log("filling new offline database.");
-		// While gather object not empty, fill 
-		for(const [fingerprint, data] of Object.entries(recordListForNewOfflineDBase)) {
-			console.log('Storing fingerprint: ' + fingerprint + '\n Storing data: ' + data);
-			offlineDatabase = storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, data, offlineDatabase);
-			pointer++;// Important to increment AFTER store.
-		}
-		let returnData = {};
-		returnData['pointer'] = pointer;
-		returnData['database'] = offlineDatabase;
-		return returnData;
-	}// fillNewOfflineDBase()
-
-	function storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, multiEncryptedDatarecord, offlineDatabase) {
-		// Multiplying moves us to record at pointer.
-		const recordStart = pointer * TOTAL_RECORD_LENGTH_BASE64;
-		const recordEnd = recordStart + TOTAL_RECORD_LENGTH_BASE64;
-		// Compile replacement database. 
-		return offlineDatabase.substring(0, recordStart) + fingerprint + multiEncryptedDatarecord + offlineDatabase.substring(recordEnd);
-	}// storeFingerprintAndDataToOfflineDBase()
-
-	// Used for both Option 1 and 2
-	// Generate two sets of 1,067,000 random base64 chars for each offline database side (ENC and UNENC).
-	// ENC side will be 1,067,024 when encrypted to hold the prepended salt.
-	// Set up these databases with pointers that point to the next 'empty' 'location' in the set of random data where the record data of the offline database is hidden.
-	//async function createAndFillOfflineDBase(chosenDatabase) {
-	async function createAndFillOfflineDBase(chosenDatabase, inputId) {
-		saveCurrentStateToHistorySoBackWillWork();
-		let offlineDatabaseUnenc = '';
-		// Roll UNENC side pointer to a random number between 0 and 999 - number of records the user is adding to the offline database.
-		let recordListLength = Object.keys(recordListForNewOfflineDBase).length;
-		let offlineDatabaseUnencPointer;
-		//Set the pointer to 1000 if all 1000 records in the database are filled.
-		if (recordListLength > 999) {
-			offlineDatabaseUnencPointer = 1000;
-		}else{
-			offlineDatabaseUnencPointer = randInt(recordListLength, MAX_POINTER_VALUE);
-		}
-		let offlineDatabaseEnc = '';
-		let offlineDatabaseEncPointer = '';
-		// Start by filling both databases with random base64 chars.
-		offlineDatabaseUnenc = getRandDatabase();
-		offlineDatabaseEnc = getRandDatabase();
-		// User can choose to encrypt their offline database with a password.
-		// This choice determines which database (ENC or UNENC) the set of pre-filled records is saved to.
-		if (chosenDatabase === 'encrypted') {
-			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
-			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseEnc);
-			// Get ENC password.
-			//const encPassword = extractPlaintextData("offlineDBasePass_input");
-			const encPassword = extractPlaintextData(inputId);
-			// Set ENC side. 
-			offlineDatabaseEnc = await encryptAESCTR(filledOfflineDatabaseAndPointer['database'], encPassword);
-			offlineDatabaseEncPointer = await encryptTriple(encPassword, encPassword, encPassword, filledOfflineDatabaseAndPointer['pointer']);
-			// Set UNENC side.
-			// Values already ready to go!
-		}else{
-			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
-			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseUnenc, offlineDatabaseUnencPointer);
-			// Get ENC password.
-			const encPassword = getRandData();
-			// Set ENC side. 
-			offlineDatabaseEnc = await encryptAESCTR(offlineDatabaseEnc, encPassword);
-			offlineDatabaseEncPointer = getRandData();
-			// Set UNENC side.
-			offlineDatabaseUnenc = filledOfflineDatabaseAndPointer['database'];
-			offlineDatabaseUnencPointer = filledOfflineDatabaseAndPointer['pointer'];
-		}
-		// Compile static standalone code with generated databases and push to user.
-		downloadStandalone(offlineDatabaseUnenc, offlineDatabaseUnencPointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
-		// Delete offline database gather object now that it has been used.
-		clearNewOfflineDBaseData();
-		showPage('home');
-	}// createAndFillNewOfflineDBase()
-
-	function getRandData() {
-		// Pick a value that will convert into 1024 base64 chars.
-		const randarray = window.crypto.getRandomValues(new Uint8Array(MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES));
-		return randarray.toBase64();
-	}// getRandData()
-
-	function getRandFingerprint() {
-		// 32 bytes is the output of SHA-256
-		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_LENGTH_BYTES));
-		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
-		return randarray.toBase64({omitPadding: true});
-	}// getRandFingerprint()
-
-	//Generate the random bytes composing our database.
-	function getRandDatabase() {
-		// Each record has 43 base64 chars for fingerprint and 1024 chars for the data.
-		// There are 1000 records, so 1000*(1024+43) = 1,067,000 base64 chars.
-		const TOTAL_BASE64_CHARS = 1000 * (MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 + FINGERPRINT_LENGTH_BASE64);
-		// So we need 1067000 base64 chars * (3 raw bytes/4 base 64 chars) = 800250 raw bytes from subtle crypto.
-		const TOTAL_RAW_BYTES_NEEDED = TOTAL_BASE64_CHARS * (3/4);
-		//console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
-		let randBytes = new Uint8Array(0);			// random raw bytes that will be converted to base64 database
-		//let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
-		let bytesStillNeeded = TOTAL_RAW_BYTES_NEEDED; // total number of random raw bytes we need to generate to make the database.
-		do{
-			if (bytesStillNeeded > 65536) {
-				randBytes = concatBuffer(randBytes, window.crypto.getRandomValues(new Uint8Array(65536)));
-				bytesStillNeeded -= 65536; // 65,536 is the max size of a Uint8Array that getRandomValues can fill.
-			}else{
-				randBytes = concatBuffer(randBytes, window.crypto.getRandomValues(new Uint8Array(bytesStillNeeded)));
-				bytesStillNeeded -= bytesStillNeeded;  //bytesStillNeeded is zero now.
-			}
-		}while(bytesStillNeeded > 0);
-		//Now that we've generated all 800250 random raw bytes, convert them to 1,067,000 base64 characters.
-		return randBytes.toBase64();
-	}// getRandDatabase()
-
-	//Generate random integers from 0 to 4,294,967,296.
-	function randInt(min, max) {
-		//Number safety checks.
-		if (!(Number.isSafeInteger(min) && Number.isSafeInteger(max))) {
-			throw Error("min and max must be safe integers");
-		}
-		if (min > max) {
-			throw Error("min must be less than or equal to max");
-		}
-		//Create array with proper integer size for the specified range (i.e. 8 bits = 0-255, 16 bits = 0-65535)
-		let randarray;
-		if (max < 256) {
-			randarray = new Uint8Array(1);
-		}else if (max < 65536) {
-			randarray = new Uint16Array(1);
-		}else if (max < 4294967296) {
-			randarray = new Uint32Array(1);
-		}else{
-			throw new Error("Max number is too large for this function!");
-		}
-		//Start generating random numbers and reject every number outside our min/max range.
-		let randnum;
-		do{
-			randnum = window.crypto.getRandomValues(randarray);
-		}while(randnum < min || randnum > max);
-		return randnum[0];
-	}// randInt()
 
 	/////////////////////////////////////////////////////////////////////////
 	//					Check Functions									   //
@@ -2174,7 +1978,7 @@
 	//////////////////////////////////////////////////////////////
 	//			Server Communication Functions				    //
 	//////////////////////////////////////////////////////////////
-	// Fetch based.
+	// Server communication relies on fetch() to handle HTTP requests.
 	//
 
 	// Check if we're online or not and inform user.
@@ -2618,6 +2422,214 @@
 			console.error(error.message);
 		}
 	}// serverDelete()
+
+
+	///////////////////////////////////////////////////////////////////////////////////
+	//                       Offline Database Creation                               //
+	///////////////////////////////////////////////////////////////////////////////////
+	// 
+	// 
+
+	// Object to gather set of records to be stored in a new offline database (Option 1).
+	let recordListForNewOfflineDBase = {};
+	//let recordListForNewOfflineDBaseLength;
+	// Global for now. Rolling here isn't a security issue?
+	//let offlineDatabaseUnencPointerGlobal = randInt(0,998);
+	function clearNewOfflineDBaseList(inputId) {
+		clearNewOfflineDBaseData();
+		saveThenShowPage(inputId);
+	}
+
+	function clearNewOfflineDBaseData() {
+		console.log("Clearing temp stack of records that were to be added to new offline database.");
+		recordListForNewOfflineDBase = {};
+	}// clearNewOfflineDBaseData()
+
+	//Getting offline records and storing them in global variable recordListForNewOfflineDBase for creation of offline database.
+	async function getOnlineRecordForNewOfflineDBase(inputId) {
+		saveCurrentStateToHistorySoBackWillWork();
+		// Gather ctrPass from input box for the given html input ID and store in passlock object.
+		await extractInputData(inputId);
+		console.log("inputID " +  inputId);
+		console.log(passlockedData);
+		// All user passwords should be ready at this point. Compute Fingerprint.
+		const fingerprint = await computeFpForAccess();
+		const multiEncryptedDatarecord = await serverLoad(fingerprint);
+		// Change history 'pointer' to top of flow once job/operation executed.
+		goBackProgrammaticallyXandDontFireShowPage(3);
+		// Check that data is valid.
+		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
+			showPage('too_many_access_failures');
+		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+			showPage('failed_to_access_for_new_offline_database_creation');
+		} else {
+			// Push fp, data to recordListForNewOfflineDBase collector object.
+			recordListForNewOfflineDBase[fingerprint] = multiEncryptedDatarecord;
+			// Check if new offline database is full.
+			const recordListForNewOfflineDBaseLength = Object.keys(recordListForNewOfflineDBase).length;
+			let numberAndRecordContent;
+			if (recordListForNewOfflineDBaseLength === 1) {
+				numberAndRecordContent = '1 RECORD';
+			} else {
+				numberAndRecordContent = recordListForNewOfflineDBaseLength + ' RECORDS';
+			}
+			document.getElementById("numRecordsAdded").innerHTML = numberAndRecordContent;
+			//A given database only holds 1000 records so move on if we break that amount.
+			if (recordListForNewOfflineDBaseLength == 1000) {
+				// No more room in offline dbase, no choice but to continue.
+				showPage('offlineDatabase_pass_or_no_filled');
+			} else if (recordListForNewOfflineDBaseLength > 1000) {
+				showPage('too_many_records');
+			} else {
+				// Let user decide to add more or continue with offline dbase creation.
+				showPage('newofflinedatabase_existingdata_record_added');
+			}
+		}
+		resetPasslock();
+	}// getOnlineRecordForNewOfflineDBase();
+
+	// Default pointer parameter. Without pointer input, will assume start at beginning of database.
+	// Function should work with empty recordListForNewOfflineDBase set?
+	function fillNewOfflineDBase(offlineDatabase, pointer=0) {
+		console.log("filling new offline database.");
+		// While gather object not empty, fill 
+		for(const [fingerprint, data] of Object.entries(recordListForNewOfflineDBase)) {
+			console.log('Storing fingerprint: ' + fingerprint + '\n Storing data: ' + data);
+			offlineDatabase = storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, data, offlineDatabase);
+			pointer++;// Important to increment AFTER store.
+		}
+		let returnData = {};
+		returnData['pointer'] = pointer;
+		returnData['database'] = offlineDatabase;
+		return returnData;
+	}// fillNewOfflineDBase()
+
+	function storeFingerprintAndDataToOfflineDBase(pointer, fingerprint, multiEncryptedDatarecord, offlineDatabase) {
+		// Multiplying moves us to record at pointer.
+		const recordStart = pointer * TOTAL_RECORD_LENGTH_BASE64;
+		const recordEnd = recordStart + TOTAL_RECORD_LENGTH_BASE64;
+		// Compile replacement database. 
+		return offlineDatabase.substring(0, recordStart) + fingerprint + multiEncryptedDatarecord + offlineDatabase.substring(recordEnd);
+	}// storeFingerprintAndDataToOfflineDBase()
+
+	// Used for both Option 1 and 2
+	// Generate two sets of 1,067,000 random base64 chars for each offline database side (ENC and UNENC).
+	// ENC side will be 1,067,024 when encrypted to hold the prepended salt.
+	// Set up these databases with pointers that point to the next 'empty' 'location' in the set of random data where the record data of the offline database is hidden.
+	//async function createAndFillOfflineDBase(chosenDatabase) {
+	async function createAndFillOfflineDBase(chosenDatabase, inputId) {
+		saveCurrentStateToHistorySoBackWillWork();
+		let offlineDatabaseUnenc = '';
+		// Roll UNENC side pointer to a random number between 0 and 999 - number of records the user is adding to the offline database.
+		let recordListLength = Object.keys(recordListForNewOfflineDBase).length;
+		let offlineDatabaseUnencPointer;
+		//Set the pointer to 1000 if all 1000 records in the database are filled.
+		if (recordListLength > 999) {
+			offlineDatabaseUnencPointer = 1000;
+		}else{
+			offlineDatabaseUnencPointer = randInt(recordListLength, MAX_POINTER_VALUE);
+		}
+		let offlineDatabaseEnc = '';
+		let offlineDatabaseEncPointer = '';
+		// Start by filling both databases with random base64 chars.
+		offlineDatabaseUnenc = getRandDatabase();
+		offlineDatabaseEnc = getRandDatabase();
+		// User can choose to encrypt their offline database with a password.
+		// This choice determines which database (ENC or UNENC) the set of pre-filled records is saved to.
+		if (chosenDatabase === 'encrypted') {
+			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
+			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseEnc);
+			// Get ENC password.
+			//const encPassword = extractPlaintextData("offlineDBasePass_input");
+			const encPassword = extractPlaintextData(inputId);
+			// Set ENC side. 
+			offlineDatabaseEnc = await encryptAESCTR(filledOfflineDatabaseAndPointer['database'], encPassword);
+			offlineDatabaseEncPointer = await encryptTriple(encPassword, encPassword, encPassword, filledOfflineDatabaseAndPointer['pointer']);
+			// Set UNENC side.
+			// Values already ready to go!
+		}else{
+			// Fill user chosen side with set of records they gathered. Returns offline database as-is if user entered no records.
+			const filledOfflineDatabaseAndPointer = fillNewOfflineDBase(offlineDatabaseUnenc, offlineDatabaseUnencPointer);
+			// Get ENC password.
+			const encPassword = getRandData();
+			// Set ENC side. 
+			offlineDatabaseEnc = await encryptAESCTR(offlineDatabaseEnc, encPassword);
+			offlineDatabaseEncPointer = getRandData();
+			// Set UNENC side.
+			offlineDatabaseUnenc = filledOfflineDatabaseAndPointer['database'];
+			offlineDatabaseUnencPointer = filledOfflineDatabaseAndPointer['pointer'];
+		}
+		// Compile static standalone code with generated databases and push to user.
+		downloadStandalone(offlineDatabaseUnenc, offlineDatabaseUnencPointer, offlineDatabaseEnc, offlineDatabaseEncPointer);
+		// Delete offline database gather object now that it has been used.
+		clearNewOfflineDBaseData();
+		showPage('home');
+	}// createAndFillNewOfflineDBase()
+
+	function getRandData() {
+		// Pick a value that will convert into 1024 base64 chars.
+		const randarray = window.crypto.getRandomValues(new Uint8Array(MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES));
+		return randarray.toBase64();
+	}// getRandData()
+
+	function getRandFingerprint() {
+		// 32 bytes is the output of SHA-256
+		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_LENGTH_BYTES));
+		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
+		return randarray.toBase64({omitPadding: true});
+	}// getRandFingerprint()
+
+	//Generate the random bytes composing our database.
+	function getRandDatabase() {
+		// Each record has 43 base64 chars for fingerprint and 1024 chars for the data.
+		// There are 1000 records, so 1000*(1024+43) = 1,067,000 base64 chars.
+		const TOTAL_BASE64_CHARS = 1000 * (MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 + FINGERPRINT_LENGTH_BASE64);
+		// So we need 1067000 base64 chars * (3 raw bytes/4 base 64 chars) = 800250 raw bytes from subtle crypto.
+		const TOTAL_RAW_BYTES_NEEDED = TOTAL_BASE64_CHARS * (3/4);
+		//console.log('total raw needed: ', TOTAL_RAW_BYTES_NEEDED);
+		let randBytes = new Uint8Array(0);			// random raw bytes that will be converted to base64 database
+		//let bytesStillNeeded = 800250; // total number of random raw bytes we need to generate to make the database.
+		let bytesStillNeeded = TOTAL_RAW_BYTES_NEEDED; // total number of random raw bytes we need to generate to make the database.
+		do{
+			if (bytesStillNeeded > 65536) {
+				randBytes = concatBuffer(randBytes, window.crypto.getRandomValues(new Uint8Array(65536)));
+				bytesStillNeeded -= 65536; // 65,536 is the max size of a Uint8Array that getRandomValues can fill.
+			}else{
+				randBytes = concatBuffer(randBytes, window.crypto.getRandomValues(new Uint8Array(bytesStillNeeded)));
+				bytesStillNeeded -= bytesStillNeeded;  //bytesStillNeeded is zero now.
+			}
+		}while(bytesStillNeeded > 0);
+		//Now that we've generated all 800250 random raw bytes, convert them to 1,067,000 base64 characters.
+		return randBytes.toBase64();
+	}// getRandDatabase()
+
+	//Generate random integers from 0 to 4,294,967,296.
+	function randInt(min, max) {
+		//Number safety checks.
+		if (!(Number.isSafeInteger(min) && Number.isSafeInteger(max))) {
+			throw Error("min and max must be safe integers");
+		}
+		if (min > max) {
+			throw Error("min must be less than or equal to max");
+		}
+		//Create array with proper integer size for the specified range (i.e. 8 bits = 0-255, 16 bits = 0-65535)
+		let randarray;
+		if (max < 256) {
+			randarray = new Uint8Array(1);
+		}else if (max < 65536) {
+			randarray = new Uint16Array(1);
+		}else if (max < 4294967296) {
+			randarray = new Uint32Array(1);
+		}else{
+			throw new Error("Max number is too large for this function!");
+		}
+		//Start generating random numbers and reject every number outside our min/max range.
+		let randnum;
+		do{
+			randnum = window.crypto.getRandomValues(randarray);
+		}while(randnum < min || randnum > max);
+		return randnum[0];
+	}// randInt()
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
