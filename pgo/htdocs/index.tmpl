@@ -949,7 +949,9 @@
 			<!---------------------------EXISTING DATA Failed to Access-----------------------!>
 			<div class="flow_pages" id="failed_to_access_for_new_offline_database_creation" style="display:none">
 				<h2>&#10060; FAILED TO ACCESS EXISTING DATA FOR OFFLINE DATABASE CREATION.</h2>
+				<h2>TOTAL ADDED: <span class="numRecordsAdded" id="failedtoaccess_numRecordsAdded" style="color:magenta; "></span></h2>
 				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
+				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineDatabase_pass_or_no_filled');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
 			</div>
 
 			<!---------------------------EXISTING DATA Too many records-----------------------!>
@@ -1196,7 +1198,6 @@
 	// This is achieved in 2 steps: creating a record in history for every page we want the user to be able to go back to.
 	// And making sure that the proper page is returned to upon a user activating browser back function.
 	//
-	// I would advise future programmers towards designs that do not require hacking browser back functionality.
 	//
 	// Listen for the popstate event which is usually fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
@@ -2487,6 +2488,7 @@
 			}
 			// Set compiled string to UI object's innerHTML.
 			document.getElementById("numRecordsAdded").innerHTML = numberAndRecordContent;
+			document.getElementById("failedtoaccess_numRecordsAdded").innerHTML = numberAndRecordContent;
 			// A given database only holds 1000 records so move on if we break that amount.
 			if (recordListForNewOfflineDBaseLength == 1000) {
 				// No more room in offline dbase, no choice but to continue.
@@ -5197,7 +5199,6 @@
 	// This is achieved in 2 steps: creating a record in history for every page we want the user to be able to go back to.
 	// And making sure that the proper page is returned to upon a user activating browser back function.
 	//
-	// I would advise future programmers towards designs that do not require hacking browser back functionality.
 	//
 	// Listen for the popstate event which is usually fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
@@ -5506,6 +5507,80 @@
 			return false;
 		}
 	}
+
+	// Check uuid chars which are used for passlock and browserID.
+	function checkUUIDChars(input) {
+		const regex = new RegExp(/^[a-f0-9-]*$/);
+		if (regex.test(input)) {
+			return true;
+		}else{
+			return false;
+		}
+	}//checkUUIDChars()
+
+	// Input: input is a string.
+	// Output: Returns false if non-base58 characters are detected.
+	function checkBase64Chars(input) {
+		// From the first char(^) to the last($), match base64 chars.
+		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
+		if (regex.test(input)) {
+			// Return true/valid
+			return true;
+		}else{
+			// Return false/invalid
+			return false;
+		}
+	}//checkBase64Chars()
+
+	function checkDataLength(data, length) {
+		// Return fail if data length surpasses length.
+		if (data.length > length) {
+			console.log("Data length Invalid!");
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	function checkLengthAndBase64(data, length){
+		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
+			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
+		} 
+	}
+
+	// Input: input is a string.
+	// Output: Returns false if the input length (in bytes) is over BROWSERINPUT_LENGTH_LIMIT: 686
+	function checkDataInputLengthWithRegex(input) {
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		let difference = BROWSERINPUT_LENGTH_LIMIT - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		document.getElementById("offlinebrowserdata_length_label").innerHTML = size_string;
+		document.getElementById("offlineeditdata_length_label").innerHTML = size_string;
+		if (size > BROWSERINPUT_LENGTH_LIMIT) {
+			return false; // Length Check Failed.
+		}else{
+			return true; // Length Check Passed.
+		}
+	}//checkDataInputLengthWithRegex()
+
+	// Input: input is a string.
+	// Output: Returns false if the input length (in bytes) is over CMDINPUT_LENGTH_LIMIT: 704
+	function checkInputLengthUpload(input) {
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		let difference = CMDINPUT_LENGTH_LIMIT - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		document.getElementById("offlineuploaddata_length_label").innerHTML = size_string;
+		if (size > CMDINPUT_LENGTH_LIMIT) {
+			return false; // Length Check Failed.
+		}else{
+			return true; // Length Check Passed.
+		}
+	}//checkInputLengthUpload()
+
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	//                 Offline Database Manipulation                     //
@@ -7604,79 +7679,6 @@
 		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
 		return concatenatedUint8;
 	}// concatBuffer()
-
-	// Check uuid chars which are used for passlock and browserID.
-	function checkUUIDChars(input) {
-		const regex = new RegExp(/^[a-f0-9-]*$/);
-		if (regex.test(input)) {
-			return true;
-		}else{
-			return false;
-		}
-	}//checkUUIDChars()
-
-	// Input: input is a string.
-	// Output: Returns false if non-base58 characters are detected.
-	function checkBase64Chars(input) {
-		// From the first char(^) to the last($), match base64 chars.
-		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
-		if (regex.test(input)) {
-			// Return true/valid
-			return true;
-		}else{
-			// Return false/invalid
-			return false;
-		}
-	}//checkBase64Chars()
-
-	function checkDataLength(data, length) {
-		// Return fail if data length surpasses length.
-		if (data.length > length) {
-			console.log("Data length Invalid!");
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	function checkLengthAndBase64(data, length){
-		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
-			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
-		} 
-	}
-
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over BROWSERINPUT_LENGTH_LIMIT: 686
-	function checkDataInputLengthWithRegex(input) {
-		// show input size in bytes
-		let size = new Blob([input]).size;
-		let difference = BROWSERINPUT_LENGTH_LIMIT - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		document.getElementById("offlinebrowserdata_length_label").innerHTML = size_string;
-		document.getElementById("offlineeditdata_length_label").innerHTML = size_string;
-		if (size > BROWSERINPUT_LENGTH_LIMIT) {
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}//checkDataInputLengthWithRegex()
-
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over CMDINPUT_LENGTH_LIMIT: 704
-	function checkInputLengthUpload(input) {
-		// show input size in bytes
-		let size = new Blob([input]).size;
-		let difference = CMDINPUT_LENGTH_LIMIT - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		document.getElementById("offlineuploaddata_length_label").innerHTML = size_string;
-		if (size > CMDINPUT_LENGTH_LIMIT) {
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}//checkInputLengthUpload()
 
 	function clearSaveToDiskReminder() {
 		document.getElementById("savetodisk_warning").style.display = "none";
