@@ -1198,10 +1198,8 @@
 	// This is achieved in 2 steps: creating a record in history for every page we want the user to be able to go back to.
 	// And making sure that the proper page is returned to upon a user activating browser back function.
 	//
-	//
 	// Listen for the popstate event which is usually fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
-	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
 	window.addEventListener('popstate', (event) => {
 		// Use event.state or window.location to update content
 		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
@@ -1237,10 +1235,10 @@
 
 	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
 	let showPageFlag = 'true';
-
 	// For overall security and because the passlock system wasn't designed for users to browser back into it,
 	// once a 'flow' completes, we move the history pointer so that if they do hit back, it will take them to the home page.
-	// Better security for this site would be to delete those records entirely but because of browser security design, this is disallowed.
+	// Browser security design disallow the removal of history records, which would be a cleaner solution than this function.
+	// Programmers can add entries to history, but cannot remove them. This function is a workaround that needs to be tuned for each usage.
 	function goBackProgrammaticallyXandDontFireShowPage(numPlaces) {
 		// Don't flicker between multiple pages as the history pointer is programmatically moved to the home page.
 		showPageFlag = 'false';
@@ -1659,7 +1657,7 @@
 		// Extracts either user password or data from DOM object's  value.
 		const plaintextData = extractPlaintextData(inputId);
 		// OpenSSL encrypt user data and store in global Object. 
-		passlockedData[keyword] = await encryptOpenSSL(plaintextData, passlock);
+		passlockedData[keyword] = await encryptFromPlaintextOpenSSL(plaintextData, passlock);
 	}// initPasslockFlow()
 
 	function clearInputs(){
@@ -1760,13 +1758,13 @@
 	// Use previously generated passlock to encrypt input.
 	async function passlockEncrypt(plaintextPassword) {
 		const passlock = await getPasslock();
-		const encryptedPassword = await encryptOpenSSL(plaintextPassword, passlock);
+		const encryptedPassword = await encryptFromPlaintextOpenSSL(plaintextPassword, passlock);
 		return encryptedPassword;
 	}// passlockEncrypt()
 
 	async function passlockDecrypt(encryptedPasslock) {
 		const passlock = await getPasslock();
-		const plaintextData = await decryptOpenSSL(encryptedPasslock, passlock);
+		const plaintextData = await decryptToPlaintextOpenSSL(encryptedPasslock, passlock);
 		return plaintextData;
 	}// passlockDecrypt()
 
@@ -1775,7 +1773,7 @@
 		const passlock = await getPasslock();
 		let plaintextSet = {};
 		for(const keyword in passlockedData) {
-			plaintextSet[keyword] = await decryptOpenSSL(passlockedData[keyword], passlock);
+			plaintextSet[keyword] = await decryptToPlaintextOpenSSL(passlockedData[keyword], passlock);
 		}
 		console.log("Plaintext Set: ");
 		console.log(plaintextSet);
@@ -2675,6 +2673,18 @@
 	//
 	//   Probabilistic Integrity:
 	//                            <Something on the probability, etc. of the seven byte set and how it's rolled.>
+	//                            At worst an attacker could gain the length of the data.
+	//                            Attacker: can an attacker determine if a set of 1000 base64 chars.
+	//                            98.76% is likelyhood of getting a valid 7byte string.
+	//  Given that an OBF-1000 string length is from 44-704, randomly choosing bytes results in a 7byte set that computes to a number inside this range, will be 87.44
+	//  However, this isn't an issue because attackers know they're attempting to decrypt OBF1000 data, which is encrypted by AES-CTR.
+	//  If AES-CTR is cracked however, they might ask, does this decrypted output include a OBF1000 string, which they could remove 13% of the junk decrypts.
+	//  87% would still need to be attempted to continue to crack.
+	//  For dev site usage, for the range 0-704, 98.7 of random bytes rolled will compute to a valid 7byte number, making it difficult to know whether a piece of 1000 length string is obf.
+	//  1
+	//  
+	//  
+	//                            
 	//
 	//   Functionality:
 	//               7 bytes are randomly selected, computed using the below formula until a set is found that computes to the target input value.
@@ -3179,7 +3189,7 @@
 	//					This will produce completely different ciphertext for every encryption run even while using the same password.
 	//
 	//	Inputs structure:	password:	 human readable plaintext string
-	//						plaintext:	 Plaintext Data Payload from browser textarea
+	//						plaintext64: plaintext in base64
 	//
 	//	Output structure:	Salted__ + Random Salt + CBC encrypted ciphertext
 	//
@@ -3190,10 +3200,8 @@
 	//	
 	//             	destination: encryptOBF1000()
 	//
-	async function encryptOpenSSL(plaintext, password) {
-		// Encode plaintext in utf8 and store in Uint8Array plaintextUint8.
-		// Convert JS string into utf8 bytes and place in Uint8Array.
-		const plaintextUint8 = new TextEncoder().encode(plaintext);
+	async function encryptOpenSSL(plaintext64, password) {
+		const plaintextUint8 = Uint8Array.fromBase64(plaintext64);
 		// Replicate Linux command line's version of OpenSSL by appending a single newline, effectively changing plaintext input to a Linux file.
 		const singleNewlineUint8 = new Uint8Array(1);
 		// utf8 newline code is the value 10 (decimal).
@@ -3250,9 +3258,9 @@
 		);
 		const ciphertextUint8 = new Uint8Array(ciphertext);
 		// Compile output to match OpenSSL Linux command line functionality. *Thoroughly explained/mapped in Cryptographic Functions section description.
-		const saltedLiteral = "Salted__";	// OpenSSL uses to designate next 8 bytes as salt.
+		const stringLiteralSalted = "Salted__";	// OpenSSL uses to designate next 8 bytes as salt.
 		// Convert string chars into bytes.
-		const saltLiteralUint8 = new TextEncoder().encode(saltedLiteral);
+		const saltLiteralUint8 = new TextEncoder().encode(stringLiteralSalted);
 		const twoSaltsUint8 = concatBuffer(saltLiteralUint8, saltCBCUint8);
 		// Merge salts with encoded ciphertext.
 		// OpenSSL Output = Salted__ + CBC Salt + Ciphertext
@@ -3338,11 +3346,14 @@
 			ciphertextUint8			// Ciphertext data to be decrypted.
 		);
 		// Interpret bytes from the ArrayBuffer decryptedPlaintext as utf8 string and place that string into variable plaintextString.
-		const plaintextString = new TextDecoder().decode(decryptedPlaintextBuffer);
+		//const plaintextString = new TextDecoder().decode(decryptedPlaintextBuffer);
 		// Remove last character in string which is a special newline char.
 		// The output of this function will go to a Browser input textarea, so remove newline used to replicate OpenSSL Linux command line behavior.
 		// (This newline allows decryption to work on the command line if CMD Line option is chosen instead of Browser.)
-		return plaintextString.substring(0, plaintextString.length - 1);
+		//return plaintextString.substring(0, plaintextString.length - 1);
+		let decryptedPlaintextUint8 = new Uint8Array(decryptedPlaintextBuffer);
+		decryptedPlaintextUint8 = decryptedPlaintextUint8.slice(0, decryptedPlaintextUint8.length -1);
+		return decryptedPlaintextUint8.toBase64();
 	}// decryptOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3364,24 +3375,32 @@
 	//	
 	//              	usage:			encryptDouble(), encryptTriple()
 	//	
-	async function encryptOBF1000(plaintext64, password) {
+	//async function encryptOBF1000(plaintext64, password) {
+	async function encryptOBF1000(plaintext64, password, stringLiteralSalted=true) {
 		// Construct byte array with base64 input data.
-		const plaintextWithSaltUint8 = Uint8Array.fromBase64(plaintext64);
-		// Check for Salted__ header bytes and error if they are not found.
-		// Get byte form of salted literal.
-		const saltedLiteral = "Salted__";
-		const saltHeaderUint8 = plaintextWithSaltUint8.slice(0,8);
-		const saltToCheck = new TextDecoder().decode(saltHeaderUint8);
-		if (saltedLiteral !== saltToCheck) {
-			showPage('no_salt');
-			throw new Error("OBF-1000 input doesn't look like OpenSSL output!");
-		}
-		if (saltedLiteral === saltToCheck) {
-			console.log("SALT: ", saltToCheck);
-		}
+		//const plaintextWithSaltUint8 = Uint8Array.fromBase64(plaintext64);
 
-		// Slice off the 8 bytes from OpenSSL that convert to: Salted__
-		const plaintextUint8 = plaintextWithSaltUint8.slice(8);
+		let plaintextUint8 = Uint8Array.fromBase64(plaintext64);
+
+		// Default to removing string literal Salted__
+		if (stringLiteralSalted) {
+			// Check for Salted__ header bytes and error if they are not found.
+			// Get byte form of string literal Salted__.
+			const stringLiteralSalted = "Salted__";
+			// Slice of (potential) salt bytes.
+			const saltHeaderUint8 = plaintextUint8.slice(0,8);
+			// Convert salt bytes to readable utf8.
+			const saltToCheck = new TextDecoder().decode(saltHeaderUint8);
+			if (stringLiteralSalted !== saltToCheck) {
+				showPage('no_salt');
+				throw new Error("OBF-1000 input doesn't look like OpenSSL output!");
+			}
+			if (stringLiteralSalted === saltToCheck) {
+				console.log("SALT: ", saltToCheck);
+			}
+			// Slice off the 8 bytes from OpenSSL that convert to: Salted__
+			plaintextUint8 = plaintextUint8.slice(8);
+		}
 		// Add 7byte prepend (representing length of data) and random filler padding.
 		const wrappedPlaintextUint8 = wrap7ByteAndFiller(plaintextUint8);
 		const wrappedPlaintextBase64 = wrappedPlaintextUint8.toBase64();
@@ -3408,46 +3427,54 @@
 	//	
 	//	                    usage:			decryptDouble(), decryptTriple()
 	//
-	async function decryptOBF1000(ciphertext64, password){
+	async function decryptOBF1000(ciphertext64, password, stringLiteralSalted=true){
 		// Always output base64 for base encryption in 1000 wrapping context.
 		const gcmDecrypted64 = await decryptGCM(ciphertext64, password);
-		gcmDecryptedUint8 = Uint8Array.fromBase64(gcmDecrypted64);
+		const gcmDecryptedUint8 = Uint8Array.fromBase64(gcmDecrypted64);
+
+		let unwrappedPlaintextUint8 = unwrap7ByteAndFiller(gcmDecryptedUint8);
+		if (stringLiteralSalted) {
+			unwrappedPlaintextUint8 = addStringLiteralSalted(unwrappedPlaintextUint8);
+		}
+		return unwrappedPlaintextUint8.toBase64();
+	}// decryptOBF1000()
+/*
 		const unwrappedPlaintextUint8 = unwrap7ByteAndFiller(gcmDecryptedUint8);
 		// Add back Salted__ which was removed on encryptOBF1000().
-		saltAddedPlaintextUint8 = addSaltedLiteral(unwrappedPlaintextUint8);
+		saltAddedPlaintextUint8 = addStringLiteralSalted(unwrappedPlaintextUint8);
 		return saltAddedPlaintextUint8.toBase64();
-	}// decryptOBF1000()
+*/
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Add salted literal back in decryptOBF1000() that was stripped in encryptOBF1000() to maintain OpenSSL ciphertext integrity.
+	// Purpose:	Add string literal Salted__ back in decryptOBF1000() that was stripped in encryptOBF1000() to maintain OpenSSL ciphertext integrity.
 	// Usage:   decryptOBF1000()
 	//
 	// Input Structure:	Uint8Array of freshly GCM decrypted and 7Byte unwrapped bytes.
 	//
 	// Output Structure:	(Salted__)Bytes + Input Uint8Array
 	//
-	function addSaltedLiteral(inputDataUint8) {
+	function addStringLiteralSalted(inputDataUint8) {
 		// Get length of input data in number of bytes.
 		const dataLength = inputDataUint8.length;
 		const saltedOffset  = dataLength + 8;
 		// Create new array that is the input length +8 for the salt.
 		let dataBytesWithSalt = new Uint8Array(saltedOffset);
-		// Get byte form of salted literal.
-		const saltedLiteral = "Salted__";
-		const saltBytes = new TextEncoder().encode(saltedLiteral);
-		// Prepend with salted literal.
+		// Get byte form of string literal Salted__.
+		const stringLiteralSalted = "Salted__";
+		const saltBytes = new TextEncoder().encode(stringLiteralSalted);
+		// Prepend with string literal Salted__.
 		dataBytesWithSalt.set(saltBytes, 0);
-		// Finally, fill in data behind salted literal.
+		// Finally, fill in data behind string literal Salted__.
 		dataBytesWithSalt.set(inputDataUint8, 8);
 		return dataBytesWithSalt;
-	}// addSaltedLiteral()
+	}// addStringLiteralSalted()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Add a 7ByteHeader representing the length of the data and also pad with random filler to satisfy output length of 1000 base64 chars.
 	//  OBF-1000 Internal Function - both source and destination.
 	//
 	//	Inputs structure:	inputDataUint8: Uint8Array containing data to be encrypted.
-	//						If this is a Multi Encrypted Datarecord, it will be OpenSSL output sans salted literal: Salted__ which is removed by encryptOBF1000.
+	//						If this is a Multi Encrypted Datarecord, it will be OpenSSL output sans string literal Salted__ which is removed by encryptOBF1000.
 	//
 	//	Output structure:	 7ByteHeader + Input Data Payload + Random Filler 
 	//						 |--7 Bytes--||------------710 Bytes-------------| 	
@@ -3888,12 +3915,12 @@
 	//	                    destination:		Database storage.
 	//
 	async function encryptDouble(obf1000Pass, ctrPass, fileDataBase64) {
+		// OBF-1000 step.
 		const obf1000Encrypted = await encryptOBF1000(fileDataBase64, obf1000Pass);
 		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
-
+		// AES-CTR step.
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_BASE64);
-
 		return ctrEncrypted;
 	}// encryptDouble()
 
@@ -3905,6 +3932,7 @@
 	//						obf1000Pass:	human readable plaintext string
 	//						ctrPass:		human readable plaintext string
 	//						plaintextData:	human readable plaintext string - a Plaintext Data Payload
+	//
 	//	Output structure:	base64 Multi Encrypted Datarecord
 	//
 	// Big Picture:			Using the Browser option, this function 'triple encrypts' user data into a Multi Encrypted Datarecord, ready for database storage.
@@ -3913,16 +3941,15 @@
 	//	                    destination:		database storage
 	//
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, plaintextData) {
-		// OpenSSL Encrypt (base 64 encoded)
-		const opensslEncrypted = await encryptOpenSSL(plaintextData, opensslPass);
+		// OpenSSL step.
+		const opensslEncrypted = await encryptFromPlaintextOpenSSL(plaintextData, opensslPass);
 		checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
-
+		// OBF-1000 step.
 		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
 		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
-
+		// AES-CTR step.
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_BASE64);
-
 		return ctrEncrypted;
 	}// encryptTriple()
 
@@ -3942,7 +3969,9 @@
 	//                      destination:   convert into file for user download 
 	//
 	async function decryptDouble(obf1000Pass, ctrPass, multiEncryptedDatarecord) {
+		// AES-CTR step.
 		const ctrDecrypted = await decryptAESCTR(multiEncryptedDatarecord, ctrPass);
+		// OBF-1000 step.
 		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
 		return obf1000Decrypted;
 	}// decryptDouble()
@@ -3964,11 +3993,28 @@
 	//	                    destination:		user viewport
 	//
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, multiEncryptedDatarecord) {
+		// AES-CTR step.
 		const ctrDecrypted = await decryptAESCTR(multiEncryptedDatarecord, ctrPass);
+		// OBF-1000 step.
 		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
-		const plaintext = await decryptOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
-		return plaintext;
+		// OpenSSL step.
+		return await decryptToPlaintextOpenSSL(obf1000Decrypted, obf1000Pass);
 	}// decryptTriple()
+
+	// Wrapper for OpenSSL which operates on base64.
+	async function encryptFromPlaintextOpenSSL(plaintext, password) {
+		const plaintextUint8 = new TextEncoder().encode(plaintext);
+		const plaintext64 = plaintextUint8.toBase64(plaintextUint8);
+		return await encryptOpenSSL(plaintext64, password);
+	}// encryptFromPlaintextOpenSSL()
+
+	// Wrapper for OpenSSL which operates on base64.
+	async function decryptToPlaintextOpenSSL(ciphertext, password) {
+		const plaintext64 = await decryptOpenSSL(ciphertext, password);// return error if error? could only return an object if it's an error.
+		const plaintextUint8 = Uint8Array.fromBase64(plaintext64);
+		const plaintext = new TextDecoder().decode(plaintextUint8);
+		return plaintext;
+	}// decryptToPlaintextOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality:  Produce a 'Fingerprint' which will be used as the Key in the Key-Value pair for storing a Multi Encrypted Datarecord.
@@ -4019,19 +4065,6 @@
 		}while(computedValue != targetValue);
 		return sevenByteUint8;
 	}// find7ByteSetForValue()
-
-	// What is this for?
-	// Find set of bytes that compute to a value in the input range.
-	function find7ByteSetInRange(targetMin, targetMax) {
-		let computedValue;
-		let sevenByteUint8;
-		do{
-			// Roll 7 random bytes.
-			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
-			computedValue = eval7ByteValue(sevenByteUint8);
-		}while(computedValue < targetMin || computedValue > targetMax);
-		return sevenByteUint8;
-	}// find7ByteSetInRange()
 
 	// Convert 7Byte array into mathematical expression then evaluate it.
 	function eval7ByteValue(sevenByteUint8) {
@@ -6794,10 +6827,9 @@
 	//	
 	//             	destination: encryptOBF1000()
 	//
-	async function encryptOpenSSL(plaintext, password) {
-		// Encode plaintext in utf8 and store in Uint8Array plaintextUint8.
-		// Convert JS string into utf8 bytes and place in Uint8Array.
-		const plaintextUint8 = new TextEncoder().encode(plaintext);
+	//
+	async function encryptOpenSSL(plaintext64, password) {
+		const plaintextUint8 = Uint8Array.fromBase64(plaintext64);
 		// Replicate Linux command line's version of OpenSSL by appending a single newline, effectively changing plaintext input to a Linux file.
 		const singleNewlineUint8 = new Uint8Array(1);
 		// utf8 newline code is the value 10 (decimal).
@@ -6854,9 +6886,9 @@
 		);
 		const ciphertextUint8 = new Uint8Array(ciphertext);
 		// Compile output to match OpenSSL Linux command line functionality. *Thoroughly explained/mapped in Cryptographic Functions section description.
-		const saltedLiteral = "Salted__";	// OpenSSL uses to designate next 8 bytes as salt.
+		const stringLiteralSalted = "Salted__";	// OpenSSL uses to designate next 8 bytes as salt.
 		// Convert string chars into bytes.
-		const saltLiteralUint8 = new TextEncoder().encode(saltedLiteral);
+		const saltLiteralUint8 = new TextEncoder().encode(stringLiteralSalted);
 		const twoSaltsUint8 = concatBuffer(saltLiteralUint8, saltCBCUint8);
 		// Merge salts with encoded ciphertext.
 		// OpenSSL Output = Salted__ + CBC Salt + Ciphertext
@@ -6941,13 +6973,11 @@
 			keyCBC,					// CryptoKey object used in the decryption.
 			ciphertextUint8			// Ciphertext data to be decrypted.
 		);
-		// Interpret bytes from the ArrayBuffer decryptedPlaintext as utf8 string and place that string into variable plaintextString.
-		const plaintextString = new TextDecoder().decode(decryptedPlaintextBuffer);
-		// Remove last character in string which is a special newline char.
-		// The output of this function will go to a Browser input textarea, so remove newline used to replicate OpenSSL Linux command line behavior.
-		// (This newline allows decryption to work on the command line if CMD Line option is chosen instead of Browser.)
-		return plaintextString.substring(0, plaintextString.length - 1);
+		let decryptedPlaintextUint8 = new Uint8Array(decryptedPlaintextBuffer);
+		decryptedPlaintextUint8 = decryptedPlaintextUint8.slice(0, decryptedPlaintextUint8.length -1);
+		return decryptedPlaintextUint8.toBase64();
 	}// decryptOpenSSL()
+
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Produce 1000 base64 chars of AES-GCM ciphertext from plaintext, password input data. The input data will be padded with random filler if necessary.
@@ -6968,24 +6998,32 @@
 	//	
 	//              	usage:			encryptDouble(), encryptTriple()
 	//	
-	async function encryptOBF1000(plaintext64, password) {
-		// Construct byte array with base64 input data.
-		const plaintextWithSaltUint8 = Uint8Array.fromBase64(plaintext64);
-		// Check for Salted__ header bytes and error if they are not found.
-		// Get byte form of salted literal.
-		const saltedLiteral = "Salted__";
-		const saltHeaderUint8 = plaintextWithSaltUint8.slice(0,8);
-		const saltToCheck = new TextDecoder().decode(saltHeaderUint8);
-		if (saltedLiteral !== saltToCheck) {
-			showPage('no_salt');
-			throw new Error("OBF-1000 input doesn't look like OpenSSL output!");
-		}
-		if (saltedLiteral === saltToCheck) {
-			console.log("SALT: ", saltToCheck);
-		}
 
-		// Slice off the 8 bytes from OpenSSL that convert to: Salted__
-		const plaintextUint8 = plaintextWithSaltUint8.slice(8);
+	async function encryptOBF1000(plaintext64, password, stringLiteralSalted=true) {
+		// Construct byte array with base64 input data.
+		//const plaintextWithSaltUint8 = Uint8Array.fromBase64(plaintext64);
+
+		let plaintextUint8 = Uint8Array.fromBase64(plaintext64);
+
+		// Default to removing string literal Salted__
+		if (stringLiteralSalted) {
+			// Check for Salted__ header bytes and error if they are not found.
+			// Get byte form of string literal Salted__.
+			const stringLiteralSalted = "Salted__";
+			// Slice of (potential) salt bytes.
+			const saltHeaderUint8 = plaintextUint8.slice(0,8);
+			// Convert salt bytes to readable utf8.
+			const saltToCheck = new TextDecoder().decode(saltHeaderUint8);
+			if (stringLiteralSalted !== saltToCheck) {
+				showPage('no_salt');
+				throw new Error("OBF-1000 input doesn't look like OpenSSL output!");
+			}
+			if (stringLiteralSalted === saltToCheck) {
+				console.log("SALT: ", saltToCheck);
+			}
+			// Slice off the 8 bytes from OpenSSL that convert to: Salted__
+			plaintextUint8 = plaintextUint8.slice(8);
+		}
 		// Add 7byte prepend (representing length of data) and random filler padding.
 		const wrappedPlaintextUint8 = wrap7ByteAndFiller(plaintextUint8);
 		const wrappedPlaintextBase64 = wrappedPlaintextUint8.toBase64();
@@ -7012,46 +7050,48 @@
 	//	
 	//	                    usage:			decryptDouble(), decryptTriple()
 	//
-	async function decryptOBF1000(ciphertext64, password){
+	async function decryptOBF1000(ciphertext64, password, stringLiteralSalted=true){
 		// Always output base64 for base encryption in 1000 wrapping context.
 		const gcmDecrypted64 = await decryptGCM(ciphertext64, password);
-		gcmDecryptedUint8 = Uint8Array.fromBase64(gcmDecrypted64);
-		const unwrappedPlaintextUint8 = unwrap7ByteAndFiller(gcmDecryptedUint8);
-		// Add back Salted__ which was removed on encryptOBF1000().
-		saltAddedPlaintextUint8 = addSaltedLiteral(unwrappedPlaintextUint8);
-		return saltAddedPlaintextUint8.toBase64();
+		const gcmDecryptedUint8 = Uint8Array.fromBase64(gcmDecrypted64);
+
+		let unwrappedPlaintextUint8 = unwrap7ByteAndFiller(gcmDecryptedUint8);
+		if (stringLiteralSalted) {
+			unwrappedPlaintextUint8 = addStringLiteralSalted(unwrappedPlaintextUint8);
+		}
+		return unwrappedPlaintextUint8.toBase64();
 	}// decryptOBF1000()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose:	Add salted literal back in decryptOBF1000() that was stripped in encryptOBF1000() to maintain OpenSSL ciphertext integrity.
+	// Purpose:	Add string literal Salted__ back in decryptOBF1000() that was stripped in encryptOBF1000() to maintain OpenSSL ciphertext integrity.
 	// Usage:   decryptOBF1000()
 	//
 	// Input Structure:	Uint8Array of freshly GCM decrypted and 7Byte unwrapped bytes.
 	//
 	// Output Structure:	(Salted__)Bytes + Input Uint8Array
 	//
-	function addSaltedLiteral(inputDataUint8) {
+	function addStringLiteralSalted(inputDataUint8) {
 		// Get length of input data in number of bytes.
 		const dataLength = inputDataUint8.length;
 		const saltedOffset  = dataLength + 8;
 		// Create new array that is the input length +8 for the salt.
 		let dataBytesWithSalt = new Uint8Array(saltedOffset);
-		// Get byte form of salted literal.
-		const saltedLiteral = "Salted__";
-		const saltBytes = new TextEncoder().encode(saltedLiteral);
-		// Prepend with salted literal.
+		// Get byte form of string literal Salted__.
+		const stringLiteralSalted = "Salted__";
+		const saltBytes = new TextEncoder().encode(stringLiteralSalted);
+		// Prepend with string literal Salted__.
 		dataBytesWithSalt.set(saltBytes, 0);
-		// Finally, fill in data behind salted literal.
+		// Finally, fill in data behind string literal Salted__.
 		dataBytesWithSalt.set(inputDataUint8, 8);
 		return dataBytesWithSalt;
-	}// addSaltedLiteral()
+	}// addStringLiteralSalted()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Add a 7ByteHeader representing the length of the data and also pad with random filler to satisfy output length of 1000 base64 chars.
 	//  OBF-1000 Internal Function - both source and destination.
 	//
 	//	Inputs structure:	inputDataUint8: Uint8Array containing data to be encrypted.
-	//						If this is a Multi Encrypted Datarecord, it will be OpenSSL output sans salted literal: Salted__ which is removed by encryptOBF1000.
+	//						If this is a Multi Encrypted Datarecord, it will be OpenSSL output sans string literal Salted__ which is removed by encryptOBF1000.
 	//
 	//	Output structure:	 7ByteHeader + Input Data Payload + Random Filler 
 	//						 |--7 Bytes--||------------710 Bytes-------------| 	
@@ -7516,16 +7556,15 @@
 	//	                    destination:		database storage
 	//
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, plaintextData) {
-		// OpenSSL Encrypt (base 64 encoded)
-		const opensslEncrypted = await encryptOpenSSL(plaintextData, opensslPass);
+		// OpenSSL step.
+		const opensslEncrypted = await encryptFromPlaintextOpenSSL(plaintextData, opensslPass);
 		checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
-
+		// OBF-1000 step.
 		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
 		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
-
+		// AES-CTR step.
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_BASE64);
-
 		return ctrEncrypted;
 	}// encryptTriple()
 
@@ -7567,11 +7606,28 @@
 	//	                    destination:		user viewport
 	//
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, multiEncryptedDatarecord) {
+		// AES-CTR step.
 		const ctrDecrypted = await decryptAESCTR(multiEncryptedDatarecord, ctrPass);
+		// OBF-1000 step.
 		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
-		const plaintext = await decryptOpenSSL(obf1000Decrypted, opensslPass);// return error if error? could only return an object if it's an error.
-		return plaintext;
+		// OpenSSL step.
+		return await decryptToPlaintextOpenSSL(obf1000Decrypted, obf1000Pass);
 	}// decryptTriple()
+
+	// Wrapper for OpenSSL which operates on base64.
+	async function encryptFromPlaintextOpenSSL(plaintext, password) {
+		const plaintextUint8 = new TextEncoder().encode(plaintext);
+		const plaintext64 = plaintextUint8.toBase64(plaintextUint8);
+		return await encryptOpenSSL(plaintext64, password);
+	}// encryptFromPlaintextOpenSSL()
+
+	// Wrapper for OpenSSL which operates on base64.
+	async function decryptToPlaintextOpenSSL(ciphertext, password) {
+		const plaintext64 = await decryptOpenSSL(ciphertext, password);// return error if error? could only return an object if it's an error.
+		const plaintextUint8 = Uint8Array.fromBase64(plaintext64);
+		const plaintext = new TextDecoder().decode(plaintextUint8);
+		return plaintext;
+	}// decryptToPlaintextOpenSSL()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality:  Produce a 'Fingerprint' which will be used as the Key in the Key-Value pair for storing a Multi Encrypted Datarecord.
