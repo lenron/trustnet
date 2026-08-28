@@ -115,18 +115,18 @@
 	//               
 	//                                absoluteValue( 24 ) = [24]
 	//               
-	//               Order matters so index 0 gets converted to a number, index 1 gets converted to a mathematical symbol, index 2 --> number, index 3 --> symbol, etc.
-	//               The symbol a byte converts to depends on whether it's even or odd: even-->(+) odd-->(-)
+	//               Order matters so index 0 gets converted to a number, index 1 gets converted to a mathematical symbol, index 2 --+ number, index 3 --+ symbol, etc.
+	//               The symbol a byte converts to depends on whether it's even or odd: even--+(+) odd--+(-)
 	//
 	//   Example:    For the Target Value: 24 an array was found:
 	//
-	//                             [162, 8, 116, 9, 181, 43, 73]            162 --> number
-	//                               |   |   |   |   |   |   |              8   --> even --> (+)
-	//                               V   V   V   V   V   V   V              116 --> number
-	//                      index:   0   1   2   3   4   5   6              9   --> odd --> (-)
-	//                               |   |   |   |   |   |   |              181 --> number
-	//                               V   V   V   V   V   V   V              43  --> odd --> (-)
-	//               absoluteValue( 162,(+),116,(-),181,(-),73 )            73  --> number
+	//                             [162, 8, 116, 9, 181, 43, 73]            162 --+ number
+	//                               |   |   |   |   |   |   |              8   --+ even --+ (+)
+	//                               V   V   V   V   V   V   V              116 --+ number
+	//                      index:   0   1   2   3   4   5   6              9   --+ odd --+ (-)
+	//                               |   |   |   |   |   |   |              181 --+ number
+	//                               V   V   V   V   V   V   V              43  --+ odd --+ (-)
+	//               absoluteValue( 162,(+),116,(-),181,(-),73 )            73  --+ number
 	//
 	//               absoluteValue( 162 + 116 - 181 - 73 ) = 24
 	//
@@ -161,7 +161,7 @@
 	//              To Javascript
 	//                   |
 	//                   V                             ___________________________________________________________
-	//     <------OpenSSL Input-------->                                                                          |
+	//     <------OpenSSL Input--------+                                                                          |
 	//     |--------Up to 686----------|                                                                          |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
@@ -171,7 +171,7 @@
 	//             +1 Newline Byte                                                                                |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//     <-------CBC Plaintext----------->                                                                      |
+	//     <-------CBC Plaintext-----------+                                                                      |
 	//     |----Plaintext-------||-Newline-|                                                                      |
 	//     |-------Up to 686----||----1----|                                                                      |
 	//                   |                                                                                        |
@@ -179,7 +179,7 @@
 	//               CBC Encrypt <----------------------[Password 3]                                              |-----OpenSSL
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//     <---------------CBC Ciphertext---------------->                                                        |
+	//     <---------------CBC Ciphertext----------------+                                                        |
 	//     |------Plaintext--||-Newline-||-CBC Blocking--|                                                        |
 	//     |----Up to 686----||----1----||--1 to 16------|                                                        |
 	//                   |                                                                                        |
@@ -190,8 +190,8 @@
 	//               +CBC 8 byte Salt                                                                             |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//     <---------------OpenSSL Output------------->                                                           |
-	//     |-Salted__-||-CBC Salt-|<--CBC Ciphertext-->                                                           |
+	//     <---------------OpenSSL Output-------------+                                                           |
+	//     |-Salted__-||-CBC Salt-|<--CBC Ciphertext--+                                                           |
 	//     |-----8----||------8---||--Up to 688-------|                                                           |
 	//     |-----------Up to 704----------------------|                                                           |
 	//                   |                             ___________________________________________________________|
@@ -209,7 +209,7 @@
 	//               +[710 - sizeof(User uploaded file data)] bytes of Random Filler                              |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//     <--------------GCM Plaintext----------------------------------->                                       |
+	//     <--------------GCM Plaintext-----------------------------------+                                       |
 	//     |-7ByteHeader-||-CBC Salt-|<-CBC Ciphertext->|--Random Filler--|                                       |------OBF-1000
 	//     |-----7-------||-------------------710-------------------------|                                       |
 	//     |---------------------------717 -------------------------------|                                       |
@@ -218,9 +218,9 @@
 	//               GCM Encrypt <------------------------[Password 1]                                            |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//     <--------------OBF-1000 Outupt----------------------->                                                 |
+	//     <--------------OBF-1000 Outupt-----------------------+                                                 |
 	//     |-GCM Salt-||----------GCM Encrypt Output------------|                                                 |
-	//     |-GCM Salt-|<-------GCM Ciphertext-------->|-GCM Tag-|                                                 |
+	//     |-GCM Salt-|<-------GCM Ciphertext--------+|-GCM Tag-|                                                 |
 	//     |---18-----||-----------717---------------||---15----|                                                 |
 	//     |---------------------750----------------------------|                                                 |
 	//                   |                             ___________________________________________________________|
@@ -228,14 +228,14 @@
 	//             To AES-CTR
 	//                   |                             ___________________________________________________________
 	//                   V                                                                                        |
-	//     <------CTR Plaintext----------------->                                                                 |
+	//     <------CTR Plaintext-----------------+                                                                 |
 	//     |-------------------750 -------------|                                                                 |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
 	//               CTR Encrypt <------------------------[Password 2]                                            |------AES-CTR
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//     <-------------AES-CTR Outupt------------------------->                                                 |
+	//     <-------------AES-CTR Outupt-------------------------+                                                 |
 	//     |-CTR Salt-||----------CTR Ciphertext----------------|                                                 |
 	//     |---18-----||-----------750--------------------------|                                                 |
 	//     |---------------------768----------------------------|                                                 |
@@ -271,7 +271,7 @@
 	//               +[710 - sizeof(User uploaded file data)] bytes of Random Filler                              |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//     <--------------GCM Plaintext----------------------------------->                                       |
+	//     <--------------GCM Plaintext-----------------------------------+                                       |
 	//     |-7ByteHeader-||-CBC Salt-|<-CBC Ciphertext->|--Random Filler--|                                       |------OBF-1000
 	//     |-----7-------||-------------------710-------------------------|                                       |
 	//     |---------------------------717 -------------------------------|                                       |
@@ -280,9 +280,9 @@
 	//               GCM Encrypt <------------------------[Password 1]                                            |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//     <--------------OBF-1000 Outupt----------------------->                                                 |
+	//     <--------------OBF-1000 Outupt-----------------------+                                                 |
 	//     |-GCM Salt-||----------GCM Encrypt Output------------|                                                 |
-	//     |-GCM Salt-|<-------GCM Ciphertext-------->|-GCM Tag-|                                                 |
+	//     |-GCM Salt-|<-------GCM Ciphertext--------+|-GCM Tag-|                                                 |
 	//     |---18-----||-----------717---------------||---15----|                                                 |
 	//     |---------------------750----------------------------|                                                 |
 	//                   |                             ___________________________________________________________|
@@ -290,14 +290,14 @@
 	//             To AES-CTR
 	//                   |                             ___________________________________________________________
 	//                   V                                                                                        |
-	//     <------CTR Plaintext----------------->                                                                 |
+	//     <------CTR Plaintext-----------------+                                                                 |
 	//     |-------------------750 -------------|                                                                 |
 	//                   |                                                                                        |
 	//                   V                                                                                        |
 	//               CTR Encrypt <------------------------[Password 2]                                            |------AES-CTR
 	//                   |                                                                                        |
 	//                   V                                                                                        |
-	//     <-------------AES-CTR Outupt------------------------->                                                 |
+	//     <-------------AES-CTR Outupt-------------------------+                                                 |
 	//     |-CTR Salt-||----------CTR Ciphertext----------------|                                                 |
 	//     |---18-----||-----------750--------------------------|                                                 |
 	//     |---------------------768----------------------------|                                                 |
@@ -452,7 +452,7 @@
 	//               _____                                                       ________
 	//              |          <43 random base64 chars> <1024 random base64 chars>       |
 	//              |          <43 random base64 chars> <1024 random base64 chars>       |
-	//  # of rows-->|          <43 random base64 chars> <1024 random base64 chars>       |
+	//  # of rows--+|          <43 random base64 chars> <1024 random base64 chars>       |
 	//  = Pointer   |          <43 random base64 chars> <1024 random base64 chars>       |
 	//              |          <43 random base64 chars> <1024 random base64 chars>       |
 	//              |_____ (*) <43 base64 Fingerprint chars> <1024 base64 MED chars>     |-----1000 rows of [Fingerprint + Multi Encrypted Datarecord]
@@ -505,8 +505,8 @@
 	//       [plaintext string]              [1,067,024* base64 chars]        [1024 base64 chars]       [43 base64 chars]  [1024 base64 chars - MED]
 	//             |                                |                                  |                        |                        |
 	//             |                                V                                  |                        |                        |
-	//             |----------------------> {AES-CTR Decrypt}                          V                        |                        |
-	//             |--------------------------------|------>{Triple Decrypt (use same pass for all 3 ciphers)}  |                        |
+	//             |----------------------+ {AES-CTR Decrypt}                          V                        |                        |
+	//             |--------------------------------|------+{Triple Decrypt (use same pass for all 3 ciphers)}  |                        |
 	//             |                                |                                  |                        |                        |
 	//             |                                |                                  V                        |                        |
 	//             |                                |                         [Decrypted Pointer]               |                        |
@@ -523,8 +523,8 @@
 	//             |                    [1,067,000 base64 chars]                       |
 	//             |                                |                                  |                      
 	//             |                                V                                  |                      
-	//             |----------------------> {AES-CTR Encrypt}                          V
-	//             |--------------------------------|------------->{Triple Encrypt (use same pass for all 3 ciphers)}
+	//             |----------------------+ {AES-CTR Encrypt}                          V
+	//             |--------------------------------|-------------+{Triple Encrypt (use same pass for all 3 ciphers)}
 	//                                              |                                  |
 	//                                              V                                  V
 	//                                    Store to HTML Object               Store to HTML Object
@@ -940,7 +940,7 @@
 	//					from encryptOBF1000() function and encrypts it using AES-GCM.
 	//
 	//	                source:			Internal function of encryptOBF1000()
-	//	                destination:	Same as output of encryptOBF1000() --> encryptAESCTR()
+	//	                destination:	Same as output of encryptOBF1000() --+ encryptAESCTR()
 	//	
 	//	                usage:		encryptOBF1000()
 	//
@@ -1443,10 +1443,10 @@
 		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
 		for(let i=0; i < 7; i++) {
 			if (i % 2 === 0) {
-				// Even index bytes -->  numbers
+				// Even index bytes --+  numbers
 				mathExpression += sevenByteUint8[i];
 			}else{
-				// Odd index bytes --> symbols
+				// Odd index bytes --+ symbols
 				if (sevenByteUint8[i] % 2 === 0) {
 					// Even bytes convert to (+)
 					mathExpression += "+";
