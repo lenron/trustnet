@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+use HTML::Template;
 use CGI qw(:standard escapeHTML);
 # Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
@@ -11,12 +12,23 @@ my $cgi = CGI->new;
 
 add_log_message_with_time_and_ip("DEV SITE ACCESSED");
 
+# Read in base template that will be populated with variables below.
+my $template = HTML::Template->new(filename => 'dev_site.tmpl');
+
 # HTTP Response requires proper header to work.
 print $cgi->header('text/html');
+
+# Print populated template to HTML Response.
+print $template->output;
+
+
+# HTTP Response requires proper header to work.
+#print $cgi->header('text/html');
+
 # Read in static error file unless we have stored less than 50,000 times today.
-open my $fh, '<', 'dev_site.html';
-print while <$fh>;
-close $fh;   
+#open my $fh, '<', 'dev_site.html';
+#print while <$fh>;
+#close $fh;   
 
 exit(0);
 

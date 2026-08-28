@@ -1,0 +1,1488 @@
+
+
+	//////////////////////////////////////////////////////////////
+	//             Constants & Base64 Map                       //
+	//////////////////////////////////////////////////////////////
+
+	// Base64 encoding as standardized in RFC 4648: https://datatracker.ietf.org/doc/html/rfc4648#section-4
+	const base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	// Plaintext Data Payload size limits.
+	const BROWSERINPUT_LENGTH_LIMIT = 686; // Data payload size limit in bytes for Triple Cipher.
+	const CMDINPUT_LENGTH_LIMIT = 704; // Data payload size limit for CMD Line input.
+	// PBKDF2 number-of-bits-to-derive constants.
+	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384; // 256 bits for key + 128 for IV
+	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352; // 256 bits for key + 96 for IV
+	const KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR = 384; // 256 bits for key + 128 for (nonce + counter)
+	const PASSLOCK_LENGTH = 36; // Length of a typical UUID, used to check validity of passlocks.
+	// JS native timeout function uses miliseconds.
+	const FIVE_SECONDS_THOUSANDTHS = 5000;
+	const TEN_SECONDS_THOUSANDTHS = 10000;
+	const FOUR_MINUTES_THIRTY_SECONDS_THOUSANDTHS = 270000;
+	const FIVE_MINUTES_THOUSANDTHS = 300000;
+	// GCM 'tag' or 'sig' or 'signature' or 'checksum' used by GCM enc/dec function to validate data.
+	const GCM_TAGLENGTH_BITS = 120; // 120 bits is 8 less than default but still valid spec recommendation.
+	const SALT_SIZE_BYTES = 18; // Chosen by balancing space with cryptographic strength.
+	// Offline databse holds 1000 records, 0-999.
+	const MAX_POINTER_VALUE = 999; // For offline database.
+	const FINGERPRINT_LENGTH_BASE64 = 43;
+	const FINGERPRINT_LENGTH_BYTES = 32;// 43 Base64 fingerprint characters convert into 32 bytes.
+	// Triple encrypted data size 1024 chosen for beauty, proxmixity to 1000.
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 = 1024;
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 * (3/4);  // 786
+	// Single Record (TOTAL_RECORD_LENGTH_BASE64) in base64:
+	//        43	       1024
+	// |--fingerprint--||--Data--|
+	// TOTAL_RECORD_LENGTH_BASE64 used for offline database ordering.
+	// fingerprint length + data record length (in base64) = 1067
+	const TOTAL_RECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64; // 1067
+	// Cryptographic salt, tag length derivations.
+	const AESCTR_SALT_SIZE_BASE64 = SALT_SIZE_BYTES * (4/3); // 24
+	const GCM_SIG_SIZE_BYTES = GCM_TAGLENGTH_BITS / 8; // 120 bits / 8 = 15 bytes
+	const GCM_SIG_SIZE_BASE64 = GCM_SIG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to base64 = 24
+	const GCM_SALT_SIZE_BASE64 = AESCTR_SALT_SIZE_BASE64; // Currently using same salt length of 24 base64 / 18 bytes.
+	// The final of 3 encryptions, AESCTR output length === triple encrypted output length.
+	const AESCTR_OUTPUT_LIMIT_BASE64 = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64; // Triple encrypted size chosen as 1024 for beauty, proximity to 1000.
+	// Not sure if it makes sense to derive this. Should be 1000.
+	const OBF1000_OUTPUT_LIMIT_BASE64 = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 - AESCTR_SALT_SIZE_BASE64; // OBF1000 outputs 1000 chars or error.
+	// OpenSSL output is limited by the data length that will decrypt safely when fed into OBF1000.
+	// Although because of CBC blocking, the effective limit is 704, which is the output size with an input size of 686, our main site Plaintext Data Payload byte size limit.
+	// This gives us a bit of 'room' or unused space that feels like will make our Triple Cipher even less likely to lose data.
+	// Output in base64 is (1000 - 20 - 24) * (4/3) convert to bytes - 7 Bytes for 7 byte set. Anything above this value will result in error.
+	const OBF1000_MAX_INPUT_BYTES = (OBF1000_OUTPUT_LIMIT_BASE64 - GCM_SIG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64) * 3 / 4 - 7;
+	// Use both to size the OBF1000 data + payload array and limit size of input.
+	const OPENSSL_OUTPUT_LIMIT_BASE64 = OBF1000_MAX_INPUT_BYTES * 4 / 3;
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//	                Core Cryptographic Functions		                                                                     //
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// We provide a free 'data locker' up to 686 bytes, which is encrypted using 3 core cryptographic ciphers:
+	//		AES-CBC
+	//		AES-GCM
+	//		AES-CTR             
+	// This produces a Multi Encrypted Datarecord (MED) that is stored in either our online database or in a user-controlled offline database.
+	//
+	// How this site works:
+	//     Data is stored as a key-value pair where the computed Fingerprint is the key and a Multi Encrypted Datarecord is the value.
+	//     So, in order to overwrite data the same sequence of passwords must be entered that was used to initially store it.
+	//              
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 7Byte Header
+	//
+	//    Why needed:
+	//               The 7Byte header is used to store the length of input data for OBF-1000 (not including the Salted__ string literal which is removed).
+	//               
+	//               We use this method for storing the length of the input in order to obfuscate often used constant values like 0.
+	//               If a simple int were used in the same place e.g. as 3 digits, shorter length strings (presumably the most likely to be stored)
+	//               would often end up as something like: 027, 098, 129, etc. resulting in a design with a potential vulnerability with the often repeated 0,1,2.
+	//               
+	//               The seven byte header method was devised in order to store the length value in a way that is statistically random.
+	//
+	//   Probabilistic Integrity:
+	//                            <Something on the probability, etc. of the seven byte set and how it's rolled.>
+	//                            At worst an attacker could gain the length of the data.
+	//                            Attacker: can an attacker determine if a set of 1000 base64 chars.
+	//                            98.76% is likelyhood of getting a valid 7byte string.
+	//  Given that an OBF-1000 string length is from 44-704, randomly choosing bytes results in a 7byte set that computes to a number inside this range, will be 87.44
+	//  However, this isn't an issue because attackers know they're attempting to decrypt OBF1000 data, which is encrypted by AES-CTR.
+	//  If AES-CTR is cracked however, they might ask, does this decrypted output include a OBF1000 string, which they could remove 13% of the junk decrypts.
+	//  87% would still need to be attempted to continue to crack.
+	//  For dev site usage, for the range 0-704, 98.7 of random bytes rolled will compute to a valid 7byte number, making it difficult to know whether a piece of 1000 length string is obf.
+	//  1
+	//  
+	//  
+	//                            
+	//
+	//   Functionality:
+	//               7 bytes are randomly selected, computed using the below formula until a set is found that computes to the target input value.
+	//               
+	//                        index:   0       1       2       3       4       5      6
+	//                                 |       |       |       |       |       |      |
+	//                                 V       V       V       V       V       V      V
+	//               absoluteValue( number, symbol, number, symbol, number, symbol, number )
+	//
+	//     Example:                 [ 162      8      116      9      181     43     73 ]
+	//                                 |       |       |       |       |       |      |
+	//                                 V       V       V       V       V       V      V
+	//                        index:   0       1       2       3       4       5      6
+	//                                 |       |       |       |       |       |      |
+	//                                 V       V       V       V       V       V      V
+	//               absoluteValue( number, symbol, number, symbol, number, symbol, number )
+	//                                 |       |       |       |       |       |      |
+	//                                 V       V       V       V       V       V      V
+	//               absoluteValue(   162     (+)     116     (-)     181     (-)    73 )
+	//
+	//                           absoluteValue(162 + 116 - 181 - 73)
+	//               
+	//                                absoluteValue( 24 ) = [24]
+	//               
+	//               Order matters so index 0 gets converted to a number, index 1 gets converted to a mathematical symbol, index 2 --> number, index 3 --> symbol, etc.
+	//               The symbol a byte converts to depends on whether it's even or odd: even-->(+) odd-->(-)
+	//
+	//   Example:    For the Target Value: 24 an array was found:
+	//
+	//                             [162, 8, 116, 9, 181, 43, 73]            162 --> number
+	//                               |   |   |   |   |   |   |              8   --> even --> (+)
+	//                               V   V   V   V   V   V   V              116 --> number
+	//                      index:   0   1   2   3   4   5   6              9   --> odd --> (-)
+	//                               |   |   |   |   |   |   |              181 --> number
+	//                               V   V   V   V   V   V   V              43  --> odd --> (-)
+	//               absoluteValue( 162,(+),116,(-),181,(-),73 )            73  --> number
+	//
+	//               absoluteValue( 162 + 116 - 181 - 73 ) = 24
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Data is stored as a key-value pair where the computed Fingerprint is the key and a Multi Encrypted Datarecord is the value.
+	// So, in order to overwrite data the same sequence of passwords must be entered that was used to initially store it.
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Multi Encrypted Datarecord - Breakdown
+	//     
+	//     |----------------------------------Multi Encrypted Datarecord (MED)---768 Bytes (1024 base 64 chars)------------------------------------------------------| 
+	//                 |-----------------------------------------CTR Plaintext---750 Bytes (1000 base 64 chars)------------------------------------------------------| 
+	//                             |-----------------------------GCM Plaintext---717 Bytes----------------------------------------------------------------| 
+	//     |-CTR Salt-||-GCM Salt-||-7ByteHeader-|***|-CBC Salt-||-----------CBC Plaintext-----------||-Newline-||-CBC Blocking--||-----Random Filler-----||-GCM Tag-|
+	//     |----18----||----18----||------7------|   |----8-----||--Browser Input---Up to 686 Bytes--||----1----||----1 to 16----||-[ 710 - File Input  ]-||---15----|
+	//                                               |-----------------File Input---Up to 704 Bytes------------------------------| 
+	//     
+	//     ***Salted__ string literal removed in OBF-1000 step. Crypto best practices are to not have a constant in your cipher input which is why the decision was made.
+	//     The added benefit here is extra space for storage.
+	//     
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Triple Cipher - BROWSER STORE
+	// {Triple Encrypt}
+	//
+	//
+	//                                                   User Input:
+	//
+	//                [Plaintext]               [OBF-1000]       [AES-CTR]         [OpenSSL]
+	//                [Plaintext]              [Password 1]     [Password 2]     [Password 3]
+	//             |---Up to 686---|
+	//                   |
+	//                   V
+	//              To Javascript
+	//                   |
+	//                   V                             ___________________________________________________________
+	//     <------OpenSSL Input-------->                                                                          |
+	//     |--------Up to 686----------|                                                                          |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//             To OpenSSL                                                                                     | 
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//             +1 Newline Byte                                                                                |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <-------CBC Plaintext----------->                                                                      |
+	//     |----Plaintext-------||-Newline-|                                                                      |
+	//     |-------Up to 686----||----1----|                                                                      |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               CBC Encrypt <----------------------[Password 3]                                              |-----OpenSSL
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <---------------CBC Ciphertext---------------->                                                        |
+	//     |------Plaintext--||-Newline-||-CBC Blocking--|                                                        |
+	//     |----Up to 686----||----1----||--1 to 16------|                                                        |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +'Salted__' string                                                                           |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +CBC 8 byte Salt                                                                             |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <---------------OpenSSL Output------------->                                                           |
+	//     |-Salted__-||-CBC Salt-|<--CBC Ciphertext-->                                                           |
+	//     |-----8----||------8---||--Up to 688-------|                                                           |
+	//     |-----------Up to 704----------------------|                                                           |
+	//                   |                             ___________________________________________________________|
+	//                   V                            
+	//             To OBF-1000                         ___________________________________________________________ 
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               -8 bytes 'Salted__' string                                                                   |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +7 bytes 7ByteHeader                                                                         |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +[710 - sizeof(OpenSSL Output)] bytes of Random Filler                                       |
+	//               +[710 - sizeof(User uploaded file data)] bytes of Random Filler                              |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <--------------GCM Plaintext----------------------------------->                                       |
+	//     |-7ByteHeader-||-CBC Salt-|<-CBC Ciphertext->|--Random Filler--|                                       |------OBF-1000
+	//     |-----7-------||-------------------710-------------------------|                                       |
+	//     |---------------------------717 -------------------------------|                                       |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               GCM Encrypt <------------------------[Password 1]                                            |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <--------------OBF-1000 Outupt----------------------->                                                 |
+	//     |-GCM Salt-||----------GCM Encrypt Output------------|                                                 |
+	//     |-GCM Salt-|<-------GCM Ciphertext-------->|-GCM Tag-|                                                 |
+	//     |---18-----||-----------717---------------||---15----|                                                 |
+	//     |---------------------750----------------------------|                                                 |
+	//                   |                             ___________________________________________________________|
+	//                   V
+	//             To AES-CTR
+	//                   |                             ___________________________________________________________
+	//                   V                                                                                        |
+	//     <------CTR Plaintext----------------->                                                                 |
+	//     |-------------------750 -------------|                                                                 |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               CTR Encrypt <------------------------[Password 2]                                            |------AES-CTR
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <-------------AES-CTR Outupt------------------------->                                                 |
+	//     |-CTR Salt-||----------CTR Ciphertext----------------|                                                 |
+	//     |---18-----||-----------750--------------------------|                                                 |
+	//     |---------------------768----------------------------|                                                 |
+	//                   |                             ___________________________________________________________|
+	//                   V
+	//          Convert to 1024 base64 chars
+	//                   |
+	//                   V
+	//     Multi Encrypted Datarecord ready for Database Storage
+	//              
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Double Cipher - FILE UPLOAD STORE
+	// {Double Encrypt}
+	//
+	//
+	//                                   User Input:
+	//
+	//    [Plaintext - OpenSSL encrypted on command line by user]              [Password 1]     [Password 2]
+	//               [File Upload]                                              [OBF-1000]        [AES-CTR]
+	//             |---Up to 704---|
+	//                   |
+	//                   V
+	//             To OBF-1000                         ___________________________________________________________ 
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               -8 bytes 'Salted__' string                                                                   |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +7 bytes 7ByteHeader                                                                         |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               +[710 - sizeof(OpenSSL Output)] bytes of Random Filler                                       |
+	//               +[710 - sizeof(User uploaded file data)] bytes of Random Filler                              |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <--------------GCM Plaintext----------------------------------->                                       |
+	//     |-7ByteHeader-||-CBC Salt-|<-CBC Ciphertext->|--Random Filler--|                                       |------OBF-1000
+	//     |-----7-------||-------------------710-------------------------|                                       |
+	//     |---------------------------717 -------------------------------|                                       |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               GCM Encrypt <------------------------[Password 1]                                            |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <--------------OBF-1000 Outupt----------------------->                                                 |
+	//     |-GCM Salt-||----------GCM Encrypt Output------------|                                                 |
+	//     |-GCM Salt-|<-------GCM Ciphertext-------->|-GCM Tag-|                                                 |
+	//     |---18-----||-----------717---------------||---15----|                                                 |
+	//     |---------------------750----------------------------|                                                 |
+	//                   |                             ___________________________________________________________|
+	//                   V
+	//             To AES-CTR
+	//                   |                             ___________________________________________________________
+	//                   V                                                                                        |
+	//     <------CTR Plaintext----------------->                                                                 |
+	//     |-------------------750 -------------|                                                                 |
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//               CTR Encrypt <------------------------[Password 2]                                            |------AES-CTR
+	//                   |                                                                                        |
+	//                   V                                                                                        |
+	//     <-------------AES-CTR Outupt------------------------->                                                 |
+	//     |-CTR Salt-||----------CTR Ciphertext----------------|                                                 |
+	//     |---18-----||-----------750--------------------------|                                                 |
+	//     |---------------------768----------------------------|                                                 |
+	//                   |                             ___________________________________________________________|
+	//                   V
+	//          Convert to 1024 base64 chars
+	//                   |
+	//                   V
+	//     Multi Encrypted Datarecord ready for Database Storage
+	//              
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// {Compute Fingerprint}
+	//
+	//                          User Input:
+	//
+	//                           [OBF-1000]     [AES-CTR]
+	//             [Codeword]   [Password 1]   [Password 2]
+	//                  |            |              |
+	//                  V            |              |
+	//            toLowerCase()      |              |
+	//                  |            |              |
+	//                  V            V              V
+	//               SHA-256      SHA-256        SHA-256
+	//                  |            |              |
+	//                  |___________ | _____________|
+	//                              ||| 
+	//                              VVV 
+	//                           Concatenate 
+	//                               | 
+	//                               V 
+	//                            SHA-256
+	//                               | 
+	//                               V 
+	//                    Convert to 43 base64 chars 
+	//                               | 
+	//                               V 
+	//              Fingerprint ready for Database Storage
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Database Storage - Triple - Browser Input
+	//
+	//                                          User Input:
+	//
+	//                                 [OpenSSL]       [OBF-1000]        [AES-CTR]
+	//                [Plaintext]    [Password 3]     [Password 1]     [Password 2]    [Codeword]
+	//                     |               |               |                |              |
+	//                     |               |               |                |              V
+	//                     |   ____________|               |                |         toLowerCase()
+	//                     |  |  __________________________|__              |              |
+	//                     |  | |  ___________________________|_____________|              |
+	//                     |  | | |                           |  |                         |
+	//                     |  | | |                           |  |   ______________________|
+	//                     |  | | |                           |  |  |
+	//                     |  | | |                           |  |  |
+	//                     V  V V V                           V  V  V
+	//                  {Triple Encrypt}                 {Compute Fingerprint}
+	//                         |                                 |
+	//                         V                                 V
+	//    [1024 base64 Multi Encrypted Datarecord]      [43 base64 Fingerprint]
+	//                         |                                 |
+	//                         |______________  _________________|
+	//                                        ||
+	//                                        ||
+	//                                        \/
+	//                                   To database
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Database Storage - Double - File Upload Input
+	//
+	//                                          User Input:
+	//
+	//                                [OBF-1000]          [AES-CTR]
+	//                [Plaintext]    [Password 1]        [Password 2]    [Codeword]
+	//                     |              |                   |              |
+	//                     |              |                   |              V
+	//                     |              |                   |         toLowerCase()
+	//                     |    __________|____               |              |
+	//                     |   |  _____________|______________|              |
+	//                     |   | |             |              |   ___________|
+	//                     |   | |             |___________   |  |
+	//                     |   | |                         |  |  |
+	//                     |   | |                         |  |  |
+	//                     V   V V                         V  V  V
+	//                  {Double Encrypt}                 {Compute Fingerprint}
+	//                         |                                 |
+	//                         V                                 V
+	//    [1024 base64 Multi Encrypted Datarecord]      [43 base64 Fingerprint]
+	//                         |                                 |
+	//                         |______________  _________________|
+	//                                        ||
+	//                                        ||
+	//                                        \/
+	//                                   To database
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Online Database Storage - A Fingerprint and a Multi Encrypted Datarecord are stored as a key-value pair in the database.
+	//
+	//                            Data to be Stored:
+	//
+	//             [43 base64 Fingerprint]   [1024 base64 Multi Encrypted Datarecord]
+	//                        |                                 |
+	//                        |______________  _________________|
+	//                                       ||
+	//                                       ||
+	//                                       \/
+	//                              Sent to Online Server
+	//                                       |
+	//                                       V
+	//                          Stored as key-value pair in MariaDB
+	//
+	//                  
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Offline Database
+	//
+	//                    Each of the two offline databases are created by randomly generating 1,067,000 base64 chars. These constitute 1000 'locations' where 
+	//                    a row of 1067 chars of junk data can be replaced with 1067 chars of 'real' data: a fingerprint and a Multi Encrypted Datarecord.
+	//
+	//                    Each offline database is stored in its own HTML DOM object. Data that is stored and changes that are made will initially only be reflected
+	//                    in non-persistent active memory and must be 'stored to disk' manually (for browser security reasons) in order for it to
+	//                    persist through reboots and be available for access using all major browsers.
+	//
+	//                    When storing to disk is needed, the standalone.html browser file that holds the offline database will show a
+	//                    button reading: SAVE DATA TO DISK. This is triggered by changing any record (by storing or modifying) in the offline database.
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Offline Database Structure - EMPTY
+	//
+	//                                                                       ___________
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |-----1000 rows of [Fingerprint + Multi Encrypted Datarecord]
+	//                                                           |                      |
+	//                                                          ...                     |
+	//                                                           |                      |
+	//                                                           V                      |
+	//                    <43 random base64 chars> <1024 random base64 chars>           |
+	//                    <43 random base64 chars> <1024 random base64 chars>___________|
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Offline Database Structure - Store
+	//
+	//          (*) Pointer is an integer that points to the row to be replaced upon next Store.
+	//              [The Unencrypted Database Pointer is a randomly chosen integer between 0-999]
+	//              [The Encrypted Database Pointer starts at 0 and is Triple Encrypted with the Encrypted Database Password]
+	//
+	//               _____                                                       ________
+	//              |          <43 random base64 chars> <1024 random base64 chars>       |
+	//              |          <43 random base64 chars> <1024 random base64 chars>       |
+	//  # of rows-->|          <43 random base64 chars> <1024 random base64 chars>       |
+	//  = Pointer   |          <43 random base64 chars> <1024 random base64 chars>       |
+	//              |          <43 random base64 chars> <1024 random base64 chars>       |
+	//              |_____ (*) <43 base64 Fingerprint chars> <1024 base64 MED chars>     |-----1000 rows of [Fingerprint + Multi Encrypted Datarecord]
+	//                      ^                                         |                  |
+	//   Pointer____________|                                        ...                 |
+	//                                                                |                  |
+	//                                                                V                  |
+	//                         <43 random base64 chars> <1024 random base64 chars>       |
+	//                         <43 random base64 chars> <1024 random base64 chars>_______|
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Unencrypted Database Pointer
+	//
+	// Unencrypted: The unencrypted offline database's pointer is initialized as a randomly chosen value 0-999.
+	//              This choice is to obscure the location of user data. A pointer always initialized to 0 would give an attacker a good place to start.
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Unencrypted Database - Diagram
+	//
+	//                            From HTML Object Storage                             Data to be stored
+	//                              |                  |                                |             |
+	//                              V                  V                                V             V
+	//              [Offline Database]                [Pointer]                   [Fingerprint]    [Multi Encrypted Datarecord]
+	//         [1,067,000 base64 chars]  [Integer representing row location]    [43 base64 chars]    [1024 base64 chars - MED]
+	//                    |                                  |                        |                        |
+	//                    |                                  |                        |          ______________|
+	//                    |                                  |                        |         |
+	//                    V                                  V                        V         V
+	//    {Store the Fingerprint and the MED in the Offline Database at the location of the Pointer (replacing the random junk data there)}
+	//                    |                                  |
+	//                    |                                  V
+	//     [Offline Database - Data is now Stored]    {Increment Pointer}
+	//          [1,067,000 base64 chars]                     |
+	//                    |                                  |
+	//                    V                                  V
+	//          Store to HTML Object               Store to HTML Object
+	//                  
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Encrypted Database Pointer
+	//
+	// Encrypted:   The encrypted offline database's pointer is initialized to 0 but is triple encrypted to obscure the user's data location.
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Encrypted Database - Diagram
+	//
+	//        User Input                                      From HTML Object Storage                          Data to be stored
+	//             |                                             |                 |                             |           |
+	//             V                                             V                 V                             V           V
+	//   [Offline Database Password]    [AES-CTR Encrypted Offline Database] [Triple Encrypted Pointer]    [Fingerprint]  [Multi Encrypted Datarecord]
+	//       [plaintext string]              [1,067,024* base64 chars]        [1024 base64 chars]       [43 base64 chars]  [1024 base64 chars - MED]
+	//             |                                |                                  |                        |                        |
+	//             |                                V                                  |                        |                        |
+	//             |----------------------> {AES-CTR Decrypt}                          V                        |                        |
+	//             |--------------------------------|------>{Triple Decrypt (use same pass for all 3 ciphers)}  |                        |
+	//             |                                |                                  |                        |                        |
+	//             |                                |                                  V                        |                        |
+	//             |                                |                         [Decrypted Pointer]               |                        |
+	//             |                                |                [Integer representing row location]        |                        |
+	//             |                                |                                  |          ______________|                        |    
+	//             |    [Decrypted Offline Database - Ready to perform Store]          |         |                                       |             
+	//             |                    [1,067,000 base64 chars]                       |         |             __________________________|  
+	//             |                                |                                  |         |            |
+	//             |                                V                                  V         V            V
+	//             |        {Store the Fingerprint and the MED in the Offline Database at the location of the Pointer (replacing the random junk data there)}
+	//             |                                |                                  |                      
+	//             |                                V                                  V                      
+	//             |            [Offline Database - Data is now Stored]        {Increment Pointer}
+	//             |                    [1,067,000 base64 chars]                       |
+	//             |                                |                                  |                      
+	//             |                                V                                  |                      
+	//             |----------------------> {AES-CTR Encrypt}                          V
+	//             |--------------------------------|------------->{Triple Encrypt (use same pass for all 3 ciphers)}
+	//                                              |                                  |
+	//                                              V                                  V
+	//                                    Store to HTML Object               Store to HTML Object
+	//                  
+	//  * There are 24 extra chars in the Encrypted Offline Database to hold the salt which is used to encrypt it.                
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//---------------------------Function Overview----------------------------------------- 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// OpenSSL
+	//    ____________________________________________________________________________ 
+	//   /                        ____________________________________________________\ 
+	//  /                        /___________________________         				  \\
+	// / Salted__ + Random Salt //          Plaintext        \ newline* + CBC Blocking \\ 
+	// |-----8----||-----8-----||------Up to 686 Bytes-------||--1--||-----1 to 16------|
+	// |----**----||----***----||------------------AES-CBC Encrypted--------------------|
+	// *A single newline byte character is used to simulate a linux file so that the cipher is identical to command line usage.
+	// **The literal string 'Salted__' is used in OpenSSL encryption to specify salted key derivation, indicating the next 8 bytes are that salt.
+	// ***Cryptographically strong randomly generated salt here is used to generate the key (and the Initialization Vector - IV) which is then used in the AES-CBC encryption, 
+	// ensuring a crypto strong new key is generated and used with each newly rolled encryption cipher.
+	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
+	// 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// OBF-1000 
+	//    __________________________________________________________________________________
+	//   /      ___________________________________________________________________         \
+	//  /      /             ______________________________________________________\         \
+	// / Salt / 7ByteHeader /         Data Payload	    +      Random Filler       \\ GCM Tag \
+	// |--18--||--7 Bytes--||-------------------------710 Bytes---------------------||---15---|
+	// |--*---||----------------------------AES-GCM Encrypted-----------------------||---Tag--|
+	// *Cryptographically strong randomly generated salt here is used to generate the key (and the Initialization Vector - IV) which is then used in the AES-GCM encryption, 
+	// ensuring a crypto strong new key is generated and used with each newly rolled encryption cipher.
+	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
+	//
+	// GCM Tag used for validation of data (will error on decrypt if checksum is wrong).
+	//
+	// Blocking to 1000 base64 output chars is done by satisfying this sum depending on the length of the Data Payload input:
+	// 710 = Data Payload size in bytes + Random Filler size in bytes
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// AES-CTR
+	//   _________________________
+	//  /       __________________\
+	// / Salt  /   Data Payload   \\
+	// |--18--||-----750 Bytes-----|					
+	// |--*---||-AES-CTR Encrypted-|
+	// *Cryptographically strong randomly generated salt here is used to generate the key (and the nonce and counter bytes) which is then used in the AES-CTR encryption, 
+	// ensuring a crypto strong new key is generated and used with each newly rolled encryption cipher.
+	// Salt is packed along side encrypted data so that key can be regenerated for the decrypt.
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// These functions make up the cryptographic core of <webstie>. We are using each of the 3 available ciphers in the subtle crypto library.
+	// Subtle crypto was chosen because of its wide availability and decades of 'experience', open source math functions that have been used over and over and thus vetted.
+	//
+	// OpenSSL was chosen for its wide availability.
+	// OBF-1000 blocks output to 1000 base64 characters.
+	//
+	// AES-CBC was chosen for its top security cipher.
+	// AES-GCM was chosen for its ability to validate data.
+	// AES-CTR stream cipher was chosen to be implemented without validation in order to make it unclear to an attacker if they crack the first level of cipher.
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Replicate OpenSSL command line functionality of command: openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
+	//
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (CTR is short for Counter) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//
+	//	Inputs structure:	password:	 human readable plaintext string
+	//						plaintext64: plaintext in base64
+	//
+	//	Output structure:	Salted__ + Random Salt + CBC encrypted ciphertext
+	//
+	// Big Picture: First step in Multi Encrypted Datarecord encryption. Constitutes entire OpenSSL step in 3-step encryption of a Multi Encrypted Datarecord.
+	//
+	//	            source:		 plaintext: User input
+	//				             password:  User input
+	//	
+	//             	destination: encryptOBF1000()
+	//
+	async function encryptOpenSSL(plaintext64, password) {
+		const plaintextUint8 = Uint8Array.fromBase64(plaintext64);
+		// Replicate Linux command line's version of OpenSSL by appending a single newline, effectively changing plaintext input to a Linux file.
+		const singleNewlineUint8 = new Uint8Array(1);
+		// utf8 newline code is the value 10 (decimal).
+		singleNewlineUint8[0] = 10;
+		// Merge the two Uint8Arrays placing plaintextUint8 first.
+		const plaintextAsFileUint8 = concatBuffer(plaintextUint8, singleNewlineUint8);
+		// Cryptographic salt used in PBKDF2 algorithm which derives both the key and iv used in main encrypt() call.
+		const saltCBCUint8 = window.crypto.getRandomValues(new Uint8Array(8));
+		// Encode password in utf8 and store in Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Import raw password bytes into a subtlecrypto-usable key object designated for the PBKDF2 algorithm.
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
+			"raw",			// format
+			passwordUint8,	// keyData
+			"PBKDF2",	    // algorithm
+			false,			// extractable?
+			["deriveBits"],	// allowed usages
+		);
+		// Create the key and iv used in the AES-CBC main encrypt() call.
+		const keyAndIVBitsBuffer = await window.crypto.subtle.deriveBits(
+			{						// This is a Pbkdf2Params object which specifies which derivation algorithm to use.
+				name: "PBKDF2",		// Name of this algorithm.
+				salt: saltCBCUint8,	// Specify which cryptographic salt to use.
+				iterations: 10000,	// Number of times to execute hash function. Higher value = more time to execute = stronger crypto.
+				hash: "SHA-256",	// digest algorithm
+			},
+			keyForPBKDF2,			// Base key used for bit derivation.
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,	// Number of bits to derive = 384
+		);
+		// Cast ArrayBuffer into a Uint8Array.
+		const keyAndIvBitsUint8 = new Uint8Array(keyAndIVBitsBuffer);
+		// OpenSSL derives the key and IV using the same PBKDF2 digest.
+		// The first 256 bits are used as key, the last 128 are used for IV.
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
+		// Now that cryptographically strong bits have been generated, import them into a cryptoKey object specified for the AES-CBC encryption call below.
+		const keyCBC = await window.crypto.subtle.importKey(
+			"raw",					// input format 
+			keyBytesUint8,			// input data
+			{						// object defining type of key to import
+				name: "AES-CBC",	// algorithm identifier
+			},
+			false,					// Can this key's data be extracted?
+			['encrypt']				// allowed usages
+		);
+		// 'Main' AES-CBC encrypt() digest.
+		const ciphertext = await window.crypto.subtle.encrypt(
+			{						// object specifying algorithm, parameters
+				name: "AES-CBC",	// algorithm name
+				iv: ivBytesUint8	// A cryptographically strong IV is used.
+			},
+			keyCBC,					// CryptoKey object used in the encryption.
+			plaintextAsFileUint8	// Plaintext data to be encrypted.
+		);
+		const ciphertextUint8 = new Uint8Array(ciphertext);
+		// Compile output to match OpenSSL Linux command line functionality. *Thoroughly explained/mapped in Cryptographic Functions section description.
+		const stringLiteralSalted = "Salted__";	// OpenSSL uses to designate next 8 bytes as salt.
+		// Convert string chars into bytes.
+		const saltLiteralUint8 = new TextEncoder().encode(stringLiteralSalted);
+		const twoSaltsUint8 = concatBuffer(saltLiteralUint8, saltCBCUint8);
+		// Merge salts with encoded ciphertext.
+		// OpenSSL Output = Salted__ + CBC Salt + Ciphertext
+		const openSSLOutputUint8 = concatBuffer(twoSaltsUint8, ciphertext);
+
+		// All crypto functions output base64-packed data for data integrity checks, uniformity.
+		return openSSLOutputUint8.toBase64();
+	}// encryptOpenSSL()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Replicate OpenSSL command line functionality of command: openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt
+	//
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (CTR is short for Counter) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//
+	//	Inputs structure:	password:	    human readable plaintext string
+	//						ciphertext64:	Salted__ + Random Salt + CBC encrypted ciphertext
+	//
+	//	Output structure:	decrypted plaintext
+	//
+	// Big Picture: Last step in Multi Encrypted Datarecord decryption. Constitutes entire OpenSSL step in 3-step decryption of a Multi Encrypted Datarecord.
+	//
+	//	            source:		 ciphertext64: decryptOBF1000()
+	//				             password:  User input
+	//	
+	//	            destination: Show user plaintext that they have just decrypted.
+	//
+	async function decryptOpenSSL(ciphertext64, password) {
+		// Convert base64 input into Uint8Array.
+		const twoSaltsAndCiphertextUint8 = Uint8Array.fromBase64(ciphertext64);
+		// Salt has been packed with ciphertext. Slice those bytes out of the input Uint8Array.
+		const saltCBCUint8 = twoSaltsAndCiphertextUint8.slice(8,16);
+		// Encode password in utf8 and store in Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Import raw password bytes into a subtlecrypto-usable key object designated for the PBKDF2 algorithm.
+		// This keyForPBKDF2 will be used to derive the key used in encryption, allowing decrypt execution.
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
+			"raw",			// format
+			passwordUint8,	// keyData
+			"PBKDF2",		// algorithm
+			false,			// extractable?
+			["deriveBits"],	// allowed usages
+		);
+		// Create the key and iv used in the AES-CBC main decrypt() call.
+		const keyAndIVBits = await window.crypto.subtle.deriveBits(
+			{						// This is a Pbkdf2Params object which specifies which derivation algorithm to use.
+				name: "PBKDF2",		// Name of this algorithm.
+				salt: saltCBCUint8,	// Specify which cryptographic salt to use.
+				iterations: 10000,	// Number of times to execute hash function. Higher value = more time to execute = stronger crypto.
+				hash: "SHA-256",	// digest algorithm
+			},
+			keyForPBKDF2,			// Base key used for bit derivation.
+			KEY_AND_IV_BITCOUNT_FOR_OPENSSL,	// Number of bits to derive.
+		);
+		// Convert ArrayBuffer into Uint8Array.
+		const keyAndIvBitsUint8 = new Uint8Array(keyAndIVBits);
+		// OpenSSL derives the key and IV using the same PBKDF2 digest.
+		// The first 256 bits are used as key, the last 128 are used for IV.
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
+		// Extract ciphertext payload from function input.
+		const ciphertextUint8 = twoSaltsAndCiphertextUint8.slice(16);
+		// Now that cryptographically strong bits have been generated, import them into a cryptoKey object specified for the AES-CBC decryption call below.
+		const keyCBC = await window.crypto.subtle.importKey(
+			"raw",					// input format 
+			keyBytesUint8,			// input data
+			{						// object defining type of key to import
+				name: "AES-CBC",	// algorithm identifier
+			},
+			false,					// Can this key's data be extracted?
+			['decrypt']				// allowed usages
+		);
+		//const decryptedPlaintext = await window.crypto.subtle.decrypt({ name: digest_algorithm, iv: ivBytesUint8 }, key, ciphertextUint8);
+		// 'Main' AES-CBC encrypt() digest.
+		const decryptedPlaintextBuffer = await window.crypto.subtle.decrypt(
+			{						// object specifying algorithm, parameters
+				name: "AES-CBC",	// algorithm name
+				iv: ivBytesUint8	// A cryptographically strong IV is used.
+			},
+			keyCBC,					// CryptoKey object used in the decryption.
+			ciphertextUint8			// Ciphertext data to be decrypted.
+		);
+		// Interpret bytes from the ArrayBuffer decryptedPlaintext as utf8 string and place that string into variable plaintextString.
+		//const plaintextString = new TextDecoder().decode(decryptedPlaintextBuffer);
+		// Remove last character in string which is a special newline char.
+		// The output of this function will go to a Browser input textarea, so remove newline used to replicate OpenSSL Linux command line behavior.
+		// (This newline allows decryption to work on the command line if CMD Line option is chosen instead of Browser.)
+		//return plaintextString.substring(0, plaintextString.length - 1);
+		let decryptedPlaintextUint8 = new Uint8Array(decryptedPlaintextBuffer);
+		decryptedPlaintextUint8 = decryptedPlaintextUint8.slice(0, decryptedPlaintextUint8.length -1);
+		return decryptedPlaintextUint8.toBase64();
+	}// decryptOpenSSL()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Produce 1000 base64 chars of AES-GCM ciphertext from plaintext, password input data. The input data will be padded with random filler if necessary.
+	//		Details:	First adds 7ByteHeader, Random Filler if needed, then encrypts with AES-GCM.
+	//
+	//	Inputs structure:	password:	 human readable plaintext string
+	//						plaintext64: Salted__ + Random Salt + CBC encrypted ciphertext
+	//									 |-8 Bytes-||--8 Bytes--||---Up to 696 Bytes-----|
+	//						
+	//	Output structure:	|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//                      Note: Salted__ string literal is removed for Multi Encrypted Datarecord security.
+	//
+	// Big Picture:		Takes input from encryptOpenSSL() and passes output to encryptAESCTR().
+	//					This step provides the cryptographic blocking for the Multi Encrypted Datarecord.
+	//
+	//               	source:			encryptOpenSSL()
+	//              	destination:	encryptAESCTR()
+	//	
+	//              	usage:			encryptDouble(), encryptTriple()
+	//	
+	async function encryptOBF1000(plaintext64, password, stringLiteralSalted=true) {
+		// Construct byte array with base64 input data.
+		let plaintextUint8 = Uint8Array.fromBase64(plaintext64);
+		// Default to removing string literal Salted__
+		if (stringLiteralSalted) {
+			// Check for Salted__ header bytes and error if they are not found.
+			// Get byte form of string literal Salted__.
+			const stringLiteralSalted = "Salted__";
+			// Slice of (potential) salt bytes.
+			const saltHeaderUint8 = plaintextUint8.slice(0,8);
+			// Convert salt bytes to readable utf8.
+			const saltToCheck = new TextDecoder().decode(saltHeaderUint8);
+			if (stringLiteralSalted !== saltToCheck) {
+				showPage('no_salt');
+				throw new Error("OBF-1000 input doesn't look like OpenSSL output!");
+			}
+			if (stringLiteralSalted === saltToCheck) {
+				console.log("SALT: ", saltToCheck);
+			}
+			// Slice off the 8 bytes from OpenSSL that convert to: Salted__
+			plaintextUint8 = plaintextUint8.slice(8);
+		}
+		// Add 7byte prepend (representing length of data) and random filler padding.
+		const wrappedPlaintextUint8 = wrap7ByteAndFiller(plaintextUint8);
+		const wrappedPlaintextBase64 = wrappedPlaintextUint8.toBase64();
+		// Now that the payload data is wrapped with a prepended 7Byte set and random filler padded, we can GCM encrypt the whole thing.
+		const gcmEncrypted64 = await encryptGCM(wrappedPlaintextBase64, password);
+		// Output length will trigger error if not 1000 in upstream function if Triple Encrypting.
+		return gcmEncrypted64;
+	}// encryptOBF1000()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Decrypt AES-GCM ciphertext, remove 7ByteHeader and Random Filler, replace Salted__ literal if using for Multi Encrypted Datarecord.
+	//		Details:	
+	//
+	//	Inputs structure:	password:	 human readable plaintext string
+	//						ciphertext64: 
+	//										|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//						
+	//	Output structure:	Salted__ + CBC Salt + CBC Ciphertext
+	//
+	// Big Picture:			Middle step in Multi Encrypted Datarecord pipeline.	
+	//
+	//	                    source:			decryptAESCTR()
+	//	                    destination:	decryptOpenSSL()
+	//	
+	//	                    usage:			decryptDouble(), decryptTriple()
+	//
+	async function decryptOBF1000(ciphertext64, password, stringLiteralSalted=true){
+		// Always output base64 for base encryption in 1000 wrapping context.
+		const gcmDecrypted64 = await decryptGCM(ciphertext64, password);
+		const gcmDecryptedUint8 = Uint8Array.fromBase64(gcmDecrypted64);
+
+		let unwrappedPlaintextUint8 = unwrap7ByteAndFiller(gcmDecryptedUint8);
+		if (stringLiteralSalted) {
+			unwrappedPlaintextUint8 = addStringLiteralSalted(unwrappedPlaintextUint8);
+		}
+		return unwrappedPlaintextUint8.toBase64();
+	}// decryptOBF1000()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose:	Add string literal Salted__ back in decryptOBF1000() that was stripped in encryptOBF1000() to maintain OpenSSL ciphertext integrity.
+	// Usage:   decryptOBF1000()
+	//
+	// Input Structure:	Uint8Array of freshly GCM decrypted and 7Byte unwrapped bytes.
+	//
+	// Output Structure:	(Salted__)Bytes + Input Uint8Array
+	//
+	function addStringLiteralSalted(inputDataUint8) {
+		// Get length of input data in number of bytes.
+		const dataLength = inputDataUint8.length;
+		const saltedOffset  = dataLength + 8;
+		// Create new array that is the input length +8 for the salt.
+		let dataBytesWithSalt = new Uint8Array(saltedOffset);
+		// Get byte form of string literal Salted__.
+		const stringLiteralSalted = "Salted__";
+		const saltBytes = new TextEncoder().encode(stringLiteralSalted);
+		// Prepend with string literal Salted__.
+		dataBytesWithSalt.set(saltBytes, 0);
+		// Finally, fill in data behind string literal Salted__.
+		dataBytesWithSalt.set(inputDataUint8, 8);
+		return dataBytesWithSalt;
+	}// addStringLiteralSalted()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Add a 7ByteHeader representing the length of the data and also pad with random filler to satisfy output length of 1000 base64 chars.
+	//  OBF-1000 Internal Function - both source and destination.
+	//
+	//	Inputs structure:	inputDataUint8: Uint8Array containing data to be encrypted.
+	//						If this is a Multi Encrypted Datarecord, it will be OpenSSL output sans string literal Salted__ which is removed by encryptOBF1000.
+	//
+	//	Output structure:	 7ByteHeader + Input Data Payload + Random Filler 
+	//						 |--7 Bytes--||------------710 Bytes-------------| 	
+	//
+	function wrap7ByteAndFiller(inputDataUint8) {
+		// Get data payload length for 7byte calculation and to derive filler size.
+		const dataLength = inputDataUint8.length;
+		// Get a 7Byte set that represents the payload dataLength.
+		const sevenByteHeaderUint8 = find7ByteSetForValue(dataLength);
+		// The randomly generated filler 'fills up' the remaining space when data payload length is less than 710.
+		// This is calculated using the following relation where 710 is the maximum data length:
+		// 710 = Data Payload Length + Random Filler Length
+		// Re-arranging we can get the fillerLength by subtracting dataLength from 710:
+		const fillerLengthInBytes = OBF1000_MAX_INPUT_BYTES - dataLength;
+		// Now we can fill a precisely sized array with random data.
+		const randFillerUint8 = window.crypto.getRandomValues(new Uint8Array(fillerLengthInBytes));
+		// Compile Byte Stack leaving 7 bytes worth of space for our 7byte set.
+		// This array can be no larger than 717 bytes to meet the 1000 base64 char output limit.
+		let dataWith7ByteSetAndRandFiller = new Uint8Array(OBF1000_MAX_INPUT_BYTES + 7);
+		// 7Byte set goes at the front of the final array.
+		dataWith7ByteSetAndRandFiller.set(sevenByteHeaderUint8, 0);
+		// Next comes payload data.
+		dataWith7ByteSetAndRandFiller.set(inputDataUint8, 7);
+		// Remaining space gets the randomly generated filler.
+		const dataOffset = 7 + dataLength;
+		dataWith7ByteSetAndRandFiller.set(randFillerUint8, dataOffset);
+		//dataWith7ByteSetAndRandFiller64 = dataWith7ByteSetAndRandFiller.toBase64();
+		//return dataWith7ByteSetAndRandFiller64;
+		return dataWith7ByteSetAndRandFiller;
+	}// wrap7ByteAndFiller()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Purpose: Remove both the 7ByteHeader and Random Filler from input Uint8Array for decryptOBF1000()
+	//
+	// Input + Output: Internal function of decryptOBF1000()
+	// Input Structure: Uint8Array composed of: 7ByteHeader + Output Uint8Array + Random Filler
+	//                                           |--7 Bytes-|  |--------710 Bytes-------------|
+	// Output Structure: Output Uint8Array
+	//
+	function unwrap7ByteAndFiller(inputDataUint8) {
+		// Slice off set of bytes that represent data length.
+		const sevenByteSlice = inputDataUint8.slice(0, 7);
+		// Compute value that 7Byte set represents.
+		const dataLength = eval7ByteValue(sevenByteSlice);
+		// Extract data bytes.
+		const dataOffset  = dataLength + 7;
+		dataBytes = inputDataUint8.slice(7, dataOffset);
+		return dataBytes;
+	}// unwrap7ByteAndFiller()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Produce AES-GCM ciphertext from plaintext, password input data.
+	//
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (the same CTR refers to) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//					With the packed salt, this key can be regenerated and used to decrypt the ciphertext.
+	//
+	//	Inputs structure:	password:	 human readable plaintext string
+	//						plaintext64: 7ByteHeader + OpenSSL Encrypted sans Salted__ + Random Filler
+	//									 |--7 Bytes--||---------------710 Bytes----------------------|
+	//						
+	//	Output structure:	|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//
+	// Big Picture:		Encryption step for OBF-1000. Takes 7ByteHeader + OpenSSL Encrypted sans Salted__ + Random Filler
+	//					from encryptOBF1000() function and encrypts it using AES-GCM.
+	//
+	//	                source:			Internal function of encryptOBF1000()
+	//	                destination:	Same as output of encryptOBF1000() --> encryptAESCTR()
+	//	
+	//	                usage:		encryptOBF1000()
+	//
+	async function encryptGCM(plaintext64, password) {
+		const plaintextUint8 = Uint8Array.fromBase64(plaintext64);
+		// Convert password text into Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Compute a new Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
+		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
+		// This increases our Multi Encrypted Datarecord Data Record size to 1024.
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// the allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				salt: randSalt,					// salt (MDN suggests at least 16 bytes for security)
+				iterations: 10000,				// strength
+				hash: 'SHA-256',				// digest algorithm
+			},
+			keyForPBKDF2,						// base key used for bit derivation
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 96 for random IV as specified NIST SP800-38D Section 8.2.
+		);
+		// Split the derived bits into key and iv for the encrypt call.
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		// Take first 256 bits derived from deriveBits above for the cryptoKey.
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		// 256 bits for key, 96 bits for IV for GCM.
+		// |-keyBytes-| |-IV-| (where X is 32 bit chunk)
+		//  xxxx xxxx 	 x x x  			
+		//
+		// AES-CTR parameters described here:
+		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-GCM 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let keyGCM = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytesUint8, 			// keydata: input data
+			{						// object defining type of key to import
+				name: 'AES-GCM',	// algorithm identifier 
+			}, 
+			false,					// extractable boolean 
+			['encrypt']				// keyUsages
+		);
+		// 'Main' Subtle Crypto encrypt() call for AES-GCM algorithm.
+        const ciphertextBuffer = await window.crypto.subtle.encrypt(
+			{									// object specifying algorithm, parameters for the encrypt call
+				name:'AES-GCM',					// algorithm name
+				iv:ivBytesUint8,				// A cryptographically strong IV is used.
+				tagLength:GCM_TAGLENGTH_BITS	// number of bits making up tag length (120)
+			},
+			keyGCM,								// CryptoKey object used to encrypt.
+			plaintextUint8						// Plaintext data to be encrypted.
+		);
+		const ciphertextUint8 = new Uint8Array(ciphertextBuffer);
+		// Wrap salt with encoded data so it can be used in the decrypt.
+		const saltAndDataUint8 = concatBuffer(randSalt, ciphertextUint8);
+		// This function outputs base64.
+		const ciphertext64 = saltAndDataUint8.toBase64();
+		return ciphertext64;
+	}// encryptGCM()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Produce AES-GCM plaintext from ciphertext, password input data.
+	//
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (the same CTR refers to) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//					With the packed salt, this key can be regenerated and used to decrypt the ciphertext.
+	//
+	//	Inputs structure:
+	//	                	password:	    human readable plaintext string
+	//		                saltAndCiphertext64: 
+	//						|--18 Bytes GCM Salt--||---------717 Bytes Ciphertext----------||-15 Byte GCM Tag-|
+	//
+	//	Output structure:	
+	//						Decrypted Plaintext that should be in the form:
+	//						7ByteHeader + OpenSSL Encrypted sans Salted__ + Random Filler
+	//						|--7 Bytes--||---------------710 Bytes----------------------|
+	//
+	// Big Picture:		Decryption step for OBF-1000.
+	//					Output is ready for unwrap7ByteHeaderAndFiller() step which will remove 7ByteHeader and Random Filler.
+	//
+	//	                source:				Internal function for decryptOBF1000()
+	//              	destination:		unwrap7ByteHeaderAndFiller() inside decryptOBF1000()
+	//
+	//              	usage:		decryptOBF1000()
+	//
+	async function decryptGCM(saltAndCiphertext64, password) {
+		// Convert password into bytes.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Convert base64 into bytes.
+		const saltAndCiphertextUint8 = Uint8Array.fromBase64(saltAndCiphertext64);
+		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
+		const packedSaltUint8 = new Uint8Array(saltAndCiphertextUint8.slice(0,SALT_SIZE_BYTES));
+		// Cast array returned by slice into a (usable) Uint8Array.
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextUint8.slice(SALT_SIZE_BYTES));
+
+		// Import key needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				salt: packedSaltUint8,			// salt
+				iterations: 10000,				// exectute hash function this many times
+				hash: 'SHA-256',				// digest algorithm
+			},
+			keyForPBKDF2,						// input data as cryptoKey object
+			KEY_AND_IV_BITCOUNT_FOR_AESGCM,		// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+		);
+		// Convert Array buffer data into Uint8Array.
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		// Take 256 bits (32 bytes) of data for the key.
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		// 96 IV bits for this GCM usage
+		const ivBytesUint8 = keyAndIvBitsUint8.slice(32);
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		let keyGCM = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytesUint8, 			// keydata: input data
+			{						// object defining type of key to import
+				name: 'AES-GCM',	// algorithm identifier 
+			}, 
+			false,					// extractable boolean 
+			['decrypt']				// keyUsages
+		);
+		// 'Main' Subtle Crypto decrypt() call for AES-GCM algorithm.
+        const decryptedBuffer = await window.crypto.subtle.decrypt(
+			{									// object specifying algorithm, parameters for the encrypt call
+				name: 'AES-GCM',				// algorithm name
+				iv: ivBytesUint8,				// IV to use
+				tagLength: GCM_TAGLENGTH_BITS	// 120 - number of tag bits
+			},
+			keyGCM,								// CryptoKey object used to encrypt.
+			encodedCiphertextUint8				// Ciphertext data to be decrypted.
+		);
+		const decryptedUint8 = new Uint8Array(decryptedBuffer);
+		return decryptedUint8.toBase64();
+	}// decryptGCM()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Produces AES-CTR encrypted ciphertext from the plaintext and password input parameters.
+	//
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (CTR is short for Counter) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//
+	//	Inputs structure:	plaintext64: 1000 base64 chars string
+	//						password:	 human readable plaintext string
+	//
+	//	Output structure:	
+	//						|---24 base64 chars of CTR Salt---||----1000 base64 chars of AES-CTR ciphertext----|
+	//						|---------------1024 base64 chars Multicipher Encrypted Datarecord (MED)-----------|
+	//
+	// Big Picture: Final step in encryptTriple() encryptDouble(). This function constitutes the entirety of the AES-CTR step.
+	// 				Functions as the outer encryption layer of security for a Multi Encrypted Datarecord.
+	//				AES-CTR runs without validation in order to obscure from an attacker whether they've successfully cracked this cipher.
+	//
+	//				input source:	plaintext64: Output of the OBF-1000 Step of the Multicipher Encryption.
+	//				 				password:    Plaintext entered into Browser by user - Password 2
+	//
+	//				output destination: Output constitutes a Multicipher Encrypted Datarecord ready for storage in the online or offline database.
+	//
+	//				additional usage:	This function is also used in encrypting the offline database.	
+	//	
+	async function encryptAESCTR(plaintext64, password) {
+
+		const plaintextUint8 = Uint8Array.fromBase64(plaintext64);
+		// Convert password text into Uint8Array.
+		const passwordUint8 = new TextEncoder().encode(password);
+		// Compute anew Uint8Array(SALT_SIZE_BYTES)) random salt that will be prepended to the data for use with decrypt.
+		// 18 bytes converts to 24 base64 characters which are packed with the output of this function.
+		// This increases our Multi Encrypted Datarecord Data Record size to 1024.
+		const randSalt = await window.crypto.getRandomValues(new Uint8Array(SALT_SIZE_BYTES));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// the allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				salt: randSalt,					// salt (MDN suggests at least 16 bytes for security)
+				iterations: 10000,				// strength
+				hash: 'SHA-256',				// 
+			},
+			keyForPBKDF2,						//
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+		);
+		// Split the derived bits into key and iv for the encrypt call.
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		// Take first 256 bits derived from deriveBits above for the cryptoKey.
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		// Here using same derivation method as for AES-CBC's Initialization Vector.
+		// AES-CTR uses a nonce and a counter block which seems to do a similar thing to an IV. 
+		// Take the rest of the bits (should be 128)
+		// First half of these 128 bits are the nonce.
+		// Second half is the counter.
+		// Slice everything 32 index and after.
+		// |-keyBytes-| |-nonce-| |-counter-| (where X is 32 bit chunk)
+		//  xxxx xxxx 	xx 			xx
+		//
+		// AES-CTR parameters described here:
+		// https://developer.mozilla.org/en-US/docs/Web/API/AesCtrParams#counter
+		const nonceAndCounterBytes = keyAndIvBitsUint8.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let keyCTR = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytesUint8, 			// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-CTR', 
+			}, 
+			false,					// Set data held by this CryptoKey as extractable? 
+			['encrypt']				// keyUsages
+		);
+		// 'Main' Subtle Crypto encrypt() call for AES-CTR algorithm.
+        const ciphertextBuffer = await window.crypto.subtle.encrypt(
+			{									// Object specifying algorithm, parameters for encrypt()
+				name: 'AES-CTR',				// algorithm name
+				counter: nonceAndCounterBytes,	// nonce and counter are wrapped together
+				length: 64						// length of nonce and counter
+			},
+			keyCTR,								// CryptoKey object used to encrypt
+			plaintextUint8						// plaintext data to be encrypted
+		);
+		const ciphertextUint8 = new Uint8Array(ciphertextBuffer);
+		// Wrap salt with encoded data so it can be used in the decrypt.
+		const saltAndDataUint8 = concatBuffer(randSalt, ciphertextUint8);
+		// This function outputs base64.
+		return saltAndDataUint8.toBase64();
+	}// encryptAESCTR()
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Decrypts AES-CTR encrypted ciphertext using the plaintext and password input parameters.
+	//
+	//		Details:	Like each of the 3 Subtle Crypto functions used, the key used for encrypt() is deriven using PBKDF2 key derivation algorithm.
+	//					The PBKDF2 deriveBits call below also produces bits for the Nonce and Counter bytes (the same CTR refers to) which are needed for the encrypt() call.
+	//					A cryptographic salt is needed for the PBKDF2 key derivation in order to completely re-shuffle the data every time the encryption is run.
+	//					This will produce completely different ciphertext for every encryption run even while using the same password.
+	//					With the packed salt, this key can be regenerated and used to decrypt the ciphertext.
+	//
+	//	Inputs structure:	password:	 human readable plaintext string
+	//						saltAndCiphertext: 1024 base64 char string
+	//
+	//						|---24 base64 chars of CTR Salt---||----1000 base64 chars of AES-CTR ciphertext----|
+	//						|-----------------------------Multi Encrypted Datarecord---------------------------|
+	//
+	//	Output structure:
+	//						|----1000 base64 chars of plaintext----|
+	//
+	// Big Picture: Final step in decryptTriple() decryptDouble(). This function constitutes the entirety of the AES-CTR step.
+	// 				Functions as the outer encryption layer of security for a Multi Encrypted Datarecord.
+	//
+	//				input source:	saltAndCiphertext: A database, either Server or Offline.
+	//				 				password:    Plaintext entered into Browser by user - Password 2
+	//
+	//				output destination: AES-CTR 'plaintext' will be passed to decryptOBF1000() for the next step in decryption.
+	//	
+	async function decryptAESCTR(saltAndCiphertext64, password) {
+		// Convert password into bytes.
+		const passwordUint8 = new TextEncoder().encode(password);
+		const saltAndCiphertextUint8 = Uint8Array.fromBase64(saltAndCiphertext64);
+		// Wrapped in the ciphertext input of this function are 18 salt bytes that were packed as 24 base64 chars.
+		const packedSaltUint8 = new Uint8Array(saltAndCiphertextUint8.slice(0,SALT_SIZE_BYTES));
+		// Cast array returned by slice into a (usable) Uint8Array.
+		const encodedCiphertextUint8 = new Uint8Array(saltAndCiphertextUint8.slice(SALT_SIZE_BYTES));
+
+		// Importkey needed to convert raw chars into a cryptoKey object which is needed for the subtle.encrypt()
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		const keyForPBKDF2 = await window.crypto.subtle.importKey(
+			"raw",				// Import a 'raw' format key, allowing arbitrary bytes as input.
+			passwordUint8,		// keyData, arbitrarily long set of bytes.
+			"PBKDF2",			// Key derivation algorithm to be used.
+			false,				// Is key data extractable from cryptoKey object or not.
+			["deriveBits"],		// allowed use of this key.
+		);
+
+		// deriveBits generates an ArrayBuffer as output. Decides which algorithm to use based on the object that is passed.
+		const pbkdf2DerivedBytesArrayBuffer = await window.crypto.subtle.deriveBits(
+			{									// PBKDF2 parameters object
+				name: "PBKDF2",					// key derivation algorithm
+				salt: packedSaltUint8,					// salt (at least 16 bytes for security;
+				iterations: 10000,				// exectute hash function this maniy times
+				hash: 'SHA-256',				// digest algorithm
+			},
+			keyForPBKDF2,						// input data as cryptoKey object
+			KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR,// Length in bits of output. We're using 256 for keyBytesUint8 and the last 128 for nonceAndCounterBytes which is 64 bits of nonce with 64 bits of counter.
+		);
+
+		const keyAndIvBitsUint8 = new Uint8Array(pbkdf2DerivedBytesArrayBuffer);
+		const keyBytesUint8 = keyAndIvBitsUint8.slice(0, 32);
+		// 64 nonce bytes with 64 counter block bytes.
+		const nonceAndCounterBytes = keyAndIvBitsUint8.slice(32);
+
+		// Import the PBKDF2 derived key bits into a key object made specifically 
+		// for use with the aes-cbc 256 algorithm.
+		// MDN syntax: importKey(format, keyData, algorithm, extractable, keyUsages)
+		let keyGCM = await window.crypto.subtle.importKey(
+			'raw',					// input data format
+			keyBytesUint8, 				// keydata: input data
+			{						// algorithm to use to importKey
+				name: 'AES-CTR', 
+			}, 
+			false,					// extractable boolean 
+			['decrypt']				// keyUsages
+		);
+		// 'Main' Subtle Crypto decrypt() call for AES-CTR algorithm.
+		const decryptedBuffer = await window.crypto.subtle.decrypt(
+			{									// Object specifying algorithm, parameters for decrypt()
+				name: 'AES-CTR',				// algorithm name
+				counter: nonceAndCounterBytes,	// nonce and counter are passed in together
+				length: 64						// length of nonce and counter
+			},
+			keyGCM,								// CryptoKey object used to decrypt
+			encodedCiphertextUint8				// ciphertext data to be decrypted
+		);
+		const decryptedUint8 = new Uint8Array(decryptedBuffer);
+		//return decryptedDecoded;
+		return decryptedUint8.toBase64();
+	}// decryptAESCTR()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Produce a Multi Encrypted Datarecord from user File Upload / CMD Line input.
+	//		Details:	
+	//
+	//	Inputs structure:	obf1000Pass:	human readable plaintext string
+	//						ctrPass:		human readable plaintext string
+	//						fileDataBase64:	base64 encoding of the raw bytes of a user uploaded file
+	//	Output structure:	base64 Multi Encrypted Datarecord
+	//
+	// Big Picture:			When using the CMD Line option to upload a file, this function is used to 'double encrypt' user file data and produce a Multi Encrypted Datarecord ready for database storage.
+	//
+	//	                    source:				User input via passlock system.
+	//	                    destination:		Database storage.
+	//
+	async function encryptDouble(obf1000Pass, ctrPass, fileDataBase64) {
+		// OBF-1000 step.
+		const obf1000Encrypted = await encryptOBF1000(fileDataBase64, obf1000Pass);
+		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
+		// AES-CTR step.
+		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_BASE64);
+		return ctrEncrypted;
+	}// encryptDouble()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Produce a Multi Encrypted Datarecord from user Browser input.
+	//		Details:	
+	//
+	//	Inputs structure:	opensslPass:	human readable plaintext string
+	//						obf1000Pass:	human readable plaintext string
+	//						ctrPass:		human readable plaintext string
+	//						plaintextData:	human readable plaintext string - a Plaintext Data Payload
+	//
+	//	Output structure:	base64 Multi Encrypted Datarecord
+	//
+	// Big Picture:			Using the Browser option, this function 'triple encrypts' user data into a Multi Encrypted Datarecord, ready for database storage.
+	//
+	//                      source:				user input via passlock system
+	//	                    destination:		database storage
+	//
+	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, plaintextData) {
+		// OpenSSL step.
+		const opensslEncrypted = await utf8EncryptOpenSSL(plaintextData, opensslPass);
+		checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
+		// OBF-1000 step.
+		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
+		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
+		// AES-CTR step.
+		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		checkLengthAndBase64(ctrEncrypted, AESCTR_OUTPUT_LIMIT_BASE64);
+		return ctrEncrypted;
+	}// encryptTriple()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Decrypt a Multi Encrypted Datarecord into a base64 ready to convert into a file for user download.
+	//		Details:	
+	//
+	//	Inputs structure:	obf1000Pass:	human readable plaintext string
+	//						ctrPass:		human readable plaintext string
+	//						multiEncryptedDatarecord:	base64 Multi Encrypted Datarecord
+	//
+	//	Output structure:	base64
+	//
+	// Big Picture:			Using the Browser option, this function 'double decrypts' a Multi Encrypted Datarecord from database into human readable plaintext string.
+	//
+	//                      source:        database storage
+	//                      destination:   convert into file for user download 
+	//
+	async function decryptDouble(obf1000Pass, ctrPass, multiEncryptedDatarecord) {
+		// AES-CTR step.
+		const ctrDecrypted = await decryptAESCTR(multiEncryptedDatarecord, ctrPass);
+		// OBF-1000 step.
+		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
+		return obf1000Decrypted;
+	}// decryptDouble()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality: Decrypt a Multi Encrypted Datarecord into human readable plaintext string.
+	//		Details:	
+	//
+	//	Inputs structure:	opensslPass:	human readable plaintext string
+	//						obf1000Pass:	human readable plaintext string
+	//						ctrPass:		human readable plaintext string
+	//						multiEncryptedDatarecord:	base64 Multi Encrypted Datarecord
+	//
+	//	Output structure:	human readable plaintext string
+	//
+	// Big Picture:			Using the Browser option, this function 'triple decrypts' a Multi Encrypted Datarecord from database into human readable plaintext string.
+	//
+	//	                    source:				database storage
+	//	                    destination:		user viewport
+	//
+	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, multiEncryptedDatarecord) {
+		// AES-CTR step.
+		const ctrDecrypted = await decryptAESCTR(multiEncryptedDatarecord, ctrPass);
+		// OBF-1000 step.
+		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
+		// OpenSSL step.
+		return await utf8DecryptOpenSSL(obf1000Decrypted, opensslPass);
+	}// decryptTriple()
+
+	function utf8ToBase64(inputUtf8) {
+		const inputUint8 = new TextEncoder().encode(inputUtf8);
+		return inputUint8.toBase64();
+	}
+
+	function base64ToUtf8(input64) {
+		const inputUint8 = Uint8Array.fromBase64(input64);
+		const inputUtf8 = new TextDecoder().decode(inputUint8);
+		return inputUtf8;
+	}
+
+	// Wrapper for OpenSSL which operates on base64.
+	async function utf8EncryptOpenSSL(plaintext, password) {
+		const plaintext64 = utf8ToBase64(plaintext);
+		return await encryptOpenSSL(plaintext64, password);
+	}// utf8EncryptOpenSSL()
+
+	// Wrapper for OpenSSL which operates on base64.
+	async function utf8DecryptOpenSSL(ciphertext, password) {
+		const plaintext64 = await decryptOpenSSL(ciphertext, password);
+		return base64ToUtf8(plaintext64);
+	}// utf8DecryptOpenSSL()
+
+	////////////////////////////////////////////////////////
+	//				7Byte Functions                       //
+	////////////////////////////////////////////////////////
+
+	// Find set of bytes that compute to targetValue.
+	function find7ByteSetForValue(targetValue) {
+		let computedValue;
+		let sevenByteUint8;
+		do{
+			// Roll 7 random bytes.
+			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
+			computedValue = eval7ByteValue(sevenByteUint8);
+		}while(computedValue != targetValue);
+		return sevenByteUint8;
+	}// find7ByteSetForValue()
+
+	// Convert 7Byte array into mathematical expression then evaluate it.
+	function eval7ByteValue(sevenByteUint8) {
+		// Start with empty expression.
+		let mathExpression = "";
+		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
+		for(let i=0; i < 7; i++) {
+			if (i % 2 === 0) {
+				// Even index bytes -->  numbers
+				mathExpression += sevenByteUint8[i];
+			}else{
+				// Odd index bytes --> symbols
+				if (sevenByteUint8[i] % 2 === 0) {
+					// Even bytes convert to (+)
+					mathExpression += "+";
+				}else{
+					// Odd bytes convert to (-)
+					mathExpression += "-";
+				}
+			}
+		}
+		return Math.abs(eval(mathExpression));
+	}// eval7ByteValue()
+
+	//////////////////////////////////////////
+	//		Misc Functions					//
+	//////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality:  Concatenate ArrayBuffers-like objects.
+	//
+	//	Inputs structure:	buffer1:    Array, Buffer, or TypedArray
+	//						buffer2:    Array, Buffer, or TypedArray
+	//
+	//	Output structure:	Uint8Array of concatenated data.
+	//
+	function concatBuffer(buffer1, buffer2) {
+		// Create new uint8array with size of buffer1 length + buffer 2 length.
+		let concatenatedUint8 = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+		// Set left part of the array to buffer 1.
+		concatenatedUint8.set(new Uint8Array(buffer1), 0);
+		// Set right part of the array to buffer 2.
+		concatenatedUint8.set(new Uint8Array(buffer2), buffer1.byteLength);
+		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
+		return concatenatedUint8;
+	}// concatBuffer()
+
+
+// Secretword Green: #54c597
+// Secretword Readonly Blue: #4491d5
+
