@@ -689,7 +689,7 @@
 			<div class="flow_pages" id="store_upload" style="display:none">
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
-				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. Please limit data size to 687 bytes BEFORE encrypting with OpenSSL.</h2>
+				<h2 id="store_upload_warning" style="color:red; display:none">FILE TOO LARGE. Please limit data size to 671 bytes BEFORE encrypting with OpenSSL.</h2>
 				<h2 id="store_upload_readytocommit" style="color:orange; display:none">READY TO COMMIT</h2>
 				<label id="uploaddata_length_label" style="color:black"></label>
 				<input autocomplete="off" onchange="catchUpload(event)" id="store_upload_input" style="border:none;" type="file">
@@ -1429,12 +1429,12 @@
 	function checkInputLengthUpload(input) {
 		// show input size in bytes
 		let size = new Blob([input]).size;
-		let difference = OBF1000_INPUT_LIMIT_BYTES - size;
+		let difference = OBF_1000_INPUT_LIMIT_BYTES - size;
 		// Show running count of data length.
 		let size_string = "Byte length remaining: " + difference;
 		//console.log("size_string: " + size_string);
 		document.getElementById("uploaddata_length_label").innerHTML = size_string;
-		if (size > OBF1000_INPUT_LIMIT_BYTES) {
+		if (size > OBF_1000_INPUT_LIMIT_BYTES) {
 			return false; // Length Check Failed.
 		}else{
 			return true; // Length Check Passed.
@@ -1939,7 +1939,6 @@
 		}else{
 			// Load data at fingerprint, should be the encrypted data block we just stored.
 			const loadResponse = await serverLoad(fingerprint);
-			console.log("loadResponse: " + loadResponse);
 			// Report store outcome.
 			if (multiEncryptedDatarecord === loadResponse) {
 				// We succeeded.
@@ -2139,6 +2138,7 @@
 				return responseObj.access_response;
 			} else if (responseObj.access_response.length === MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
+				console.log("loadResponse: " + responseObj.access_response);
 				return responseObj.access_response;
 			} else {
 				console.log("serverLoad Error: " + responseObj.access_response);
@@ -3339,7 +3339,7 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
-				<h2 id="offlinestore_upload_warning" style="color:red; display:none">FILE TOO LARGE. Please limit data size to 687 bytes BEFORE encrypting with OpenSSL.</h2>
+				<h2 id="offlinestore_upload_warning" style="color:red; display:none">FILE TOO LARGE. Please limit data size to 671 bytes BEFORE encrypting with OpenSSL.</h2>
 				<h2 id="offlinestore_upload_readytocommit" style="color:orange; display:none">READY TO COMMIT</h2>
 				<label id="offlineuploaddata_length_label" style="color:black"></label>
 				<input autocomplete="off" onchange="catchUpload(event)" id="offlinestore_upload_input" style="border:none;" type="file">
@@ -4021,15 +4021,15 @@
 	}//checkDataInputLengthWithRegex()
 
 	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over OBF1000_INPUT_LIMIT_BYTES: 704
+	// Output: Returns false if the input length (in bytes) is over OBF_1000_INPUT_LIMIT_BYTES: 704
 	function checkInputLengthUpload(input) {
 		// show input size in bytes
 		let size = new Blob([input]).size;
-		let difference = OBF1000_INPUT_LIMIT_BYTES - size;
+		let difference = OBF_1000_INPUT_LIMIT_BYTES - size;
 		// Show running count of data length.
 		let size_string = "Byte length remaining: " + difference;
 		document.getElementById("offlineuploaddata_length_label").innerHTML = size_string;
-		if (size > OBF1000_INPUT_LIMIT_BYTES) {
+		if (size > OBF_1000_INPUT_LIMIT_BYTES) {
 			return false; // Length Check Failed.
 		}else{
 			return true; // Length Check Passed.
@@ -4343,7 +4343,6 @@
 		// Check that data stored properly.
 		// Load data at fingerprint, should be the encrypted data block we just stored.
 		const loadResponse = await attemptLoadOfflineDBase(fingerprint);
-		//console.log("loadResponse: " + loadResponse);
 		// Report store outcome.
 		if (multiEncryptedDatarecord === loadResponse) {
 			// Data successfully stored to memory. Still needs saved to disk which must happen 'manually' by user.

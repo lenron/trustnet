@@ -5,19 +5,19 @@
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// A Multi Encrypted Datarecord is built to be nigh uncrackable. A user may store data utilizing a MEDrecord in either our 
 	// hosted online or a user-controlled offline database. 4 passwords are required for our cryptosystem. Data is stored utilizing
-	// a key-value pair where a fingerprint is determined with a series of hashes involving 3 of the 4 passwords. User data is
+	// a key-value pair where a fingerprint is determined with a series of SHA-256 hashes involving 3 of the 4 passwords. User data is
 	// encrypted using a different set of 3 of the 4 passwords where those 3 are each used in a triple-encryption scheme utilizing
-	// the AES-CBC, AES-GCM, and AES-CTR ciphers residing in javascript's native SubtleCrypto library.
+	// the AES-CBC, AES-GCM, and AES-CTR ciphers residing in javascript's native SubtleCrypto library, guaranteeing wide browser
+	// compatibility.
 	// 
-	// To modify data a user simply needs to enter the 4 passwords previously used to store the data they intend to change (or delete).
+	// To modify data a user may enter the 4 passwords previously used to store the data they intend to change (or delete).
 	//
 	// The online database is meant to be accessible from anywhere in the world and mirrored on read-only backup sites intending
-	// greater than 5 9's reachability of data (if not modification access provided we stick with monolithic write design).
+	// greater than 5 9's uptime for reachability of data (if not modification access provided we stick with monolithic write design).
 	//
 	// The offline database is meant to work in a browser with zero internet access, storing data to a block of base64 characters
-	// in order to obfuscate the exact location of user data (providing cryptographic obfuscation). Means is also provided for a user
-	// to save their data in a secure environment offline, and then later transfer that data to the worldwide accessible online
-	// database servers.
+	// in order to obfuscate the exact location of user data (providing cryptographic obfuscation). Users may also transfer encrypted
+	// data from their offline database to the worldwide accessible online database without decrypting it.
 	// 
 	// It is becoming more clear that the question of whether user data will be leaked is when and not if. The design of the
 	// Multi Encrypted Datarecord is intended to definitively answer that question by putting cryptographic strength 
@@ -25,72 +25,6 @@
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//	                                 Core Cryptographic Functions		                                                     //
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 7Byte Header
-	//
-	//    Why needed:
-	//               The 7Byte header is used to store the length of input data for OBF-1000 (not including the Salted__ string literal which is removed).
-	//               
-	//               We use this method for storing the length of the input in order to obfuscate often used constant values like 0.
-	//               If a simple int were used in the same place e.g. as 3 digits, shorter length strings (presumably the most likely to be stored)
-	//               would often end up as something like: 027, 098, 129, etc. resulting in a design with a potential vulnerability with the often repeated 0,1,2.
-	//               
-	//               The seven byte header method was devised in order to store the length value in a way that is statistically random.
-	//
-	//   Probabilistic Integrity:
-	//                            <Something on the probability, etc. of the seven byte set and how it's rolled.>
-	//                            At worst an attacker could gain the length of the data.
-	//                            Attacker: can an attacker determine if a set of 1000 base64 chars.
-	//                            98.76% is likelyhood of getting a valid 7byte string.
-	//  Given that an OBF-1000 string length is from 44-704, randomly choosing bytes results in a 7byte set that computes to a number inside this range, will be 87.44
-	//  However, this isn't an issue because attackers know they're attempting to decrypt OBF1000 data, which is encrypted by AES-CTR.
-	//  If AES-CTR is cracked however, they might ask, does this decrypted output include a OBF1000 string, which they could remove 13% of the junk decrypts.
-	//  87% would still need to be attempted to continue to crack.
-	//  For dev site usage, for the range 0-704, 98.7 of random bytes rolled will compute to a valid 7byte number, making it difficult to know whether a piece of 1000 length string is obf.
-	//  
-	//                            
-	//
-	//   Functionality:
-	//               7 bytes are randomly selected, computed using the below formula until a set is found that computes to the target input value.
-	//               
-	//                        index:   0       1       2       3       4       5      6
-	//                                 |       |       |       |       |       |      |
-	//                                 V       V       V       V       V       V      V
-	//               absoluteValue( number, symbol, number, symbol, number, symbol, number )
-	//
-	//     Example:                 [ 162      8      116      9      181     43     73 ]
-	//                                 |       |       |       |       |       |      |
-	//                                 V       V       V       V       V       V      V
-	//                        index:   0       1       2       3       4       5      6
-	//                                 |       |       |       |       |       |      |
-	//                                 V       V       V       V       V       V      V
-	//               absoluteValue( number, symbol, number, symbol, number, symbol, number )
-	//                                 |       |       |       |       |       |      |
-	//                                 V       V       V       V       V       V      V
-	//               absoluteValue(   162     (+)     116     (-)     181     (-)    73 )
-	//
-	//                           absoluteValue(162 + 116 - 181 - 73)
-	//               
-	//                                absoluteValue( 24 ) = [24]
-	//              ——————————————————————————————————————————————————————————————————— 
-	//               Order matters so index 0 gets converted to a number, index 1 gets converted to a mathematical symbol, index 2 --+ number, index 3 --+ symbol, etc.
-	//               The symbol a byte converts to depends on whether it's even or odd: even--+(+) odd--+(-)
-	//
-	//   Example:    For the Target Value: 24 an array was found:
-	//
-	//                             [162, 8, 116, 9, 181, 43, 73]            162 --+ number
-	//                               |   |   |   |   |   |   |              8   --+ even --+ (+)
-	//                               V   V   V   V   V   V   V              116 --+ number
-	//                      index:   0   1   2   3   4   5   6              9   --+ odd --+ (-)
-	//                               |   |   |   |   |   |   |              181 --+ number
-	//                               V   V   V   V   V   V   V              43  --+ odd --+ (-)
-	//               absoluteValue( 162,(+),116,(-),181,(-),73 )            73  --+ number
-	//
-	//               absoluteValue( 162 + 116 - 181 - 73 ) = 24
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Data is stored as a key-value pair where the computed Fingerprint is the key and a Multi Encrypted Datarecord is the value.
-	// So, in order to overwrite data the same sequence of passwords must be entered that was used to initially store it.
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Multi Encrypted Datarecord - 2Byte
 	//     
@@ -608,9 +542,14 @@
 	const FINGERPRINT_LENGTH_BYTES = 32; // 32 bytes is the result of SHA-256 derivation (256 bits = 32 bytes).
 	// Obfuscation specific constants for OBF-1000.
 	const OBF1000_OUTPUT_LIMIT_BASE64 = 1000; // OBF-1000 function is defined by outputting exactly 1000 base64 chars.
-	const SEVEN_BYTE_SET_LENGTH = 7;
+	//const SEVEN_BYTE_SET_LENGTH = 7;
+	const TWO_BYTE_SET_LENGTH = 20; // 2bytes representing a length value + 18 AES-CTR bytes.
 	// Multi Encrypted Datarecord size of 1024 chosen as it saves to hard disk drive as exactly 1 Kib.
 	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 = 1024;
+	const NEWLINE_BYTE_LENGTH = 1;
+	const OPENSSL_CBC_BLOCKING_MIN_LENGTH = 1; // We scale limits based on minimum CBC block size.
+	// The pointer points to the next position of data to get written to. The limit below ensures that we do not exceed the limits of our database.
+	const MAX_POINTER_VALUE = 999; // There are a possible 1000 records (0-999) in each of the two sections (encrypted and unencrypted) of the offline database.
 
 // Subtle crypto values.
 	// These constants are used in the PBKDF2 derivation.
@@ -631,10 +570,37 @@
 	const GCM_TAG_SIZE_BYTES = GCM_TAGLENGTH_BITS / 8; // bytes conversion: 120 bits / 8 = 15 bytes
 	const GCM_TAG_SIZE_BASE64 = GCM_TAG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to base64 = 24
 	// Offline database constant derivations.
-	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 * (3/4);  // convert to base64: 1024 * (3/4) = 786 bytes
 	const FINGERPRINT_LENGTH_BASE64 = Math.ceil(FINGERPRINT_LENGTH_BYTES * (4/3)); // 32 bytes converts to 43 base64 chars.
 	// Since the fingerprint and MED record are stored together in the offline database, this is their combined total.
 	const FINGERPRINT_AND_MEDRECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64; // 43 + 1024 = 1067 base64
+
+	// Simple derivation for Input Limits.
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 * (3/4);  // 768 = 1024 * (3/4)    Convert to base64.
+	const AES_CTR_INPUT_LIMIT_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES - SALT_SIZE_FOR_AESCTR_AESGCM; // 750 = 768 - 18
+	//console.log(AES_CTR_INPUT_LIMIT_BYTES);
+	const OBF_1000_INPUT_LIMIT_BYTES = AES_CTR_INPUT_LIMIT_BYTES - SALT_SIZE_FOR_AESCTR_AESGCM - GCM_TAG_SIZE_BYTES - TWO_BYTE_SET_LENGTH; // 697 = 750 - 18 - 15 - 20
+	//console.log(OBF_1000_INPUT_LIMIT_BYTES);
+	const MANDO_RANDO_FILL = OBF_1000_INPUT_LIMIT_BYTES % 16; // 9 = 697 % 16 
+	//console.log(MANDO_RANDO_FILL);
+	const OPENSSL_INPUT_LIMIT_BYTES = OBF_1000_INPUT_LIMIT_BYTES - MANDO_RANDO_FILL - OPENSSL_STRING_LITERAL_LENGTH - SALT_SIZE_AESCBC - NEWLINE_BYTE_LENGTH - OPENSSL_CBC_BLOCKING_MIN_LENGTH; // 670 = 697 - 9 - 8 - 8 - 1 - 1
+	//console.log(OPENSSL_INPUT_LIMIT_BYTES);
+
+	// Convert input limits to base64 for data pipeline checks.
+	const AES_CTR_INPUT_LIMIT_BASE64 = AES_CTR_INPUT_LIMIT_BYTES * (4/3); // 1000 = 750 * (4/3)
+	//console.log(AES_CTR_INPUT_LIMIT_BASE64);
+	const OBF_1000_INPUT_LIMIT_BASE64 = Math.floor(OBF_1000_INPUT_LIMIT_BYTES * (4/3)); // 929 = round down[ 697 * (4/3) ]
+	//console.log(OBF_1000_INPUT_LIMIT_BASE64);
+	const OPENSSL_INPUT_LIMIT_BASE64 = Math.floor(OPENSSL_INPUT_LIMIT_BYTES * (4/3)); // 893 = round down[ 670 * (4/3) ]
+	//console.log(OPENSSL_INPUT_LIMIT_BASE64);
+	// Check that our intended OBF-1000 output of 1000 base64 chars matches computed input limit for AES-CTR step.
+	if (OBF1000_OUTPUT_LIMIT_BASE64 !== AES_CTR_INPUT_LIMIT_BASE64) {
+		throw new Error("Constant derivation math check failed!");
+	}
+
+
+/*
+	//const OBF1000_MAX_INPUT_BYTES = (OBF1000_OUTPUT_LIMIT_BASE64 - GCM_TAG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64) * (3/4) - TWO_BYTE_SET_LENGTH; // [(1000 - 20 - 24) * (3/4)] - 20 = 697 bytes
+
 	// This constant limits the max number of bytes that can be inputted into OBF-1000 without error.
 	const OBF1000_MAX_INPUT_BYTES = (OBF1000_OUTPUT_LIMIT_BASE64 - GCM_TAG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64) * (3/4) - SEVEN_BYTE_SET_LENGTH; // [(1000 - 20 - 24) * (3/4)] - 7 = 710 bytes
 	const MANDO_RANDO_FILL = OBF1000_MAX_INPUT_BYTES % 16;	// 710 mod 16 = 6 mandatory random filler bytes. AES-CBC uses a constant 128 bit (16 byte) blocking size, which imperfectly fits into
@@ -646,8 +612,7 @@
 	const OBF1000_INPUT_LIMIT_BYTES = OBF1000_MAX_INPUT_BYTES - MANDO_RANDO_FILL; // 710 - 6 = 704 bytes
 	// Ensures that OpenSSL's output data length does not exceed OBF-1000's data input length restriction.
 	const OPENSSL_OUTPUT_LIMIT_BASE64 = Math.floor(OBF1000_MAX_INPUT_BYTES * (4/3)); // 710 * (4/3) ~ 946.6667 = 946 rounded down
-	// The pointer points to the next position of data to get written to. The limit below ensures that we do not exceed the limits of our database.
-	const MAX_POINTER_VALUE = 999; // There are a possible 1000 records (0-999) in each of the two sections (encrypted and unencrypted) of the offline database.
+*/
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Replicate OpenSSL command line functionality of command: openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
@@ -870,8 +835,7 @@
 		//const wrappedPlaintextUint8 = wrap7ByteAndFiller(plaintextUint8);
 
 		// Wrap 2Byte header which represents the length of GCM payload.
-		const wrappedPlaintextUint8 = wrap7ByteAndFiller(plaintextUint8);
-
+		const wrappedPlaintextUint8 = await wrap2ByteAndFiller(plaintextUint8, password);
 
 		const wrappedPlaintextBase64 = wrappedPlaintextUint8.toBase64();
 		// Now that the payload data is wrapped with a prepended 7Byte set and random filler padded, we can GCM encrypt the whole thing.
@@ -902,7 +866,7 @@
 		const gcmDecrypted64 = await decryptGCM(ciphertext64, password);
 		const gcmDecryptedUint8 = Uint8Array.fromBase64(gcmDecrypted64);
 
-		let unwrappedPlaintextUint8 = unwrap7ByteAndFiller(gcmDecryptedUint8);
+		let unwrappedPlaintextUint8 = await unwrap2ByteAndFiller(gcmDecryptedUint8, password);
 		if (stringLiteralSalted) {
 			unwrappedPlaintextUint8 = addStringLiteralSalted(unwrappedPlaintextUint8);
 		}
@@ -947,11 +911,13 @@
 	//						 |--18 bytes--||--2 Bytes--||------------710 Bytes-------------| 	
 	//
 
+
+
 	// Interpret 2 byte set as base-256 where the highest index is the most significant digit and return that int value.
 	// Used to check 2Byte set generation and for getting the value back for decryption.
 	function getValueFrom2ByteSet(lengthAs2BytesUint8) {
 		// Setting little-endian option in the dataview byte modification makes the most significant byte to the highest index,
-		// so multiply highest index value by 256 (sizeof byte^1) to get value back.
+		// so multiply highest index value by 256 [(size of a byte)^1] to get value back.
 		return 256 * lengthAs2BytesUint8[1] + lengthAs2BytesUint8[0];
 	}
 
@@ -975,32 +941,72 @@
 
 	// Produce 2Byte header for OBF-1000 that is representative of the length of OBF-1000 payload.
 	// First convert input length value int into base-256 byte form, then encrypt with AES-CTR.
-	async function getAndEncrypt2ByteHeader(length, password) {
+	async function produce2ByteHeader(length, password) {
 		// Convert length int into 2 byte Uint8Array representation of that int value.
+console.log("encrypt length: ", length);
 		const lengthAs2BytesUint8 = get2ByteRepFromValue(length);
-		// Convert 2byte set to base64 as input, encrypt with OBF-1000 password.
+console.log("encrypt 2byte set: ", lengthAs2BytesUint8);
+		// Exectue the encryption by passing in base64 representation of bytes, use OBF-1000 password to encrypt.
 		const encrypted2ByteSetWithSalt64 = await encryptAESCTR(lengthAs2BytesUint8.toBase64(), password);
-		//console.log(encrypted2ByteSetWithSalt64);
 		// |--18 bytes salt--||--2 encrypted bytes--| should be the output.
-		return Uint8Array.fromBase64(encrypted2ByteSetWithSalt64);
+		const twoByteHeader = Uint8Array.fromBase64(encrypted2ByteSetWithSalt64);
+console.log("encrypt two byte header: ", twoByteHeader);
+		return twoByteHeader;
 	}
 
 	// First decrypt 20 bytes worth of header into 2 bytes in base256,
 	// then convert those bytes into int represenation of the length of OBF-1000 data payload which will aid in decryption.
 	async function decrypt2ByteHeaderAndGetValue(encrypted2ByteSetWithSaltUint8, password) {
+console.log("decrypt two byte header: ", encrypted2ByteSetWithSaltUint8);
+		// Core crypto enc/dec functions input and output base64.
+		// Exectue the decryption passing in base64 representation of bytes, use OBF-1000 password to decrypt.
 		const decrypted2ByteSet64 = await decryptAESCTR(encrypted2ByteSetWithSaltUint8.toBase64(), password);
+		const decrypted2ByteSetUint8 = Uint8Array.fromBase64(decrypted2ByteSet64);
+console.log("decrypt 2byte set: ", decrypted2ByteSetUint8);
 		//const length = getValueFrom2ByteSet(Uint8Array.fromBase64(decrypted2ByteSet64));
-		return getValueFrom2ByteSet(Uint8Array.fromBase64(decrypted2ByteSet64));
+		const length = getValueFrom2ByteSet(decrypted2ByteSetUint8);
+console.log("decrypt length: ", length);
+		//return getValueFrom2ByteSet(Uint8Array.fromBase64(decrypted2ByteSet64));
+		return length;
 	}
 
-	function wrap2ByteAndFiller(inputDataUint8, password) {
+	async function wrap2ByteAndFiller(inputDataUint8, password) {
+		// Get pieces of array first.
 		// Get data payload length for 7byte calculation and to derive filler size.
 		const dataLength = inputDataUint8.length;
-		// Convert data length into 2 byte representation, encrypt results with AES-CTR.
-		const encrypted2ByteHeaderUint8 = getAndEncrypt2ByteHeader(dataLength, password);
-
+		// Convert data length into 2Byte header, encrypt results with AES-CTR.
+		// |--18 bytes salt--||--2 encrypted bytes--|
+		const twoByteHeaderUint8 = await produce2ByteHeader(dataLength, password);
+		// There is space for 697 bytes with this scheme, determine how many filler bytes we need based on input length.
+		const fillerLengthInBytes = OBF_1000_INPUT_LIMIT_BYTES - dataLength; // 697 - dataLength
+		const randFillerUint8 = window.crypto.getRandomValues(new Uint8Array(fillerLengthInBytes));
+		// Now that we have pieces ready, place in array.
+		// Total size is 2Byte header size + max input size: 697 + 20 = 717
+		let payloadArrayGCM = new Uint8Array(OBF_1000_INPUT_LIMIT_BYTES + TWO_BYTE_SET_LENGTH);
+		// Start filling the GCM payload array with 20 bytes of 2Byte header at index 0.
+		payloadArrayGCM.set(twoByteHeaderUint8, 0);
+		// Next fill in data starting at the next byte after 2byte header offset (index 20).
+		payloadArrayGCM.set(inputDataUint8, TWO_BYTE_SET_LENGTH);
+		// Input data size is variable, so calculate how much more space we need.
+		const headerAndDataOffset = TWO_BYTE_SET_LENGTH + dataLength;
+		payloadArrayGCM.set(randFillerUint8, headerAndDataOffset);
+		return payloadArrayGCM;
 	}
 
+	async function unwrap2ByteAndFiller(inputDataUint8, password) {
+		// Slice off the 20 bytes that hold the (encrypted) data length.
+		const twoByteSlice = inputDataUint8.slice(0, TWO_BYTE_SET_LENGTH);
+		// Compute value that 2Byte set represents.
+		//const dataLength = eval7ByteValue(sevenByteSlice);
+		const dataLength = await decrypt2ByteHeaderAndGetValue(twoByteSlice, password);
+		// Extract data bytes.
+		const headerAndDataOffset = dataLength + TWO_BYTE_SET_LENGTH;
+		dataBytes = inputDataUint8.slice(TWO_BYTE_SET_LENGTH, headerAndDataOffset);
+		return dataBytes;
+	}// unwrap2ByteAndFiller()
+
+
+/*
 	function wrap7ByteAndFiller(inputDataUint8) {
 		// Get data payload length for 7byte calculation and to derive filler size.
 		const dataLength = inputDataUint8.length;
@@ -1046,7 +1052,7 @@
 		dataBytes = inputDataUint8.slice(7, dataOffset);
 		return dataBytes;
 	}// unwrap7ByteAndFiller()
-
+*/
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Produce AES-GCM ciphertext from plaintext, password input data.
 	//
@@ -1436,10 +1442,13 @@
 	//
 	async function encryptDouble(obf1000Pass, ctrPass, fileDataBase64) {
 		// OBF-1000 step.
+		checkLengthAndBase64(fileDataBase64, OBF_1000_INPUT_LIMIT_BASE64);
 		const obf1000Encrypted = await encryptOBF1000(fileDataBase64, obf1000Pass);
-		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
+		//checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
 		// AES-CTR step.
+		checkLengthAndBase64(obf1000Encrypted, AES_CTR_INPUT_LIMIT_BASE64);
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+		// Check output before returning data.
 		checkLengthAndBase64(ctrEncrypted, MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64);
 		return ctrEncrypted;
 	}// encryptDouble()
@@ -1462,13 +1471,20 @@
 	//
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, plaintextData) {
 		// OpenSSL step.
+		checkLengthAndBase64(plaintextData, OPENSSL_INPUT_LIMIT_BASE64);
 		const opensslEncrypted = await utf8EncryptOpenSSL(plaintextData, opensslPass);
-		checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
+console.log("openssl encrypted: ", opensslEncrypted);
+		//checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
 		// OBF-1000 step.
+		checkLengthAndBase64(opensslEncrypted, OBF_1000_INPUT_LIMIT_BASE64);
 		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
-		checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
+console.log("obf encrypted: ", obf1000Encrypted);
+		//checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
 		// AES-CTR step.
+		checkLengthAndBase64(obf1000Encrypted, AES_CTR_INPUT_LIMIT_BASE64);
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
+console.log("ctr encrypted: ", ctrEncrypted);
+		// Check output before returning data.
 		checkLengthAndBase64(ctrEncrypted, MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64);
 		return ctrEncrypted;
 	}// encryptTriple()
@@ -1515,8 +1531,10 @@
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, multiEncryptedDatarecord) {
 		// AES-CTR step.
 		const ctrDecrypted = await decryptAESCTR(multiEncryptedDatarecord, ctrPass);
+console.log("CTR decrypted: ", ctrDecrypted);
 		// OBF-1000 step.
 		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
+console.log("obf decrypted: ", obf1000Decrypted);
 		// OpenSSL step.
 		return await utf8DecryptOpenSSL(obf1000Decrypted, opensslPass);
 	}// decryptTriple()
