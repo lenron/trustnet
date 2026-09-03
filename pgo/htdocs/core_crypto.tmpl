@@ -1,75 +1,30 @@
-// delete <script> after review is done - only for text shading
-
-
-	//////////////////////////////////////////////////////////////
-	//                   Site Constants                         //
-	//////////////////////////////////////////////////////////////
-
-// Site specific values.
-	// A passlock is a time-limited encryption scheme to secure user passwords in the browser during the 5 minute window a user is encrypting data.
-	const PASSLOCK_LENGTH = 36; // Length of a UUID, used to encrypt/decrypt passlock-encrypted passwords (UUID is stored on server, but user passwords never leave the browser).
-	// These constants are used for passlock timeout functionality, which uses milliseconds.
-	const FIVE_SECONDS = 5000;
-	const FOUR_MINUTES_THIRTY_SECONDS = 270000;
-	const FIVE_MINUTES = 300000;
-	// Fingerprint is the SHA-256 of: sha256(codeword) + sha256(password 1) + sha256(password 2).
-	const FINGERPRINT_LENGTH_BYTES = 32; // 32 bytes is the result of SHA-256 derivation (256 bits = 32 bytes).
-	// Obfuscation specific constants for OBF-1000.
-	const OBF1000_OUTPUT_LIMIT_BASE64 = 1000; // OBF-1000 function is defined by outputting exactly 1000 base64 chars.
-	const SEVEN_BYTE_SET_LENGTH = 7;
-	// Multi Encrypted Datarecord size of 1024 chosen as it saves to hard disk drive as exactly 1 Kib.
-	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 = 1024;
-
-// Subtle crypto values.
-	// These constants are used in the PBKDF2 derivation.
-	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384; // 256 bits for key + 128 for IV
-	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352; // 256 bits for key + 96 for IV
-	const KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR = 384; // 256 bits for key + 64 for nonce + 64 for counter
-	// Salt and string literal sizes.
-	const OPENSSL_STRING_LITERAL_LENGTH = 8; // String literal 'Salted__' is used by OpenSSL to indicate that it contains a cryptographic salt.
-	const SALT_SIZE_AESCBC = 8;
-	const SALT_SIZE_FOR_AESCTR_AESGCM = 18; // For PBKDF2, key derivation meets recommended limit of 16 bytes: https://developer.mozilla.org/en-US/docs/Web/API/Pbkdf2Params
-	// GCM Tag, which is used like a signature or checksum: generated on encrypt, and later used to validate data during decryption.
-	const GCM_TAGLENGTH_BITS = 120; // 120 bits is valid spec recommendation for GCM: https://w3c.github.io/webcrypto/#aes-gcm-operations-encrypt
-
-// Derivations.
-	// Cryptographic salt & tag length derivations.
-	const AESCTR_SALT_SIZE_BASE64 = SALT_SIZE_FOR_AESCTR_AESGCM * (4/3); // base64 conversion: 18 * (4/3) = 24
-	const GCM_SALT_SIZE_BASE64 = AESCTR_SALT_SIZE_BASE64; // Currently using same salt length of 24 base64 / 18 bytes.
-	const GCM_TAG_SIZE_BYTES = GCM_TAGLENGTH_BITS / 8; // bytes conversion: 120 bits / 8 = 15 bytes
-	const GCM_TAG_SIZE_BASE64 = GCM_TAG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to base64 = 24
-	// Offline database constant derivations.
-	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 * (3/4);  // convert to base64: 1024 * (3/4) = 786 bytes 
-	const FINGERPRINT_LENGTH_BASE64 = Math.ceil(FINGERPRINT_LENGTH_BYTES * (4/3)); // 32 bytes converts to 43 base64 chars.
-	// Since the fingerprint and MED record are stored together in the offline database, this is their combined total.
-	const FINGERPRINT_AND_MEDRECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64; // 43 + 1024 = 1067 base64
-	// This constant limits the max number of bytes that can be inputted into OBF-1000 without error.
-	const OBF1000_MAX_INPUT_BYTES = (OBF1000_OUTPUT_LIMIT_BASE64 - GCM_TAG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64) * (3/4) - SEVEN_BYTE_SET_LENGTH; // [(1000 - 20 - 24) * (3/4)] - 7 = 710 bytes
-	const MANDO_RANDO_FILL = OBF1000_MAX_INPUT_BYTES % 16;	// 710 mod 16 = 6 mandatory random filler bytes. AES-CBC uses a constant 128 bit (16 byte) blocking size, which imperfectly fits into
-															// the OBF-1000 function's limit of 710 bytes, leaving us with 6 bytes of random filler, and 704 bytes of encrypted data from OpenSSL's output.
-	// Data payload size limit in bytes for Browser input to our Javascript implementation of OpenSSL AES-CBC.
-	const OPENSSL_INPUT_LIMIT_BYTES = OBF1000_MAX_INPUT_BYTES - MANDO_RANDO_FILL - OPENSSL_STRING_LITERAL_LENGTH - SALT_SIZE_AESCBC - 1 - 1; // 710 - 6 bytes of mandatory random filler - 8 string -
-																																			 // 8 salt - 1 newline - 1 CBC Blocking byte = 686 bytes
-	// The maximum file size a user may upload after OpenSSL AES-CBC encryption given the input limits of OBF-1000.
-	const OBF1000_INPUT_LIMIT_BYTES = OBF1000_MAX_INPUT_BYTES - MANDO_RANDO_FILL; // 710 - 6 = 704 bytes
-	// Ensures that OpenSSL's output data length does not exceed OBF-1000's data input length restriction.
-	const OPENSSL_OUTPUT_LIMIT_BASE64 = Math.floor(OBF1000_MAX_INPUT_BYTES * (4/3)); // 710 * (4/3) ~ 946.6667 = 946 rounded down
-	// The pointer points to the next position of data to get written to. The limit below ensures that we do not exceed the limits of our database.
-	const MAX_POINTER_VALUE = 999; // There are a possible 1000 records (0-999) in each of the two sections (encrypted and unencrypted) of the offline database.
+// This <script> turns on syntax highlighting.
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//	                Core Cryptographic Functions		                                                                     //
+	//                                   The MEDRecord Cryptosystem                                                              //
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// We provide a free 'data locker' up to 686 bytes, which is encrypted using 3 core cryptographic ciphers:
-	//		AES-CBC
-	//		AES-GCM
-	//		AES-CTR             
-	// This produces a Multi Encrypted Datarecord (MED) that is stored in either our online database or in a user-controlled offline database.
+	// A Multi Encrypted Datarecord is built to be nigh uncrackable. A user may store data utilizing a MEDrecord in either our 
+	// hosted online or a user-controlled offline database. 4 passwords are required for our cryptosystem. Data is stored utilizing
+	// a key-value pair where a fingerprint is determined with a series of hashes involving 3 of the 4 passwords. User data is
+	// encrypted using a different set of 3 of the 4 passwords where those 3 are each used in a triple-encryption scheme utilizing
+	// the AES-CBC, AES-GCM, and AES-CTR ciphers residing in javascript's native SubtleCrypto library.
+	// 
+	// To modify data a user simply needs to enter the 4 passwords previously used to store the data they intend to change (or delete).
 	//
-	// How this site works:
-	//     Data is stored as a key-value pair where the computed Fingerprint is the key and a Multi Encrypted Datarecord is the value.
-	//     So, in order to overwrite data the same sequence of passwords must be entered that was used to initially store it.
-	//              
+	// The online database is meant to be accessible from anywhere in the world and mirrored on read-only backup sites intending
+	// greater than 5 9's reachability of data (if not modification access provided we stick with monolithic write design).
+	//
+	// The offline database is meant to work in a browser with zero internet access, storing data to a block of base64 characters
+	// in order to obfuscate the exact location of user data (providing cryptographic obfuscation). Means is also provided for a user
+	// to save their data in a secure environment offline, and then later transfer that data to the worldwide accessible online
+	// database servers.
+	// 
+	// It is becoming more clear that the question of whether user data will be leaked is when and not if. The design of the
+	// Multi Encrypted Datarecord is intended to definitively answer that question by putting cryptographic strength 
+	// squarely in the hands of the user.
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//	                                 Core Cryptographic Functions		                                                     //
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 7Byte Header
 	//
@@ -92,8 +47,6 @@
 	//  If AES-CTR is cracked however, they might ask, does this decrypted output include a OBF1000 string, which they could remove 13% of the junk decrypts.
 	//  87% would still need to be attempted to continue to crack.
 	//  For dev site usage, for the range 0-704, 98.7 of random bytes rolled will compute to a valid 7byte number, making it difficult to know whether a piece of 1000 length string is obf.
-	//  1
-	//  
 	//  
 	//                            
 	//
@@ -139,7 +92,56 @@
 	// Data is stored as a key-value pair where the computed Fingerprint is the key and a Multi Encrypted Datarecord is the value.
 	// So, in order to overwrite data the same sequence of passwords must be entered that was used to initially store it.
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Multi Encrypted Datarecord - Breakdown
+	// Multi Encrypted Datarecord - 2Byte
+	//     
+	//     |--------------------------------------Multi Encrypted Datarecord (MED)---768 Bytes (1024 base 64 chars)------------------------------------------------------| 
+	//                 |---------------------------------------------CTR Plaintext---750 Bytes (1000 base 64 chars)------------------------------------------------------| 
+	//                             |---------------------------------GCM Plaintext---717 Bytes----------------------------------------------------------------| 
+	//     |-CTR Salt-||-GCM Salt-||-2Byte CTR Salt-||-2Byte-||-***-||-CBC Salt-||-----------CBC Plaintext-----------||-Newline-||-CBC Blocking--||-----Random Filler-----||-GCM Tag-| 
+	//     |----18----||----18----||-------18-------||---2---||-***-||----8-----||--Browser Input---Up to 686 Bytes--||----1----||----1 to 16----||-[ 710 - File Input  ]-||---15----|
+	//
+	//     
+	//     The MEDRecord Cryptosystem
+	//     
+	//     The Multi Encrypted Datarecord                                        |-----------User Data---------------|
+	//                                                        |-***-||-CBC Salt-||-----------CBC Payload-------------||-Newline-||-CBC Blocking--|
+	//                             |-2Byte CTR Salt-||-2Byte-||-----------------------------OpenSSL Output---------------------------------------||-----Random Filler-----|
+	//                             |----------------------------------------------------OBF-1000 Blocking System----------------------------------------------------------|
+	//                 |-GCM Salt-||-----------------------------------------------------GCM Payload-----717 Bytes--------------------------------------------------------||-GCM Tag-|
+	//                 |----------------------------------------------------OBF-1000 Output - 750 Bytes (1000 base64 chars)----------------------------------------------------------|
+	//     |-CTR Salt-||------------------------------------------------------CTR Payload-----750 Bytes (1000 base 64 chars)---------------------------------------------------------| 
+	//     |-----------------------------------------------------------------AES-CTR Output---768 Bytes (1024 base 64 chars)---------------------------------------------------------| 
+	//     
+	//     AES-CTR provides the foundation of our cryptographic strength. We do not use validation in order to obscure from an attacker whether they've correctly decrypted the
+	//     outer layer. OBF-1000 further obfuscates from an attacker the actual size of the User Data Payload by blocking to 750 bytes of output and encrypting with a second
+	//     technology, AES-GCM. Providing the core of the MEDRecord cryptosystem is AES-CBC implemented in functionally the same way as OpenSSL used with pbkdf2 on the command line.
+	//     
+	//     The Multi Encrypted Datarecord
+	//     
+	//     |-----------------------------------------------------------------AES-CTR Output---768 Bytes (1024 base 64 chars)---------------------------------------------------------| 
+	//     |-CTR Salt-||------------------------------------------------------CTR Plaintext---750 Bytes (1000 base 64 chars)---------------------------------------------------------| 
+	//                 |----------------------------------------------------OBF-1000 Output - 750 Bytes (1000 base64 chars)----------------------------------------------------------|
+	//                 |-GCM Salt-||-----------------------------------------------------GCM Plaintext---717 Bytes--------------------------------------------------------||-GCM Tag-|
+	//                             |----------------------------------------------------OBF-1000 Blocking System----------------------------------------------------------|
+	//                             |-2Byte CTR Salt-||-2Byte-||-----------------------------OpenSSL Output---------------------------------------||-----Random Filler-----|
+	//                                                        |-***-||-CBC Salt-||-----------CBC Plaintext-----------||-Newline-||-CBC Blocking--|
+	//                                                                           |-------User Data Payload-----------|
+	//     
+	//     
+	//
+	//     |----18----||----18----||-------18-------||---2---||-***-||----8-----||--Browser Input---Up to 670 Bytes--||----1----||----1 to 16----||-[ 710 - File Input  ]-||---15----|
+	//                                           |-------------------------File Input---Up to 704 Bytes------------------------------| 
+	//                                           |-------------------------File Input---Up to 688 Bytes------------------------------| 
+	//		* I think 717 - 20 = 697 theoretical where effectively because of CBC blocking, 688 will be the limit on File Input.
+	//		*                         This would bump User Data Payload / Browser Input down to 670.
+	//		* I think 710 - 13 = 
+	//     
+	//     (***) String literal "Salted__" is removed in the OBF-1000 step. Crypto best practices are to not have a constant in your cipher input which is why the decision was made.
+	//     The added benefit here is extra space for storage.
+	//		****** Maybe CBC blocking is the end of the datagram? which would explain why there's no need for a length variable? maybe it's in the block?
+	//     
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Multi Encrypted Datarecord - Old
 	//     
 	//     |--------------------------------------Multi Encrypted Datarecord (MED)---768 Bytes (1024 base 64 chars)------------------------------------------------------| 
 	//                 |---------------------------------------------CTR Plaintext---750 Bytes (1000 base 64 chars)------------------------------------------------------| 
@@ -591,6 +593,62 @@
 	// AES-CTR stream cipher was chosen to be implemented without validation in order to make it unclear to an attacker if they crack the first level of cipher.
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	//////////////////////////////////////////////////////////////
+	//                   Site Constants                         //
+	//////////////////////////////////////////////////////////////
+
+// Site specific values.
+	// A passlock is a time-limited encryption scheme to secure user passwords in the browser during the 5 minute window a user is encrypting data.
+	const PASSLOCK_LENGTH = 36; // Length of a UUID, used to encrypt/decrypt passlock-encrypted passwords (UUID is stored on server, but user passwords never leave the browser).
+	// These constants are used for passlock timeout functionality, which uses milliseconds.
+	const FIVE_SECONDS = 5000;
+	const FOUR_MINUTES_THIRTY_SECONDS = 270000;
+	const FIVE_MINUTES = 300000;
+	// Fingerprint is the SHA-256 of: sha256(codeword) + sha256(password 1) + sha256(password 2).
+	const FINGERPRINT_LENGTH_BYTES = 32; // 32 bytes is the result of SHA-256 derivation (256 bits = 32 bytes).
+	// Obfuscation specific constants for OBF-1000.
+	const OBF1000_OUTPUT_LIMIT_BASE64 = 1000; // OBF-1000 function is defined by outputting exactly 1000 base64 chars.
+	const SEVEN_BYTE_SET_LENGTH = 7;
+	// Multi Encrypted Datarecord size of 1024 chosen as it saves to hard disk drive as exactly 1 Kib.
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 = 1024;
+
+// Subtle crypto values.
+	// These constants are used in the PBKDF2 derivation.
+	const KEY_AND_IV_BITCOUNT_FOR_OPENSSL = 384; // 256 bits for key + 128 for IV
+	const KEY_AND_IV_BITCOUNT_FOR_AESGCM = 352; // 256 bits for key + 96 for IV
+	const KEY_AND_NONCEANDCOUNTER_BITCOUNT_FOR_AESCTR = 384; // 256 bits for key + 64 for nonce + 64 for counter
+	// Salt and string literal sizes.
+	const OPENSSL_STRING_LITERAL_LENGTH = 8; // String literal 'Salted__' is used by OpenSSL to indicate that it contains a cryptographic salt.
+	const SALT_SIZE_AESCBC = 8;
+	const SALT_SIZE_FOR_AESCTR_AESGCM = 18; // For PBKDF2, key derivation meets recommended limit of 16 bytes: https://developer.mozilla.org/en-US/docs/Web/API/Pbkdf2Params
+	// GCM Tag, which is used like a signature or checksum: generated on encrypt, and later used to validate data during decryption.
+	const GCM_TAGLENGTH_BITS = 120; // 120 bits is valid spec recommendation for GCM: https://w3c.github.io/webcrypto/#aes-gcm-operations-encrypt
+
+// Derivations.
+	// Cryptographic salt & tag length derivations.
+	const AESCTR_SALT_SIZE_BASE64 = SALT_SIZE_FOR_AESCTR_AESGCM * (4/3); // base64 conversion: 18 * (4/3) = 24
+	const GCM_SALT_SIZE_BASE64 = AESCTR_SALT_SIZE_BASE64; // Currently using same salt length of 24 base64 / 18 bytes.
+	const GCM_TAG_SIZE_BYTES = GCM_TAGLENGTH_BITS / 8; // bytes conversion: 120 bits / 8 = 15 bytes
+	const GCM_TAG_SIZE_BASE64 = GCM_TAG_SIZE_BYTES * (4/3); // 15 bytes * (4/3) to convert to base64 = 24
+	// Offline database constant derivations.
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 * (3/4);  // convert to base64: 1024 * (3/4) = 786 bytes
+	const FINGERPRINT_LENGTH_BASE64 = Math.ceil(FINGERPRINT_LENGTH_BYTES * (4/3)); // 32 bytes converts to 43 base64 chars.
+	// Since the fingerprint and MED record are stored together in the offline database, this is their combined total.
+	const FINGERPRINT_AND_MEDRECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64; // 43 + 1024 = 1067 base64
+	// This constant limits the max number of bytes that can be inputted into OBF-1000 without error.
+	const OBF1000_MAX_INPUT_BYTES = (OBF1000_OUTPUT_LIMIT_BASE64 - GCM_TAG_SIZE_BASE64 - GCM_SALT_SIZE_BASE64) * (3/4) - SEVEN_BYTE_SET_LENGTH; // [(1000 - 20 - 24) * (3/4)] - 7 = 710 bytes
+	const MANDO_RANDO_FILL = OBF1000_MAX_INPUT_BYTES % 16;	// 710 mod 16 = 6 mandatory random filler bytes. AES-CBC uses a constant 128 bit (16 byte) blocking size, which imperfectly fits into
+															// the OBF-1000 function's limit of 710 bytes, leaving us with 6 bytes of random filler, and 704 bytes of encrypted data from OpenSSL's output.
+	// Data payload size limit in bytes for Browser input to our Javascript implementation of OpenSSL AES-CBC.
+	const OPENSSL_INPUT_LIMIT_BYTES = OBF1000_MAX_INPUT_BYTES - MANDO_RANDO_FILL - OPENSSL_STRING_LITERAL_LENGTH - SALT_SIZE_AESCBC - 1 - 1; // 710 - 6 bytes of mandatory random filler - 8 string -
+																																			 // 8 salt - 1 newline - 1 CBC Blocking byte = 686 bytes
+	// The maximum file size a user may upload after OpenSSL AES-CBC encryption given the input limits of OBF-1000.
+	const OBF1000_INPUT_LIMIT_BYTES = OBF1000_MAX_INPUT_BYTES - MANDO_RANDO_FILL; // 710 - 6 = 704 bytes
+	// Ensures that OpenSSL's output data length does not exceed OBF-1000's data input length restriction.
+	const OPENSSL_OUTPUT_LIMIT_BASE64 = Math.floor(OBF1000_MAX_INPUT_BYTES * (4/3)); // 710 * (4/3) ~ 946.6667 = 946 rounded down
+	// The pointer points to the next position of data to get written to. The limit below ensures that we do not exceed the limits of our database.
+	const MAX_POINTER_VALUE = 999; // There are a possible 1000 records (0-999) in each of the two sections (encrypted and unencrypted) of the offline database.
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Replicate OpenSSL command line functionality of command: openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc
 	//
@@ -809,7 +867,12 @@
 			plaintextUint8 = plaintextUint8.slice(8);
 		}
 		// Add 7byte prepend (representing length of data) and random filler padding.
+		//const wrappedPlaintextUint8 = wrap7ByteAndFiller(plaintextUint8);
+
+		// Wrap 2Byte header which represents the length of GCM payload.
 		const wrappedPlaintextUint8 = wrap7ByteAndFiller(plaintextUint8);
+
+
 		const wrappedPlaintextBase64 = wrappedPlaintextUint8.toBase64();
 		// Now that the payload data is wrapped with a prepended 7Byte set and random filler padded, we can GCM encrypt the whole thing.
 		const gcmEncrypted64 = await encryptGCM(wrappedPlaintextBase64, password);
@@ -880,9 +943,43 @@
 	//	Output structure:	 7ByteHeader + Input Data Payload + Random Filler 
 	//						 |--7 Bytes--||------------710 Bytes-------------| 	
 	//
+	//	Output structure:	 CTR Salt + 2 Length Bytes + Input Data Payload + Random Filler 
+	//						 |--18 bytes--||--2 Bytes--||------------710 Bytes-------------| 	
+	//
+
+
+
+	function getAndEncrypt2ByteHeader(length, password) {
+		// Create an ArrayBuffer, needed for DataView to operate on. Does this change the const??
+		const lengthBuffer = new ArrayBuffer(2);
+		let lengthUint8 = new Uint8Array(lengthBuffer);
+		console.log('Empty bytes: ', lengthUint8);
+		console.log(lengthUint8);
+		// Change the bytes in the buffer to represent the number held in variable: 'length'.
+		new DataView(lengthBuffer).setUint16(0, length, true); // false = big-endian; true = little-endian
+		lengthUint8 = new Uint8Array(lengthBuffer);
+		console.log('Set bytes: ', lengthUint8);
+		// Setting little-endian option in the dataview byte modification makes the most significant byte to the highest index.
+		const computedLength = 256 * lengthUint8[1] + lengthUint8[0];
+
+		console.log('Length: ', length);
+		console.log('Re-computed Length: ', computedLength);
+	}
+
+	function wrap2ByteAndFiller(inputDataUint8, password) {
+		// Get data payload length for 7byte calculation and to derive filler size.
+		const dataLength = inputDataUint8.length;
+		// Convert data length into 2 byte representation, encrypt results with AES-CTR.
+		const twoByteHeaderUint8 = getAndEncrypt2ByteHeader(dataLength, password);
+
+	}
+
 	function wrap7ByteAndFiller(inputDataUint8) {
 		// Get data payload length for 7byte calculation and to derive filler size.
 		const dataLength = inputDataUint8.length;
+
+
+
 		// Get a 7Byte set that represents the payload dataLength.
 		const sevenByteHeaderUint8 = find7ByteSetForValue(dataLength);
 		// The randomly generated filler 'fills up' the remaining space when data payload length is less than 710.
@@ -890,6 +987,8 @@
 		// 710 = Data Payload Length + Random Filler Length
 		// Re-arranging we can get the fillerLength by subtracting dataLength from 710:
 		const fillerLengthInBytes = OBF1000_MAX_INPUT_BYTES - dataLength;
+
+
 		// Now we can fill a precisely sized array with random data.
 		const randFillerUint8 = window.crypto.getRandomValues(new Uint8Array(fillerLengthInBytes));
 		// Compile Byte Stack leaving 7 bytes worth of space for our 7byte set.
@@ -1422,6 +1521,17 @@
 		const plaintext64 = await decryptOpenSSL(ciphertext, password);
 		return base64ToUtf8(plaintext64);
 	}// utf8DecryptOpenSSL()
+
+
+	////////////////////////////////////////////////////////
+	//				2Byte Functions                       //
+	////////////////////////////////////////////////////////
+
+
+
+
+
+
 
 	////////////////////////////////////////////////////////
 	//				7Byte Functions                       //
