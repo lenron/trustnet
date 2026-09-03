@@ -947,39 +947,63 @@
 	//						 |--18 bytes--||--2 Bytes--||------------710 Bytes-------------| 	
 	//
 
+	// Interpret 2 byte set as base-256 where the highest index is the most significant digit and return that int value.
+	// Used to check 2Byte set generation and for getting the value back for decryption.
+	function getValueFrom2ByteSet(lengthAs2BytesUint8) {
+		// Setting little-endian option in the dataview byte modification makes the most significant byte to the highest index,
+		// so multiply highest index value by 256 (sizeof byte^1) to get value back.
+		return 256 * lengthAs2BytesUint8[1] + lengthAs2BytesUint8[0];
+	}
 
-
-	function getAndEncrypt2ByteHeader(length, password) {
-		// Create an ArrayBuffer, needed for DataView to operate on. Does this change the const??
+	// Take an int and converts it into the 2Byte representation. This is performed before being packed with payload and sent down the pipeline for further encryption.
+	// Used to convert int into a 2byte set.
+	function get2ByteRepFromValue(length) {
+		// Need to manually create buffer for DataView to operate on.
 		const lengthBuffer = new ArrayBuffer(2);
-		let lengthUint8 = new Uint8Array(lengthBuffer);
-		console.log('Empty bytes: ', lengthUint8);
-		console.log(lengthUint8);
 		// Change the bytes in the buffer to represent the number held in variable: 'length'.
-		new DataView(lengthBuffer).setUint16(0, length, true); // false = big-endian; true = little-endian
-		lengthUint8 = new Uint8Array(lengthBuffer);
-		console.log('Set bytes: ', lengthUint8);
 		// Setting little-endian option in the dataview byte modification makes the most significant byte to the highest index.
-		const computedLength = 256 * lengthUint8[1] + lengthUint8[0];
+		new DataView(lengthBuffer).setUint16(0, length, true); // false = big-endian; true = little-endian
+		const lengthAs2BytesUint8 = new Uint8Array(lengthBuffer);
+		// Make sure we set up the bytes correctly.
+		const computedLength = getValueFrom2ByteSet(lengthAs2BytesUint8);
+		if (length === computedLength){
+			return lengthAs2BytesUint8;
+		} else {
+			throw new Error("2Byte generation failed! Something is very wrong!");
+		}
+	}
 
-		console.log('Length: ', length);
-		console.log('Re-computed Length: ', computedLength);
+	// Produce 2Byte header for OBF-1000 that is representative of the length of OBF-1000 payload.
+	// First convert input length value int into base-256 byte form, then encrypt with AES-CTR.
+	async function getAndEncrypt2ByteHeader(length, password) {
+		// Convert length int into 2 byte Uint8Array representation of that int value.
+		const lengthAs2BytesUint8 = get2ByteRepFromValue(length);
+		// Convert 2byte set to base64 as input, encrypt with OBF-1000 password.
+		const encrypted2ByteSetWithSalt64 = await encryptAESCTR(lengthAs2BytesUint8.toBase64(), password);
+		//console.log(encrypted2ByteSetWithSalt64);
+		// |--18 bytes salt--||--2 encrypted bytes--| should be the output.
+		return Uint8Array.fromBase64(encrypted2ByteSetWithSalt64);
+	}
+
+	// First decrypt 20 bytes worth of header into 2 bytes in base256,
+	// then convert those bytes into int represenation of the length of OBF-1000 data payload which will aid in decryption.
+	async function decrypt2ByteHeaderAndGetValue(encrypted2ByteSetWithSaltUint8, password) {
+		const decrypted2ByteSet64 = await decryptAESCTR(encrypted2ByteSetWithSaltUint8.toBase64(), password);
+		//const length = getValueFrom2ByteSet(Uint8Array.fromBase64(decrypted2ByteSet64));
+		return getValueFrom2ByteSet(Uint8Array.fromBase64(decrypted2ByteSet64));
 	}
 
 	function wrap2ByteAndFiller(inputDataUint8, password) {
 		// Get data payload length for 7byte calculation and to derive filler size.
 		const dataLength = inputDataUint8.length;
 		// Convert data length into 2 byte representation, encrypt results with AES-CTR.
-		const twoByteHeaderUint8 = getAndEncrypt2ByteHeader(dataLength, password);
+		const encrypted2ByteHeaderUint8 = getAndEncrypt2ByteHeader(dataLength, password);
 
 	}
 
 	function wrap7ByteAndFiller(inputDataUint8) {
 		// Get data payload length for 7byte calculation and to derive filler size.
 		const dataLength = inputDataUint8.length;
-
-
-
 		// Get a 7Byte set that represents the payload dataLength.
 		const sevenByteHeaderUint8 = find7ByteSetForValue(dataLength);
 		// The randomly generated filler 'fills up' the remaining space when data payload length is less than 710.
@@ -987,8 +1011,6 @@
 		// 710 = Data Payload Length + Random Filler Length
 		// Re-arranging we can get the fillerLength by subtracting dataLength from 710:
 		const fillerLengthInBytes = OBF1000_MAX_INPUT_BYTES - dataLength;
-
-
 		// Now we can fill a precisely sized array with random data.
 		const randFillerUint8 = window.crypto.getRandomValues(new Uint8Array(fillerLengthInBytes));
 		// Compile Byte Stack leaving 7 bytes worth of space for our 7byte set.
