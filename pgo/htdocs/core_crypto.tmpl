@@ -575,22 +575,25 @@
 	const FINGERPRINT_AND_MEDRECORD_LENGTH_BASE64 = FINGERPRINT_LENGTH_BASE64 + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64; // 43 + 1024 = 1067 base64
 
 	// Simple derivation for Input Limits.
-	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 * (3/4);  // 768 = 1024 * (3/4)    Convert to base64.
+	// Input limits are derived based on the size chosen for the Multi Encrypted Datarecord and values that are set in order to maximize available space.
+	const MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 * (3/4);  // 768 = 1024 * (3/4)    Convert to bytes.
+	// We need 18 bytes to fit the AES-CTR salt, which sets the limit for AES-CTR input to 750 bytes (1000 base64).
 	const AES_CTR_INPUT_LIMIT_BYTES = MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES - SALT_SIZE_FOR_AESCTR_AESGCM; // 750 = 768 - 18
-	//console.log(AES_CTR_INPUT_LIMIT_BYTES);
-	const OBF_1000_INPUT_LIMIT_BYTES = AES_CTR_INPUT_LIMIT_BYTES - SALT_SIZE_FOR_AESCTR_AESGCM - GCM_TAG_SIZE_BYTES - TWO_BYTE_SET_LENGTH; // 697 = 750 - 18 - 15 - 20
-	//console.log(OBF_1000_INPUT_LIMIT_BYTES);
+	const OBF_1000_INPUT_LIMIT_BYTES = AES_CTR_INPUT_LIMIT_BYTES - SALT_SIZE_FOR_AESCTR_AESGCM - TWO_BYTE_SET_LENGTH - GCM_TAG_SIZE_BYTES ; // 697 = 750 - 18 - 20 - 15
 	const MANDO_RANDO_FILL = OBF_1000_INPUT_LIMIT_BYTES % 16; // 9 = 697 % 16 
-	//console.log(MANDO_RANDO_FILL);
+	// We size input limits to maximize available space. This informs the decision to choose values starting with CBC blocking of one byte.
+	// The minimum number of bytes OpenSSL's CBC blocking can take up is one byte. 
+	// A minimum of one byte is needed for OpenSSL's CBC blocking due to spec. The input payload size is set to its maximum size in part due to this constraint.
+	// To maximize space with keeping CBC blocking in mind (can be 1-16 bytes) we set its value to 1 and work backwards.
+	// In otherwords, we set the limit based on the maximum size of input before another full 16-byte CBC block would be needed.
 	const OPENSSL_INPUT_LIMIT_BYTES = OBF_1000_INPUT_LIMIT_BYTES - MANDO_RANDO_FILL - OPENSSL_STRING_LITERAL_LENGTH - SALT_SIZE_AESCBC - NEWLINE_BYTE_LENGTH - OPENSSL_CBC_BLOCKING_MIN_LENGTH; // 670 = 697 - 9 - 8 - 8 - 1 - 1
-	//console.log(OPENSSL_INPUT_LIMIT_BYTES);
 
 	// Convert input limits to base64 for data pipeline checks.
 	const AES_CTR_INPUT_LIMIT_BASE64 = AES_CTR_INPUT_LIMIT_BYTES * (4/3); // 1000 = 750 * (4/3)
 	//console.log(AES_CTR_INPUT_LIMIT_BASE64);
-	const OBF_1000_INPUT_LIMIT_BASE64 = Math.floor(OBF_1000_INPUT_LIMIT_BYTES * (4/3)); // 929 = round down[ 697 * (4/3) ]
+	const OBF_1000_INPUT_LIMIT_BASE64 = Math.floor(OBF_1000_INPUT_LIMIT_BYTES * (4/3)); // 929 = round down [697 * (4/3)]
 	//console.log(OBF_1000_INPUT_LIMIT_BASE64);
-	const OPENSSL_INPUT_LIMIT_BASE64 = Math.floor(OPENSSL_INPUT_LIMIT_BYTES * (4/3)); // 893 = round down[ 670 * (4/3) ]
+	const OPENSSL_INPUT_LIMIT_BASE64 = Math.floor(OPENSSL_INPUT_LIMIT_BYTES * (4/3)); // 893 = round down [670 * (4/3)]
 	//console.log(OPENSSL_INPUT_LIMIT_BASE64);
 	// Check that our intended OBF-1000 output of 1000 base64 chars matches computed input limit for AES-CTR step.
 	if (OBF1000_OUTPUT_LIMIT_BASE64 !== AES_CTR_INPUT_LIMIT_BASE64) {
@@ -898,78 +901,14 @@
 	}// addStringLiteralSalted()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality: Add a 7ByteHeader representing the length of the data and also pad with random filler to satisfy output length of 1000 base64 chars.
+	// Base Functionality: Add a 2ByteHeader representing the length of the data and also pad with random filler to satisfy output length of 1000 base64 chars.
 	//  OBF-1000 Internal Function - both source and destination.
 	//
 	//	Inputs structure:	inputDataUint8: Uint8Array containing data to be encrypted.
-	//						If this is a Multi Encrypted Datarecord, it will be OpenSSL output sans string literal Salted__ which is removed by encryptOBF1000.
-	//
-	//	Output structure:	 7ByteHeader + Input Data Payload + Random Filler 
-	//						 |--7 Bytes--||------------710 Bytes-------------| 	
 	//
 	//	Output structure:	 CTR Salt + 2 Length Bytes + Input Data Payload + Random Filler 
 	//						 |--18 bytes--||--2 Bytes--||------------710 Bytes-------------| 	
 	//
-
-
-
-	// Interpret 2 byte set as base-256 where the highest index is the most significant digit and return that int value.
-	// Used to check 2Byte set generation and for getting the value back for decryption.
-	function getValueFrom2ByteSet(lengthAs2BytesUint8) {
-		// Setting little-endian option in the dataview byte modification makes the most significant byte to the highest index,
-		// so multiply highest index value by 256 [(size of a byte)^1] to get value back.
-		return 256 * lengthAs2BytesUint8[1] + lengthAs2BytesUint8[0];
-	}
-
-	// Take an int and converts it into the 2Byte representation. This is performed before being packed with payload and sent down the pipeline for further encryption.
-	// Used to convert int into a 2byte set.
-	function get2ByteRepFromValue(length) {
-		// Need to manually create buffer for DataView to operate on.
-		const lengthBuffer = new ArrayBuffer(2);
-		// Change the bytes in the buffer to represent the number held in variable: 'length'.
-		// Setting little-endian option in the dataview byte modification makes the most significant byte to the highest index.
-		new DataView(lengthBuffer).setUint16(0, length, true); // false = big-endian; true = little-endian
-		const lengthAs2BytesUint8 = new Uint8Array(lengthBuffer);
-		// Make sure we set up the bytes correctly.
-		const computedLength = getValueFrom2ByteSet(lengthAs2BytesUint8);
-		if (length === computedLength){
-			return lengthAs2BytesUint8;
-		} else {
-			throw new Error("2Byte generation failed! Something is very wrong!");
-		}
-	}
-
-	// Produce 2Byte header for OBF-1000 that is representative of the length of OBF-1000 payload.
-	// First convert input length value int into base-256 byte form, then encrypt with AES-CTR.
-	async function produce2ByteHeader(length, password) {
-		// Convert length int into 2 byte Uint8Array representation of that int value.
-console.log("encrypt length: ", length);
-		const lengthAs2BytesUint8 = get2ByteRepFromValue(length);
-console.log("encrypt 2byte set: ", lengthAs2BytesUint8);
-		// Exectue the encryption by passing in base64 representation of bytes, use OBF-1000 password to encrypt.
-		const encrypted2ByteSetWithSalt64 = await encryptAESCTR(lengthAs2BytesUint8.toBase64(), password);
-		// |--18 bytes salt--||--2 encrypted bytes--| should be the output.
-		const twoByteHeader = Uint8Array.fromBase64(encrypted2ByteSetWithSalt64);
-console.log("encrypt two byte header: ", twoByteHeader);
-		return twoByteHeader;
-	}
-
-	// First decrypt 20 bytes worth of header into 2 bytes in base256,
-	// then convert those bytes into int represenation of the length of OBF-1000 data payload which will aid in decryption.
-	async function decrypt2ByteHeaderAndGetValue(encrypted2ByteSetWithSaltUint8, password) {
-console.log("decrypt two byte header: ", encrypted2ByteSetWithSaltUint8);
-		// Core crypto enc/dec functions input and output base64.
-		// Exectue the decryption passing in base64 representation of bytes, use OBF-1000 password to decrypt.
-		const decrypted2ByteSet64 = await decryptAESCTR(encrypted2ByteSetWithSaltUint8.toBase64(), password);
-		const decrypted2ByteSetUint8 = Uint8Array.fromBase64(decrypted2ByteSet64);
-console.log("decrypt 2byte set: ", decrypted2ByteSetUint8);
-		//const length = getValueFrom2ByteSet(Uint8Array.fromBase64(decrypted2ByteSet64));
-		const length = getValueFrom2ByteSet(decrypted2ByteSetUint8);
-console.log("decrypt length: ", length);
-		//return getValueFrom2ByteSet(Uint8Array.fromBase64(decrypted2ByteSet64));
-		return length;
-	}
-
 	async function wrap2ByteAndFiller(inputDataUint8, password) {
 		// Get pieces of array first.
 		// Get data payload length for 7byte calculation and to derive filler size.
@@ -997,7 +936,6 @@ console.log("decrypt length: ", length);
 		// Slice off the 20 bytes that hold the (encrypted) data length.
 		const twoByteSlice = inputDataUint8.slice(0, TWO_BYTE_SET_LENGTH);
 		// Compute value that 2Byte set represents.
-		//const dataLength = eval7ByteValue(sevenByteSlice);
 		const dataLength = await decrypt2ByteHeaderAndGetValue(twoByteSlice, password);
 		// Extract data bytes.
 		const headerAndDataOffset = dataLength + TWO_BYTE_SET_LENGTH;
@@ -1005,54 +943,55 @@ console.log("decrypt length: ", length);
 		return dataBytes;
 	}// unwrap2ByteAndFiller()
 
+	// Interpret 2 byte set as base-256 where the highest index is the most significant digit and return that int value.
+	// Used to check 2Byte set generation and for getting the value back for decryption.
+	function getValueFrom2ByteSet(lengthAs2BytesUint8) {
+		// Setting little-endian option in the dataview byte modification makes the most significant byte to the highest index,
+		// so multiply highest index value by 256 [(size of a byte)^1] to get value back.
+		return 256 * lengthAs2BytesUint8[1] + lengthAs2BytesUint8[0];
+	}
 
-/*
-	function wrap7ByteAndFiller(inputDataUint8) {
-		// Get data payload length for 7byte calculation and to derive filler size.
-		const dataLength = inputDataUint8.length;
-		// Get a 7Byte set that represents the payload dataLength.
-		const sevenByteHeaderUint8 = find7ByteSetForValue(dataLength);
-		// The randomly generated filler 'fills up' the remaining space when data payload length is less than 710.
-		// This is calculated using the following relation where 710 is the maximum data length:
-		// 710 = Data Payload Length + Random Filler Length
-		// Re-arranging we can get the fillerLength by subtracting dataLength from 710:
-		const fillerLengthInBytes = OBF1000_MAX_INPUT_BYTES - dataLength;
-		// Now we can fill a precisely sized array with random data.
-		const randFillerUint8 = window.crypto.getRandomValues(new Uint8Array(fillerLengthInBytes));
-		// Compile Byte Stack leaving 7 bytes worth of space for our 7byte set.
-		// This array can be no larger than 717 bytes to meet the 1000 base64 char output limit.
-		let dataWith7ByteSetAndRandFiller = new Uint8Array(OBF1000_MAX_INPUT_BYTES + 7);
-		// 7Byte set goes at the front of the final array.
-		dataWith7ByteSetAndRandFiller.set(sevenByteHeaderUint8, 0);
-		// Next comes payload data.
-		dataWith7ByteSetAndRandFiller.set(inputDataUint8, 7);
-		// Remaining space gets the randomly generated filler.
-		const dataOffset = 7 + dataLength;
-		dataWith7ByteSetAndRandFiller.set(randFillerUint8, dataOffset);
-		//dataWith7ByteSetAndRandFiller64 = dataWith7ByteSetAndRandFiller.toBase64();
-		//return dataWith7ByteSetAndRandFiller64;
-		return dataWith7ByteSetAndRandFiller;
-	}// wrap7ByteAndFiller()
+	// Take an int and converts it into the 2Byte representation. This is performed before being packed with payload and sent down the pipeline for further encryption.
+	// Used to convert int into a 2byte set.
+	function get2ByteSetFromValue(length) {
+		// Need to manually create buffer for DataView to operate on.
+		const lengthBuffer = new ArrayBuffer(2);
+		// Change the bytes in the buffer to represent the number held in variable: 'length'.
+		// Setting little-endian option in the dataview byte modification makes the most significant byte to the highest index.
+		new DataView(lengthBuffer).setUint16(0, length, true); // false = big-endian; true = little-endian
+		const lengthAs2BytesUint8 = new Uint8Array(lengthBuffer);
+		// Make sure we set up the bytes correctly.
+		const computedLength = getValueFrom2ByteSet(lengthAs2BytesUint8);
+		if (length === computedLength){
+			return lengthAs2BytesUint8;
+		} else {
+			throw new Error("2Byte generation failed! Something is very wrong!");
+		}
+	}
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Purpose: Remove both the 7ByteHeader and Random Filler from input Uint8Array for decryptOBF1000()
-	//
-	// Input + Output: Internal function of decryptOBF1000()
-	// Input Structure: Uint8Array composed of: 7ByteHeader + Output Uint8Array + Random Filler
-	//                                           |--7 Bytes-|  |--------710 Bytes-------------|
-	// Output Structure: Output Uint8Array
-	//
-	function unwrap7ByteAndFiller(inputDataUint8) {
-		// Slice off set of bytes that represent data length.
-		const sevenByteSlice = inputDataUint8.slice(0, 7);
-		// Compute value that 7Byte set represents.
-		const dataLength = eval7ByteValue(sevenByteSlice);
-		// Extract data bytes.
-		const dataOffset  = dataLength + 7;
-		dataBytes = inputDataUint8.slice(7, dataOffset);
-		return dataBytes;
-	}// unwrap7ByteAndFiller()
-*/
+	// Produce 2Byte header for OBF-1000 that is representative of the length of OBF-1000 payload.
+	// First convert input length value int into base-256 byte form, then encrypt with AES-CTR.
+	async function produce2ByteHeader(length, password) {
+		// Convert length int into 2 byte Uint8Array representation of that int value.
+		const lengthAs2BytesUint8 = get2ByteSetFromValue(length);
+		// Exectue the encryption by passing in base64 representation of bytes, use OBF-1000 password to encrypt.
+		const encrypted2ByteSetWithSalt64 = await encryptAESCTR(lengthAs2BytesUint8.toBase64(), password);
+		// |--18 bytes salt--||--2 encrypted bytes--| should be the output.
+		const twoByteHeader = Uint8Array.fromBase64(encrypted2ByteSetWithSalt64);
+		return twoByteHeader;
+	}
+
+	// First decrypt 20 bytes worth of header into 2 bytes in base256,
+	// then convert those bytes into int represenation of the length of OBF-1000 data payload which will aid in decryption.
+	async function decrypt2ByteHeaderAndGetValue(encrypted2ByteSetWithSaltUint8, password) {
+		// Core crypto enc/dec functions input and output base64.
+		// Exectue the decryption passing in base64 representation of bytes, use OBF-1000 password to decrypt.
+		const decrypted2ByteSet64 = await decryptAESCTR(encrypted2ByteSetWithSaltUint8.toBase64(), password);
+		const decrypted2ByteSetUint8 = Uint8Array.fromBase64(decrypted2ByteSet64);
+		const length = getValueFrom2ByteSet(decrypted2ByteSetUint8);
+		return length;
+	}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Produce AES-GCM ciphertext from plaintext, password input data.
 	//
@@ -1442,9 +1381,7 @@ console.log("decrypt length: ", length);
 	//
 	async function encryptDouble(obf1000Pass, ctrPass, fileDataBase64) {
 		// OBF-1000 step.
-		checkLengthAndBase64(fileDataBase64, OBF_1000_INPUT_LIMIT_BASE64);
 		const obf1000Encrypted = await encryptOBF1000(fileDataBase64, obf1000Pass);
-		//checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
 		// AES-CTR step.
 		checkLengthAndBase64(obf1000Encrypted, AES_CTR_INPUT_LIMIT_BASE64);
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
@@ -1471,19 +1408,13 @@ console.log("decrypt length: ", length);
 	//
 	async function encryptTriple(obf1000Pass, ctrPass, opensslPass, plaintextData) {
 		// OpenSSL step.
-		checkLengthAndBase64(plaintextData, OPENSSL_INPUT_LIMIT_BASE64);
 		const opensslEncrypted = await utf8EncryptOpenSSL(plaintextData, opensslPass);
-console.log("openssl encrypted: ", opensslEncrypted);
-		//checkLengthAndBase64(opensslEncrypted, OPENSSL_OUTPUT_LIMIT_BASE64);
 		// OBF-1000 step.
 		checkLengthAndBase64(opensslEncrypted, OBF_1000_INPUT_LIMIT_BASE64);
 		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
-console.log("obf encrypted: ", obf1000Encrypted);
-		//checkLengthAndBase64(obf1000Encrypted, OBF1000_OUTPUT_LIMIT_BASE64);
 		// AES-CTR step.
 		checkLengthAndBase64(obf1000Encrypted, AES_CTR_INPUT_LIMIT_BASE64);
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
-console.log("ctr encrypted: ", ctrEncrypted);
 		// Check output before returning data.
 		checkLengthAndBase64(ctrEncrypted, MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64);
 		return ctrEncrypted;
@@ -1531,10 +1462,8 @@ console.log("ctr encrypted: ", ctrEncrypted);
 	async function decryptTriple(obf1000Pass, ctrPass, opensslPass, multiEncryptedDatarecord) {
 		// AES-CTR step.
 		const ctrDecrypted = await decryptAESCTR(multiEncryptedDatarecord, ctrPass);
-console.log("CTR decrypted: ", ctrDecrypted);
 		// OBF-1000 step.
 		const obf1000Decrypted = await decryptOBF1000(ctrDecrypted, obf1000Pass);
-console.log("obf decrypted: ", obf1000Decrypted);
 		// OpenSSL step.
 		return await utf8DecryptOpenSSL(obf1000Decrypted, opensslPass);
 	}// decryptTriple()
