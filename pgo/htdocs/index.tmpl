@@ -373,7 +373,7 @@
 				<a href="https://obf.mkrsvr.org/faq">FAQ</a>
 			</div>
 			<div class="header_label" style="">
-				<a href="javascript:void(0);" onclick="toggleDevSite()">DEV_SITE</a>
+				<a id="dev_site_toggle_link" href="javascript:void(0);" onclick="toggleDevSite()">DEV_SITE</a>
 			</div>
 			<div class="header_label" style="">
 				<a href="https://obf.mkrsvr.org/contact">CONTACT</a>
@@ -1335,13 +1335,21 @@
 </body>
 <script>
 
+	///////////////////////////////////////////////////////////////////////////////////
+	//						Dev Site                                                 //
+	///////////////////////////////////////////////////////////////////////////////////
+
 	let main_page = true;
 	function toggleDevSite() {
 		if (main_page) {
+			// Switch to Dev site. Change link name to MAIN_SITE
+			document.getElementById("dev_site_toggle_link").innerHTML = "MAIN_SITE";
 			document.getElementById("dev_site").style.display = "flex";
 			document.getElementById("main_page").style.display = "none";
 			main_page = false;
 		} else {
+			// Switch to Main site. Change link name to DEV_SITE
+			document.getElementById("dev_site_toggle_link").innerHTML = "DEV_SITE";
 			document.getElementById("dev_site").style.display = "none";
 			document.getElementById("main_page").style.display = "flex";
 			main_page = true;
@@ -2022,121 +2030,6 @@
 		// Execute crypto on button click.
 		executeTriple();
 	}// activateDecTriple()
-
-
-	// Return true if input only contains base64 chars, including padding char: '='
-	function checkBase64Chars(input) {
-		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
-		if (regex.test(input)) {
-			// Return true/valid
-			return true;
-		}else{
-			// Return false/invalid
-			return false;
-		}
-	}// checkBase64Chars()
-
-	function checkDataLength(data, length) {
-		// Return fail if data length surpasses length.
-		if (data.length > length) {
-			console.log("Data length Invalid!");
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	function checkLengthAndBase64(data, length){
-		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
-			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
-		} 
-	}
-
-
-	// Concatenates ArrayBuffers.
-	// Inputs: buffer1, buffer2 are tested as working if they are buffers or Uint8Arrays.
-	// Output: return = buffer1 concatenated with buffer2 in order buffer1, then buffer2.
-	// There doesn't appear to be a native array merge for typed arrays like Uint8Array (their length is fixed).
-	function concatBuffer(buffer1, buffer2) {
-		// Create new uint8array with size of buffer1 length + buffer 2 length.
-		let tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
-		// Set left part of the array to buffer 1.
-		tmp.set(new Uint8Array(buffer1), 0);
-		// Set right part of the array to buffer 2.
-		tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
-		// Return the uint8array (which contains underlying ArrayBuffer which contains raw binary data)
-		return tmp;
-	}// concatBuffer()
-
-	////////////////////////////////////////////////////////////////////////////////
-	//                       Copy to Click Functions                              //
-	////////////////////////////////////////////////////////////////////////////////
-
-	// Attach encrypt function listeners to access and store divs.
-	document.getElementById("encrypt_click_access").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
-	// Attach decrypt function listeners to access and store divs.
-	document.getElementById("decrypt_click_access").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
-
-	// Copy command line OpenSSL command to clipboard as user clicks div.
-	async function copyEncryptOpenSslCmdToClipboard(){
-		try {
-			// Copy command to clipboard.
-			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc");
-			console.log("OpenSSL encrypt command copied to clipboard.");
-			// Display message indicating command was copied to clipboard.
-			showAllCopiedEncryptCommandInform();
-			// Undisplay message in 5 seconds after showing it.
-			setTimeout(() => {
-				hideAllCopiedEncryptCommandInform();
-			}, FIVE_SECONDS); 
-		} catch (error){
-			console.error(error.message);
-		}
-	}
-
-	function showAllCopiedEncryptCommandInform(){
-		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
-		for (const element of messageElements){
-			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
-		}
-	}
-
-	function hideAllCopiedEncryptCommandInform(){
-		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
-		for (const element of messageElements){
-			element.style.display = 'none'; // Or 'inline', 'flex', etc.
-		}   
-	}
-
-	// Copy command line OpenSSL command to clipboard as user clicks div.
-	async function copyDecryptOpenSslCmdToClipboard(){
-		try {
-			// Copy command to clipboard.
-			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt");
-			console.log("OpenSSL decrypt command copied to clipboard.");
-			// Display message indicating command was copied to clipboard.
-			showAllCopiedDecryptCommandInform();
-			// Undisplay message in 5 seconds after showing it.
-			setTimeout(() => {
-				hideAllCopiedDecryptCommandInform();
-			}, FIVE_SECONDS); 
-		} catch (error){
-			console.error(error.message);
-		}
-	}
-
-	function showAllCopiedDecryptCommandInform(){
-		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
-		for (const element of messageElements){
-			element.style.display = 'inline'; // Or 'inline', 'flex', etc.
-		}
-	}
-	function hideAllCopiedDecryptCommandInform(){
-		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
-		for (const element of messageElements){
-			element.style.display = 'none'; // Or 'inline', 'flex', etc.
-		}   
-	}
 
 
 	//////////////////////////////////////////////////////////////
@@ -3817,7 +3710,6 @@
 		font-optical-sizing: auto;
 		font-weight: 600;
 		font-style: normal;
-		/*color: #54c597;    Online Green */
 		/* Offline Red */
 		color: red;
 	}
@@ -3840,8 +3732,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		/*color: #54c597;    Online Green */
-/* Offline Red */color: red;
+		color: red; /* Offline Red */
 		padding: 4px;
 		padding-right: 10px;
 		padding-left: 10px;
@@ -3876,8 +3767,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center; 
-		/*color: #54c597;    Online Green */
-/* Offline Red */color: red;
+		color: red; /* Offline Red */
 	}
 
 	/* default button styling. HTML style="" will override. */
@@ -3890,25 +3780,22 @@
 		margin: 8px;
 		padding-right: 10px;
 		padding-left: 10px;
-		/*color: #54c597;    Online Green */
-/* Offline Red */color: red;
-		/*border-color: #54c597;    Online Green */
-/* Offline Red */border-color: red;
+		color: red; /* Offline Red */
+		border-color: red; /* Offline Red */
 		font-size: 17px;
 		border-radius: 15px;
 	}
 
-	input[type="password"] {
+	/* input[type="password"] { */
+	.main_site_password_input {
 		height: 80px;
 		width: 95%;
 		background-color: #272727;
 		border: 2px solid;
 		padding: 8px;
 		margin: 8px;
-		/*border-color: #54c597;    Online Green */
-/* Offline Red */border-color: red;
-		/*color: #54c597;    Online Green */
-/* Offline Red */color: red;
+		border-color: red; /* Offline Red */
+		color: red; /* Offline Red */
 		font-size: 25px;
 		border-radius: 20px;
 	}
@@ -3916,7 +3803,7 @@
 	a {
 		font-family: Arial, Helvetica, sans-serif;
 		font-size: 16px;
-		color: blue;
+		color: #4491d5;
 	}
 
 	p {
@@ -4023,12 +3910,12 @@
 	}
 
 	/* Makes the text blend from orange to #AEE850 */
-	/* background-clip: text creates a 'cut-out' of the background where the text exists, creating text with a linear gradient.*/
+	/* background-clip: text creates a 'cut-out' of the background where the text exists, creating text with a linear gradient.
 	.glossy_icon {
 		background-image: linear-gradient(orange, #aee850);
 		color: transparent;
 		background-clip: text;
-	}
+	}*/
 
 	/* Set minimum page Width to */
 	@media screen and (max-width: 340px) { html,body {min-width: 340px} }
@@ -4097,6 +3984,77 @@
 		}
 	}
 
+	/*    Dev Site   */
+
+	.main_page {
+		background-color: #272727;
+		display: flex;
+		flex-direction: column;
+		min-height: 90vh;
+		margin: 0;
+		padding: 0;
+	}
+
+	.dev_site {
+		background-color: #272727;
+		display: none;
+		flex-direction: column;
+		min-height: 90vh;
+		margin: 0;
+		padding: 0;
+	}
+
+	.glossy_icon {
+		color: magenta;
+	}
+
+	.sidebar_button {
+		margin-top: 20px;
+		writing-mode: vertical-lr;
+		/* Scale appears to rotate text around a center point. Translate then moves it to the right enough to not be cut off by the left screen edge. */
+		transform: scale(-1, -1) translate(-15px);
+		cursor: pointer;
+	}
+
+	.dev_site_sections {
+		display:flex;
+		flex-direction:column;
+		padding:10px;
+		margin-bottom:10px;
+		width: 90%;
+	}
+
+	.textarea_div_heightcontrol {
+		height: 400px;
+	}
+
+	textarea {
+		background-color: #272727;
+		border: 2px solid;
+		border-color: #54c597;
+		color: #54c597;
+		border-radius: 10px;
+		/* Use the first font installed on your system. */
+		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+		/*font-family: Liberation Mono;*/
+		height: 100%;
+	}
+
+	.dev_site_password_input {
+		padding: 6px;
+		background-color: #272727;
+		border: 2px solid;
+		border-color: #54c597;
+		color: #54c597;
+		border-radius: 10px;
+		/* Use the first font installed on your system. */
+		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+	}
+
+
+
+
+
 </style>
 <body>
 	<!--------------------------HEADER----------------------------!>
@@ -4108,7 +4066,7 @@
 		</div>
 		<div class="header_content" id="header_right">
 			<div class="header_label" style="">
-				<label id="faq">FAQ</label>
+				<a id="dev_site_toggle_link" href="javascript:void(0);" onclick="toggleDevSite()">DEV_SITE</a>
 			</div>
 		</div>
 	</div>
@@ -4121,302 +4079,591 @@
 	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
 		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
 	</div>
-	<!--------------------------Div Housing for Flow Pages----------------------------!>
-	<div class="center_html" id="center_html" style="">
 
-<!----------------------------Offline Flow Start--------------------------------------------------------------!>
-			<!--------------------------OFFLINE HOME----------------------------!>
-			<div class="flow_pages home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
-				<h2 style="color:red">OFFLINE HOME</h2>
-				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_codeword')">ACCESS SECRET DATA</button>
-					<button class="obf_button" id='go_offlinesync_flow' style="flex-grow:1" onclick="saveThenShowPage('offlinesync_codeword')">SYNC STORED DATA TO ONLINE DATABASE</button>
-				</div>
-			</div>
 
-<!----------------------------Offline SYNC TO ONLINE--------------------------------------------------------------!>
-			<!---------------------------SYNC TO ONLINE Codeword-----------------------!>
-			<div class="flow_pages passlock" id="offlinesync_codeword" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-				<h2 style="color:red">OFFLINE FLOW</h2>
-					<label>SYNC FLOW</label>
-					<label>CODEWORD</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlinesync_codeword_input" style="" oninput="codewordToLowerCase(event)">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_codeword_input'); saveThenShowPage('offlinesync_obf1000Pass')">CONTINUE</button>
-				</div>
-			</div>
-
-			<!---------------------------SYNC TO ONLINE obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinesync_obf1000Pass" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-					<label>SYNC FLOW</label>
-					<label>PASS 1</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinesync_obf1000Pass_input" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_obf1000Pass_input'); saveThenShowPage('offlinesync_ctrPass');">CONTINUE</button>
-				</div>
-			</div>
-
-			<!---------------------------SYNC TO ONLINE ctrPass-----------------------!>
-			<div class="flow_pages passlock" id="offlinesync_ctrPass" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-					<label>SYNC FLOW</label>
-					<label>PASS 2</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER PASSWORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlinesync_ctrPass_input" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_obf1000Pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptSyncToOnline('offlinesync_ctrPass_input')">SYNC TO ONLINE</button>
-				</div>
-			</div>
-
-<!----------------------------Offline Access--------------------------------------------------------------!>
-			<!---------------------------Codeword-----------------------!>
-			<div class="flow_pages passlock" id="offlineaccess_codeword" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-				<h2 style="color:red">OFFLINE FLOW</h2>
-					<label>ACCESS FLOW</label>
-					<label>CODEWORD</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="" oninput="codewordToLowerCase(event)">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); saveThenShowPage('offlineaccess_obf1000Pass')">CONTINUE</button>
-				</div>
-			</div>
-
-			<!---------------------------obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlineaccess_obf1000Pass" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-					<label>ACCESS FLOW</label>
-					<label>PASS 1</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlineaccess_obf1000Pass_input" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf1000Pass_input');saveThenShowPage('offlineaccess_ctrPass');">CONTINUE</button>
-				</div>
-			</div>
-
-			<!---------------------------ctrPass-----------------------!>
-			<div class="flow_pages passlock" id="offlineaccess_ctrPass" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-					<label>ACCESS FLOW</label>
-					<label>PASS 2</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER PASSWORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlineaccess_ctrPass_input" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_obf1000Pass')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_ctrPass_input');saveThenShowPage('offlineaccess_choose');">CONTINUE</button>
-				</div>
-			</div>
-
-			<!--------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
-			<div class="flow_pages" id="offlineaccess_choose" style="display:none">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-				<label>ACCESS DATA</label>
-				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_ctrPass')">BACK</button>
-					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="activatable_by_enter" id='offlineaccess_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="saveThenShowPage('offlineaccess_opensslpass')">
-							<span style="">BROWSER</span>
-							<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
-						</button>
+		<!--------------------------DEV SITE--------------------------------------------------------------------------------------------------------------------------------------------------------!>
+		<div class="dev_site" id="dev_site">
+			<!--------------------------Sidebar and Page----------------------------!>
+			<div class="" id="sidebar_and_page" style="display:flex; flex-direction:row; width:100%; ">
+				<!--------------------------SIDEBAR----------------------------!>
+				<div class="" id="sidebar_section" style="position:fixed; display:flex; flex-direction:column; align-items:flex-end; background-color:#434343; margin-top:50px; width:20px; height:100%; ">
+					<div class="sidebar_button" id="openssl_sidebar_button" style="">
+						<a id="" href="#openssl" style="text-decoration:none; "><p id="openssl_sidebar_text" style="color:magenta; ">AES-CBC</p></a>
 					</div>
-					<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
-						<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="attemptCMDAccessOffline()">
-							<span class="coolpink" style="">COMMAND LINE</span>
-							<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
-						</button>
-						<label class="coolpink" style="align-self:center;">More Secure</label>
+					<div class="sidebar_button" id="gcm1000_sidebar_button" style="">
+						<a id="" href="#gcm1000" style="text-decoration:none; "><p id="gcm1000_sidebar_text" style=" ">OBF-1000</p></a>
+					</div>
+					<div class="sidebar_button" id="aesctr_sidebar_button" style="">
+						<a id="" href="#aesctr" style="text-decoration:none; "><p id="aesctr_sidebar_text" style=" ">AES-CTR</p></a>
+					</div>
+					<div class="sidebar_button" id="triple_sidebar_button" style="">
+						<a id="" href="#triple" style="text-decoration:none; "><p id="triple_sidebar_text" style=" ">Triple Cipher</p></a>
 					</div>
 				</div>
-			</div>
+				<!--------------------------SIDEBAR----------------------------!>
+				<!--------------------------Header and Functions----------------------------!>
+				<div class="" id="header_and_functions" style="display:flex; flex-direction:column; margin-left:5px; width:100%; ">
+					<!--------------------------FUNCTIONS----------------------------!>
+					<div class="" id="functions_section" style="display:flex; flex-direction:column; align-items:center; width:90%; margin-top:50px; ">
+						<!--------------------------OpenSSL SECTION-------------------------------------!>
+						<div class="dev_site_sections" id="openssl_section" style=" padding-bottom:30px; ">
+							<div style="position:relative; ">
+								<div class="" id="openssl_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+									<p>
+										OpenSSL was chosen for the base encryption because it is widely available from the command line and its featureset includes AES-256-CBC symmetric encryption/decryption which is good enough for the US government as described in its spec document,
+										<a href="https://datatracker.ietf.org/doc/html/rfc3602" target="_blank">RFC3602.</a>
+										<br>
+										<br>
+										<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
 
-			<!---------------------------BROWSER Chosen: -----------------------!>
-			<!---------------------------OpenSSL Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlineaccess_opensslpass" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-					<label>ACCESS FLOW</label>
-					<label>PASS 3</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
-				</div>
-				<h2>ENTER PASSWORD 3</h2>
-				<input autocomplete="off" type="password" value="" id="offlineaccess_opensslpass_input" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_choose')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptBrowserAccessOffline('offlineaccess_opensslpass_input');">ACCESS DATA</button>
-				</div>
-			</div>
+										Our OpenSSL implementation uses the MDN SubtleCrypto library with the encrypt() function which has many options for use including AES-256-CBC.
+										<br>
 
-			<!---------------------------Outcome-----------------------!>
-			<!---------------------------File Download-----------------------!>
-			<div class="flow_pages passlock" id="offlineaccess_file" style="display:none">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-				<h2>&#10004; SUCCESS</h2>
-				<label>File should automatically download.</label>
-				<br>
-				<div class="overlay_container" style="position:relative">
-					<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
-					<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
-						<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
-							<div style="display:flex; justify-content:space-between;">
-								<label>Encrypt:</label>
-								<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+										<div style='display:flex; flex-direction:column; width:fit-content; padding:5px;'>
+											<label>Linux Command Line Commands:</label>
+											<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+												<div style="display:flex; justify-content:space-between;">
+													<label>Encrypt:</label>
+													<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+												</div>
+												<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+											</div>
+											<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+												<div style="display:flex; justify-content:space-between;">
+													<label>Decrypt:</label>
+													<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
+												</div>
+												<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+											</div>
+										</div>
+
+										Specification Documentation:
+										<br>
+										<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+										<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+										<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+
+									</p>
+									<button class="glossy_button" onclick="hideTipOpenSSL()">Close</button>
+								</div>
 							</div>
-							<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
-						</div>
-						<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
-							<div style="display:flex; justify-content:space-between;">
-								<label>Decrypt:</label>
-								<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
+							<div style="display:flex;  ">
+								<h3 id="openssl" style="scroll-margin-top:75px; ">OpenSSL AES-256-CBC</h3>
+								<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipOpenSSL()" >[?]</a>
 							</div>
-							<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+							<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
+								<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+									<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+										<label id="openssl_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+										<div id="" style="display:flex; flex-direction:column; justify-content:flex-end; ">
+											<label id="openssl_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
+										</div>
+									</div>
+									<textarea value="" id="openssl_cleartext" style="" oninput="executeOpenSSL()"></textarea>
+								</div>
+								<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:32px;">
+									<button class="" id='openssl_enc_button' style="flex-grow:1; " onclick="activateEncOpenSSL()">Encrypt<br>------></button>
+									<button class="" id='openssl_dec_button' style="flex-grow:1; " onclick="activateDecOpenSSL()">Decrypt<br><------</button>
+								</div>
+								<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+									<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+										<label id="openssl_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
+										<div id="" style="display:flex; flex-direction:column;  ">
+											<label id="openssl_ciphertext_bytesize_label" style="color:gray; ">Bytes:</label>
+										</div>
+									</div>
+									<textarea value="" id="openssl_ciphertext" style="" oninput="executeOpenSSL()"></textarea>
+								</div>
+							</div>
+							<label id="openssl_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+							<label style="">Password:</label>
+							<input class="dev_site_password_input" autocomplete="off" type="" value="" id="openssl_password" style="" oninput="executeOpenSSL()">
+						</div>
+						<!--------------------------OpenSSL SECTION-------------------------------------!>
+
+						<!--------------------------OBF-1000 SECTION-------------------------------------!>
+						<div class="dev_site_sections" id="gcm1000_section" style="">
+							<div style="position:relative; ">
+								<div class="" id="gcm1000_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+									<!------------------COPY IN TOOLTIP LATER------------------------->
+									<p>
+										OBF-1000 TOOLTIP SECTION
+										<br>
+										<br>
+										<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+										<br>
+										Specification Documentation:
+										<br>
+										<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+										<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+										<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+
+									</p>
+									<button class="glossy_button" onclick="hideTipOBF1000()">Close</button>
+								</div>
+							</div>
+							<div style="display:flex;  ">
+								<h3 id="gcm1000" style="scroll-margin-top:75px; ">OBF-1000</h3>
+								<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipOBF1000()">[?]</a>
+							</div>
+							<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
+								<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+									<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+										<label id="gcm1000_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+										<div id="" style="display:flex; flex-direction:column;  ">
+											<label id="gcm1000_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
+										</div>
+									</div>
+									<textarea value="" id="gcm1000_cleartext" style="" rows="8" oninput="executeOBF1000()"></textarea>
+								</div>
+								<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
+									<button class="" id='gcm1000_enc_button' style="flex-grow:1; " onclick="activateEncOBF1000()">Encrypt<br>------></button>
+									<button class="" id='gcm1000_dec_button' style="flex-grow:1; " onclick="activateDecOBF1000()">Decrypt<br><------</button>
+								</div>
+								<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+									<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+										<label id="gcm1000_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
+										<div id="" style="display:flex; flex-direction:column;  ">
+											<label id="gcm1000_ciphertext_bytesize_label" style="color:gray; ">Bytes:</label>
+										</div>
+									</div>
+									<textarea value="" id="gcm1000_ciphertext" style="" rows="8" oninput="executeOBF1000()"></textarea>
+								</div>
+							</div>
+							<label id="gcm1000_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+							<label>Password:</label>
+							<input class="dev_site_password_input" autocomplete="off" type="" value="" id="gcm1000_password" style="" oninput="executeOBF1000()">
+						</div>
+						<!--------------------------OBF-1000 SECTION-------------------------------------!>
+
+						<!--------------------------AES-CTR SECTION-------------------------------------!>
+						<div class="dev_site_sections" id="aesctr_section" style="">
+							<div style="position:relative; ">
+								<div class="" id="aesctr_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+									<!------------------COPY IN TOOLTIP LATER------------------------->
+									<p>
+										AES-CTR TOOLTIP SECTION
+										<br>
+										<br>
+										<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+										<br>
+										Specification Documentation:
+										<br>
+										<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+										<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+										<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+
+									</p>
+									<button class="glossy_button" onclick="hideTipAESCTR()">Close</button>
+								</div>
+							</div>
+							<div style="display:flex;  ">
+								<h3 id="aesctr" style="scroll-margin-top:75px; ">AES-CTR</h3>
+								<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipAESCTR()" >[?]</a>
+							</div>
+							<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
+								<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+									<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+										<label id="aesctr_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+										<div id="" style="display:flex; flex-direction:column;  ">
+											<label id="aesctr_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
+										</div>
+									</div>
+									<textarea value="" id="aesctr_cleartext" style="" rows="8" oninput="executeAESCTR()"></textarea>
+								</div>
+								<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
+									<button class="" id='aesctr_enc_button' style="flex-grow:1; " onclick="activateEncAESCTR()">Encrypt<br>------></button>
+									<button class="" id='aesctr_dec_button' style="flex-grow:1; " onclick="activateDecAESCTR()">Decrypt<br><------</button>
+								</div>
+								<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+									<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+										<label id="aesctr_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
+										<div id="" style="display:flex; flex-direction:column;  ">
+											<label id="aesctr_ciphertext_bytesize_label" style="color:gray; ">Bytes:</label>
+										</div>
+									</div>
+									<textarea value="" id="aesctr_ciphertext" style="" rows="8" oninput="executeAESCTR()"></textarea>
+								</div>
+							</div>
+							<label id="aesctr_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+							<label>Password:</label>
+							<input class="dev_site_password_input" autocomplete="off" type="" value="" id="aesctr_password" style="" oninput="executeAESCTR()">
+						</div>
+						<!--------------------------AES-CTR SECTION-------------------------------------!>
+
+						<!--------------------------TRIPLE SECTION-------------------------------------!>
+						<div class="dev_site_sections" id="triple_section" style="">
+							<div style="position:relative; ">
+								<div class="" id="triple_tooltip" style="display:flex; position:absolute; z-index:2; top:50px; left:50px; display:none; background-color:#434343; border:5px solid gold; padding:5px;">
+									<!------------------COPY IN TOOLTIP LATER------------------------->
+									<p>
+										TRIPLE TOOLTIP SECTION
+										<br>
+										<br>
+										<span style="color:magenta; ">No data is ever sent to any server!</span> All OBF functionality including OpenSSL, OBF-1000, AES-CTR is executed on the client side in the browser. You can check this yourself by turning internet off while keeping the browser up or by checking using the browser's developer tools (ctrl+shift+i in chrome based) and clicking on Network tab which shows all packets sent and received by the browser.
+										<br>
+										Specification Documentation:
+										<br>
+										<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt" target="_blank">encrypt() MDN Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#aes-cbc" target="_blank">AES-CBC W3C Specification/Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#aes-ctr" target="_blank">AES-CTR W3C Specification/Documentation</a><br>
+										<a href="https://www.w3.org/TR/webcrypto/#SubtleCrypto-method-importKey" target="_blank">importKey() W3C Specification/Documentation</a><br>
+										<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto Documentation</a><br>
+										<a href="https://en.wikipedia.org/wiki/World_Wide_Web_Consortium" target="_blank">W3C Wiki</a><br>
+
+									</p>
+									<button class="glossy_button" onclick="hideTipTriple()">Close</button>
+								</div>
+							</div>
+							<div style="display:flex;  ">
+								<h3 id="triple" style="scroll-margin-top:75px; ">Triple Cipher</h3>
+								<a class="glossy_icon" style="margin-top:13px; " href="javascript:void('show tooltip')" onclick="showTipTriple()" >[?]</a>
+							</div>
+							<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
+								<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+									<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+										<label id="triple_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+										<div id="" style="display:flex; flex-direction:column;  ">
+											<label id="triple_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
+										</div>
+									</div>
+									<textarea value="" id="triple_cleartext" style="" rows="8" oninput="executeTriple()"></textarea>
+								</div>
+								<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
+									<button class="" id='triple_enc_button' style="flex-grow:1; " onclick="activateEncTriple()">Encrypt<br>------></button>
+									<button class="" id='triple_dec_button' style="flex-grow:1; " onclick="activateDecTriple()">Decrypt<br><------</button>
+								</div>
+								<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
+									<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
+										<label id="triple_ciphertext_label" style="align-self:flex-end;">Ciphertext:</label>
+										<div id="" style="display:flex; flex-direction:column;  ">
+											<label id="triple_ciphertext_bytesize_label" style="color:gray; ">Bytes:</label>
+										</div>
+									</div>
+									<textarea value="" id="triple_ciphertext" style="" rows="8" oninput="executeTriple()"></textarea>
+								</div>
+							</div>
+							<label id="triple_outcome_message" style="visibility:hidden; color:red; align-self:center; margin-top:5px; ">Error: Decryption unsuccessful</label>
+							<label>OBF-1000:</label>
+							<input class="dev_site_password_input" autocomplete="off" type="" value="" id="triple_password_1" style="" oninput="executeTriple()">
+							<label>AES-CTR:</label>
+							<input class="dev_site_password_input" autocomplete="off" type="" value="" id="triple_password_2" style="" oninput="executeTriple()">
+							<label>AES-CBC:</label>
+							<input class="dev_site_password_input" autocomplete="off" type="" value="" id="triple_password_3" style="" oninput="executeTriple()">
+						</div><!--------------------------TRIPLE SECTION-------------------------------------!>
+					</div><!--------------------------FUNCTIONS----------------------------!>
+				</div><!--------------------------Header and Functions----------------------------!>
+			</div><!--------------------------Sidebar and Page----------------------------!>
+		</div><!--------------------------DEV SITE----------------------------------------------------------------------------!>
+
+		<!--------------------------MAIN PAGE--------------------------------------------------------------------------------------------------------------------------------------------------------!>
+		<div class="main_page" id="main_page">
+
+		<!--------------------------Div Housing for Flow Pages----------------------------!>
+		<div class="center_html" id="center_html" style="">
+
+	<!----------------------------Offline Flow Start--------------------------------------------------------------!>
+				<!--------------------------OFFLINE HOME----------------------------!>
+				<div class="flow_pages home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
+					<h2 style="color:red">OFFLINE HOME</h2>
+					<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+						<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_codeword')">STORE SECRET DATA</button>
+						<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_codeword')">ACCESS SECRET DATA</button>
+						<button class="obf_button" id='go_offlinesync_flow' style="flex-grow:1" onclick="saveThenShowPage('offlinesync_codeword')">SYNC STORED DATA TO ONLINE DATABASE</button>
+					</div>
+				</div>
+
+	<!----------------------------Offline SYNC TO ONLINE--------------------------------------------------------------!>
+				<!---------------------------SYNC TO ONLINE Codeword-----------------------!>
+				<div class="flow_pages passlock" id="offlinesync_codeword" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+						<label>SYNC FLOW</label>
+						<label>CODEWORD</label>
+						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+					</div>
+					<h2>ENTER CODEWORD</h2>
+					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinesync_codeword_input" style="" oninput="codewordToLowerCase(event)">
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_codeword_input'); saveThenShowPage('offlinesync_obf1000Pass')">CONTINUE</button>
+					</div>
+				</div>
+
+				<!---------------------------SYNC TO ONLINE obf1000Pass-----------------------!>
+				<div class="flow_pages passlock" id="offlinesync_obf1000Pass" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+						<label>SYNC FLOW</label>
+						<label>PASS 1</label>
+						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+					</div>
+					<h2>ENTER PASSWORD 1</h2>
+					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinesync_obf1000Pass_input" style="">
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_codeword')">BACK</button>
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinesync_obf1000Pass_input'); saveThenShowPage('offlinesync_ctrPass');">CONTINUE</button>
+					</div>
+				</div>
+
+				<!---------------------------SYNC TO ONLINE ctrPass-----------------------!>
+				<div class="flow_pages passlock" id="offlinesync_ctrPass" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+						<label>SYNC FLOW</label>
+						<label>PASS 2</label>
+						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+					</div>
+					<h2>ENTER PASSWORD 2</h2>
+					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinesync_ctrPass_input" style="">
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_obf1000Pass')">BACK</button>
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptSyncToOnline('offlinesync_ctrPass_input')">SYNC TO ONLINE</button>
+					</div>
+				</div>
+
+	<!----------------------------Offline Access--------------------------------------------------------------!>
+				<!---------------------------Codeword-----------------------!>
+				<div class="flow_pages passlock" id="offlineaccess_codeword" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<h2 style="color:red">OFFLINE FLOW</h2>
+						<label>ACCESS FLOW</label>
+						<label>CODEWORD</label>
+						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+					</div>
+					<h2>ENTER CODEWORD</h2>
+					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="" oninput="codewordToLowerCase(event)">
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_codeword_input'); saveThenShowPage('offlineaccess_obf1000Pass')">CONTINUE</button>
+					</div>
+				</div>
+
+				<!---------------------------obf1000Pass-----------------------!>
+				<div class="flow_pages passlock" id="offlineaccess_obf1000Pass" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+						<label>ACCESS FLOW</label>
+						<label>PASS 1</label>
+						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+					</div>
+					<h2>ENTER PASSWORD 1</h2>
+					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlineaccess_obf1000Pass_input" style="">
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_codeword')">BACK</button>
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_obf1000Pass_input');saveThenShowPage('offlineaccess_ctrPass');">CONTINUE</button>
+					</div>
+				</div>
+
+				<!---------------------------ctrPass-----------------------!>
+				<div class="flow_pages passlock" id="offlineaccess_ctrPass" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+						<label>ACCESS FLOW</label>
+						<label>PASS 2</label>
+						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+					</div>
+					<h2>ENTER PASSWORD 2</h2>
+					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlineaccess_ctrPass_input" style="">
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_obf1000Pass')">BACK</button>
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlineaccess_ctrPass_input');saveThenShowPage('offlineaccess_choose');">CONTINUE</button>
+					</div>
+				</div>
+
+				<!--------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
+				<div class="flow_pages" id="offlineaccess_choose" style="display:none">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+					<label>ACCESS DATA</label>
+					<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_ctrPass')">BACK</button>
+						<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+							<button class="activatable_by_enter" id='offlineaccess_choose_browser' style="display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="saveThenShowPage('offlineaccess_opensslpass')">
+								<span style="">BROWSER</span>
+								<span style="margin-top:4px; color:gray; font-size:15px;">Text Input</span>
+							</button>
+						</div>
+						<div class="informative_button_set" id="" style="flex-grow:3; display:flex; display:flex; flex-direction:column;">
+							<button class="" id='' style="display:flex; flex-direction:column; justify-content:center;" onclick="attemptCMDAccessOffline()">
+								<span class="coolpink" style="">COMMAND LINE</span>
+								<span style="margin-top:4px; color:gray; font-size:15px;">File Input</span>
+							</button>
+							<label class="coolpink" style="align-self:center;">More Secure</label>
 						</div>
 					</div>
-					<div class="deletecheck" id="offlineoverlay_delete_cmd" style="display:none">
-						<h2>Are you sure you want to delete this data?</h2> 
-						<div class="button_pair" id="" style="display:flex">
-							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('offlineoverlay_delete_cmd')">KEEP DATA</button>
-							<button class="" id='' style="flex-grow:1" onclick="attemptDeleteOffline()">DELETE DATA</button>
+				</div>
+
+				<!---------------------------BROWSER Chosen: -----------------------!>
+				<!---------------------------OpenSSL Pass-----------------------!>
+				<div class="flow_pages passlock" id="offlineaccess_opensslpass" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+						<label>ACCESS FLOW</label>
+						<label>PASS 3</label>
+						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+					</div>
+					<h2>ENTER PASSWORD 3</h2>
+					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlineaccess_opensslpass_input" style="">
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineaccess_choose')">BACK</button>
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptBrowserAccessOffline('offlineaccess_opensslpass_input');">ACCESS DATA</button>
+					</div>
+				</div>
+
+				<!---------------------------Outcome-----------------------!>
+				<!---------------------------File Download-----------------------!>
+				<div class="flow_pages passlock" id="offlineaccess_file" style="display:none">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+					<h2>&#10004; SUCCESS</h2>
+					<label>File should automatically download.</label>
+					<br>
+					<div class="overlay_container" style="position:relative">
+						<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
+						<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
+							<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+								<div style="display:flex; justify-content:space-between;">
+									<label>Encrypt:</label>
+									<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
+								</div>
+								<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
+							</div>
+							<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+								<div style="display:flex; justify-content:space-between;">
+									<label>Decrypt:</label>
+									<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
+								</div>
+								<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-d</span> -pbkdf2 -in <span class="coolpink">yourfile.enc</span> -out <span class="coolpink">yourfile.txt</span></label>
+							</div>
+						</div>
+						<div class="deletecheck" id="offlineoverlay_delete_cmd" style="display:none">
+							<h2>Are you sure you want to delete this data?</h2> 
+							<div class="button_pair" id="" style="display:flex">
+								<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('offlineoverlay_delete_cmd')">KEEP DATA</button>
+								<button class="" id='' style="flex-grow:1" onclick="attemptDeleteOffline()">DELETE DATA</button>
+							</div>
 						</div>
 					</div>
+					<div class="button_pair" id="" style="display:flex">
+						<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_codeword')">STORE DATA</button>
+						<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_codeword')">ACCESS DATA</button>
+						<button class="" id='' style="flex-grow:1" onclick="showDeleteOverlay('offlineoverlay_delete_cmd')">DELETE DATA</button>
+					</div>
 				</div>
-				<div class="button_pair" id="" style="display:flex">
-					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_codeword')">STORE DATA</button>
-					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('offlineaccess_codeword')">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1" onclick="showDeleteOverlay('offlineoverlay_delete_cmd')">DELETE DATA</button>
-				</div>
-			</div>
-			<!---------------------------END CMD LINE Access Flow-----------------------!>
+				<!---------------------------END CMD LINE Access Flow-----------------------!>
 
-			<!---------------------------Show Plaintext-----------------------!>
-			<div class="flow_pages passlock" id="offlineaccess_plaintext" style="display:none">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-				<h2>&#10004; SUCCESS</h2>
-				<label>result:</label>
-				<div class="overlay_container" style="position:relative; ">
-					<label id="offlineeditdata_length_label" style="color:black"></label>
-					<textarea disabled value="" id="offlineaccess_data_outputdisplay" oninput="checkDataInputLength('offlineaccess_data_outputdisplay')" style="color:gray; " rows="8" cols="50"></textarea>
-					<div class="deletecheck" id="offlineoverlay_delete_browser" style="display:none">
-						<h2>Are you sure you want to delete this data?</h2> 
-						<div class="button_pair" id="" style="display:flex">
-							<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('offlineoverlay_delete_browser')">KEEP DATA</button>
-							<button class="" id='' style="flex-grow:1" onclick="attemptDeleteOffline()">DELETE DATA</button>
+				<!---------------------------Show Plaintext-----------------------!>
+				<div class="flow_pages passlock" id="offlineaccess_plaintext" style="display:none">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+					<h2>&#10004; SUCCESS</h2>
+					<label>result:</label>
+					<div class="overlay_container" style="position:relative; ">
+						<label id="offlineeditdata_length_label" style="color:black"></label>
+						<textarea disabled value="" id="offlineaccess_data_outputdisplay" oninput="checkDataInputLength('offlineaccess_data_outputdisplay')" style="color:gray; " rows="8" cols="50"></textarea>
+						<div class="deletecheck" id="offlineoverlay_delete_browser" style="display:none">
+							<h2>Are you sure you want to delete this data?</h2> 
+							<div class="button_pair" id="" style="display:flex">
+								<button class="" id='' style="flex-grow:1" onclick="deleteCheckHide('offlineoverlay_delete_browser')">KEEP DATA</button>
+								<button class="" id='' style="flex-grow:1" onclick="attemptDeleteOffline()">DELETE DATA</button>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="button_pair" id="" style="display:flex">
-					<button class="" id='offline_save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStoreOfflineBackWrapper('offlineaccess_data_outputdisplay')">SAVE DATA</button>
-					<div id='edit_input_warning' style="flex-grow:1;display:none;">
-						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
+					<div class="button_pair" id="" style="display:flex">
+						<button class="" id='offline_save_button' style="flex-grow:1; display:none" onclick="attemptBrowserStoreOfflineBackWrapper('offlineaccess_data_outputdisplay')">SAVE DATA</button>
+						<div id='edit_input_warning' style="flex-grow:1;display:none;">
+							<h2 id='' style="color:red;">TOO MUCH DATA</h2>
+						</div>
+						<button class="" id='offline_editdata_button' style="flex-grow:1" onclick="editDataOffline()">EDIT DATA</button>
+						<button class="" id='offline_delete_button' style="flex-grow:1" onclick="showDeleteOverlay('offlineoverlay_delete_browser')">DELETE DATA</button>
 					</div>
-					<button class="" id='offline_editdata_button' style="flex-grow:1" onclick="editDataOffline()">EDIT DATA</button>
-					<button class="" id='offline_delete_button' style="flex-grow:1" onclick="showDeleteOverlay('offlineoverlay_delete_browser')">DELETE DATA</button>
 				</div>
-			</div>
-			<!---------------------------END BROWSER Access Flow-----------------------!>
+				<!---------------------------END BROWSER Access Flow-----------------------!>
 
-			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
-			<div class="flow_pages" id="offlinefailed_to_access" style="display:none">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-				<h2>&#10060; FAILED TO ACCESS</h2>
-				<div class="button_pair" id="" style="display:flex">
+				<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
+				<div class="flow_pages" id="offlinefailed_to_access" style="display:none">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+					<h2>&#10060; FAILED TO ACCESS</h2>
+					<div class="button_pair" id="" style="display:flex">
+					</div>
 				</div>
-			</div>
 
-			<!---------------------------Password Entry Error-----------------------!>
-			<div class="flow_pages" id="password_entry_error" style="display:none">
-				<h2>&#10060; PASSWORD 3 IS INCORRECT!</h2>
-			</div>
-
-			<!----------------------------Fingerprint Holder for Delete------------------------------!>
-			<input id="offlinefingerprint_holder" autocomplete="off" value="" style="display:none">
-
-			<!----------------------------Successfully Deleted Data--------------------------------------------------------------!>
-			<div class="flow_pages" id="offlinedelete_success" style="display:none">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-				<h2>&#10004; SUCCESSFULLY DELETED DATA</h2>
-				<div class="button_pair" id="" style="display:flex">
+				<!---------------------------Password Entry Error-----------------------!>
+				<div class="flow_pages" id="password_entry_error" style="display:none">
+					<h2>&#10060; PASSWORD 3 IS INCORRECT!</h2>
 				</div>
-			</div>
 
-			<!----------------------------Failed to Delete--------------------------------------------------------------!>
-			<div class="flow_pages" id="offlinedelete_failed" style="display:none">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-				<h2>&#10060; FAILED TO DELETE</h2>
-				<div class="button_pair" id="" style="display:flex">
-				</div>
-			</div>
-<!----------------------------END Offline Access--------------------------------------------------------------!>
+				<!----------------------------Fingerprint Holder for Delete------------------------------!>
+				<input class="main_site_password_input" id="offlinefingerprint_holder" autocomplete="off" value="" style="display:none">
 
-<!----------------------------Offline Store--------------------------------------------------------------!>
-			<!---------------------------Codeword-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_codeword" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-					<label>STORE FLOW</label>
-					<label>CODEWORD</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				<!----------------------------Successfully Deleted Data--------------------------------------------------------------!>
+				<div class="flow_pages" id="offlinedelete_success" style="display:none">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+					<h2>&#10004; SUCCESSFULLY DELETED DATA</h2>
+					<div class="button_pair" id="" style="display:flex">
+					</div>
 				</div>
-				<h2>ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="" oninput="codewordToLowerCase(event)">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');saveThenShowPage('offlinestore_obf1000Pass')">CONTINUE</button>
-				</div>
-			</div>
 
-			<!---------------------------obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1000Pass" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
-					<h2 style="color:red">OFFLINE FLOW</h2>
-					<label>STORE FLOW</label>
-					<label>PASS 1</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+				<!----------------------------Failed to Delete--------------------------------------------------------------!>
+				<div class="flow_pages" id="offlinedelete_failed" style="display:none">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+					<h2>&#10060; FAILED TO DELETE</h2>
+					<div class="button_pair" id="" style="display:flex">
+					</div>
 				</div>
-				<h2>ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_input" style="">
-				<div class="button_pair" id="" style="display:flex;">
-					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword')">BACK</button>
-					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf1000Pass_input');saveThenShowPage('offlinestore_ctrPass');">CONTINUE</button>
-				</div>
-			</div>
+	<!----------------------------END Offline Access--------------------------------------------------------------!>
 
-			<!---------------------------ctrPass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_ctrPass" style="display:none">
-				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+	<!----------------------------Offline Store--------------------------------------------------------------!>
+				<!---------------------------Codeword-----------------------!>
+				<div class="flow_pages passlock" id="offlinestore_codeword" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+						<label>STORE FLOW</label>
+						<label>CODEWORD</label>
+						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+					</div>
+					<h2>ENTER CODEWORD</h2>
+					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="" oninput="codewordToLowerCase(event)">
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_codeword_input');saveThenShowPage('offlinestore_obf1000Pass')">CONTINUE</button>
+					</div>
+				</div>
+
+				<!---------------------------obf1000Pass-----------------------!>
+				<div class="flow_pages passlock" id="offlinestore_obf1000Pass" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<h2 style="color:red">OFFLINE FLOW</h2>
+						<label>STORE FLOW</label>
+						<label>PASS 1</label>
+						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
+					</div>
+					<h2>ENTER PASSWORD 1</h2>
+					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_input" style="">
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword')">BACK</button>
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_obf1000Pass_input');saveThenShowPage('offlinestore_ctrPass');">CONTINUE</button>
+					</div>
+				</div>
+
+				<!---------------------------ctrPass-----------------------!>
+				<div class="flow_pages passlock" id="offlinestore_ctrPass" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>PASS 2</label>
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_input" style="">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_ctrPass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_obf1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_ctrPass_input');saveThenShowPage('offlinestore_choose');">CONTINUE</button>
@@ -4457,7 +4704,7 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdcheckinput" style="" oninput="codewordToLowerCase(event)">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_codeword_cmdcheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_cmdcheckinput', 'offlinestore_obf1000Pass_cmdcheck')">CONTINUE</button>
@@ -4474,7 +4721,7 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_cmdcheckinput" style="">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1000Pass_cmdcheckinput', 'offlinestore_ctrPass_cmdcheck')">CONTINUE</button>
@@ -4491,7 +4738,7 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_cmdcheckinput" style="">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_ctrPass_cmdcheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_obf1000Pass_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_ctrPass_cmdcheckinput', 'offlinestore_upload')">CONTINUE</button>
@@ -4506,7 +4753,7 @@
 				<h2 id="offlinestore_upload_warning" style="color:red; display:none">FILE TOO LARGE. Please limit data size to 671 bytes BEFORE encrypting with OpenSSL.</h2>
 				<h2 id="offlinestore_upload_readytocommit" style="color:orange; display:none">READY TO COMMIT</h2>
 				<label id="offlineuploaddata_length_label" style="color:black"></label>
-				<input autocomplete="off" onchange="catchUpload(event)" id="offlinestore_upload_input" style="border:none;" type="file">
+				<input class="main_site_password_input" autocomplete="off" onchange="catchUpload(event)" id="offlinestore_upload_input" style="border:none;" type="file">
 				<br>
 				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 				<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
@@ -4542,7 +4789,7 @@
 					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 3</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_input" style="">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_opensslpass_input" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputDataOffline('offlinestore_opensslpass_input');saveThenShowPage('offlinestore_codeword_browsercheck');">CONTINUE</button>
@@ -4559,7 +4806,7 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_codeword_browsercheckinput" style="" oninput="codewordToLowerCase(event)">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_codeword_browsercheckinput" style="" oninput="codewordToLowerCase(event)">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_opensslpass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_codeword_browsercheckinput', 'offlinestore_obf1000Pass_browsercheck')">CONTINUE</button>
@@ -4576,7 +4823,7 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 1</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_browsercheckinput" style="">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_codeword_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_obf1000Pass_browsercheckinput', 'offlinestore_ctrPass_browsercheck')">CONTINUE</button>
@@ -4593,7 +4840,7 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 2</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_ctrPass_browsercheckinput" style="">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_ctrPass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_obf1000Pass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_ctrPass_browsercheckinput', 'offlinestore_opensslpass_browsercheck')">CONTINUE</button>
@@ -4610,7 +4857,7 @@
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 3</h2>
-				<input autocomplete="off" type="password" value="" id="offlinestore_opensslpass_browsercheckinput" style="">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_opensslpass_browsercheckinput" style="">
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinestore_ctrPass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkDataOffline('offlinestore_opensslpass_browsercheckinput', 'offlinestore_data')">CONTINUE</button>
@@ -4680,7 +4927,7 @@
 			<div class="flow_pages" id="enter_offlinedbase_pass" style="display:flex; ">
 				<label id='emptyPassWarning' style='color:magenta; display:none; '>Please enter a password or choose NO PASSWORD.</label>
 				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
-				<input autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="resetOfflineData(); saveThenShowPage('offline_home')">NO PASSWORD</button>
 					<!-- <button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="resetOfflineData(); extractInputDataOffline('set_offlineDBasePass_input'); verifyOfflineDBasePasswordLength() ">PASSWORD READY</button> -->
@@ -4693,8 +4940,11 @@
 				<h2>&#10060; OFFLINE DATABASE PASSWORD ENTERED INCORRECTLY!</h2>
 				</div>
 			</div>
+		</div> <!-------------------------------------------- Center HTML----------------------------------------------------!>
+	</div><!-------------------------------------------- Main Site ----------------------------------------------------!>
 
-	</div> <!-------------------------------------------- Center HTML----------------------------------------------------!>
+
+
 	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
 		<div id="savetodisk_warning" style="background-color:gray; display:none; flex-direction:column;">
@@ -4710,6 +4960,707 @@
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <script>
+
+	///////////////////////////////////////////////////////////////////////////////////
+	//						Dev Site                                                 //
+	///////////////////////////////////////////////////////////////////////////////////
+
+	let main_page = true;
+	function toggleDevSite() {
+		if (main_page) {
+			// Switch to Dev site. Change link name to MAIN_SITE
+			document.getElementById("dev_site_toggle_link").innerHTML = "MAIN_SITE";
+			document.getElementById("dev_site").style.display = "flex";
+			document.getElementById("main_page").style.display = "none";
+			main_page = false;
+		} else {
+			// Switch to Main site. Change link name to DEV_SITE
+			document.getElementById("dev_site_toggle_link").innerHTML = "DEV_SITE";
+			document.getElementById("dev_site").style.display = "none";
+			document.getElementById("main_page").style.display = "flex";
+			main_page = true;
+		}
+	}
+
+	function turnOffPinkBar() {
+		document.getElementById('openssl_sidebar_text').style.color = '#54c597';
+		document.getElementById('gcm1000_sidebar_text').style.color = '#54c597';
+		document.getElementById('aesctr_sidebar_text').style.color = '#54c597';
+		document.getElementById('triple_sidebar_text').style.color = '#54c597';
+	}
+
+	function turnOnPinkBarOpenSSL() {
+		document.getElementById('openssl_sidebar_text').style.color = 'magenta';
+	}
+	function turnOnPinkBarOBF1000() {
+		document.getElementById('gcm1000_sidebar_text').style.color = 'magenta';
+	}
+	function turnOnPinkBarAESCTR() {
+		document.getElementById('aesctr_sidebar_text').style.color = 'magenta';
+	}
+	function turnOnPinkBarTriple() {
+		document.getElementById('triple_sidebar_text').style.color = 'magenta';
+	}
+
+	window.addEventListener("scroll", (event) => {
+		let scroll = window.scrollY;
+		//console.log(scroll);
+
+		if (scroll < 500) {
+			turnOffPinkBar();
+			turnOnPinkBarOpenSSL();
+		} else if (scroll >= 500 && scroll < 1000){
+			turnOffPinkBar();
+			turnOnPinkBarOBF1000();
+		} else if (scroll >= 1000 && scroll < 1500){
+			turnOffPinkBar();
+			turnOnPinkBarAESCTR();
+		} else if (scroll >= 1500){
+			turnOffPinkBar();
+			turnOnPinkBarTriple();
+		}
+	});
+
+	// Add listeners for focus events for each cleartext + ciphertext window.
+	document.getElementById('openssl_cleartext').addEventListener("focus", (event) => {
+		activateEncOpenSSL();
+	});
+	document.getElementById('openssl_ciphertext').addEventListener("focus", (event) => {
+		activateDecOpenSSL();
+	});
+	document.getElementById('gcm1000_cleartext').addEventListener("focus", (event) => {
+		activateEncOBF1000();
+	});
+	document.getElementById('gcm1000_ciphertext').addEventListener("focus", (event) => {
+		activateDecOBF1000();
+	});
+	document.getElementById('aesctr_cleartext').addEventListener("focus", (event) => {
+		activateEncAESCTR();
+	});
+	document.getElementById('aesctr_ciphertext').addEventListener("focus", (event) => {
+		activateDecAESCTR();
+	});
+	document.getElementById('triple_cleartext').addEventListener("focus", (event) => {
+		activateEncTriple();
+	});
+	document.getElementById('triple_ciphertext').addEventListener("focus", (event) => {
+		activateDecTriple();
+	});
+
+	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
+	let openSSLEncrypt_f = true;
+	let gcm1000Encrypt_f = true;
+	let aesctrEncrypt_f = true;
+	let tripleEncrypt_f = true;
+
+	// Show / hide tooltip functionality.
+	function showTipOpenSSL () {
+		document.getElementById('openssl_tooltip').style.display = "inline";
+	}
+	function hideTipOpenSSL () {
+		document.getElementById('openssl_tooltip').style.display = "none";
+	}
+	function showTipOBF1000 () {
+		document.getElementById('gcm1000_tooltip').style.display = "inline";
+	}
+	function hideTipOBF1000 () {
+		document.getElementById('gcm1000_tooltip').style.display = "none";
+	}
+	function showTipAESCTR () {
+		document.getElementById('aesctr_tooltip').style.display = "inline";
+	}
+	function hideTipAESCTR () {
+		document.getElementById('aesctr_tooltip').style.display = "none";
+	}
+	function showTipTriple() {
+		document.getElementById('triple_tooltip').style.display = "inline";
+	}
+	function hideTipTriple() {
+		document.getElementById('triple_tooltip').style.display = "none";
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	//					OpenSSL HTML handling									 //
+	///////////////////////////////////////////////////////////////////////////////
+
+	async function utf8EncryptOpenSSL(cleartext, password) {
+		const cleartext64 = utf8ToBase64(cleartext);
+		return await encryptOpenSSL(cleartext64, password);
+	}
+
+	async function utf8DecryptOpenSSL(ciphertext, password) {
+		const cleartext64 = await decryptOpenSSL(ciphertext, password);
+		return base64ToUtf8(cleartext64);
+	}
+
+	async function executeOpenSSL() {
+		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
+		if (openSSLEncrypt_f === true) { // Encrypt function
+			// Gather inputs.
+			const cleartext = document.getElementById('openssl_cleartext').value;
+			const password = document.getElementById('openssl_password').value;
+			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			try {
+				document.getElementById('openssl_ciphertext').value = await utf8EncryptOpenSSL(cleartext, password);
+				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				document.getElementById('openssl_outcome_message').style.color = 'lime';
+				document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				document.getElementById('openssl_outcome_message').style.color = 'red';
+				document.getElementById('openssl_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				document.getElementById('openssl_ciphertext').value = '';
+			}
+		} else { // Decrypt function
+			// Gather inputs.
+			const ciphertext = document.getElementById('openssl_ciphertext').value;
+			const password = document.getElementById('openssl_password').value;
+			// Execute
+			try {
+				document.getElementById('openssl_cleartext').value = await utf8DecryptOpenSSL(ciphertext, password);
+				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				document.getElementById('openssl_outcome_message').style.color = 'lime';
+				document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
+			} catch (error) {
+				console.log(error);
+				//document.getElementById('openssl_outcome_message').style.display = 'inline';
+				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				document.getElementById('openssl_outcome_message').style.color = 'red';
+				document.getElementById('openssl_outcome_message').innerHTML = 'Decryption unsuccessful';
+				document.getElementById('openssl_cleartext').value = '';
+			}
+		}
+		clearTimeout(timeoutIdOpenSSL)
+		timeoutIdOpenSSL = setTimeout(() => {
+			turnOffOpenSSLDecryptOutcomeMessage();
+		}, 2000); 
+		// Show length value AFTER execution.
+		setLengthOpenSSL();
+	}// executeOpenSSL()
+	let timeoutIdOpenSSL;
+
+	function setLengthOpenSSL() {
+		// Cleartext 
+		const cleartext = document.getElementById('openssl_cleartext').value;
+		const cleartextByteSize = new Blob([cleartext]).size;
+		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
+		document.getElementById('openssl_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		// Ciphertext
+		const ciphertext = document.getElementById('openssl_ciphertext').value;
+		const ciphertextByteSize = new Blob([ciphertext]).size;
+		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
+		document.getElementById('openssl_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
+	}
+
+	function turnOffOpenSSLDecryptOutcomeMessage() {
+		document.getElementById('openssl_outcome_message').style.visibility = 'hidden';
+	}
+
+	function activateEncOpenSSL() {
+		// Set flag
+		openSSLEncrypt_f = true;
+
+		// Turn off decryption error.
+		document.getElementById('openssl_outcome_message').style.visibility = 'hidden';
+
+		// Disable decrypt.
+		// Change button text to disabled color.
+		document.getElementById('openssl_dec_button').style.color = 'dimgray';
+		// Change outline, label to diabled color.
+		document.getElementById('openssl_ciphertext_label').style.color = 'gray';
+		document.getElementById('openssl_ciphertext').style.color = 'gray';
+		document.getElementById('openssl_ciphertext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('openssl_ciphertext').disabled = true;
+
+		// Enable encrypt.
+		// Change button text to enabled color.
+		document.getElementById('openssl_enc_button').style.color = 'lime';
+		// Change outline, label to enabled color.
+		document.getElementById('openssl_cleartext_label').style.color = '#54c597';
+		document.getElementById('openssl_cleartext').style.color = '#54c597';
+		document.getElementById('openssl_cleartext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('openssl_cleartext').disabled = false;
+
+		// Focus newly active textarea
+		document.getElementById('openssl_cleartext').focus();
+
+		// Execute crypto on button click.
+		executeOpenSSL();
+	}// activateEncOpenSSL()
+
+// PGO Green: #54c597
+// PGO Readonly Blue: #4491d5
+
+	function activateDecOpenSSL() {
+		// Set flag
+		openSSLEncrypt_f = false;
+
+		// Enable decrypt - ciphertext.
+		// Change button text to enabled color.
+		document.getElementById('openssl_dec_button').style.color = 'lime';
+		// Change outline, label to diabled color.
+		document.getElementById('openssl_ciphertext_label').style.color = '#54c597';
+		document.getElementById('openssl_ciphertext').style.color = '#54c597';
+		document.getElementById('openssl_ciphertext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('openssl_ciphertext').disabled = false;
+
+		// Disable encrypt - cleartext.
+		// Change button text to disabled color.
+		document.getElementById('openssl_enc_button').style.color = 'dimgray';
+		// Change outline, label to enabled color.
+		document.getElementById('openssl_cleartext_label').style.color = 'gray';
+		document.getElementById('openssl_cleartext').style.color = 'gray';
+		document.getElementById('openssl_cleartext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('openssl_cleartext').disabled = true;
+
+		// Focus newly active textarea
+		document.getElementById('openssl_ciphertext').focus();
+
+		// Execute crypto on button click.
+		executeOpenSSL();
+	}// activateDecOpenSSL()
+
+	///////////////////////////////////////////////////////////////////////////////
+	//					OBF-1000 HTML handling									 //
+	///////////////////////////////////////////////////////////////////////////////
+
+	async function utf8EncryptOBF1000(cleartext, password) {
+		const cleartext64 = utf8ToBase64(cleartext);
+		return await encryptOBF1000(cleartext64, password, false);
+	}
+
+	async function utf8DecryptOBF1000(ciphertext, password) {
+		const cleartext64 = await decryptOBF1000(ciphertext, password, false);
+		return base64ToUtf8(cleartext64);
+	}
+
+	async function executeOBF1000() {
+		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
+		if (gcm1000Encrypt_f === true) { // Encrypt function
+			// Gather inputs.
+			const cleartext = document.getElementById('gcm1000_cleartext').value;
+			const password = document.getElementById('gcm1000_password').value;
+			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			try {
+				document.getElementById('gcm1000_ciphertext').value = await utf8EncryptOBF1000(cleartext, password);
+				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('gcm1000_outcome_message').style.color = 'lime';
+				document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('gcm1000_outcome_message').style.color = 'red';
+				document.getElementById('gcm1000_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				document.getElementById('gcm1000_ciphertext').value = '';
+			}
+		} else { // Decrypt function
+			// Gather inputs.
+			const ciphertext = document.getElementById('gcm1000_ciphertext').value;
+			const password = document.getElementById('gcm1000_password').value;
+			// Execute
+			try {
+				document.getElementById('gcm1000_cleartext').value = await utf8DecryptOBF1000(ciphertext, password);
+				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('gcm1000_outcome_message').style.color = 'lime';
+				document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				document.getElementById('gcm1000_outcome_message').style.color = 'red';
+				document.getElementById('gcm1000_outcome_message').innerHTML = 'Decryption unsuccessful';
+				document.getElementById('gcm1000_cleartext').value = '';
+			}
+		}
+		clearTimeout(timeoutIdGCM)
+		timeoutIdGCM = setTimeout(() => {
+			turnOffOBF1000DecryptOutcomeMessage();
+		}, 2000); 
+		// Show length value AFTER execution.
+		setLengthOBF1000();
+	}// executeOBF1000()
+	let timeoutIdGCM;
+
+	function setLengthOBF1000() {
+		// Cleartext 
+		const cleartext = document.getElementById('gcm1000_cleartext').value;
+		const cleartextByteSize = new Blob([cleartext]).size;
+		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
+		document.getElementById('gcm1000_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		// Ciphertext
+		const ciphertext = document.getElementById('gcm1000_ciphertext').value;
+		const ciphertextByteSize = new Blob([ciphertext]).size;
+		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
+		document.getElementById('gcm1000_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
+	}
+
+	function turnOffOBF1000DecryptOutcomeMessage() {
+		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
+	}
+
+	function activateEncOBF1000() {
+		// Set flag
+		gcm1000Encrypt_f = true;
+
+		// Turn off decryption error.
+		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
+
+		// Disable decrypt.
+		// Change button text to disabled color.
+		document.getElementById('gcm1000_dec_button').style.color = 'dimgray';
+		// Change outline, label to diabled color.
+		document.getElementById('gcm1000_ciphertext_label').style.color = 'gray';
+		document.getElementById('gcm1000_ciphertext').style.color = 'gray';
+		document.getElementById('gcm1000_ciphertext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('gcm1000_ciphertext').disabled = true;
+
+		// Enable encrypt.
+		// Change button text to enabled color.
+		document.getElementById('gcm1000_enc_button').style.color = 'lime';
+		// Change outline, label to enabled color.
+		document.getElementById('gcm1000_cleartext_label').style.color = '#54c597';
+		document.getElementById('gcm1000_cleartext').style.color = '#54c597';
+		document.getElementById('gcm1000_cleartext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('gcm1000_cleartext').disabled = false;
+
+		// Focus newly active textarea
+		document.getElementById('gcm1000_cleartext').focus();
+
+		// Execute crypto on button click.
+		executeOBF1000();
+	}// activateEncOBF1000()
+
+// Secretword Green: #54c597
+// Secretword Readonly Blue: #4491d5
+
+	function activateDecOBF1000() {
+		// Set flag
+		gcm1000Encrypt_f = false;
+
+		// Enable decrypt - ciphertext.
+		// Change button text to enabled color.
+		document.getElementById('gcm1000_dec_button').style.color = 'lime';
+		// Change outline, label to diabled color.
+		document.getElementById('gcm1000_ciphertext_label').style.color = '#54c597';
+		document.getElementById('gcm1000_ciphertext').style.color = '#54c597';
+		document.getElementById('gcm1000_ciphertext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('gcm1000_ciphertext').disabled = false;
+
+		// Disable encrypt - cleartext.
+		// Change button text to disabled color.
+		document.getElementById('gcm1000_enc_button').style.color = 'dimgray';
+		// Change outline, label to enabled color.
+		document.getElementById('gcm1000_cleartext_label').style.color = 'gray';
+		document.getElementById('gcm1000_cleartext').style.color = 'gray';
+		document.getElementById('gcm1000_cleartext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('gcm1000_cleartext').disabled = true;
+
+		// Focus newly active textarea
+		document.getElementById('gcm1000_ciphertext').focus();
+
+		// Execute crypto on button click.
+		executeOBF1000();
+	}// activateDecOBF1000()
+
+
+	///////////////////////////////////////////////////////////////////////////////
+	//					AES-CTR HTML handling									 //
+	///////////////////////////////////////////////////////////////////////////////
+
+	async function utf8EncryptAESCTR(cleartext, password) {
+		const cleartext64 = utf8ToBase64(cleartext);
+		return await encryptAESCTR(cleartext64, password, false);
+	}
+
+	async function utf8DecryptAESCTR(ciphertext, password) {
+		const cleartext64 = await decryptAESCTR(ciphertext, password, false);
+		return base64ToUtf8(cleartext64);
+	}
+
+	async function executeAESCTR() {
+		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
+		if (aesctrEncrypt_f === true) { // Encrypt function
+			// Gather inputs.
+			const cleartext = document.getElementById('aesctr_cleartext').value;
+			const password = document.getElementById('aesctr_password').value;
+			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			try {
+				//document.getElementById('aesctr_ciphertext').value = await encryptAESCTR(cleartext, password, 'utf8');
+				document.getElementById('aesctr_ciphertext').value = await utf8EncryptAESCTR(cleartext, password);
+				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				document.getElementById('aesctr_outcome_message').style.color = 'lime';
+				document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				document.getElementById('aesctr_outcome_message').style.color = 'red';
+				document.getElementById('aesctr_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				document.getElementById('aesctr_ciphertext').value = '';
+			}
+		} else { // Decrypt function
+			// Gather inputs.
+			const ciphertext = document.getElementById('aesctr_ciphertext').value;
+			const password = document.getElementById('aesctr_password').value;
+			// Execute
+			try {
+				//document.getElementById('aesctr_cleartext').value = await decryptAESCTR(ciphertext, password, 'utf8');
+				document.getElementById('aesctr_cleartext').value = await utf8DecryptAESCTR(ciphertext, password);
+				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				document.getElementById('aesctr_outcome_message').style.color = 'lime';
+				document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				document.getElementById('aesctr_outcome_message').style.color = 'red';
+				document.getElementById('aesctr_outcome_message').innerHTML = 'Decryption unsuccessful';
+				document.getElementById('aesctr_cleartext').value = '';
+			}
+		}
+		clearTimeout(timeoutIdCTR)
+		timeoutIdCTR = setTimeout(() => {
+			turnOffAESCTRDecryptOutcomeMessage();
+		}, 2000); 
+		// Show length value AFTER execution.
+		setLengthAESCTR();
+	}// executeAESCTR()
+	let timeoutIdCTR;
+
+	function setLengthAESCTR() {
+		// Cleartext 
+		const cleartext = document.getElementById('aesctr_cleartext').value;
+		const cleartextByteSize = new Blob([cleartext]).size;
+		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
+		document.getElementById('aesctr_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		// Ciphertext
+		const ciphertext = document.getElementById('aesctr_ciphertext').value;
+		const ciphertextByteSize = new Blob([ciphertext]).size;
+		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
+		document.getElementById('aesctr_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
+	}
+
+	function turnOffAESCTRDecryptOutcomeMessage() {
+		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
+	}
+
+	function activateEncAESCTR() {
+		// Set flag
+		aesctrEncrypt_f = true;
+
+		// Turn off decryption error.
+		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
+
+		// Disable decrypt.
+		// Change button text to disabled color.
+		document.getElementById('aesctr_dec_button').style.color = 'dimgray';
+		// Change outline, label to diabled color.
+		document.getElementById('aesctr_ciphertext_label').style.color = 'gray';
+		document.getElementById('aesctr_ciphertext').style.color = 'gray';
+		document.getElementById('aesctr_ciphertext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('aesctr_ciphertext').disabled = true;
+
+		// Enable encrypt.
+		// Change button text to enabled color.
+		document.getElementById('aesctr_enc_button').style.color = 'lime';
+		// Change outline, label to enabled color.
+		document.getElementById('aesctr_cleartext_label').style.color = '#54c597';
+		document.getElementById('aesctr_cleartext').style.color = '#54c597';
+		document.getElementById('aesctr_cleartext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('aesctr_cleartext').disabled = false;
+
+		// Focus newly active textarea
+		document.getElementById('aesctr_cleartext').focus();
+
+		// Execute crypto on button click.
+		executeAESCTR();
+	}// activateEncAESCTR()
+
+// PGO Green: #54c597
+// PGO Readonly Blue: #4491d5
+
+	function activateDecAESCTR() {
+		// Set flag
+		aesctrEncrypt_f = false;
+
+		// Enable decrypt - ciphertext.
+		// Change button text to enabled color.
+		document.getElementById('aesctr_dec_button').style.color = 'lime';
+		// Change outline, label to diabled color.
+		document.getElementById('aesctr_ciphertext_label').style.color = '#54c597';
+		document.getElementById('aesctr_ciphertext').style.color = '#54c597';
+		document.getElementById('aesctr_ciphertext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('aesctr_ciphertext').disabled = false;
+
+		// Disable encrypt - cleartext.
+		// Change button text to disabled color.
+		document.getElementById('aesctr_enc_button').style.color = 'dimgray';
+		// Change outline, label to enabled color.
+		document.getElementById('aesctr_cleartext_label').style.color = 'gray';
+		document.getElementById('aesctr_cleartext').style.color = 'gray';
+		document.getElementById('aesctr_cleartext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('aesctr_cleartext').disabled = true;
+
+		// Focus newly active textarea
+		document.getElementById('aesctr_ciphertext').focus();
+
+		// Execute crypto on button click.
+		executeAESCTR();
+	}// activateDecAESCTR()
+
+
+	///////////////////////////////////////////////////////////////////////////////
+	//					Triple HTML handling									 //
+	///////////////////////////////////////////////////////////////////////////////
+	async function executeTriple() {
+		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
+		if (tripleEncrypt_f === true) { // Encrypt function
+			// Gather inputs.
+			const cleartext = document.getElementById('triple_cleartext').value;
+			const password1GCM = document.getElementById('triple_password_1').value;
+			const password2CTR = document.getElementById('triple_password_2').value;
+			const password3OpenSSL = document.getElementById('triple_password_3').value;
+			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			try {
+				document.getElementById('triple_ciphertext').value = await encryptTriple(password1GCM, password2CTR, password3OpenSSL, cleartext);
+				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				document.getElementById('triple_outcome_message').style.color = 'lime';
+				document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				document.getElementById('triple_outcome_message').style.color = 'red';
+				document.getElementById('triple_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				document.getElementById('triple_ciphertext').value = '';
+			}
+		} else { // Decrypt function
+			// Gather inputs.
+			const ciphertext = document.getElementById('triple_ciphertext').value;
+			const password1GCM = document.getElementById('triple_password_1').value;
+			const password2CTR = document.getElementById('triple_password_2').value;
+			const password3OpenSSL = document.getElementById('triple_password_3').value;
+			// Execute
+			try {
+				document.getElementById('triple_cleartext').value = await decryptTriple(password1GCM, password2CTR, password3OpenSSL, ciphertext);
+				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				document.getElementById('triple_outcome_message').style.color = 'lime';
+				document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
+			} catch (error) {
+				console.log(error);
+				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				document.getElementById('triple_outcome_message').style.color = 'red';
+				document.getElementById('triple_outcome_message').innerHTML = 'Decryption unsuccessful';
+				document.getElementById('triple_cleartext').value = '';
+			}
+		}
+		clearTimeout(timeoutIdTriple)
+		timeoutIdTriple = setTimeout(() => {
+			turnOffTripleDecryptOutcomeMessage();
+		}, 2000); 
+		// Show length AFTER execution.
+		setLengthTriple();
+	}// executeTriple()
+	let timeoutIdTriple;
+
+	function setLengthTriple() {
+		// Cleartext 
+		const cleartext = document.getElementById('triple_cleartext').value;
+		const cleartextByteSize = new Blob([cleartext]).size;
+		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
+		document.getElementById('triple_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		// Ciphertext
+		const ciphertext = document.getElementById('triple_ciphertext').value;
+		const ciphertextByteSize = new Blob([ciphertext]).size;
+		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
+		document.getElementById('triple_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
+	}
+
+	function turnOffTripleDecryptOutcomeMessage() {
+		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
+	}
+
+	function activateEncTriple() {
+		// Set flag
+		tripleEncrypt_f = true;
+
+		// Turn off decryption error.
+		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
+
+		// Disable decrypt.
+		// Change button text to disabled color.
+		document.getElementById('triple_dec_button').style.color = 'dimgray';
+		// Change outline, label to diabled color.
+		document.getElementById('triple_ciphertext_label').style.color = 'gray';
+		document.getElementById('triple_ciphertext').style.color = 'gray';
+		document.getElementById('triple_ciphertext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('triple_ciphertext').disabled = true;
+
+		// Enable encrypt.
+		// Change button text to enabled color.
+		document.getElementById('triple_enc_button').style.color = 'lime';
+		// Change outline, label to enabled color.
+		document.getElementById('triple_cleartext_label').style.color = '#54c597';
+		document.getElementById('triple_cleartext').style.color = '#54c597';
+		document.getElementById('triple_cleartext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('triple_cleartext').disabled = false;
+
+		// Focus newly active textarea
+		document.getElementById('triple_cleartext').focus();
+
+		// Execute crypto on button click.
+		executeTriple();
+	}// activateEncTriple()
+
+// PGO Green: #54c597
+// PGO Readonly Blue: #4491d5
+
+	function activateDecTriple() {
+		// Set flag
+		tripleEncrypt_f = false;
+
+		// Enable decrypt - ciphertext.
+		// Change button text to enabled color.
+		document.getElementById('triple_dec_button').style.color = 'lime';
+		// Change outline, label to diabled color.
+		document.getElementById('triple_ciphertext_label').style.color = '#54c597';
+		document.getElementById('triple_ciphertext').style.color = '#54c597';
+		document.getElementById('triple_ciphertext').style.borderColor = '#54c597';
+		// Enable cleartext textarea.
+		document.getElementById('triple_ciphertext').disabled = false;
+
+		// Disable encrypt - cleartext.
+		// Change button text to disabled color.
+		document.getElementById('triple_enc_button').style.color = 'dimgray';
+		// Change outline, label to enabled color.
+		document.getElementById('triple_cleartext_label').style.color = 'gray';
+		document.getElementById('triple_cleartext').style.color = 'gray';
+		document.getElementById('triple_cleartext').style.borderColor = 'gray';
+		// Disable ciphertext textarea.
+		document.getElementById('triple_cleartext').disabled = true;
+
+		// Focus newly active textarea
+		document.getElementById('triple_ciphertext').focus();
+
+		// Execute crypto on button click.
+		executeTriple();
+	}// activateDecTriple()
+
+
+	
+
+
 
 	// Set Title to link to Home without dropping offline dbase.
 	document.getElementById("titletext").onclick = function() {
