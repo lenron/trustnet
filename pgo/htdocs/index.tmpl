@@ -292,7 +292,7 @@
 	}
 
 
-	/*    FAQSite   */
+	/*    FAQ Site   */
 	.faq_site {
 		width: 100%;
 		min-height: 100%;
@@ -1088,7 +1088,7 @@
 	}
 
 	//////////////////////////////////////////////////////////////
-	//                Captcha Functions                         //
+	//                Contact & Captcha Functions               //
 	//////////////////////////////////////////////////////////////
 
 	// Perform simple captcha check.
@@ -3028,6 +3028,19 @@
 		}
 	}
 
+
+
+	/*    FAQ Site   */
+	.faq_site {
+		width: 100%;
+		min-height: 100%;
+		background-color: #272727;
+		flex: 1 auto;
+		display: none;
+		justify-content: center;
+	}
+
+
 	/*    Dev Site   */
 
 	.main_page {
@@ -3097,8 +3110,6 @@
 
 
 
-
-
 </style>
 <body>
 	<!--------------------------HEADER----------------------------!>
@@ -3109,9 +3120,23 @@
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
-			<div class="header_label" style="">
+			<!--<div class="header_label" style="">
 				<a id="dev_site_toggle_link" href="javascript:void(0);" onclick="toggleDevSite()">DEV_SITE</a>
+			</div>-->
+
+			<div class="header_label" style="">
+				<!--<a href="https://obf.mkrsvr.org/faq">FAQ</a>-->
+				<a id="contact_link" href="javascript:void(0);" onclick="showPage('faq_site')">FAQ</a>
 			</div>
+			<div class="header_label" style="">
+				<!--<a id="dev_site_toggle_link" href="javascript:void(0);" onclick="toggleDevSite()">DEV_SITE</a>-->
+				<a id="dev_site_link" href="javascript:void(0);" onclick="showPage('dev_site')">DEV_SITE</a>
+			</div>
+			<div class="header_label" style="">
+				<!--<a href="https://obf.mkrsvr.org/contact">CONTACT</a>-->
+				<a id="contact_link" href="javascript:void(0);" onclick="showPage('contact_page_captcha')">CONTACT</a>
+			</div>
+
 		</div>
 	</div>
 
@@ -3125,17 +3150,54 @@
 	</div>
 
 
-	<TMPL_INCLUDE NAME="dev_site_html.tmpl">
+	<!--------------------------MAIN PAGE--------------------------------------------------------------------------------------------------------------------------------------------------------!>
+	<div class="main_page" id="main_page">
 
-		<!--------------------------MAIN PAGE--------------------------------------------------------------------------------------------------------------------------------------------------------!>
-		<div class="main_page" id="main_page">
+		<!--------------------------DEV SITE----------------------------!>
+		<TMPL_INCLUDE NAME="dev_site_html.tmpl">
+		<!--------------------------FAQ SITE----------------------------!>
+		<TMPL_INCLUDE NAME="faq_html.tmpl">
 
 		<!--------------------------Div Housing for Flow Pages----------------------------!>
 		<div class="center_html" id="center_html" style="">
 
+
+	<!------------------------------------HEADER PAGES--------------------------------------------------------------------------!>
+				<!--------------------------CONTACT PAGE - CAPTCHA----------------------------!>
+				<div class="flow_pages show_page_activatable " id="contact_page_captcha" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<label>CONTACT PAGE</label>
+					</div>
+					<h2>THE COLOR OF THE SKY IS?</h2>
+					<input autocomplete="off" type="" value="" id="captcha_input" style="" >
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkCaptcha()">CONTINUE</button>
+					</div>
+				</div>
+
+				<!--------------------------CONTACT PAGE----------------------------!>
+				<div class="flow_pages show_page_activatable " id="contact_page" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<label>CONTACT PAGE</label>
+					</div>
+					<h2>Please leave us a message:</h2>
+					<textarea value="" id="contact_textarea" style="color:gray" rows="8" cols="50"></textarea>
+					<div class="button_pair" id="" style="display:flex;">
+						<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="submitContactMessage()">CONTINUE</button>
+					</div>
+				</div>
+
+				<!--------------------------CONTACT THANKS----------------------------!>
+				<div class="flow_pages show_page_activatable " id="contact_thanks" style="display:none">
+					<div style="display:flex; flex-direction:row; justify-content:space-between;">
+						<label>CONTACT PAGE</label>
+					</div>
+					<h2>THANK YOU FOR YOUR MESSAGE!</h2>
+				</div>
+
 	<!----------------------------Offline Flow Start--------------------------------------------------------------!>
 				<!--------------------------OFFLINE HOME----------------------------!>
-				<div class="flow_pages home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
+				<div class="flow_pages show_page_activatable home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
 					<h2 style="color:red">OFFLINE HOME</h2>
 					<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 						<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="saveThenShowPage('offlinestore_codeword')">STORE SECRET DATA</button>
@@ -3146,7 +3208,7 @@
 
 	<!----------------------------Offline SYNC TO ONLINE--------------------------------------------------------------!>
 				<!---------------------------SYNC TO ONLINE Codeword-----------------------!>
-				<div class="flow_pages passlock" id="offlinesync_codeword" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlinesync_codeword" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>SYNC FLOW</label>
@@ -3162,7 +3224,7 @@
 				</div>
 
 				<!---------------------------SYNC TO ONLINE obf1000Pass-----------------------!>
-				<div class="flow_pages passlock" id="offlinesync_obf1000Pass" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlinesync_obf1000Pass" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>SYNC FLOW</label>
@@ -3178,7 +3240,7 @@
 				</div>
 
 				<!---------------------------SYNC TO ONLINE ctrPass-----------------------!>
-				<div class="flow_pages passlock" id="offlinesync_ctrPass" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlinesync_ctrPass" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>SYNC FLOW</label>
@@ -3195,7 +3257,7 @@
 
 	<!----------------------------Offline Access--------------------------------------------------------------!>
 				<!---------------------------Codeword-----------------------!>
-				<div class="flow_pages passlock" id="offlineaccess_codeword" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlineaccess_codeword" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>ACCESS FLOW</label>
@@ -3211,7 +3273,7 @@
 				</div>
 
 				<!---------------------------obf1000Pass-----------------------!>
-				<div class="flow_pages passlock" id="offlineaccess_obf1000Pass" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlineaccess_obf1000Pass" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>ACCESS FLOW</label>
@@ -3227,7 +3289,7 @@
 				</div>
 
 				<!---------------------------ctrPass-----------------------!>
-				<div class="flow_pages passlock" id="offlineaccess_ctrPass" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlineaccess_ctrPass" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>ACCESS FLOW</label>
@@ -3243,7 +3305,7 @@
 				</div>
 
 				<!--------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
-				<div class="flow_pages" id="offlineaccess_choose" style="display:none">
+				<div class="flow_pages show_page_activatable" id="offlineaccess_choose" style="display:none">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>ACCESS DATA</label>
 					<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
@@ -3267,7 +3329,7 @@
 
 				<!---------------------------BROWSER Chosen: -----------------------!>
 				<!---------------------------OpenSSL Pass-----------------------!>
-				<div class="flow_pages passlock" id="offlineaccess_opensslpass" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlineaccess_opensslpass" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>ACCESS FLOW</label>
@@ -3284,7 +3346,7 @@
 
 				<!---------------------------Outcome-----------------------!>
 				<!---------------------------File Download-----------------------!>
-				<div class="flow_pages passlock" id="offlineaccess_file" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlineaccess_file" style="display:none">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 					<h2>&#10004; SUCCESS</h2>
 					<label>File should automatically download.</label>
@@ -3324,7 +3386,7 @@
 				<!---------------------------END CMD LINE Access Flow-----------------------!>
 
 				<!---------------------------Show Plaintext-----------------------!>
-				<div class="flow_pages passlock" id="offlineaccess_plaintext" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlineaccess_plaintext" style="display:none">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 					<h2>&#10004; SUCCESS</h2>
 					<label>result:</label>
@@ -3351,7 +3413,7 @@
 				<!---------------------------END BROWSER Access Flow-----------------------!>
 
 				<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
-				<div class="flow_pages" id="offlinefailed_to_access" style="display:none">
+				<div class="flow_pages show_page_activatable" id="offlinefailed_to_access" style="display:none">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 					<h2>&#10060; FAILED TO ACCESS</h2>
 					<div class="button_pair" id="" style="display:flex">
@@ -3359,7 +3421,7 @@
 				</div>
 
 				<!---------------------------Password Entry Error-----------------------!>
-				<div class="flow_pages" id="password_entry_error" style="display:none">
+				<div class="flow_pages show_page_activatable" id="password_entry_error" style="display:none">
 					<h2>&#10060; PASSWORD 3 IS INCORRECT!</h2>
 				</div>
 
@@ -3367,7 +3429,7 @@
 				<input class="main_site_password_input" id="offlinefingerprint_holder" autocomplete="off" value="" style="display:none">
 
 				<!----------------------------Successfully Deleted Data--------------------------------------------------------------!>
-				<div class="flow_pages" id="offlinedelete_success" style="display:none">
+				<div class="flow_pages show_page_activatable" id="offlinedelete_success" style="display:none">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 					<h2>&#10004; SUCCESSFULLY DELETED DATA</h2>
 					<div class="button_pair" id="" style="display:flex">
@@ -3375,7 +3437,7 @@
 				</div>
 
 				<!----------------------------Failed to Delete--------------------------------------------------------------!>
-				<div class="flow_pages" id="offlinedelete_failed" style="display:none">
+				<div class="flow_pages show_page_activatable" id="offlinedelete_failed" style="display:none">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 					<h2>&#10060; FAILED TO DELETE</h2>
 					<div class="button_pair" id="" style="display:flex">
@@ -3385,7 +3447,7 @@
 
 	<!----------------------------Offline Store--------------------------------------------------------------!>
 				<!---------------------------Codeword-----------------------!>
-				<div class="flow_pages passlock" id="offlinestore_codeword" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlinestore_codeword" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>STORE FLOW</label>
@@ -3401,7 +3463,7 @@
 				</div>
 
 				<!---------------------------obf1000Pass-----------------------!>
-				<div class="flow_pages passlock" id="offlinestore_obf1000Pass" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlinestore_obf1000Pass" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>STORE FLOW</label>
@@ -3417,7 +3479,7 @@
 				</div>
 
 				<!---------------------------ctrPass-----------------------!>
-				<div class="flow_pages passlock" id="offlinestore_ctrPass" style="display:none">
+				<div class="flow_pages show_page_activatable passlock" id="offlinestore_ctrPass" style="display:none">
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3433,7 +3495,7 @@
 			</div>
 
 			<!---------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
-			<div class="flow_pages" id="offlinestore_choose" style="display:none">
+			<div class="flow_pages show_page_activatable" id="offlinestore_choose" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
@@ -3457,7 +3519,7 @@
 
 			<!---------------------------CMD LINE Chosen: -----------------------!>
 			<!---------------------------Check Codeword-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_codeword_cmdcheck" style="display:none">
+			<div class="flow_pages show_page_activatable passlock" id="offlinestore_codeword_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3474,7 +3536,7 @@
 			</div>
 
 			<!---------------------------Check obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1000Pass_cmdcheck" style="display:none">
+			<div class="flow_pages show_page_activatable passlock" id="offlinestore_obf1000Pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3491,7 +3553,7 @@
 			</div>
 
 			<!---------------------------Check ctrPass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_ctrPass_cmdcheck" style="display:none">
+			<div class="flow_pages show_page_activatable passlock" id="offlinestore_ctrPass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3508,7 +3570,7 @@
 			</div>
 
 			<!---------------------------FILE UPLOAD-----------------------!>
-			<div class="flow_pages" id="offlinestore_upload" style="display:none">
+			<div class="flow_pages show_page_activatable" id="offlinestore_upload" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
@@ -3543,7 +3605,7 @@
 
 			<!---------------------------BROWSER Chosen: -----------------------!>
 			<!---------------------------OpenSSL Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_opensslpass" style="display:none">
+			<div class="flow_pages show_page_activatable passlock" id="offlinestore_opensslpass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3559,7 +3621,7 @@
 			</div>
 
 			<!---------------------------Check Codeword-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_codeword_browsercheck" style="display:none">
+			<div class="flow_pages show_page_activatable passlock" id="offlinestore_codeword_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3576,7 +3638,7 @@
 			</div>
 
 			<!---------------------------Check obf1000Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_obf1000Pass_browsercheck" style="display:none">
+			<div class="flow_pages show_page_activatable passlock" id="offlinestore_obf1000Pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3593,7 +3655,7 @@
 			</div>
 
 			<!---------------------------Check ctrPass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_ctrPass_browsercheck" style="display:none">
+			<div class="flow_pages show_page_activatable passlock" id="offlinestore_ctrPass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3610,7 +3672,7 @@
 			</div>
 
 			<!---------------------------Check OpenSSL Pass-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_opensslpass_browsercheck" style="display:none">
+			<div class="flow_pages show_page_activatable passlock" id="offlinestore_opensslpass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3627,7 +3689,7 @@
 			</div>
 
 			<!---------------------------Enter Data-----------------------!>
-			<div class="flow_pages passlock" id="offlinestore_data" style="display:none">
+			<div class="flow_pages show_page_activatable passlock" id="offlinestore_data" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
@@ -3646,13 +3708,13 @@
 			<!---------------------------END BROWSER Store Flow-----------------------!>
 
 			<!---------------------------Edit Success-----------------------!>
-			<div class="flow_pages" id="offlineedit_success" style="display:none">
+			<div class="flow_pages show_page_activatable" id="offlineedit_success" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<h2>&#10004; SECRET DATA SUCCESSFULLY EDITED AND SAVED TO DATABASE</h2>
 			</div>
 
 			<!---------------------------Store Success-----------------------!>
-			<div class="flow_pages" id="offlinestore_success" style="display:none">
+			<div class="flow_pages show_page_activatable" id="offlinestore_success" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<h2>&#10004; SECRET DATA SUCCESSFULLY ENCRYPTED AND STORED TO MEMORY. STILL NEEDS STORED TO DISK BY CLICKING BUTTON BELOW:</h2>
 				<div class="button_pair" id="" style="display:flex;">
@@ -3660,7 +3722,7 @@
 			</div>
 
 			<!---------------------------Store Fail-----------------------!>
-			<div class="flow_pages" id="offlinestore_failed" style="display:none">
+			<div class="flow_pages show_page_activatable" id="offlinestore_failed" style="display:none">
 					<h2 style="color:red">OFFLINE FLOW</h2>
 				<h2>&#10060; FAILED TO STORE</h2>
 				<div class="button_pair" id="" style="display:flex;">
@@ -3668,25 +3730,25 @@
 			</div>
 
 			<!---------------------------Store Success-----------------------!>
-			<div class="flow_pages" id="sync_success" style="display:none">
+			<div class="flow_pages show_page_activatable" id="sync_success" style="display:none">
 				<h2>&#10004; SECRET DATA SUCCESSFULLY SYNCED TO ONLINE SERVER</h2>
 			</div>
 
 			<!---------------------------Stores Over 100 Fail-----------------------!>
-			<div class="flow_pages" id="stores_over_100" style="display:none">
+			<div class="flow_pages show_page_activatable" id="stores_over_100" style="display:none">
 				<h2>&#10060; SYNC ERROR</h2>
 				<h2>You've reached your limit of 100 stores today.</h2>
 			</div>
 
 			<!---------------------------Store Fail-----------------------!>
-			<div class="flow_pages" id="sync_failed" style="display:none">
+			<div class="flow_pages show_page_activatable" id="sync_failed" style="display:none">
 				<h2>&#10060; SYNC ERROR</h2>
 			</div>
 <!----------------------------END Store--------------------------------------------------------------!>
 <!----------------------------END Offline Flow--------------------------------------------------------------!>
 
 			<!--------------------------Ask user for encrypted pointer password-----------------------!>
-			<div class="flow_pages" id="enter_offlinedbase_pass" style="display:flex; ">
+			<div class="flow_pages show_page_activatable" id="enter_offlinedbase_pass" style="display:flex; ">
 				<label id='emptyPassWarning' style='color:magenta; display:none; '>Please enter a password or choose NO PASSWORD.</label>
 				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
 				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
@@ -3698,7 +3760,7 @@
 			</div>
 
 			<!---------------------------Offline Database Password Fail-----------------------!>
-			<div class="flow_pages" id="wrong_offlinedbase_password" style="display:none">
+			<div class="flow_pages show_page_activatable" id="wrong_offlinedbase_password" style="display:none">
 				<h2>&#10060; OFFLINE DATABASE PASSWORD ENTERED INCORRECTLY!</h2>
 				</div>
 			</div>
@@ -3743,6 +3805,28 @@
 	window.onload = async function() {
 		// Initial server online check.
 		await updateOnlineStatus();
+	}
+
+	//////////////////////////////////////////////////////////////
+	//                Contact & Captcha Functions               //
+	//////////////////////////////////////////////////////////////
+
+	// Perform simple captcha check.
+	function checkCaptcha() {
+		let enteredCaptchaValue = document.getElementById('captcha_input').value;
+		// Accept case insensitive.
+		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
+		if (enteredCaptchaValue === 'blue') {
+			saveCurrentStateToHistorySoBackWillWork();
+			showPage('contact_page');
+		}
+	}
+
+	// Submit user message to site owners.
+	function submitContactMessage() {
+		const contactMessage = document.getElementById('contact_textarea').value;
+		serverSendContactMessage(contactMessage);
+		showPage('contact_thanks');
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -3938,7 +4022,8 @@
 		// Reset UI warnings and clear all HTML input data as user moves through the interface.
 		resetSecurityAndUI();
 		// Fill flow_page_divs array with set of objects (divs) that contain the flow_pages class.
-		let flow_page_divs = document.getElementsByClassName('flow_pages');
+		//let flow_page_divs = document.getElementsByClassName('flow_pages');
+		let flow_page_divs = document.getElementsByClassName('show_page_activatable');
 		// Hide all of the flow pages.
 		for (let i = 0; i < flow_page_divs.length; i++) {
 			flow_page_divs[i].style.display = "none";
@@ -4947,6 +5032,43 @@
 			console.error(error.message);
 		}
 	}// serverDelete()
+
+	// Send contact message to site admin.
+	async function serverSendContactMessage(contactMessage) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exesendcontactmessage';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					message: contactMessage,// Don't need to send any information to server?
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			//console.log(responseObj);
+			if (responseObj.response) {
+				console.log("Contact message response: " + responseObj.response);
+			}else{
+				console.log("Contact message return error.");
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverSendContactMessage()
+
 
 	function clearSaveToDiskReminder() {
 		document.getElementById("savetodisk_warning").style.display = "none";
