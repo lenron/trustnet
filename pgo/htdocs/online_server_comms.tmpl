@@ -1,0 +1,450 @@
+// This <script> seems to turn on syntax highlighting.
+
+
+	//////////////////////////////////////////////////////////////
+	//			Server Communication Functions				    //
+	//////////////////////////////////////////////////////////////
+	// Server communication relies on fetch() to handle HTTP requests.
+	//////////////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////////////
+	// We need to set the origin differently depending if we're a standalone file or not.
+	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
+	// Returns the SERVER_URL to be used for server communication functions.
+	// 
+	// This function used by both online client and offline standalone.html file that houses the offline database.
+	// While the online client can find there the online database is to store using window.location.origin,
+	// the offline database needs to have that URL set manually by this function.
+	// 
+	// Figure out whether we are an online client of offline database housing standalone.html file
+	// and set the origin accordingly so that communication with the online server will work.
+	function getOnlineServerOrigin() {
+		// Get origin detected by the browser.
+		const browserDetectedOrigin = window.location.origin;
+		let onlineServerOrigin = '';
+		// If we're standalone, set address manually.
+		const regex = new RegExp(/^file/);
+		if (regex.test(browserDetectedOrigin)) {
+			// This is a standalone file; set origin manually.
+			onlineServerOrigin = 'https://obf.mkrsvr.org/';
+		}else{
+			// This an online client, empty in this context gets interpreted as 'this origin' by fetch() when used.
+			onlineServerOrigin = '';
+		}
+		return onlineServerOrigin;
+	}// getOnlineServerOrigin()
+
+	// Check if we're online by querying server.
+	async function checkOnline() {
+		// Get origin of the online server.
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exeonlinecheck';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				}
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				//throw new Error(fetchResponseObject.status);
+				return 'offline';
+			}
+			// Looks like we're online!
+			return 'online';
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			// If we're in this error block we know that it is a communication/offline error. Yes this is arcane knowledge.
+			console.log("Fetch Error on Online Check: " + error.message);
+			console.log("response FAILED");
+			return "offline";
+		}
+	}// checkOnline()
+
+	// Check if we're online or not and inform user by changing UI label that is always visible as user moves through interface.
+	async function updateOnlineStatus() {
+		document.getElementById("offline_label").innerHTML = "ONLINE STATUS PENDING...";
+		// Check if we're online
+		const online_status = await checkOnline();
+		if (online_status === "online") {
+			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
+		}else{
+			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
+		}
+	}// updateOnlineStatus()
+
+	// Count every time a unique visitor accesses this site.
+	async function serverCountUniqueVisitors() {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'execountuniquevisitors';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					token: 'token',// Don't need to send any information to server?
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			//console.log(responseObj);
+			if (responseObj.ip_query_response) {
+				console.log("IP query response: " + responseObj.ip_query_response);
+			}else{
+				console.log("Unique Visitor Count return error.");
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverCountUniqueVisitors()
+
+	// Send contact message to site admin.
+	async function serverSendContactMessage(contactMessage) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exesendcontactmessage';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					message: contactMessage,// Don't need to send any information to server?
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			//console.log(responseObj);
+			if (responseObj.response) {
+				console.log("Contact message response: " + responseObj.response);
+			}else{
+				console.log("Contact message return error.");
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverSendContactMessage()
+
+	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
+	// Input: fingerprint is hexadecimal.
+	// Output: POST message to server script which will attempt to load encrypted data from server database.
+	//
+	// Accesses the Multi Encrypted Datarecord at fingerprint location from the online server and returns it. 
+	async function serverLoad(fingerprint) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exeload';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					fingerprint: fingerprint,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND") {
+				console.log("serverLoad Error: " + responseObj.access_response);
+				return responseObj.access_response;
+			} else if (responseObj.access_response.length === MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
+				console.log("serverLoad: Successfully loaded encrypted data.");
+				console.log("loadResponse: " + responseObj.access_response);
+				return responseObj.access_response;
+			} else {
+				console.log("serverLoad Error: " + responseObj.access_response);
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverLoad()
+
+	// Stores Multi Encrypted Datarecord to fingerprint location in the online database.
+	async function serverStore(fingerprint, data) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exestore';
+		
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					fingerprint: fingerprint,
+					data: data,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			console.log("Store responseObj.response: " + responseObj.store_response);
+			if (responseObj.store_response === "TOTAL_STORES_OVER_50000") {
+				showPage("lockedout_50000"); // Shown for a split second before page reload.
+				window.location.reload(true);
+				throw new Error("TOTAL_STORES_OVER_50000");
+			} else if (responseObj.store_response === "SUCCESS") {
+				console.log("serverStore: Successfully stored encrypted data.");
+				return "success";
+			} else if (responseObj.store_response === "STORES_OVER_100") {
+				return "STORES_OVER_100";
+			} else if (responseObj.store_response === "STORE FAILED") {
+				throw Error("serverStore Error! Database failed to store data.");
+			} else {
+				throw Error("serverStore Error! Maybe a database error?");
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		// 500 Internal Server Errors will be caught here too.
+		}catch(error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverStore()
+
+	// Endpoint /obf/exedelete will attempt to delete.
+	// Input: fingerprint is hexadecimal.
+	// Output: POST message to server script that will attempt to Delete.
+	// 
+	// Deletes the Multi Encrypted Datarecord at fingerprint location.
+	async function serverDelete(fingerprint) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exedelete';
+		
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					fingerprint: fingerprint,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			if (Number(responseObj.response) !== 1) { // there appears to be a problem.
+				throw Error("serverDelete Error! Data not deleted!");
+				return "error";
+			}else{
+				console.log("serverDelete: Successfully deleted data.");
+				return "success";
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		// 500 Internal Server Errors will be caught here too.
+		}catch(error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverDelete()
+
+
+	// Attempts to delete active passlock from online database. After ~5 minutes the database will delete the passlock itself for added security.
+	// Runs after Store or Access call completes as a security measure to ensure user passlocks exist only as long as necessary.
+	async function serverDeletePasslock(passedBrowserId) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exepasslockdelete';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					// browser_id is the key which will be used to access data on server side.
+					browser_id: passedBrowserId,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			// checkResponseObject(response_obj);
+			console.log("delete passlock response: ");
+			console.log(responseObj);
+			// Handle database query outcome.
+			if (responseObj.response !== "passlock successfully deleted") { // there appears to be a problem.
+				throw Error("serverDeletePasslock() Failed to delete passlock!");
+				return "error";
+			}else{
+				console.log("Passlock successfully deleted from database.");
+				return "success";
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverDeletePasslock()
+
+	// Ask the server to extend time period before it auto-deletes a passlock.
+	// Called when user clicks 'EXTEND TIME' in last 30 seconds of passlock being active.
+	async function serverExtendPasslock(browserId) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exeextendpasslock';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					// browser_id is the key which will be used to access data on server side.
+					browser_id: browserId,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const response_obj = await fetchResponseObject.json();
+			// Handle database query outcome.
+			if (response_obj.response != 1) { // there appears to be a problem.
+				throw Error("serverExtendPasslock() database store error!");
+			}else{
+				console.log("Passlock successfully extended.");
+				return;
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverExtendPasslock()
+
+	// Send passlock to server, store as key value pair with browserId as key.
+	// Used when passlock is instantiated as user beings a UI flow.
+	// Passlock stored on server in case user walks away - added security.
+	async function serverSetPasslock(browserId, passlock) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exesetpasslock';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					// browser_id is the key which will be used to access data on server side.
+					browser_id: browserId,
+					passlock: passlock,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const response_obj = await fetchResponseObject.json();
+			// Handle database query outcome.
+			if (response_obj.response != 1) { // there appears to be a problem.
+				throw Error("serverSetPasslock() database store error!");
+			}else{
+				//console.log("New passlock successfully stored to database.");
+				return;
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverSetPasslock()
+
+	// Access passlock from server as user moves through UI.
+	// Passlock will then be used to either encrypt user plaintext data or decrypt when ready to execute a Store or Access.
+	async function serverGetPasslock(browserId) {
+		let SERVER_URL = getOnlineServerOrigin();
+		SERVER_URL += 'exegetpasslock';
+
+		try { // Catch a rejected promise so we can operate on it.
+			// Execute HTTP request to SERVER_URL with the following options.
+			const fetchResponseObject = await fetch(SERVER_URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
+					// browser_id is the key which will be used to access data on server side.
+					browser_id: browserId,
+				}),
+			});
+
+			if (!fetchResponseObject.ok) { // Indicates HTTP error.
+				// Response Status is the numerical code like 404, 500, etc.
+				throw new Error(fetchResponseObject.status);
+			}
+			// Now that we've cleared the error check, we can proceed with processing the response.
+			// Make a copy of the json extraction.
+			const responseObj = await fetchResponseObject.json();
+			if (responseObj.passlock.length === PASSLOCK_LENGTH && checkUUIDChars(responseObj.passlock)) { // Data looks good.
+				//console.log("serverGetPasslock: Successfully retrieved existing passlock.");
+				return responseObj.passlock;
+			}else{
+				throw Error("serverGetPasslock: Failed to load passlock.");
+				return "failed to get passlock";
+			}
+		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
+		} catch (error) { // Catch rejected promise.
+			console.error(error.message);
+		}
+	}// serverGetPasslock()
+
+
+
+

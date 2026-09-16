@@ -304,7 +304,6 @@
 
 
 	/*    Dev Site   */
-
 	.main_page {
 		background-color: #272727;
 		display: flex;
@@ -489,7 +488,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>ACCESS FLOW</label>
 						<label>CODEWORD</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER CODEWORD</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="access_codeword_input" style="" oninput="codewordToLowerCase(event)">
@@ -504,7 +502,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>ACCESS FLOW</label>
 						<label>PASS 1</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 1</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="access_obf1000Pass_input" style="">
@@ -519,7 +516,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>ACCESS FLOW</label>
 						<label>PASS 2</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 2</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="access_ctrPass_input" style="">
@@ -557,7 +553,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>ACCESS FLOW</label>
 						<label>PASS 3</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 3</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="access_opensslpass_input" style="">
@@ -576,14 +571,14 @@
 					<div class="overlay_container" style="position:relative">
 						<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 						<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
-							<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+							<div class="encrypt_hover encrypt_copy_to_click" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
 								<div style="display:flex; justify-content:space-between;">
 									<label>Encrypt:</label>
 									<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
 								</div>
 								<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 							</div>
-							<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+							<div class="decrypt_hover decrypt_copy_to_click" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
 								<div style="display:flex; justify-content:space-between;">
 									<label>Decrypt:</label>
 									<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
@@ -669,7 +664,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>CODEWORD</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER CODEWORD</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="store_codeword_input" style="" oninput="codewordToLowerCase(event)">
@@ -684,7 +678,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>PASS 1</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 1</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="store_obf1000Pass_input" style="">
@@ -699,7 +692,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>PASS 2</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 2</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="store_ctrPass_input" style="">
@@ -737,7 +729,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>CHECK CODEWORD</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 					<h2>RE-ENTER CODEWORD</h2>
@@ -753,7 +744,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>CHECK PASS 1</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 					<h2>RE-ENTER PASSWORD 1</h2>
@@ -769,7 +759,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>CHECK PASS 2</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 					<h2>RE-ENTER PASSWORD 2</h2>
@@ -791,14 +780,14 @@
 					<br>
 					<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 					<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
-						<div class="encrypt_hover" id="encrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+						<div class="encrypt_hover encrypt_copy_to_click" id="encrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
 							<div style="display:flex; justify-content:space-between;">
 								<label>Encrypt:</label>
 								<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
 							</div>
 							<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 						</div>
-						<div class="decrypt_hover" id="decrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+						<div class="decrypt_hover decrypt_copy_to_click" id="decrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
 							<div style="display:flex; justify-content:space-between;">
 								<label>Decrypt:</label>
 								<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
@@ -819,7 +808,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>PASS 3</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 3</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="store_opensslpass_input" style="">
@@ -834,7 +822,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>CHECK CODEWORD</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 					<h2>RE-ENTER CODEWORD</h2>
@@ -850,7 +837,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>CHECK PASS 1</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 					<h2>RE-ENTER PASSWORD 1</h2>
@@ -866,7 +852,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>CHECK PASS 2</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 					<h2>RE-ENTER PASSWORD 2</h2>
@@ -882,7 +867,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>STORE FLOW</label>
 						<label>CHECK PASS 3</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 					<h2>RE-ENTER PASSWORD 3</h2>
@@ -973,7 +957,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>OFFLINE DATABASE - EXISTING DATA FLOW</label>
 						<label>CODEWORD</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER CODEWORD</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="existingdata_codeword_input" style="" oninput="codewordToLowerCase(event)">
@@ -987,7 +970,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>OFFLINE DATABASE - EXISTING DATA FLOW</label>
 						<label>PASS 1</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 1</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="existingdata_obf1000Pass_input" style="">
@@ -1002,7 +984,6 @@
 					<div style="display:flex; flex-direction:row; justify-content:space-between;">
 						<label>OFFLINE DATABASE - EXISTING DATA FLOW</label>
 						<label>PASS 2</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 2</h2>
 					<input class="main_site_password_input"autocomplete="off" type="password" value="" id="existingdata_ctrPass_input" style="">
@@ -1085,109 +1066,27 @@
 		await updateOnlineStatus();
 		// Count every time a unique visitor accesses this site.
 		serverCountUniqueVisitors();
+		// Set up all copy to click listeners.
+		addListenersToAllCopyToClick();
+	}
+
+
+	function addListenersToAllCopyToClick() {
+		// Add encrypt elements.
+		let encryptElements = document.getElementsByClassName('encrypt_copy_to_click');
+		for (let i = 0; i < encryptElements.length; i++) {
+			encryptElements[i].addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
+		}
+
+		// Add decrypt elements.
+		let decryptElements = document.getElementsByClassName('decrypt_copy_to_click');
+		for (let i = 0; i < decryptElements.length; i++) {
+			decryptElements[i].addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
+		}
 	}
 
 	//////////////////////////////////////////////////////////////
-	//                Contact & Captcha Functions               //
-	//////////////////////////////////////////////////////////////
-
-	// Perform simple captcha check.
-	function checkCaptcha() {
-		let enteredCaptchaValue = document.getElementById('captcha_input').value;
-		// Accept case insensitive.
-		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
-		if (enteredCaptchaValue === 'blue') {
-			saveCurrentStateToHistorySoBackWillWork();
-			showPage('contact_page');
-		}
-	}
-
-	// Submit user message to site owners.
-	function submitContactMessage() {
-		const contactMessage = document.getElementById('contact_textarea').value;
-		serverSendContactMessage(contactMessage);
-		showPage('contact_thanks');
-	}
-
-	/////////////////////////////////////////////////////////////////
-	//                  Copy to Click Functions                    //
-	/////////////////////////////////////////////////////////////////
-
-	// Make it so that when this div is clicked, copyEncryptOpenSslCmdToClipboard() is executed.
-	document.getElementById("encrypt_click_access").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
-	document.getElementById("encrypt_click_store").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
-	// Make it so that when this div is clicked, copyDecryptOpenSslCmdToClipboard() is executed.
-	document.getElementById("decrypt_click_access").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
-	document.getElementById("decrypt_click_store").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
-
-	// Copy command line OpenSSL command to clipboard as user clicks div.
-	async function copyEncryptOpenSslCmdToClipboard() {
-		try {
-			// Copy command to clipboard.
-			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc");
-			console.log("OpenSSL encrypt command copied to clipboard.");
-			// Display message indicating command was copied to clipboard.
-			showEncryptCommandCopied();
-			// Undisplay message in 5 seconds after showing it.
-			setTimeout(() => {
-				hideEncryptCommandCopied();
-			}, FIVE_SECONDS); 
-		} catch (error) {
-			console.error(error.message);
-		}
-	}
-
-	// Copy command line OpenSSL command to clipboard as user clicks div.
-	async function copyDecryptOpenSslCmdToClipboard() {
-		try {
-			// Copy command to clipboard.
-			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt");
-			console.log("OpenSSL decrypt command copied to clipboard.");
-			// Display message indicating command was copied to clipboard.
-			showDecryptCommandCopied();
-			// Undisplay message in 5 seconds after showing it.
-			setTimeout(() => {
-				hideDecryptCommandCopied();
-			}, FIVE_SECONDS); 
-		} catch (error) {
-			console.error(error.message);
-		}
-	}
-
-	// Show immediate UI change so user knows their clipboard was modified.
-	function showEncryptCommandCopied() {
-		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'inline';
-		}
-	}
-
-	// Show immediate UI change so user knows their clipboard was modified.
-	function hideEncryptCommandCopied() {
-		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'none';
-		}   
-	}
-
-	// Show immediate UI change so user knows their clipboard was modified.
-	function showDecryptCommandCopied() {
-		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'inline';
-		}
-	}
-
-	// Show immediate UI change so user knows their clipboard was modified.
-	function hideDecryptCommandCopied() {
-		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'none';
-		}   
-	}
-
-	//////////////////////////////////////////////////////////////
-	//                    Security Reset                        //
+	//               Security Reset - Main Site                 //
 	//////////////////////////////////////////////////////////////
 
 	// Reset state variables, etc. that could be security concern.
@@ -1216,164 +1115,14 @@
 		updateOnlineStatus();
 		// Hide password RE-Entry check warnings (passlock flow).
 		hidePassCheckFailWarnings();
-		// Hide all password length warnings.
-		hidePasswordLengthWarnings();
 		// Reset delete overlay
 		deleteCheckHide('overlay_delete_cmd');
 		deleteCheckHide('overlay_delete_browser');
 	}// resetSecurityAndUI()
 
-	// (Nothing currently turns these on)
-	// 
-	// Hide all password length warnings.
-	function hidePasswordLengthWarnings() {
-		let pass_warn_elements = document.getElementsByClassName('pass_length_warn');
-		for (let i = 0; i < pass_warn_elements.length; i++) {
-			pass_warn_elements[i].style.display = "none";
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//							Browser Back functionality										     		  //
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Harnessing the browser's back functionality is complexity rooted in browser security decisions and the
-	// functional opacity that brings. You are disallowed from things like deleting history records as a user moves
-	// through a custom interface, so workarounds are needed. Because of the opacity of how this works in the browser,
-	// testing and tuning was required to get it to work - there was no straightforward theory available.
-	//
-	// The goal is to map the back button to the last page of the UI a user was on.
-	// This is achieved in 2 steps: creating a record in history for every page we want the user to be able to go back to.
-	// And making sure that the proper page is returned to upon a user activating browser back function.
-	//
-	// Listen for the popstate event which is usually fired by user activating browser back button.
-	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
-	window.addEventListener('popstate', (event) => {
-		// Use event.state or window.location to update content
-		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
-			showPage(event.state.page);
-		} else {
-			// Skip showPage for this popstate:
-			// we don't want to flicker as we're history.go()ing back programmatically if the user clicks back after completing a flow job.
-			showPageFlag = 'true';
-		}
-	});
-
-	// In order for custom back functionality to work, we have to manually save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
-	function saveCurrentStateToHistorySoBackWillWork() {
-		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
-		const state = {page: currentPage}; // Create JS object with attribute page that has value currentPage.
-		// First parameter for replaceState(), state is js object that can contain more data than just the page if needed.
-		// Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
-		// Last, window.location should be url of current page.
-		// Replace the current history entry with additional state data that we will use to return to with custom function.
-		history.replaceState(state, '', window.location);
-		// My current theory is under the hood function isn't expecting a manual removal of a state so we have to work around their garbage collection?
-		// Create new (empty) entry in the history stack.
-		// This function is needed for custom back to work even though we're not sure why exactly it's needed besides it breaking when this is removed.
-		history.pushState({}, '', '');
-	}// saveCurrentStateToHistorySoBackWillWork()
-
-	// Create record in history whenever user moves to a new page. This enables history's back function to return to that page.
-	// Used as a 'wrapper' solution to creating save states as the user moves through the UI.
-	function saveThenShowPage(activateThisPage) {
-		saveCurrentStateToHistorySoBackWillWork();
-		showPage(activateThisPage);
-	}// saveThenShowPage()
-
-	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
-	let showPageFlag = 'true';
-	// For overall security and because the passlock system wasn't designed for users to browser back into it,
-	// once a 'flow' completes, we move the history pointer so that if they do hit back, it will take them to the home page.
-	// Browser security design disallow the removal of history records, which would be a cleaner solution than this function.
-	// Programmers can add entries to history, but cannot remove them. This function is a workaround that needs to be tuned for each usage.
-	function goBackProgrammaticallyXandDontFireShowPage(numPlaces) {
-		// Don't flicker between multiple pages as the history pointer is programmatically moved to the home page.
-		showPageFlag = 'false';
-		// Move the pointer back a variable number of places. Each case of this number was found by trial and error.
-		history.go(-numPlaces);
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//							          Show Page                                                           //
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Pages are defined by the 'flow_pages' class which is held by HTML div that holds DOM elements needed for that page's functionality.
-	// Moving through the UI is accomplished by manipulating which 'page' is currently shown to the user;
-	// the page to be made active is shown while all others are hidden. 
-	// 
-	// Global variable to keep track of the page we're on. Start on home page.
-	let currentPage = 'home';
-	// Hide all other pages, then show activateThisPage page. 
-	// Input: Target is the element ID of a div containing class: flow_pages
-	function showPage(activateThisPage) {
-		// This global variable keeps track of the page the user is currently on. Needed for activatable-by-enter and harnessing browser back.
-		currentPage = activateThisPage;
-		// Reset UI warnings and clear all HTML input data as user moves through the interface.
-		resetSecurityAndUI();
-		// Fill flow_page_divs array with set of objects (divs) that contain the flow_pages class.
-		//let flow_page_divs = document.getElementsByClassName('flow_pages');
-		let flow_page_divs = document.getElementsByClassName('show_page_activatable');
-		// Hide all of the flow pages.
-		for (let i = 0; i < flow_page_divs.length; i++) {
-			flow_page_divs[i].style.display = "none";
-		}
-		// Show the page -- make visible by changing display style from none to flex.
-		document.getElementById(activateThisPage).style.display = "flex";
-		// Focus input or textbox (for convenience).
-		let inputs_array = document.getElementById(activateThisPage).getElementsByTagName('input');
-		let textareas_array = document.getElementById(activateThisPage).getElementsByTagName('textarea');
-		// There is only 1 input or 1 textarea per div in our setup.
-		// If we found more than zero inputs in the array, focus the first and only one.
-		if (inputs_array.length > 0) {
-			inputs_array[0].focus();
-		}else if (textareas_array.length > 0) {
-			// Otherwise, we should find 1 textarea to focus if we need to focus anything.
-			textareas_array[0].focus();
-		}else{
-			// If there's no input, focus the button with 'activatable_by_enter' class (used to select the 'default' option (BRWOSER) at UI branch.
-			const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-			if (buttonObj !== null) {
-				document.getElementById(buttonObj.id).focus();
-			}
-		}
-	}// showPage()
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//							activatable_by_enter functionality								     		  //
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// To empower the user to move through the interface quickly, we implement a class: activatable_by_enter.
-	// The global variable currentPage holds the page currently in view of the user. When enter is clicked,
-	// the following anonymous function will utilize querySelector to search for DOM objects containing the
-	// activatable_by_enter class. The button containing this class will then be clicked.
-	// 
-	// In simple terms, users can hit enter while the input they're typing in is focused in order to move to the next page in the interface.
-	// 
-	// Globally detect when user hits ENTER on their keyboard.
-	window.addEventListener("keydown", function(event) {
-		if (event.key === "Enter") {
-			// If focused element is an input, enter clicks the button containing the class: activatable_by_enter
-			if (document.activeElement.tagName == "INPUT") {
-				// Select all DOM objects containing the class: activatable_by_enter
-				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-				if (buttonObj !== null) {
-					// Click button that was selected.
-					buttonObj.click();
-				}else{
-					//console.log("Enter clicked but no activatable_by_enter class found: " + currentPage);
-				}
-				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
-				// Prevent strange behavior where "the default action is performed on the newly focused element".
-				event.preventDefault();
-				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
-			}else{
-				// Focused element isn't an Input, do nothng I guess?
-			}
-		}
-	});// activatable_by_enter page listener
-
 	//////////////////////////////////////////////////////////////
 	//           	UI Manipulation Functions	         		//
 	//////////////////////////////////////////////////////////////
-
 	// Change UI to show Edit button, activate textarea input.
 	function showEditEnabledUI() {
 		document.getElementById('access_data_outputdisplay').disabled = false;
@@ -1385,43 +1134,6 @@
 		document.getElementById('access_data_outputdisplay').disabled = true;
 		document.getElementById('access_data_outputdisplay').style.color = 'gray';
 	}// showEditDisabledUI()
-
-	// Show overlay where user can DELETE record.
-	function showDeleteOverlay(targetId) {
-		document.getElementById(targetId).style.display = "flex";
-	}// showDeleteOverlay()
-
-	// Hides DELETE overlay.
-	function deleteCheckHide(targetId) {
-		document.getElementById(targetId).style.display = "none";
-	}// deleteCheckHide()
-
-	// Inform user that RE-ENTERED data on a password check step was different.
-	function showPassCheckFailWarnings() {
-		// Show all password warnings on all html pages.
-		passCheckElements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < passCheckElements.length; i++) {
-			passCheckElements[i].style.display = "inline";
-		}
-	}// showPassCheckFailWarnings()
-
-	// Disable all password warnings.
-	function hidePassCheckFailWarnings() {
-		passCheckElements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < passCheckElements.length; i++) {
-			passCheckElements[i].style.display = "none";
-		}
-	}// hidePassCheckFailWarnings()
-
-	// Replaces all upper case letters with lower case as user types them into the frontend UI.
-	function codewordToLowerCase(events) {
-		// .toLowerCase() needs a string to run.
-		let userinput = '';
-		// event.target.value returns the value of whichever input the user is currently typing in.
-		userinput = event.target.value;
-		// event.target.value can also be used to set. This allows us to use a genral function in several places working independently.
-		event.target.value = userinput.toLowerCase();
-	}// codewordToLowerCase()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// catchUpload() is executed from the HTML UI when a user uploads a file.
@@ -1492,56 +1204,6 @@
 		}
 	}// checkBase64Chars()
 
-	function checkDataLength(data, length) {
-		// Return fail if data length surpasses length.
-		if (data.length > length) {
-			console.log("Data length Invalid!");
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	function checkLengthAndBase64(data, length){
-		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
-			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
-		} 
-	}
-
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over OPENSSL_INPUT_LIMIT_BYTES: 686
-	function checkDataInputLengthWithRegex(input) {
-		// Get input size in bytes.
-		let size = new Blob([input]).size;
-		let difference = OPENSSL_INPUT_LIMIT_BYTES - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		document.getElementById("browserdata_length_label").innerHTML = size_string;
-		document.getElementById("editdata_length_label").innerHTML = size_string;
-		if (size > OPENSSL_INPUT_LIMIT_BYTES) {
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}// checkDataInputLengthWithRegex()
-
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over 544.
-	function checkInputLengthUpload(input) {
-		// show input size in bytes
-		let size = new Blob([input]).size;
-		let difference = OBF_1000_INPUT_LIMIT_BYTES - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		//console.log("size_string: " + size_string);
-		document.getElementById("uploaddata_length_label").innerHTML = size_string;
-		if (size > OBF_1000_INPUT_LIMIT_BYTES) {
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}// checkInputLengthUpload()
-
 	// Returns true if input has precisely FINGERPRINT_LENGTH_BASE64 (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint) {
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH_BASE64 can be passed in.
@@ -1563,44 +1225,8 @@
 		}
 	}// checkDataIsValid()
 
-	function checkFingerprintAndData(fingerprint, multiEncryptedDatarecord) {
-		if (!checkFingerprintIsValid(fingerprint)) {
-			throw new Error('Attempt to store failed! FINGERPRINT is invalid.');
-		}else{
-			console.log("FINGERPRINT IS VALID!");
-		}
-		if (!checkDataIsValid(multiEncryptedDatarecord)) {
-			throw new Error('Attempt to store failed! DATA is invalid.');
-		}else{
-			console.log("DATA IS VALID!");
-		}
-	}
+	<TMPL_INCLUDE NAME="common_js.tmpl">
 
-	// Called on change of text area, checks length of that text area and shows warning if input data too long.
-	function checkDataInputLength(input_id) {
-		let input = document.getElementById(input_id).value;
-		if (checkDataInputLengthWithRegex(input)) {
-			// Length OK, turn off warning
-			document.getElementById("text_input_warning").style.display = "none";
-			// display button
-			document.getElementById("text_input_continue").style.display = "inline";
-
-			// Length OK, turn off warning
-			document.getElementById("edit_input_warning").style.display = "none";
-			// display button
-			document.getElementById("save_button").style.display = "inline";
-		}else{
-			// Length NOT OK, turn ON warning
-			document.getElementById("text_input_warning").style.display = "inline";
-			// remove button
-			document.getElementById("text_input_continue").style.display = "none";
-
-			// Length NOT OK, turn ON warning
-			document.getElementById("edit_input_warning").style.display = "inline";
-			// remove button
-			document.getElementById("save_button").style.display = "none";
-		}
-	}// checkDataInputLength()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							 Passlock and User Data Handling Functions                                    //
@@ -1840,40 +1466,6 @@
 		return fingerprintAndData;
 	}// computeFpAndDataForStore()
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality:  Produce a 'Fingerprint' which will be used as the Key in the Key-Value pair for storing a Multi Encrypted Datarecord.
-	//                      This is achieved by SHA-256 hashing inputs, concatenating them, and finally returning a hash of that concatenation.
-	//
-	//	Inputs structure:	codeword:    human readable plaintext string
-	//						obf1000Pass: human readable plaintext string
-	//						ctrPass:     human readable plaintext string
-	//
-	//	Output structure:	43 base64 char string
-	//
-	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
-		// Convert codeword to lowercase.
-		const codewordLower = codeword.toLowerCase();
-		// Create a new TextEncoder object.
-		const enc = new TextEncoder();
-		// Convert human readable plaintext string to Uint8Array.
-		const codewordUint8 = enc.encode(codewordLower);
-		const obf1000PassUint8 = enc.encode(obf1000Pass);
-		const ctrPassUint8 = enc.encode(ctrPass);
-		// Compute SHA-256 hash.
-		const codewordHash = await crypto.subtle.digest('SHA-256', codewordUint8);
-		const obf1000PassHash = await crypto.subtle.digest('SHA-256', obf1000PassUint8);
-		const ctrPassHash = await crypto.subtle.digest('SHA-256', ctrPassUint8);
-		// Concatenate: fingerprint = codewordHash + obf1000PassHash + ctrPassHash
-		const codeword_and_obf1000PassHash = concatBuffer(codewordHash, obf1000PassHash)
-		const concatenatedHashes = concatBuffer(codeword_and_obf1000PassHash, ctrPassHash)
-		// SHA-256 hash the result.
-		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
-		const fingerprint = new Uint8Array(fingerprintHash);
-		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
-		const b64 = fingerprint.toBase64({omitPadding: true});
-		return b64;
-	}// computeFingerprint()
-
 	async function attemptCMDStore() {
 		goBackProgrammaticallyXandDontFireShowPage(7);
 		const fingerprintAndData = await computeFpAndDataForStore();
@@ -2057,450 +1649,7 @@
 		await resetPasslock();
 	}// storeDataToServer()
 
-
-	//////////////////////////////////////////////////////////////
-	//			Server Communication Functions				    //
-	//////////////////////////////////////////////////////////////
-	// Server communication relies on fetch() to handle HTTP requests.
-	//////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////
-	// We need to set the origin differently depending if we're a standalone file or not.
-	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
-	// Returns the SERVER_URL to be used for server communication functions.
-	// 
-	// This function used by both online client and offline standalone.html file that houses the offline database.
-	// While the online client can find there the online database is to store using window.location.origin,
-	// the offline database needs to have that URL set manually by this function.
-	// 
-	// Figure out whether we are an online client of offline database housing standalone.html file
-	// and set the origin accordingly so that communication with the online server will work.
-	function getOnlineServerOrigin() {
-		// Get origin detected by the browser.
-		const browserDetectedOrigin = window.location.origin;
-		let onlineServerOrigin = '';
-		// If we're standalone, set address manually.
-		const regex = new RegExp(/^file/);
-		if (regex.test(browserDetectedOrigin)) {
-			// This is a standalone file; set origin manually.
-			onlineServerOrigin = 'https://obf.mkrsvr.org/';
-		}else{
-			// This an online client, empty in this context gets interpreted as 'this origin' by fetch() when used.
-			onlineServerOrigin = '';
-		}
-		return onlineServerOrigin;
-	}// getOnlineServerOrigin()
-
-	// Check if we're online by querying server.
-	async function checkOnline() {
-		// Get origin of the online server.
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exeonlinecheck';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				}
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				//throw new Error(`Response status: ${fetchResponseObject.status}`);
-				return 'offline';
-			}
-			// Looks like we're online!
-			return 'online';
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			// If we're in this error block we know that it is a communication/offline error. Yes this is arcane knowledge.
-			console.log("Fetch Error on Online Check: " + error.message);
-			console.log("response FAILED");
-			return "offline";
-		}
-	}// checkOnline()
-
-	// Check if we're online or not and inform user by changing UI label that is always visible as user moves through interface.
-	async function updateOnlineStatus() {
-		document.getElementById("offline_label").innerHTML = "ONLINE STATUS PENDING...";
-		// Check if we're online
-		const online_status = await checkOnline();
-		if (online_status === "online") {
-			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
-		}else{
-			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
-		}
-	}// updateOnlineStatus()
-
-	// Count every time a unique visitor accesses this site.
-	async function serverCountUniqueVisitors() {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'execountuniquevisitors';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					token: 'token',// Don't need to send any information to server?
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
-			if (responseObj.ip_query_response) {
-				console.log("IP query response: " + responseObj.ip_query_response);
-			}else{
-				console.log("Unique Visitor Count return error.");
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverCountUniqueVisitors()
-
-	// Send contact message to site admin.
-	async function serverSendContactMessage(contactMessage) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exesendcontactmessage';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					message: contactMessage,// Don't need to send any information to server?
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
-			if (responseObj.response) {
-				console.log("Contact message response: " + responseObj.response);
-			}else{
-				console.log("Contact message return error.");
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverSendContactMessage()
-
-	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
-	// Input: fingerprint is hexadecimal.
-	// Output: POST message to server script which will attempt to load encrypted data from server database.
-	//
-	// Accesses the Multi Encrypted Datarecord at fingerprint location from the online server and returns it. 
-	async function serverLoad(fingerprint) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exeload';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					fingerprint: fingerprint,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND") {
-				console.log("serverLoad Error: " + responseObj.access_response);
-				return responseObj.access_response;
-			} else if (responseObj.access_response.length === MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
-				console.log("serverLoad: Successfully loaded encrypted data.");
-				console.log("loadResponse: " + responseObj.access_response);
-				return responseObj.access_response;
-			} else {
-				console.log("serverLoad Error: " + responseObj.access_response);
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverLoad()
-
-	// Stores Multi Encrypted Datarecord to fingerprint location in the online database.
-	async function serverStore(fingerprint, data) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exestore';
-		
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					fingerprint: fingerprint,
-					data: data,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			console.log("Store responseObj.response: " + responseObj.store_response);
-			if (responseObj.store_response === "TOTAL_STORES_OVER_50000") {
-				showPage("lockedout_50000"); // Shown for a split second before page reload.
-				window.location.reload(true);
-				throw new Error("TOTAL_STORES_OVER_50000");
-			} else if (responseObj.store_response === "SUCCESS") {
-				console.log("serverStore: Successfully stored encrypted data.");
-				return "success";
-			} else if (responseObj.store_response === "STORES_OVER_100") {
-				return "STORES_OVER_100";
-			} else if (responseObj.store_response === "STORE FAILED") {
-				throw Error("serverStore Error! Database failed to store data.");
-			} else {
-				throw Error("serverStore Error! Maybe a database error?");
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		// 500 Internal Server Errors will be caught here too.
-		}catch(error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverStore()
-
-	// Endpoint /obf/exedelete will attempt to delete.
-	// Input: fingerprint is hexadecimal.
-	// Output: POST message to server script that will attempt to Delete.
-	// 
-	// Deletes the Multi Encrypted Datarecord at fingerprint location.
-	async function serverDelete(fingerprint) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exedelete';
-		
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					fingerprint: fingerprint,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			if (Number(responseObj.response) !== 1) { // there appears to be a problem.
-				throw Error("serverDelete Error! Data not deleted!");
-				return "error";
-			}else{
-				console.log("serverDelete: Successfully deleted data.");
-				return "success";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		// 500 Internal Server Errors will be caught here too.
-		}catch(error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverDelete()
-
-
-	// Attempts to delete active passlock from online database. After ~5 minutes the database will delete the passlock itself for added security.
-	// Runs after Store or Access call completes as a security measure to ensure user passlocks exist only as long as necessary.
-	async function serverDeletePasslock(passedBrowserId) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exepasslockdelete';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					// browser_id is the key which will be used to access data on server side.
-					browser_id: passedBrowserId,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			// checkResponseObject(response_obj);
-			console.log("delete passlock response: ");
-			console.log(responseObj);
-			// Handle database query outcome.
-			if (responseObj.response !== "passlock successfully deleted") { // there appears to be a problem.
-				throw Error("serverDeletePasslock() Failed to delete passlock!");
-				return "error";
-			}else{
-				console.log("Passlock successfully deleted from database.");
-				return "success";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverDeletePasslock()
-
-	// Ask the server to extend time period before it auto-deletes a passlock.
-	// Called when user clicks 'EXTEND TIME' in last 30 seconds of passlock being active.
-	async function serverExtendPasslock(browserId) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exeextendpasslock';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					// browser_id is the key which will be used to access data on server side.
-					browser_id: browserId,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const response_obj = await fetchResponseObject.json();
-			// Handle database query outcome.
-			if (response_obj.response != 1) { // there appears to be a problem.
-				throw Error("serverExtendPasslock() database store error!");
-			}else{
-				console.log("Passlock successfully extended.");
-				return;
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverExtendPasslock()
-
-	// Send passlock to server, store as key value pair with browserId as key.
-	// Used when passlock is instantiated as user beings a UI flow.
-	// Passlock stored on server in case user walks away - added security.
-	async function serverSetPasslock(browserId, passlock) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exesetpasslock';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					// browser_id is the key which will be used to access data on server side.
-					browser_id: browserId,
-					passlock: passlock,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const response_obj = await fetchResponseObject.json();
-			// Handle database query outcome.
-			if (response_obj.response != 1) { // there appears to be a problem.
-				throw Error("serverSetPasslock() database store error!");
-			}else{
-				//console.log("New passlock successfully stored to database.");
-				return;
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverSetPasslock()
-
-	// Access passlock from server as user moves through UI.
-	// Passlock will then be used to either encrypt user plaintext data or decrypt when ready to execute a Store or Access.
-	async function serverGetPasslock(browserId) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exegetpasslock';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					// browser_id is the key which will be used to access data on server side.
-					browser_id: browserId,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(`Response status: ${fetchResponseObject.status}`);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			if (responseObj.passlock.length === PASSLOCK_LENGTH && checkUUIDChars(responseObj.passlock)) { // Data looks good.
-				//console.log("serverGetPasslock: Successfully retrieved existing passlock.");
-				return responseObj.passlock;
-			}else{
-				throw Error("serverGetPasslock: Failed to load passlock.");
-				return "failed to get passlock";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverGetPasslock()
+	<TMPL_INCLUDE NAME="online_server_comms.tmpl">
 
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -3213,7 +2362,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>SYNC FLOW</label>
 						<label>CODEWORD</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER CODEWORD</h2>
 					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinesync_codeword_input" style="" oninput="codewordToLowerCase(event)">
@@ -3229,7 +2377,6 @@
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>SYNC FLOW</label>
 						<label>PASS 1</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 1</h2>
 					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinesync_obf1000Pass_input" style="">
@@ -3245,7 +2392,6 @@
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>SYNC FLOW</label>
 						<label>PASS 2</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 2</h2>
 					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinesync_ctrPass_input" style="">
@@ -3262,7 +2408,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>ACCESS FLOW</label>
 						<label>CODEWORD</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER CODEWORD</h2>
 					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlineaccess_codeword_input" style="" oninput="codewordToLowerCase(event)">
@@ -3278,7 +2423,6 @@
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>ACCESS FLOW</label>
 						<label>PASS 1</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 1</h2>
 					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlineaccess_obf1000Pass_input" style="">
@@ -3294,7 +2438,6 @@
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>ACCESS FLOW</label>
 						<label>PASS 2</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 2</h2>
 					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlineaccess_ctrPass_input" style="">
@@ -3334,7 +2477,6 @@
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>ACCESS FLOW</label>
 						<label>PASS 3</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 3</h2>
 					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlineaccess_opensslpass_input" style="">
@@ -3354,14 +2496,14 @@
 					<div class="overlay_container" style="position:relative">
 						<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 						<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
-							<div class="encrypt_hover" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+							<div class="encrypt_hover encrypt_copy_to_click" id="encrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
 								<div style="display:flex; justify-content:space-between;">
 									<label>Encrypt:</label>
 									<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
 								</div>
 								<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 							</div>
-							<div class="decrypt_hover" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+							<div class="decrypt_hover decrypt_copy_to_click" id="decrypt_click_access" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
 								<div style="display:flex; justify-content:space-between;">
 									<label>Decrypt:</label>
 									<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
@@ -3452,7 +2594,6 @@
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>STORE FLOW</label>
 						<label>CODEWORD</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER CODEWORD</h2>
 					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_codeword_input" style="" oninput="codewordToLowerCase(event)">
@@ -3468,7 +2609,6 @@
 						<h2 style="color:red">OFFLINE FLOW</h2>
 						<label>STORE FLOW</label>
 						<label>PASS 1</label>
-						<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 					</div>
 					<h2>ENTER PASSWORD 1</h2>
 					<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_obf1000Pass_input" style="">
@@ -3484,7 +2624,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>PASS 2</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 2</h2>
 				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_ctrPass_input" style="">
@@ -3524,7 +2663,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>CHECK CODEWORD</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
@@ -3541,7 +2679,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 1</h2>
@@ -3558,7 +2695,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 2</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 2</h2>
@@ -3581,14 +2717,14 @@
 				<br>
 				<label>OpenSSL Linux <span class="coolpink" style="">Command Line</span> Usage:</label>
 				<div style='display:flex; flex-direction:column; border-style:inset; width:fit-content; padding:5px;'>
-					<div class="encrypt_hover" id="encrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
+					<div class="encrypt_hover encrypt_copy_to_click" id="encrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:cyan; padding:10px; margin-bottom:5px; ">
 						<div style="display:flex; justify-content:space-between;">
 							<label>Encrypt:</label>
 							<span class="copied_encrypt_command_inform_class" id="" style="color:red; display:none;">ENCRYPT COMMAND COPIED!</span>
 						</div>
 						<label>openssl enc -aes-256-cbc <span class="coolpink" style="">-e</span> -pbkdf2 -in <span class="coolpink">yourfile.txt</span> -out <span class="coolpink">yourfile.enc</span></label>
 					</div>
-					<div class="decrypt_hover" id="decrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
+					<div class="decrypt_hover decrypt_copy_to_click" id="decrypt_click_store" style="display:flex; flex-direction:column; border-style:solid; border-color:yellow; padding:10px; ">
 						<div style="display:flex; justify-content:space-between;">
 							<label>Decrypt:</label>
 							<span class="copied_decrypt_command_inform_class" id="" style="color:red; display:none;">DECRYPT COMMAND COPIED!</span>
@@ -3610,7 +2746,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>PASS 3</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<h2>ENTER PASSWORD 3</h2>
 				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="offlinestore_opensslpass_input" style="">
@@ -3626,7 +2761,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>CHECK CODEWORD</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER CODEWORD</h2>
@@ -3643,7 +2777,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 1</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 1</h2>
@@ -3660,7 +2793,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 2</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 2</h2>
@@ -3677,7 +2809,6 @@
 					<h2 style="color:red">OFFLINE FLOW</h2>
 					<label>STORE FLOW</label>
 					<label>CHECK PASS 3</label>
-					<label class="pass_length_warn" style="color:red; display:none;">Password too short!</label>
 				</div>
 				<label class="pass_check_warning" style="color:red; display:none;">Passwords don't match!</label>
 				<h2>RE-ENTER PASSWORD 3</h2>
@@ -3805,105 +2936,7 @@
 	window.onload = async function() {
 		// Initial server online check.
 		await updateOnlineStatus();
-	}
-
-	//////////////////////////////////////////////////////////////
-	//                Contact & Captcha Functions               //
-	//////////////////////////////////////////////////////////////
-
-	// Perform simple captcha check.
-	function checkCaptcha() {
-		let enteredCaptchaValue = document.getElementById('captcha_input').value;
-		// Accept case insensitive.
-		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
-		if (enteredCaptchaValue === 'blue') {
-			saveCurrentStateToHistorySoBackWillWork();
-			showPage('contact_page');
-		}
-	}
-
-	// Submit user message to site owners.
-	function submitContactMessage() {
-		const contactMessage = document.getElementById('contact_textarea').value;
-		serverSendContactMessage(contactMessage);
-		showPage('contact_thanks');
-	}
-
-	/////////////////////////////////////////////////////////////////
-	//                  Copy to Click Functions                    //
-	/////////////////////////////////////////////////////////////////
-
-	// Make it so that when this div is clicked, copyEncryptOpenSslCmdToClipboard() is executed.
-	document.getElementById("encrypt_click_access").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
-	document.getElementById("encrypt_click_store").addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
-	// Make it so that when this div is clicked, copyDecryptOpenSslCmdToClipboard() is executed.
-	document.getElementById("decrypt_click_access").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
-	document.getElementById("decrypt_click_store").addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
-
-	// Copy command line OpenSSL command to clipboard as user clicks div.
-	async function copyEncryptOpenSslCmdToClipboard() {
-		try {
-			// Copy command to clipboard.
-			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc");
-			console.log("OpenSSL encrypt command copied to clipboard.");
-			// Display message indicating command was copied to clipboard.
-			showEncryptCommandCopied();
-			// Undisplay message in 5 seconds after showing it.
-			setTimeout(() => {
-				hideEncryptCommandCopied();
-			}, FIVE_SECONDS); 
-		} catch (error) {
-			console.error(error.message);
-		}
-	}
-
-	// Copy command line OpenSSL command to clipboard as user clicks div.
-	async function copyDecryptOpenSslCmdToClipboard() {
-		try {
-			// Copy command to clipboard.
-			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt");
-			console.log("OpenSSL decrypt command copied to clipboard.");
-			// Display message indicating command was copied to clipboard.
-			showDecryptCommandCopied();
-			// Undisplay message in 5 seconds after showing it.
-			setTimeout(() => {
-				hideDecryptCommandCopied();
-			}, FIVE_SECONDS); 
-		} catch (error) {
-			console.error(error.message);
-		}
-	}
-
-	// Show immediate UI change so user knows their clipboard was modified.
-	function showEncryptCommandCopied() {
-		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'inline';
-		}
-	}
-
-	// Show immediate UI change so user knows their clipboard was modified.
-	function hideEncryptCommandCopied() {
-		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'none';
-		}   
-	}
-
-	// Show immediate UI change so user knows their clipboard was modified.
-	function showDecryptCommandCopied() {
-		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'inline';
-		}
-	}
-
-	// Show immediate UI change so user knows their clipboard was modified.
-	function hideDecryptCommandCopied() {
-		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
-		for (const element of messageElements) {
-			element.style.display = 'none';
-		}   
+		addListenersToAllCopyToClick();
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -3935,152 +2968,10 @@
 		updateOnlineStatus();
 		// Hide password RE-Entry check warnings (passlock flow).
 		hidePassCheckFailWarnings();
-		// Hide all password length warnings.
-		//hidePasswordLengthWarnings();
 		// Reset delete overlay
 		deleteCheckHide('offlineoverlay_delete_cmd');
 		deleteCheckHide('offlineoverlay_delete_browser');
 	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//							Browser Back functionality										     		  //
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Harnessing the browser's back functionality is complexity rooted in browser security decisions and the
-	// functional opacity that brings. You are disallowed from things like deleting history records as a user moves
-	// through a custom interface, so workarounds are needed. Because of the opacity of how this works in the browser,
-	// testing and tuning was required to get it to work - there was no straightforward theory available.
-	//
-	// The goal is to map the back button to the last page of the UI a user was on.
-	// This is achieved in 2 steps: creating a record in history for every page we want the user to be able to go back to.
-	// And making sure that the proper page is returned to upon a user activating browser back function.
-	//
-	//
-	// Listen for the popstate event which is usually fired by user activating browser back button.
-	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
-	// We only need to keep track of 2 things for back functionality? Pushing the state on showPage and catching popstate?
-	window.addEventListener('popstate', (event) => {
-		// Use event.state or window.location to update content
-		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
-			showPage(event.state.page);
-		} else {
-			// Skip showPage for this popstate:
-			// we don't want to flicker as we're history.go()ing back programmatically if the user clicks back after completing a flow job.
-			showPageFlag = 'true';
-		}
-	});
-
-	// In order for custom back functionality to work, we have to manually save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
-	function saveCurrentStateToHistorySoBackWillWork() {
-		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
-		const state = {page: currentPage}; // Create JS object with attribute page that has value currentPage.
-		// First parameter for replaceState(), state is js object that can contain more data than just the page if needed.
-		// Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
-		// Last, window.location should be url of current page.
-		// Replace the current history entry with additional state data that we will use to return to with custom function.
-		history.replaceState(state, '', window.location);
-		// My current theory is under the hood function isn't expecting a manual removal of a state so we have to work around their garbage collection?
-		// Create new (empty) entry in the history stack.
-		// This function is needed for custom back to work even though we're not sure why exactly it's needed besides it breaking when this is removed.
-		history.pushState({}, '', '');
-	}// saveCurrentStateToHistorySoBackWillWork()
-
-	// Create record in history whenever user moves to a new page. This enables history's back function to return to that page.
-	// Used as a 'wrapper' solution to creating save states as the user moves through the UI.
-	function saveThenShowPage(activateThisPage) {
-		saveCurrentStateToHistorySoBackWillWork();
-		showPage(activateThisPage);
-	}// saveThenShowPage()
-
-	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
-	let showPageFlag = 'true';
-
-	// For overall security and because the passlock system wasn't designed for users to browser back into it,
-	// once a 'flow' completes, we move the history pointer so that if they do hit back, it will take them to the home page.
-	// Better security for this site would be to delete those records entirely but because of browser security design, this is disallowed.
-	function goBackProgrammaticallyXandDontFireShowPage(numPlaces) {
-		// Don't flicker between multiple pages as the history pointer is programmatically moved to the home page.
-		showPageFlag = 'false';
-		// Move the pointer back a variable number of places. Each case of this number was found by trial and error.
-		history.go(-numPlaces);
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//							          Show Page                                                           //
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Pages are defined by the 'flow_pages' class which is held by HTML div that holds DOM elements needed for that page's functionality.
-	// Moving through the UI is accomplished by manipulating which 'page' is currently shown to the user;
-	// the page to be made active is shown while all others are hidden. 
-	// 
-	// Global variable to keep track of the page we're on. Start on home page.
-	let currentPage = 'home';
-	// Hide all other pages, then show activateThisPage page. 
-	// Input: Target is the element ID of a div containing class: flow_pages
-	function showPage(activateThisPage) {
-		// This global variable keeps track of the page the user is currently on. Needed for activatable-by-enter and harnessing browser back.
-		currentPage = activateThisPage;
-		// Reset UI warnings and clear all HTML input data as user moves through the interface.
-		resetSecurityAndUI();
-		// Fill flow_page_divs array with set of objects (divs) that contain the flow_pages class.
-		//let flow_page_divs = document.getElementsByClassName('flow_pages');
-		let flow_page_divs = document.getElementsByClassName('show_page_activatable');
-		// Hide all of the flow pages.
-		for (let i = 0; i < flow_page_divs.length; i++) {
-			flow_page_divs[i].style.display = "none";
-		}
-		// Show the page -- make visible by changing display style from none to flex.
-		document.getElementById(activateThisPage).style.display = "flex";
-		// Focus input or textbox (for convenience).
-		let inputs_array = document.getElementById(activateThisPage).getElementsByTagName('input');
-		let textareas_array = document.getElementById(activateThisPage).getElementsByTagName('textarea');
-		// There is only 1 input or 1 textarea per div in our setup.
-		// If we found more than zero inputs in the array, focus the first and only one.
-		if (inputs_array.length > 0) {
-			inputs_array[0].focus();
-		}else if (textareas_array.length > 0) {
-			// Otherwise, we should find 1 textarea to focus if we need to focus anything.
-			textareas_array[0].focus();
-		}else{
-			// If there's no input, focus the button with 'activatable_by_enter' class (used to select the 'default' option (BRWOSER) at UI branch.
-			const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-			if (buttonObj !== null) {
-				document.getElementById(buttonObj.id).focus();
-			}
-		}
-	}// showPage()
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//							activatable_by_enter functionality								     		  //
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// To empower the user to move through the interface quickly, we implement a class: activatable_by_enter.
-	// The global variable currentPage holds the page currently in view of the user. When enter is clicked,
-	// the following anonymous function will utilize querySelector to search for DOM objects containing the
-	// activatable_by_enter class. The button containing this class will then be clicked.
-	// 
-	// In simple terms, users can hit enter while the input they're typing in is focused in order to move to the next page in the interface.
-	// 
-	// Globally detect when user hits ENTER on their keyboard.
-	window.addEventListener("keydown", function(event) {
-		if (event.key === "Enter") {
-			// If focused element is an input, enter clicks the button containing the class: activatable_by_enter
-			if (document.activeElement.tagName == "INPUT") {
-				// Select all DOM objects containing the class: activatable_by_enter
-				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
-				if (buttonObj !== null) {
-					// Click button that was selected.
-					buttonObj.click();
-				}else{
-					//console.log("Enter clicked but no activatable_by_enter class found: " + currentPage);
-				}
-				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
-				// Prevent strange behavior where "the default action is performed on the newly focused element".
-				event.preventDefault();
-				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
-			}else{
-				// Focused element isn't an Input, do nothng I guess?
-			}
-		}
-	});// activatable_by_enter page listener
 
 	//////////////////////////////////////////////////////////////
 	//           	UI Manipulation Functions	         		//
@@ -4097,44 +2988,6 @@
 		document.getElementById('offlineaccess_data_outputdisplay').disabled = true;
 		document.getElementById('offlineaccess_data_outputdisplay').style.color = 'gray';
 	}// showEditDisabledUI()
-
-	// Show overlay where user can DELETE record.
-	function showDeleteOverlay(targetId) {
-		document.getElementById(targetId).style.display = "flex";
-	}// showDeleteOverlay()
-
-	// Hides DELETE overlay.
-	function deleteCheckHide(targetId) {
-		document.getElementById(targetId).style.display = "none";
-	}// deleteCheckHide()
-
-	// Inform user that RE-ENTERED data on a password check step was different.
-	function showPassCheckFailWarnings() {
-		// Show all password warnings on all html pages.
-		passCheckElements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < passCheckElements.length; i++) {
-			passCheckElements[i].style.display = "inline";
-		}
-	}// showPassCheckFailWarnings()
-
-	// Disable all password warnings.
-	function hidePassCheckFailWarnings() {
-		passCheckElements = document.getElementsByClassName('pass_check_warning');
-		for (let i = 0; i < passCheckElements.length; i++) {
-			passCheckElements[i].style.display = "none";
-		}
-	}// hidePassCheckFailWarnings()
-
-	// Replaces all upper case letters with lower case as user types them into the frontend UI.
-	function codewordToLowerCase(events) {
-		// .toLowerCase() needs a string to run.
-		let userinput = '';
-		// event.target.value returns the value of whichever input the user is currently typing in.
-		userinput = event.target.value;
-		// event.target.value can also be used to set. This allows us to use a genral function in several places working independently.
-		event.target.value = userinput.toLowerCase();
-	}// codewordToLowerCase()
-
 
 	// Catch File Ingest
 	// listener is placed inline of the html
@@ -4174,47 +3027,9 @@
 		console.log("File input contents: " + document.getElementById('offlinestore_upload_input').value);
 	}
 
-	// Called on change of text area, checks length of that text area and shows warning if input data too long.
-	function checkDataInputLength(input_id) {
-		//let input = document.getElementById("store_data").value;
-		let input = document.getElementById(input_id).value;
-		if (checkDataInputLengthWithRegex(input)) {
-			// Length OK, turn off warning
-			document.getElementById("text_input_warning").style.display = "none";
-			// display button
-			document.getElementById("text_input_continue").style.display = "inline";
-
-			// Length OK, turn off warning
-			document.getElementById("edit_input_warning").style.display = "none";
-			// display button
-			document.getElementById("offline_save_button").style.display = "inline";
-		}else{
-			// Length NOT OK, turn ON warning
-			document.getElementById("text_input_warning").style.display = "inline";
-			// remove button
-			document.getElementById("text_input_continue").style.display = "none";
-
-			// Length NOT OK, turn ON warning
-			document.getElementById("edit_input_warning").style.display = "inline";
-			// remove button
-			document.getElementById("offline_save_button").style.display = "none";
-		}
-	}
-
-	// Randomly generate a single Multi Encrypted Datarecord worth of junk data.
-	function getRandMultiEncryptedDatarecord() {
-		// This value that will convert to 1024 base64 chars.
-		const randarray = window.crypto.getRandomValues(new Uint8Array(MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES));
-		return randarray.toBase64();
-	}// getRandMultiEncryptedDataRecord()
-
-	// Randomly generate 43 base64 chars of junk data.
-	function getRandFingerprint() {
-		// 32 bytes is the output of SHA-256
-		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_LENGTH_BYTES));
-		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
-		return randarray.toBase64({omitPadding: true});
-	}// getRandFingerprint()
+	////////////////////////////////////////////////////////////////////////
+	//                   Check Functions                                  //
+	////////////////////////////////////////////////////////////////////////
 
 	// Returns true if input has precisely FINGERPRINT_LENGTH_BASE64 (43) base64 chars.
 	function checkFingerprintIsValid(fingerprint) {
@@ -4251,54 +3066,9 @@
 		}
 	}//checkBase64Chars()
 
-	function checkDataLength(data, length) {
-		// Return fail if data length surpasses length.
-		if (data.length > length) {
-			console.log("Data length Invalid!");
-			return false;
-		} else {
-			return true;
-		}
-	}
 
-	function checkLengthAndBase64(data, length){
-		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
-			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
-		} 
-	}
+	<TMPL_INCLUDE NAME="common_js.tmpl">
 
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over OPENSSL_INPUT_LIMIT_BYTES: 686
-	function checkDataInputLengthWithRegex(input) {
-		// show input size in bytes
-		let size = new Blob([input]).size;
-		let difference = OPENSSL_INPUT_LIMIT_BYTES - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		document.getElementById("offlinebrowserdata_length_label").innerHTML = size_string;
-		document.getElementById("offlineeditdata_length_label").innerHTML = size_string;
-		if (size > OPENSSL_INPUT_LIMIT_BYTES) {
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}//checkDataInputLengthWithRegex()
-
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over OBF_1000_INPUT_LIMIT_BYTES: 704
-	function checkInputLengthUpload(input) {
-		// show input size in bytes
-		let size = new Blob([input]).size;
-		let difference = OBF_1000_INPUT_LIMIT_BYTES - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		document.getElementById("offlineuploaddata_length_label").innerHTML = size_string;
-		if (size > OBF_1000_INPUT_LIMIT_BYTES) {
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}//checkInputLengthUpload()
 
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
@@ -4794,280 +3564,8 @@
 		}
 	}//attemptDeleteOffline()
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Base Functionality:  Produce a 'Fingerprint' which will be used as the Key in the Key-Value pair for storing a Multi Encrypted Datarecord.
-	//                      This is achieved by SHA-256 hashing inputs, concatenating them, and finally returning a hash of that concatenation.
-	//
-	//	Inputs structure:	codeword:    human readable plaintext string
-	//						obf1000Pass: human readable plaintext string
-	//						ctrPass:     human readable plaintext string
-	//
-	//	Output structure:	43 base64 char string
-	//
-	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
-		// Convert codeword to lowercase.
-		const codewordLower = codeword.toLowerCase();
-		// Create a new TextEncoder object.
-		const enc = new TextEncoder();
-		// Convert human readable plaintext string to Uint8Array.
-		const codewordUint8 = enc.encode(codewordLower);
-		const obf1000PassUint8 = enc.encode(obf1000Pass);
-		const ctrPassUint8 = enc.encode(ctrPass);
-		// Compute SHA-256 hash.
-		const codewordHash = await crypto.subtle.digest('SHA-256', codewordUint8);
-		const obf1000PassHash = await crypto.subtle.digest('SHA-256', obf1000PassUint8);
-		const ctrPassHash = await crypto.subtle.digest('SHA-256', ctrPassUint8);
-		// Concatenate: fingerprint = codewordHash + obf1000PassHash + ctrPassHash
-		const codeword_and_obf1000PassHash = concatBuffer(codewordHash, obf1000PassHash)
-		const concatenatedHashes = concatBuffer(codeword_and_obf1000PassHash, ctrPassHash)
-		// SHA-256 hash the result.
-		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
-		const fingerprint = new Uint8Array(fingerprintHash);
-		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
-		const b64 = fingerprint.toBase64({omitPadding: true});
-		return b64;
-	}// computeFingerprint()
 
-
-	//////////////////////////////////////////////////////////////
-	//			Server Communication Functions				    //
-	//////////////////////////////////////////////////////////////
-	// Server communication relies on fetch() to handle HTTP requests.
-	//////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////
-	// We need to set the origin differently depending if we're a standalone file or not.
-	// This function checks our origin and sets it to the server url to enable server functionality for a standalone.html.
-	// Returns the SERVER_URL to be used for server communication functions.
-	// 
-	// This function used by both online client and offline standalone.html file that houses the offline database.
-	// While the online client can find there the online database is to store using window.location.origin,
-	// the offline database needs to have that URL set manually by this function.
-	// 
-	// Figure out whether we are an online client of offline database housing standalone.html file
-	// and set the origin accordingly so that communication with the online server will work.
-	function getOnlineServerOrigin() {
-		// Get origin detected by the browser.
-		const browserDetectedOrigin = window.location.origin;
-		let onlineServerOrigin = '';
-		// If we're standalone, set address manually.
-		const regex = new RegExp(/^file/);
-		if (regex.test(browserDetectedOrigin)) {
-			// This is a standalone file; set origin manually.
-			onlineServerOrigin = 'https://obf.mkrsvr.org/';
-		}else{
-			// This an online client, empty in this context gets interpreted as 'this origin' by fetch() when used.
-			onlineServerOrigin = '';
-		}
-		return onlineServerOrigin;
-	}// getOnlineServerOrigin()
-
-	// Check if we're online by querying server.
-	async function checkOnline() {
-		// Get origin of the online server.
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exeonlinecheck';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				}
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				return 'offline';
-			}
-			// Looks like we're online!
-			return 'online';
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			// If we're in this error block we know that it is a communication/offline error. Yes this is arcane knowledge.
-			console.log("Fetch Error on Online Check: " + error.message);
-			console.log("response FAILED");
-			return "offline";
-		}
-	}// checkOnline()
-
-	// Check if we're online or not and inform user by changing UI label that is always visible as user moves through interface.
-	async function updateOnlineStatus() {
-		document.getElementById("offline_label").innerHTML = "ONLINE STATUS PENDING...";
-		// Check if we're online
-		const online_status = await checkOnline();
-		if (online_status === "online") {
-			document.getElementById("offline_label").innerHTML = "YOU'RE ONLINE";
-		}else{
-			document.getElementById("offline_label").innerHTML = "YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.";
-		}
-	}// updateOnlineStatus()
-
-	// Endpoint /obf/exeload will attempt to load encrypted data corresponding to the input fingerprint.
-	// Input: fingerprint is hexadecimal.
-	// Output: POST message to server script which will attempt to load encrypted data from server database.
-	//
-	// Accesses the Multi Encrypted Datarecord at fingerprint location from the online server and returns it. 
-	async function serverLoad(fingerprint) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exeload';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					fingerprint: fingerprint,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND") {
-				console.log("serverLoad Error: " + responseObj.access_response);
-				return responseObj.access_response;
-			} else if (responseObj.access_response.length === MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
-				console.log("serverLoad: Successfully loaded encrypted data.");
-				return responseObj.access_response;
-			} else {
-				console.log("serverLoad Error: " + responseObj.access_response);
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverLoad()
-
-	// Stores Multi Encrypted Datarecord to fingerprint location in the online database.
-	async function serverStore(fingerprint, data) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exestore';
-		
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					fingerprint: fingerprint,
-					data: data,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			console.log("Store responseObj.response: " + responseObj.store_response);
-			if (responseObj.store_response === "TOTAL_STORES_OVER_50000") {
-				showPage("lockedout_50000"); // Shown for a split second before page reload.
-				window.location.reload(true);
-				throw new Error("TOTAL_STORES_OVER_50000");
-			} else if (responseObj.store_response === "SUCCESS") {
-				console.log("serverStore: Successfully stored encrypted data.");
-				return "success";
-			} else if (responseObj.store_response === "STORES_OVER_100") {
-				return "STORES_OVER_100";
-			} else if (responseObj.store_response === "STORE FAILED") {
-				throw Error("serverStore Error! Database failed to store data.");
-			} else {
-				throw Error("serverStore Error! Maybe a database error?");
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		// 500 Internal Server Errors will be caught here too.
-		}catch(error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverStore()
-
-	// Endpoint /obf/exedelete will attempt to delete.
-	// Input: fingerprint is hexadecimal.
-	// Output: POST message to server script that will attempt to Delete.
-	// 
-	// Deletes the Multi Encrypted Datarecord at fingerprint location.
-	async function serverDelete(fingerprint) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exedelete';
-		
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					fingerprint: fingerprint,
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			if (Number(responseObj.response) !== 1) { // there appears to be a problem.
-				throw Error("serverDelete Error! Data not deleted!");
-				return "error";
-			}else{
-				console.log("serverDelete: Successfully deleted data.");
-				return "success";
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		// 500 Internal Server Errors will be caught here too.
-		}catch(error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverDelete()
-
-	// Send contact message to site admin.
-	async function serverSendContactMessage(contactMessage) {
-		let SERVER_URL = getOnlineServerOrigin();
-		SERVER_URL += 'exesendcontactmessage';
-
-		try { // Catch a rejected promise so we can operate on it.
-			// Execute HTTP request to SERVER_URL with the following options.
-			const fetchResponseObject = await fetch(SERVER_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/plain',
-				},
-				body: JSON.stringify({ // Convert javascript JSON object into string for transport.
-					message: contactMessage,// Don't need to send any information to server?
-				}),
-			});
-
-			if (!fetchResponseObject.ok) { // Indicates HTTP error.
-				// Response Status is the numerical code like 404, 500, etc.
-				throw new Error(fetchResponseObject.status);
-			}
-			// Now that we've cleared the error check, we can proceed with processing the response.
-			// Make a copy of the json extraction.
-			const responseObj = await fetchResponseObject.json();
-			//console.log(responseObj);
-			if (responseObj.response) {
-				console.log("Contact message response: " + responseObj.response);
-			}else{
-				console.log("Contact message return error.");
-			}
-		//Can be triggered by: a DNS failure, connection timeout, or the user being offline.
-		} catch (error) { // Catch rejected promise.
-			console.error(error.message);
-		}
-	}// serverSendContactMessage()
+	<TMPL_INCLUDE NAME="online_server_comms.tmpl">
 
 
 	function clearSaveToDiskReminder() {

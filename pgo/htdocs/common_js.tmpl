@@ -1,0 +1,415 @@
+// This <script> seems to turn on syntax highlighting.
+
+	//////////////////////////////////////////////////////////////
+	//                Contact & Captcha Functions               //
+	//////////////////////////////////////////////////////////////
+
+	// Perform simple captcha check.
+	function checkCaptcha() {
+		let enteredCaptchaValue = document.getElementById('captcha_input').value;
+		// Accept case insensitive.
+		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
+		if (enteredCaptchaValue === 'blue') {
+			saveCurrentStateToHistorySoBackWillWork();
+			showPage('contact_page');
+		}
+	}
+
+	// Submit user message to site owners.
+	function submitContactMessage() {
+		const contactMessage = document.getElementById('contact_textarea').value;
+		serverSendContactMessage(contactMessage);
+		showPage('contact_thanks');
+	}
+
+	/////////////////////////////////////////////////////////////////
+	//                  Copy to Click Functions                    //
+	/////////////////////////////////////////////////////////////////
+
+	// Adds a copy to click listener to each HTML element that contains the respective class.
+	function addListenersToAllCopyToClick() {
+		// Add encrypt elements.
+		let encryptElements = document.getElementsByClassName('encrypt_copy_to_click');
+		for (let i = 0; i < encryptElements.length; i++) {
+			encryptElements[i].addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
+		}
+
+		// Add decrypt elements.
+		let decryptElements = document.getElementsByClassName('decrypt_copy_to_click');
+		for (let i = 0; i < decryptElements.length; i++) {
+			decryptElements[i].addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
+		}
+	}
+
+	// Copy command line OpenSSL command to clipboard as user clicks div.
+	async function copyEncryptOpenSslCmdToClipboard() {
+		try {
+			// Copy command to clipboard.
+			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc");
+			console.log("OpenSSL encrypt command copied to clipboard.");
+			// Display message indicating command was copied to clipboard.
+			showEncryptCommandCopied();
+			// Undisplay message in 5 seconds after showing it.
+			setTimeout(() => {
+				hideEncryptCommandCopied();
+			}, FIVE_SECONDS); 
+		} catch (error) {
+			console.error(error.message);
+		}
+	}
+
+	// Copy command line OpenSSL command to clipboard as user clicks div.
+	async function copyDecryptOpenSslCmdToClipboard() {
+		try {
+			// Copy command to clipboard.
+			await navigator.clipboard.writeText("openssl enc -aes-256-cbc -d -pbkdf2 -in yourfile.enc -out yourfile.txt");
+			console.log("OpenSSL decrypt command copied to clipboard.");
+			// Display message indicating command was copied to clipboard.
+			showDecryptCommandCopied();
+			// Undisplay message in 5 seconds after showing it.
+			setTimeout(() => {
+				hideDecryptCommandCopied();
+			}, FIVE_SECONDS); 
+		} catch (error) {
+			console.error(error.message);
+		}
+	}
+
+	// Show immediate UI change so user knows their clipboard was modified.
+	function showEncryptCommandCopied() {
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		for (const element of messageElements) {
+			element.style.display = 'inline';
+		}
+	}
+
+	// Show immediate UI change so user knows their clipboard was modified.
+	function hideEncryptCommandCopied() {
+		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		for (const element of messageElements) {
+			element.style.display = 'none';
+		}   
+	}
+
+	// Show immediate UI change so user knows their clipboard was modified.
+	function showDecryptCommandCopied() {
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements) {
+			element.style.display = 'inline';
+		}
+	}
+
+	// Show immediate UI change so user knows their clipboard was modified.
+	function hideDecryptCommandCopied() {
+		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		for (const element of messageElements) {
+			element.style.display = 'none';
+		}   
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//							Browser Back functionality										     		  //
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Harnessing the browser's back functionality is complexity rooted in browser security decisions and the
+	// functional opacity that brings. You are disallowed from things like deleting history records as a user moves
+	// through a custom interface, so workarounds are needed. Because of the opacity of how this works in the browser,
+	// testing and tuning was required to get it to work - there was no straightforward theory available.
+	//
+	// The goal is to map the back button to the last page of the UI a user was on.
+	// This is achieved in 2 steps: creating a record in history for every page we want the user to be able to go back to.
+	// And making sure that the proper page is returned to upon a user activating browser back function.
+	//
+	// Listen for the popstate event which is usually fired by user activating browser back button.
+	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
+	window.addEventListener('popstate', (event) => {
+		// Use event.state or window.location to update content
+		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
+			showPage(event.state.page);
+		} else {
+			// Skip showPage for this popstate:
+			// we don't want to flicker as we're history.go()ing back programmatically if the user clicks back after completing a flow job.
+			showPageFlag = 'true';
+		}
+	});
+
+	// In order for custom back functionality to work, we have to manually save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
+	function saveCurrentStateToHistorySoBackWillWork() {
+		// Every time this function is called, we want that to be treated as a state that a back button click will go back to.
+		const state = {page: currentPage}; // Create JS object with attribute page that has value currentPage.
+		// First parameter for replaceState(), state is js object that can contain more data than just the page if needed.
+		// Middle is a 'title' which is legacy per MDN. Third is URL of history entry (pretty much always gonna be obf.mkrsvr.org or equivalent).
+		// Last, window.location should be url of current page.
+		// Replace the current history entry with additional state data that we will use to return to with custom function.
+		history.replaceState(state, '', window.location);
+		// My current theory is under the hood function isn't expecting a manual removal of a state so we have to work around their garbage collection?
+		// Create new (empty) entry in the history stack.
+		// This function is needed for custom back to work even though we're not sure why exactly it's needed besides it breaking when this is removed.
+		history.pushState({}, '', '');
+	}// saveCurrentStateToHistorySoBackWillWork()
+
+	// Create record in history whenever user moves to a new page. This enables history's back function to return to that page.
+	// Used as a 'wrapper' solution to creating save states as the user moves through the UI.
+	function saveThenShowPage(activateThisPage) {
+		saveCurrentStateToHistorySoBackWillWork();
+		showPage(activateThisPage);
+	}// saveThenShowPage()
+
+	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
+	let showPageFlag = 'true';
+	// For overall security and because the passlock system wasn't designed for users to browser back into it,
+	// once a 'flow' completes, we move the history pointer so that if they do hit back, it will take them to the home page.
+	// Browser security design disallow the removal of history records, which would be a cleaner solution than this function.
+	// Programmers can add entries to history, but cannot remove them. This function is a workaround that needs to be tuned for each usage.
+	function goBackProgrammaticallyXandDontFireShowPage(numPlaces) {
+		// Don't flicker between multiple pages as the history pointer is programmatically moved to the home page.
+		showPageFlag = 'false';
+		// Move the pointer back a variable number of places. Each case of this number was found by trial and error.
+		history.go(-numPlaces);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//							          Show Page                                                           //
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Pages are defined by the 'flow_pages' class which is held by HTML div that holds DOM elements needed for that page's functionality.
+	// Moving through the UI is accomplished by manipulating which 'page' is currently shown to the user;
+	// the page to be made active is shown while all others are hidden. 
+	// 
+	// Global variable to keep track of the page we're on. Start on home page.
+	let currentPage = 'home';
+	// Hide all other pages, then show activateThisPage page. 
+	// Input: Target is the element ID of a div containing class: flow_pages
+	function showPage(activateThisPage) {
+		// This global variable keeps track of the page the user is currently on. Needed for activatable-by-enter and harnessing browser back.
+		currentPage = activateThisPage;
+		// Reset UI warnings and clear all HTML input data as user moves through the interface.
+		resetSecurityAndUI();
+		// Fill flow_page_divs array with set of objects (divs) that contain the flow_pages class.
+		//let flow_page_divs = document.getElementsByClassName('flow_pages');
+		let flow_page_divs = document.getElementsByClassName('show_page_activatable');
+		// Hide all of the flow pages.
+		for (let i = 0; i < flow_page_divs.length; i++) {
+			flow_page_divs[i].style.display = "none";
+		}
+		// Show the page -- make visible by changing display style from none to flex.
+		document.getElementById(activateThisPage).style.display = "flex";
+		// Focus input or textbox (for convenience).
+		let inputs_array = document.getElementById(activateThisPage).getElementsByTagName('input');
+		let textareas_array = document.getElementById(activateThisPage).getElementsByTagName('textarea');
+		// There is only 1 input or 1 textarea per div in our setup.
+		// If we found more than zero inputs in the array, focus the first and only one.
+		if (inputs_array.length > 0) {
+			inputs_array[0].focus();
+		}else if (textareas_array.length > 0) {
+			// Otherwise, we should find 1 textarea to focus if we need to focus anything.
+			textareas_array[0].focus();
+		}else{
+			// If there's no input, focus the button with 'activatable_by_enter' class (used to select the 'default' option (BRWOSER) at UI branch.
+			const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
+			if (buttonObj !== null) {
+				document.getElementById(buttonObj.id).focus();
+			}
+		}
+	}// showPage()
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//							activatable_by_enter functionality								     		  //
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// To empower the user to move through the interface quickly, we implement a class: activatable_by_enter.
+	// The global variable currentPage holds the page currently in view of the user. When enter is clicked,
+	// the following anonymous function will utilize querySelector to search for DOM objects containing the
+	// activatable_by_enter class. The button containing this class will then be clicked.
+	// 
+	// In simple terms, users can hit enter while the input they're typing in is focused in order to move to the next page in the interface.
+	// 
+	// Globally detect when user hits ENTER on their keyboard.
+	window.addEventListener("keydown", function(event) {
+		if (event.key === "Enter") {
+			// If focused element is an input, enter clicks the button containing the class: activatable_by_enter
+			if (document.activeElement.tagName == "INPUT") {
+				// Select all DOM objects containing the class: activatable_by_enter
+				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
+				if (buttonObj !== null) {
+					// Click button that was selected.
+					buttonObj.click();
+				}else{
+					//console.log("Enter clicked but no activatable_by_enter class found: " + currentPage);
+				}
+				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
+				// Prevent strange behavior where "the default action is performed on the newly focused element".
+				event.preventDefault();
+				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
+			}else{
+				// Focused element isn't an Input, do nothng I guess?
+			}
+		}
+	});// activatable_by_enter page listener
+
+	//////////////////////////////////////////////////////////////
+	//           	UI Manipulation Functions	         		//
+	//////////////////////////////////////////////////////////////
+
+	// Show overlay where user can DELETE record.
+	function showDeleteOverlay(targetId) {
+		document.getElementById(targetId).style.display = "flex";
+	}// showDeleteOverlay()
+
+	// Hides DELETE overlay.
+	function deleteCheckHide(targetId) {
+		document.getElementById(targetId).style.display = "none";
+	}// deleteCheckHide()
+
+	// Inform user that RE-ENTERED data on a password check step was different.
+	function showPassCheckFailWarnings() {
+		// Show all password warnings on all html pages.
+		passCheckElements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < passCheckElements.length; i++) {
+			passCheckElements[i].style.display = "inline";
+		}
+	}// showPassCheckFailWarnings()
+
+	// Disable all password warnings.
+	function hidePassCheckFailWarnings() {
+		passCheckElements = document.getElementsByClassName('pass_check_warning');
+		for (let i = 0; i < passCheckElements.length; i++) {
+			passCheckElements[i].style.display = "none";
+		}
+	}// hidePassCheckFailWarnings()
+
+	// Replaces all upper case letters with lower case as user types them into the frontend UI.
+	function codewordToLowerCase(events) {
+		// .toLowerCase() needs a string to run.
+		let userinput = '';
+		// event.target.value returns the value of whichever input the user is currently typing in.
+		userinput = event.target.value;
+		// event.target.value can also be used to set. This allows us to use a genral function in several places working independently.
+		event.target.value = userinput.toLowerCase();
+	}// codewordToLowerCase()
+
+	/////////////////////////////////////////////////////////////////////////
+	//					Check Functions									   //
+	/////////////////////////////////////////////////////////////////////////
+
+	function checkDataLength(data, length) {
+		// Return fail if data length surpasses length.
+		if (data.length > length) {
+			console.log("Data length Invalid!");
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	function checkLengthAndBase64(data, length){
+		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
+			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
+		} 
+	}
+
+	// Input: input is a string.
+	// Output: Returns false if the input length (in bytes) is over OPENSSL_INPUT_LIMIT_BYTES: 686
+	function checkDataInputLengthWithRegex(input) {
+		// Get input size in bytes.
+		let size = new Blob([input]).size;
+		let difference = OPENSSL_INPUT_LIMIT_BYTES - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		document.getElementById("browserdata_length_label").innerHTML = size_string;
+		document.getElementById("editdata_length_label").innerHTML = size_string;
+		if (size > OPENSSL_INPUT_LIMIT_BYTES) {
+			return false; // Length Check Failed.
+		}else{
+			return true; // Length Check Passed.
+		}
+	}// checkDataInputLengthWithRegex()
+
+	// Input: input is a string.
+	// Output: Returns false if the input length (in bytes) is over 544.
+	function checkInputLengthUpload(input) {
+		// show input size in bytes
+		let size = new Blob([input]).size;
+		let difference = OBF_1000_INPUT_LIMIT_BYTES - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		//console.log("size_string: " + size_string);
+		document.getElementById("uploaddata_length_label").innerHTML = size_string;
+		if (size > OBF_1000_INPUT_LIMIT_BYTES) {
+			return false; // Length Check Failed.
+		}else{
+			return true; // Length Check Passed.
+		}
+	}// checkInputLengthUpload()
+
+	function checkFingerprintAndData(fingerprint, multiEncryptedDatarecord) {
+		if (!checkFingerprintIsValid(fingerprint)) {
+			throw new Error('Attempt to store failed! FINGERPRINT is invalid.');
+		}else{
+			console.log("FINGERPRINT IS VALID!");
+		}
+		if (!checkDataIsValid(multiEncryptedDatarecord)) {
+			throw new Error('Attempt to store failed! DATA is invalid.');
+		}else{
+			console.log("DATA IS VALID!");
+		}
+	}
+
+	// Called on change of text area, checks length of that text area and shows warning if input data too long.
+	function checkDataInputLength(input_id) {
+		let input = document.getElementById(input_id).value;
+		if (checkDataInputLengthWithRegex(input)) {
+			// Length OK, turn off warning
+			document.getElementById("text_input_warning").style.display = "none";
+			// display button
+			document.getElementById("text_input_continue").style.display = "inline";
+
+			// Length OK, turn off warning
+			document.getElementById("edit_input_warning").style.display = "none";
+			// display button
+			document.getElementById("save_button").style.display = "inline";
+		}else{
+			// Length NOT OK, turn ON warning
+			document.getElementById("text_input_warning").style.display = "inline";
+			// remove button
+			document.getElementById("text_input_continue").style.display = "none";
+
+			// Length NOT OK, turn ON warning
+			document.getElementById("edit_input_warning").style.display = "inline";
+			// remove button
+			document.getElementById("save_button").style.display = "none";
+		}
+	}// checkDataInputLength()
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Base Functionality:  Produce a 'Fingerprint' which will be used as the Key in the Key-Value pair for storing a Multi Encrypted Datarecord.
+	//                      This is achieved by SHA-256 hashing inputs, concatenating them, and finally returning a hash of that concatenation.
+	//
+	//	Inputs structure:	codeword:    human readable plaintext string
+	//						obf1000Pass: human readable plaintext string
+	//						ctrPass:     human readable plaintext string
+	//
+	//	Output structure:	43 base64 char string
+	//
+	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
+		// Convert codeword to lowercase.
+		const codewordLower = codeword.toLowerCase();
+		// Create a new TextEncoder object.
+		const enc = new TextEncoder();
+		// Convert human readable plaintext string to Uint8Array.
+		const codewordUint8 = enc.encode(codewordLower);
+		const obf1000PassUint8 = enc.encode(obf1000Pass);
+		const ctrPassUint8 = enc.encode(ctrPass);
+		// Compute SHA-256 hash.
+		const codewordHash = await crypto.subtle.digest('SHA-256', codewordUint8);
+		const obf1000PassHash = await crypto.subtle.digest('SHA-256', obf1000PassUint8);
+		const ctrPassHash = await crypto.subtle.digest('SHA-256', ctrPassUint8);
+		// Concatenate: fingerprint = codewordHash + obf1000PassHash + ctrPassHash
+		const codeword_and_obf1000PassHash = concatBuffer(codewordHash, obf1000PassHash)
+		const concatenatedHashes = concatBuffer(codeword_and_obf1000PassHash, ctrPassHash)
+		// SHA-256 hash the result.
+		const fingerprintHash = await crypto.subtle.digest('SHA-256', concatenatedHashes);
+		const fingerprint = new Uint8Array(fingerprintHash);
+		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
+		const b64 = fingerprint.toBase64({omitPadding: true});
+		return b64;
+	}// computeFingerprint()
+
+
