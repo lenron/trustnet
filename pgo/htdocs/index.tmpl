@@ -1053,8 +1053,24 @@
 </body>
 <script>
 
-
+	//////////////////////////////////////////////////////////////
+	//             Included Template Files                      //
+	//////////////////////////////////////////////////////////////
+	// This isn't cpp code but they would call these header files.
+	// So, the top of the javascript seems like a good place for them?
+	// The alternative is interspersed or at the end or something, both of which 
+	// seem like worse options for code structure predictability/findability.
+	//
+	// Dev site javascript functions. Handles UI & crypto wrapper functions.
 	<TMPL_INCLUDE NAME="dev_site_js.tmpl">
+	// Javascript functions that are common to both main site index.html as well as offline database standalone.html.
+	<TMPL_INCLUDE NAME="common_js.tmpl">
+	// Fetch based server communication functions that interact with an online server.
+	// - Might merge with common
+	// - Need to devise wise way to use an if to filter out server comms functions that we wish to prune for security and otherwise.
+	<TMPL_INCLUDE NAME="online_server_comms.tmpl">
+	// Javascript native subtleCrypto lib based library used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
+	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
 	//////////////////////////////////////////////////////////////
 	//                The onload Function                       //
@@ -1068,21 +1084,6 @@
 		serverCountUniqueVisitors();
 		// Set up all copy to click listeners.
 		addListenersToAllCopyToClick();
-	}
-
-
-	function addListenersToAllCopyToClick() {
-		// Add encrypt elements.
-		let encryptElements = document.getElementsByClassName('encrypt_copy_to_click');
-		for (let i = 0; i < encryptElements.length; i++) {
-			encryptElements[i].addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
-		}
-
-		// Add decrypt elements.
-		let decryptElements = document.getElementsByClassName('decrypt_copy_to_click');
-		for (let i = 0; i < decryptElements.length; i++) {
-			decryptElements[i].addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
-		}
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -1225,7 +1226,6 @@
 		}
 	}// checkDataIsValid()
 
-	<TMPL_INCLUDE NAME="common_js.tmpl">
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1649,7 +1649,6 @@
 		await resetPasslock();
 	}// storeDataToServer()
 
-	<TMPL_INCLUDE NAME="online_server_comms.tmpl">
 
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -1873,7 +1872,6 @@
 		return randnum[0];
 	}// randInt()
 
-	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Once the 2 offline databases (encrypted, unencrypted) and their corresponding pointers are ready,
@@ -2917,7 +2915,25 @@
 <script>
 
 
+	//////////////////////////////////////////////////////////////
+	//             Included Template Files                      //
+	//////////////////////////////////////////////////////////////
+	// This isn't cpp code but they would call these header files.
+	// So, the top of the javascript seems like a good place for them?
+	// The alternative is interspersed or at the end or something, both of which 
+	// seem like worse options for code structure predictability/findability.
+	//
+	// Dev site javascript functions. Handles UI & crypto wrapper functions.
 	<TMPL_INCLUDE NAME="dev_site_js.tmpl">
+	// Javascript functions that are common to both main site index.html as well as offline database standalone.html.
+	<TMPL_INCLUDE NAME="common_js.tmpl">
+	// Fetch based server communication functions that interact with an online server.
+	// - Might merge with common
+	// - Need to devise wise way to use an if to filter out server comms functions that we wish to prune for security and otherwise.
+	<TMPL_INCLUDE NAME="online_server_comms.tmpl">
+	// Javascript native subtleCrypto lib based library used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
+	<TMPL_INCLUDE NAME="core_crypto.tmpl">
+
 
 	// Set Title to link to Home without dropping offline dbase.
 	document.getElementById("titletext").onclick = function() {
@@ -3065,9 +3081,6 @@
 			return false;
 		}
 	}//checkBase64Chars()
-
-
-	<TMPL_INCLUDE NAME="common_js.tmpl">
 
 
 	///////////////////////////////////////////////////////////////////////
@@ -3565,9 +3578,6 @@
 	}//attemptDeleteOffline()
 
 
-	<TMPL_INCLUDE NAME="online_server_comms.tmpl">
-
-
 	function clearSaveToDiskReminder() {
 		document.getElementById("savetodisk_warning").style.display = "none";
 	}
@@ -3598,7 +3608,6 @@
 		document.body.removeChild(element);
 	}
 
-	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
 
 </script>
