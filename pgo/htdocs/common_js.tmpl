@@ -1,6 +1,56 @@
 // This <script> seems to turn on syntax highlighting.
 
 	//////////////////////////////////////////////////////////////
+	//               Security Reset - Main Site                 //
+	//////////////////////////////////////////////////////////////
+
+	// Reset state variables, etc. that could be security concern.
+	function resetSecurityAndUI() {
+		// Reset EDIT functionality buttons.
+		document.getElementById("editdata_button").style.display = hideReadonlyButtons;
+		document.getElementById("delete_button").style.display = hideReadonlyButtons;
+		document.getElementById("save_button").style.display = "none";
+		// Return Access Success page to default input disabled state.
+		showEditDisabledUI();
+		// Clear data input running byte total.
+		document.getElementById("browserdata_length_label").innerHTML = '';
+		document.getElementById("editdata_length_label").innerHTML = '';
+		document.getElementById("uploaddata_length_label").innerHTML = '';
+		// Clear Store Upload file input (clears data from previously uploaded file).
+		document.getElementById('store_upload_input').value = null;
+		// Hide Store Upload commit button shown upon user uploading a file.
+		document.getElementById("store_upload_commit_button").style.display = "none";
+		// Hide READY TO COMMIT message shown upon user uploading a file.
+		document.getElementById("store_upload_readytocommit").style.display = "none";
+		// Clear Accessed, decrypted user data.
+		document.getElementById("access_data_outputdisplay").value = '';
+		// Clear fingerprint held for delete.
+		document.getElementById("fingerprint_holder").value = '';
+		// Check if we're online and inform user if we are or not.
+		updateOnlineStatus();
+		// Hide password RE-Entry check warnings (passlock flow).
+		hidePassCheckFailWarnings();
+		// Reset delete overlay
+		deleteCheckHide('overlay_delete_cmd');
+		deleteCheckHide('overlay_delete_browser');
+	}// resetSecurityAndUI()
+
+	//////////////////////////////////////////////////////////////
+	//           	UI Manipulation Functions	         		//
+	//////////////////////////////////////////////////////////////
+	// Change UI to show Edit button, activate textarea input.
+	function showEditEnabledUI() {
+		document.getElementById('access_data_outputdisplay').disabled = false;
+		document.getElementById('access_data_outputdisplay').style.color = siteColor; // Our 'normal' green.
+	}// showEditEnabledUI()
+
+	// Change UI to hide Edit button, deactivate textarea input.
+	function showEditDisabledUI() {
+		document.getElementById('access_data_outputdisplay').disabled = true;
+		document.getElementById('access_data_outputdisplay').style.color = 'gray';
+	}// showEditDisabledUI()
+
+	//////////////////////////////////////////////////////////////
 	//                Contact & Captcha Functions               //
 	//////////////////////////////////////////////////////////////
 
@@ -413,3 +463,17 @@
 	}// computeFingerprint()
 
 
+	// Randomly generate a single Multi Encrypted Datarecord worth of junk data.
+	function getRandMultiEncryptedDatarecord() {
+		// This value that will convert to 1024 base64 chars.
+		const randarray = window.crypto.getRandomValues(new Uint8Array(MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES));
+		return randarray.toBase64();
+	}// getRandMultiEncryptedDatarecord()
+
+	// Randomly generate 43 base64 chars of junk data.
+	function getRandFingerprint() {
+		// 32 bytes is the output of SHA-256
+		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_LENGTH_BYTES));
+		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
+		return randarray.toBase64({omitPadding: true});
+	}// getRandFingerprint()

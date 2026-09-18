@@ -10,371 +10,13 @@
 </head>
 <style>
 
-	/* Set color variable */
+	/* Set CSS color variable. Needed to keep standalone.html offline database red for both readonly and main sites. */
 	:root {
 		--site-type-color: #<TMPL_VAR NAME=page_type_color>;
+		--readonly-store-buttons: <TMPL_VAR NAME=hide_readonly_store_buttons>;
 	}
 
-	* {
-		font-family: "Orbitron", serif;
-		font-optical-sizing: auto;
-		font-weight: 600;
-		font-style: normal;
-/*		color: #<TMPL_VAR NAME=page_type_color>; */
-		/*color: brown;*/
-		color: var(--site-type-color);
-	}
-
-	html, body {
-		background-color: #272727;
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-		margin: 0;
-		padding: 0;
-	}
-
-	.main_site {
-		height: 100%;
-	}
-
-	.header {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		color: var(--site-type-color);
-		padding: 4px;
-		padding-right: 10px;
-		padding-left: 10px;
-	}
-
-	.header_content {
-		display: flex;
-	}
-
-	.header_title:hover {
-		cursor: pointer;
-	}
-
-	.header_label {
-		padding: 8px;
-	}
-
-	.center_html {
-		width: 100%;
-		min-height: 100%;
-		background-color: #272727;
-		flex: 1 auto;
-		display: flex;
-		justify-content: center;
-	}
-
-/*	 Single (pages) shown to user as they (flow) through site. */
-	.flow_pages {
-		width: 700px;
-		margin: 10px;
-		align-self: center;
-		display: flex;
-		flex-direction: column;
-		justify-content: center; 
-		color: var(--site-type-color);
-	}
-
-	/* default button styling. HTML style="" will override. */
-	button {
-		/*width: 400px;*/
-		height: 65px;
-		background-color: #434343;
-		border: 2px solid;
-		padding: 2px;
-		margin: 8px;
-		padding-right: 10px;
-		padding-left: 10px;
-		color: var(--site-type-color);
-		border-color: var(--site-type-color);
-		font-size: 17px;
-		border-radius: 15px;
-	}
-
-	/*input[type="password"] {*/
-	.main_site_password_input {
-		height: 80px;
-		width: 95%;
-		background-color: #272727;
-		border: 2px solid;
-		padding: 8px;
-		margin: 8px;
-		border-color: var(--site-type-color);
-		color: var(--site-type-color);
-		font-size: 25px;
-		border-radius: 20px;
-	}
-
-	a {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: #4491d5;
-	}
-
-	p {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: black;
-	}
-
-	/* Change the textareas inside divs with 'flow_pages' class to the following: */
-	.flow_pages textarea {
-		width: 95%;
-		height: 150px;
-		background-color: #272727;
-		border: 2px solid;
-		padding: 12px;
-		margin: 8px;
-		border-color: var(--site-type-color);
-		color: var(--site-type-color);
-		font-size: 25px;
-		border-radius: 30px;
-	}
-
-	/* 'Are you sure?' overlay */
-	.deletecheck {
-		justify-content:center;
-		align-items:center;
-		z-index:10;
-		position:absolute;
-		width:100%;
-		height:215%;
-		background-color:gray;
-		padding:8px;
-		margin-left:0;
-		margin-top:-40%;
-		flex-direction: column;
-		border:2px solid;
-		border-color:red; 
-		border-radius:30px;
-	}
-
-	.devsite_inputs {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: black;
-		background-color: grey;
-	}
-
-	.tooltip {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: black;
-	}
-
-	/* Add this class to a span or label (and other types?) to make it a cool looking pink */
-	.coolpink {
-		color:magenta;
-		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-	}
-
-	/* Change cursor image to pointer with plus (identified by 'copy' indicator) */
-	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
-	.encrypt_hover:hover * {
-		cursor: copy;
-	}
-	/* Apply hover to specific div id*/
-	#encrypt_click_access:hover {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#encrypt_click_store:hover {
-		cursor: copy;
-	}
-
-	/* Apply hover to div child elements recursively which apply encrypt_hover class.*/
-	.decrypt_hover:hover * {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#decrypt_click_access:hover {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#decrypt_click_store:hover {
-		cursor: copy;
-	}
-
-	.openssl_encrypt_flowchart {
-		background-image: url('./svg_images/openssl_encrypt_flowchart.drawio.svg');
-	}
-
-	.openssl_decrypt_flowchart {
-		background-image: url('./svg_images/openssl_decrypt_flowchart.drawio.svg');
-	}
-
-	/* Makes the background color blend from orange to #AEE850 */
-	.glossy_button {
-		background: linear-gradient(orange, #aee850);
-		border: 1px solid #1d6511;
-		color: black;
-		font-size: 12px;
-		height: 30px;
-		cursor: pointer;
-	}
-
-	/* Dev site Responsive Design */
-	/* --> below width size that changes from desktop to mobile or tablet, */
-	/* width 90% or whatever makes sense */
-/*
-	@media screen and (max-width:500px) {
-		/* Narrow all textareas on mobile screens.
-		textarea {
-			width: 140px;
-		}
-	}
-*/
-
-	/* Makes the text blend from orange to #AEE850 */
-	/* background-clip: text creates a 'cut-out' of the background where the text exists, creating text with a linear gradient.
-	.glossy_icon {
-		background-image: linear-gradient(orange, #aee850);
-		color: transparent;
-		background-clip: text;
-	}
-*/
-
-	/* Set minimum page Width to */
-	@media screen and (max-width: 340px) { html,body {min-width: 340px} }
-
-	/* Set minimum page Height to 400 */
-	@media screen and (max-height: 400px) { html,body {min-height: 400px} }	
-
-	/* Responsive Design: When the viewport is fewer than 700px wide, activate the following CSS. */
-	@media screen and (max-width:700px) {
-
-		input[type="password"] {
-			width: 90%;
-		}
-
-		textarea {
-			width: 90%;
-		}
-
-		.header {
-			flex-direction: column;
-		}
-
-		.home button {
-			width: 200px;
-			/*border-color: black;*/
-		}
-
-		.home_buttons {
-			/*flex-direction: column;*/
-		}
-
-		.choose button {
-			font-size: 14px;
-		}
-
-		.upload input {
-			font-size: 16px;
-		}
-
-		.deletecheck {
-			margin-top: -50%;
-			height: 220%;
-		}
-	}
-
-	@media screen and (max-width:500px) {
-		.home button {
-			width: 150px;
-			font-size: 14px;
-			/*border-color: black;*/
-		}
-
-		.deletecheck {
-			width: 95%;
-			margin-top: -75%;
-			height:250%;
-		}
-	}
-
-
-	/*    FAQ Site   */
-	.faq_site {
-		width: 100%;
-		min-height: 100%;
-		background-color: #272727;
-		flex: 1 auto;
-		display: none;
-		justify-content: center;
-	}
-
-
-	/*    Dev Site   */
-	.main_page {
-		background-color: #272727;
-		display: flex;
-		flex-direction: column;
-		min-height: 90vh;
-		margin: 0;
-		padding: 0;
-	}
-
-	.dev_site {
-		background-color: #272727;
-		display: none;
-		flex-direction: column;
-		min-height: 90vh;
-		margin: 0;
-		padding: 0;
-	}
-
-	.glossy_icon {
-		color: magenta;
-	}
-
-	.sidebar_button {
-		margin-top: 20px;
-		writing-mode: vertical-lr;
-		/* Scale appears to rotate text around a center point. Translate then moves it to the right enough to not be cut off by the left screen edge. */
-		transform: scale(-1, -1) translate(-15px);
-		cursor: pointer;
-	}
-
-	.dev_site_sections {
-		display:flex;
-		flex-direction:column;
-		padding:10px;
-		margin-bottom:10px;
-		width: 90%;
-	}
-
-	.textarea_div_heightcontrol {
-		height: 400px;
-	}
-
-	textarea {
-		background-color: #272727;
-		border: 2px solid;
-		border-color: #54c597;
-		color: #54c597;
-		border-radius: 10px;
-		/* Use the first font installed on your system. */
-		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
-		/*font-family: Liberation Mono;*/
-		height: 100%;
-	}
-
-	.dev_site_password_input {
-		padding: 6px;
-		background-color: #272727;
-		border: 2px solid;
-		border-color: #54c597;
-		color: #54c597;
-		border-radius: 10px;
-		/* Use the first font installed on your system. */
-		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
-	}
+	<TMPL_INCLUDE NAME="css_commmon.tmpl">
 
 
 </style>
@@ -474,7 +116,7 @@
 				<div class="flow_pages show_page_activatable home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center;">
 					<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 					<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-						<button class="obf_button" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
+						<button class="obf_button" id='' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
 						<button class="obf_button" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
 					</div>
 				</div>
@@ -484,7 +126,7 @@
 					<h3 style="color:red;">TIMED OUT!</h3>
 					<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
 					<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-						<button class="obf_button" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
+						<button class="obf_button" id='' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
 						<button class="obf_button" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
 					</div>
 				</div>
@@ -603,8 +245,8 @@
 					</div>
 					<div class="button_pair" id="" style="display:flex">
 						<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS DATA</button>
-						<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="saveThenShowPage('store_codeword')">STORE DATA</button>
-						<button class="" id='' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showDeleteOverlay('overlay_delete_cmd')">DELETE DATA</button>
+						<button class="" id='' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="saveThenShowPage('store_codeword')">STORE DATA</button>
+						<button class="" id='' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="showDeleteOverlay('overlay_delete_cmd')">DELETE DATA</button>
 					</div>
 				</div>
 				<!---------------------------END CMD LINE Access Flow-----------------------!>
@@ -629,8 +271,8 @@
 						<div id='edit_input_warning' style="flex-grow:1;display:none;">
 							<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 						</div>
-						<button class="" id='editdata_button' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="editData()">EDIT DATA</button>
-						<button class="" id='delete_button' style="flex-grow:1; display:<TMPL_VAR NAME=hide_readonly_store_buttons>;" onclick="showDeleteOverlay('overlay_delete_browser')">DELETE DATA</button>
+						<button class="" id='editdata_button' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="editData()">EDIT DATA</button>
+						<button class="" id='delete_button' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="showDeleteOverlay('overlay_delete_browser')">DELETE DATA</button>
 					</div>
 				</div>
 				<!---------------------------END BROWSER Access Flow-----------------------!>
@@ -1061,6 +703,24 @@
 <script>
 
 	//////////////////////////////////////////////////////////////
+	//                The onload Function                       //
+	//////////////////////////////////////////////////////////////
+
+	//The load event is fired when the whole page has loaded.
+	window.onload = async function() {
+		// Initial server online check.
+		await updateOnlineStatus();
+		// Count every time a unique visitor accesses this site.
+		serverCountUniqueVisitors();
+		// Set up all copy to click listeners.
+		addListenersToAllCopyToClick();
+	}
+
+	// Allows things to switch to offline database variable for both main, readonly site versions.
+	const siteColor = '#<TMPL_VAR NAME=page_type_color>';
+	const hideReadonlyButtons = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
+
+	//////////////////////////////////////////////////////////////
 	//             Included Template Files                      //
 	//////////////////////////////////////////////////////////////
 	// This isn't cpp code but they would call these header files.
@@ -1079,72 +739,6 @@
 	// Javascript native subtleCrypto lib based library used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
 	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
-	const siteColor = '#<TMPL_VAR NAME=page_type_color>';
-
-	//////////////////////////////////////////////////////////////
-	//                The onload Function                       //
-	//////////////////////////////////////////////////////////////
-
-	//The load event is fired when the whole page has loaded.
-	window.onload = async function() {
-		// Initial server online check.
-		await updateOnlineStatus();
-		// Count every time a unique visitor accesses this site.
-		serverCountUniqueVisitors();
-		// Set up all copy to click listeners.
-		addListenersToAllCopyToClick();
-	}
-
-	//////////////////////////////////////////////////////////////
-	//               Security Reset - Main Site                 //
-	//////////////////////////////////////////////////////////////
-
-	// Reset state variables, etc. that could be security concern.
-	function resetSecurityAndUI() {
-		// Reset EDIT functionality buttons.
-		document.getElementById("editdata_button").style.display = "<TMPL_VAR NAME=hide_readonly_store_buttons>";
-		document.getElementById("delete_button").style.display = "<TMPL_VAR NAME=hide_readonly_store_buttons>";
-		document.getElementById("save_button").style.display = "none";
-		// Return Access Success page to default input disabled state.
-		showEditDisabledUI();
-		// Clear data input running byte total.
-		document.getElementById("browserdata_length_label").innerHTML = '';
-		document.getElementById("editdata_length_label").innerHTML = '';
-		document.getElementById("uploaddata_length_label").innerHTML = '';
-		// Clear Store Upload file input (clears data from previously uploaded file).
-		document.getElementById('store_upload_input').value = null;
-		// Hide Store Upload commit button shown upon user uploading a file.
-		document.getElementById("store_upload_commit_button").style.display = "none";
-		// Hide READY TO COMMIT message shown upon user uploading a file.
-		document.getElementById("store_upload_readytocommit").style.display = "none";
-		// Clear Accessed, decrypted user data.
-		document.getElementById("access_data_outputdisplay").value = '';
-		// Clear fingerprint held for delete.
-		document.getElementById("fingerprint_holder").value = '';
-		// Check if we're online and inform user if we are or not.
-		updateOnlineStatus();
-		// Hide password RE-Entry check warnings (passlock flow).
-		hidePassCheckFailWarnings();
-		// Reset delete overlay
-		deleteCheckHide('overlay_delete_cmd');
-		deleteCheckHide('overlay_delete_browser');
-	}// resetSecurityAndUI()
-
-	//////////////////////////////////////////////////////////////
-	//           	UI Manipulation Functions	         		//
-	//////////////////////////////////////////////////////////////
-	// Change UI to show Edit button, activate textarea input.
-	function showEditEnabledUI() {
-		document.getElementById('access_data_outputdisplay').disabled = false;
-		//document.getElementById('access_data_outputdisplay').style.color = '#<TMPL_VAR NAME=page_type_color>'; // Our 'normal' green.
-		document.getElementById('access_data_outputdisplay').style.color = siteColor; // Our 'normal' green.
-	}// showEditEnabledUI()
-
-	// Change UI to hide Edit button, deactivate textarea input.
-	function showEditDisabledUI() {
-		document.getElementById('access_data_outputdisplay').disabled = true;
-		document.getElementById('access_data_outputdisplay').style.color = 'gray';
-	}// showEditDisabledUI()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// catchUpload() is executed from the HTML UI when a user uploads a file.
@@ -1189,52 +783,6 @@
 		document.getElementById('store_upload_input').value = null;
 	}// catchUpload()
 
-	/////////////////////////////////////////////////////////////////////////
-	//					Check Functions									   //
-	/////////////////////////////////////////////////////////////////////////
-
-	// Return true if input only contains uuid chars which are used for passlock and browserID.
-	function checkUUIDChars(input) {
-		const regex = new RegExp(/^[a-f0-9-]*$/);
-		if (regex.test(input)) {
-			return true;
-		}else{
-			return false;
-		}
-	}// checkUUIDChars()
-
-	// Return true if input only contains base64 chars, including padding char: '='
-	function checkBase64Chars(input) {
-		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
-		if (regex.test(input)) {
-			// Return true/valid
-			return true;
-		}else{
-			// Return false/invalid
-			return false;
-		}
-	}// checkBase64Chars()
-
-	// Returns true if input has precisely FINGERPRINT_LENGTH_BASE64 (43) base64 chars.
-	function checkFingerprintIsValid(fingerprint) {
-		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH_BASE64 can be passed in.
-		const regex = new RegExp(`^[A-Za-z0-9+/=]{${FINGERPRINT_LENGTH_BASE64}}$`);
-		if (regex.test(fingerprint)) {
-			return true;
-		}else{
-			return false;
-		}
-	}// checkFingerprintIsValid()
-
-	// Returns true if input has precisely MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 (1024) base64 chars.
-	function checkDataIsValid(data) {
-		const regex = new RegExp(`^[A-Za-z0-9+/=]{${MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64}}$`);
-		if (regex.test(data)) {
-			return true;
-		}else{
-			return false;
-		}
-	}// checkDataIsValid()
 
 
 
@@ -1882,6 +1430,53 @@
 		return randnum[0];
 	}// randInt()
 
+	/////////////////////////////////////////////////////////////////////////
+	//					Check Functions									   //
+	/////////////////////////////////////////////////////////////////////////
+
+	// Return true if input only contains uuid chars which are used for passlock and browserID.
+	function checkUUIDChars(input) {
+		const regex = new RegExp(/^[a-f0-9-]*$/);
+		if (regex.test(input)) {
+			return true;
+		}else{
+			return false;
+		}
+	}// checkUUIDChars()
+
+	// Return true if input only contains base64 chars, including padding char: '='
+	function checkBase64Chars(input) {
+		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
+		if (regex.test(input)) {
+			// Return true/valid
+			return true;
+		}else{
+			// Return false/invalid
+			return false;
+		}
+	}// checkBase64Chars()
+
+	// Returns true if input has precisely FINGERPRINT_LENGTH_BASE64 (43) base64 chars.
+	function checkFingerprintIsValid(fingerprint) {
+		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH_BASE64 can be passed in.
+		const regex = new RegExp(`^[A-Za-z0-9+/=]{${FINGERPRINT_LENGTH_BASE64}}$`);
+		if (regex.test(fingerprint)) {
+			return true;
+		}else{
+			return false;
+		}
+	}// checkFingerprintIsValid()
+
+	// Returns true if input has precisely MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 (1024) base64 chars.
+	function checkDataIsValid(data) {
+		const regex = new RegExp(`^[A-Za-z0-9+/=]{${MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64}}$`);
+		if (regex.test(data)) {
+			return true;
+		}else{
+			return false;
+		}
+	}// checkDataIsValid()
+
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Once the 2 offline databases (encrypted, unencrypted) and their corresponding pointers are ready,
@@ -1911,365 +1506,7 @@
 		--site-type-color: red;
 	}
 
-	* {
-		font-family: "Orbitron", serif;
-		font-optical-sizing: auto;
-		font-weight: 600;
-		font-style: normal;
-		/* Offline Red */
-		color: var(--site-type-color);
-	}
-
-	html, body {
-		background-color: #272727;
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-		margin: 0;
-		padding: 0;
-	}
-
-	.main_site {
-		height: 100%;
-	}
-
-	.header {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		color: var(--site-type-color); /* Offline Red */
-		padding: 4px;
-		padding-right: 10px;
-		padding-left: 10px;
-	}
-
-	.header_content {
-		display: flex;
-	}
-
-	.header_title:hover {
-		cursor: pointer;
-	}
-
-	.header_label {
-		padding: 8px;
-	}
-
-	.center_html {
-		width: 100%;
-		min-height: 100%;
-		background-color: #272727;
-		flex: 1 auto;
-		display: flex;
-		justify-content: center;
-	}
-
-	/* Single (pages) shown to user as they (flow) through site. */
-	.flow_pages {
-		width: 700px;
-		margin: 10px;
-		align-self: center;
-		display: flex;
-		flex-direction: column;
-		justify-content: center; 
-		color: var(--site-type-color); /* Offline Red */
-	}
-
-	/* default button styling. HTML style="" will override. */
-	button {
-		/*width: 400px;*/
-		height: 65px;
-		background-color: #434343;
-		border: 2px solid;
-		padding: 2px;
-		margin: 8px;
-		padding-right: 10px;
-		padding-left: 10px;
-		color: var(--site-type-color); /* Offline Red */
-		border-color: var(--site-type-color); /* Offline Red */
-		font-size: 17px;
-		border-radius: 15px;
-	}
-
-	/* input[type="password"] { */
-	.main_site_password_input {
-		height: 80px;
-		width: 95%;
-		background-color: #272727;
-		border: 2px solid;
-		padding: 8px;
-		margin: 8px;
-		border-color: var(--site-type-color); /* Offline Red */
-		color: var(--site-type-color); /* Offline Red */
-		font-size: 25px;
-		border-radius: 20px;
-	}
-
-	a {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: #4491d5;
-	}
-
-	p {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: black;
-	}
-
-	/* Change the textareas inside divs with 'flow_pages' class to the following: */
-	.flow_pages textarea {
-		width: 95%;
-		height: 150px;
-		background-color: #272727;
-		border: 2px solid;
-		padding: 12px;
-		margin: 8px;
-		/*border-color: #54c597;    Online Green */
-/* Offline Red */border-color: var(--site-type-color);
-		/*color: #54c597;    Online Green */
-/* Offline Red */color: var(--site-type-color);
-		font-size: 25px;
-		border-radius: 30px;
-	}
-
-	/* 'Are you sure?' overlay */
-	.deletecheck {
-		justify-content:center;
-		align-items:center;
-		z-index:10;
-		position:absolute;
-		width:100%;
-		height:215%;
-		background-color:gray;
-		padding:8px;
-		margin-left:0;
-		margin-top:-40%;
-		flex-direction: column;
-		border:2px solid;
-		border-color:var(--site-type-color); 
-		border-radius:30px;
-	}
-
-	.devsite_inputs {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: black;
-		background-color: grey;
-	}
-
-	.tooltip {
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 16px;
-		color: black;
-	}
-
-	/* Add this class to a span or label (and other types?) to make it a cool looking pink */
-	.coolpink {
-		color:magenta;
-		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-	}
-
-	/* Apply hover to div child elements which apply encrypt_hover class.*/
-	.encrypt_hover:hover * {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#encrypt_click_access:hover {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#encrypt_click_store:hover {
-		cursor: copy;
-	}
-
-	/* Apply hover to div child elements which apply encrypt_hover class.*/
-	.decrypt_hover:hover * {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#decrypt_click_access:hover {
-		cursor: copy;
-	}
-	/* Apply hover to specific div */
-	#decrypt_click_store:hover {
-		cursor: copy;
-	}
-
-	.openssl_encrypt_flowchart {
-		background-image: url('./svg_images/openssl_encrypt_flowchart.drawio.svg');
-	}
-
-	.openssl_decrypt_flowchart {
-		background-image: url('./svg_images/openssl_decrypt_flowchart.drawio.svg');
-	}
-
-	/* Makes the background color blend from orange to #AEE850 */
-	.glossy_button {
-		background: linear-gradient(orange, #aee850);
-		border: 1px solid #1d6511;
-		color: black;
-		font-size: 12px;
-		height: 30px;
-		cursor: pointer;
-	}
-
-	/* Makes the text blend from orange to #AEE850 */
-	/* background-clip: text creates a 'cut-out' of the background where the text exists, creating text with a linear gradient.
-	.glossy_icon {
-		background-image: linear-gradient(orange, #aee850);
-		color: transparent;
-		background-clip: text;
-	}*/
-
-	/* Set minimum page Width to */
-	@media screen and (max-width: 340px) { html,body {min-width: 340px} }
-
-	/* Set minimum page Height to 400 */
-	@media screen and (max-height: 400px) { html,body {min-height: 400px} }	
-
-	/* Responsive Design: When the viewport is fewer than 700px wide, activate the following CSS. */
-	@media screen and (max-width:700px) {
-
-		input[type="password"] {
-			width: 90%;
-		}
-
-		textarea {
-			width: 90%;
-		}
-
-		.header {
-			flex-direction: column;
-		}
-
-		.home button {
-			width: 200px;
-			/*border-color: black;*/
-		}
-
-		.home_buttons {
-			/*flex-direction: column;*/
-		}
-
-		.choose button {
-			font-size: 14px;
-		}
-
-		.upload input {
-			font-size: 16px;
-		}
-
-		.deletecheck {
-			margin-top: -50%;
-			height: 220%;
-		}
-		
-	}
-	@media screen and (max-width:500px) {
-/*
-		input {
-			width: 400px;
-		}
-
-		textarea {
-			width: 400px;
-		}
-*/
-		.home button {
-			width: 150px;
-			font-size: 14px;
-			/*border-color: black;*/
-		}
-
-		.deletecheck {
-			width: 95%;
-			margin-top: -75%;
-			height:250%;
-		}
-	}
-
-
-
-	/*    FAQ Site   */
-	.faq_site {
-		width: 100%;
-		min-height: 100%;
-		background-color: #272727;
-		flex: 1 auto;
-		display: none;
-		justify-content: center;
-	}
-
-
-	/*    Dev Site   */
-
-	.main_page {
-		background-color: #272727;
-		display: flex;
-		flex-direction: column;
-		min-height: 90vh;
-		margin: 0;
-		padding: 0;
-	}
-
-	.dev_site {
-		background-color: #272727;
-		display: none;
-		flex-direction: column;
-		min-height: 90vh;
-		margin: 0;
-		padding: 0;
-	}
-
-	.glossy_icon {
-		color: magenta;
-	}
-
-	.sidebar_button {
-		margin-top: 20px;
-		writing-mode: vertical-lr;
-		/* Scale appears to rotate text around a center point. Translate then moves it to the right enough to not be cut off by the left screen edge. */
-		transform: scale(-1, -1) translate(-15px);
-		cursor: pointer;
-	}
-
-	.dev_site_sections {
-		display:flex;
-		flex-direction:column;
-		padding:10px;
-		margin-bottom:10px;
-		width: 90%;
-	}
-
-	.textarea_div_heightcontrol {
-		height: 400px;
-	}
-
-	textarea {
-		background-color: #272727;
-		border: 2px solid;
-		border-color: #54c597;
-		color: #54c597;
-		border-radius: 10px;
-		/* Use the first font installed on your system. */
-		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
-		/*font-family: Liberation Mono;*/
-		height: 100%;
-	}
-
-	.dev_site_password_input {
-		padding: 6px;
-		background-color: #272727;
-		border: 2px solid;
-		border-color: #54c597;
-		color: #54c597;
-		border-radius: 10px;
-		/* Use the first font installed on your system. */
-		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
-	}
-
+	<TMPL_INCLUDE NAME="css_commmon.tmpl">
 
 
 </style>
@@ -2282,20 +1519,13 @@
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
-			<!--<div class="header_label" style="">
-				<a id="dev_site_toggle_link" href="javascript:void(0);" onclick="toggleDevSite()">DEV_SITE</a>
-			</div>-->
-
 			<div class="header_label" style="">
-				<!--<a href="https://obf.mkrsvr.org/faq">FAQ</a>-->
 				<a id="contact_link" href="javascript:void(0);" onclick="showPage('faq_site')">FAQ</a>
 			</div>
 			<div class="header_label" style="">
-				<!--<a id="dev_site_toggle_link" href="javascript:void(0);" onclick="toggleDevSite()">DEV_SITE</a>-->
 				<a id="dev_site_link" href="javascript:void(0);" onclick="showPage('dev_site')">DEV_SITE</a>
 			</div>
 			<div class="header_label" style="">
-				<!--<a href="https://obf.mkrsvr.org/contact">CONTACT</a>-->
 				<a id="contact_link" href="javascript:void(0);" onclick="showPage('contact_page_captcha')">CONTACT</a>
 			</div>
 
@@ -2928,6 +2158,27 @@
 <!----------------------------------JAVASCRIPT-------------------------------------!>
 <script>
 
+	//////////////////////////////////////////////////////////////
+	//                The onload Function                       //
+	//////////////////////////////////////////////////////////////
+
+	//The load event is fired when the whole page has loaded.
+	window.onload = async function() {
+		// Initial server online check.
+		await updateOnlineStatus();
+		addListenersToAllCopyToClick();
+	}
+
+	// Allows things to switch to offline database variable for both main, readonly site versions.
+	const siteColor = 'red';
+	const hideReadonlyButtons = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
+
+	// Set Title to link to Home without dropping offline dbase.
+	document.getElementById("titletext").onclick = function() {
+		// Clear storage object for security.
+		offlineData = {};
+		showPage('enter_offlinedbase_pass');
+	}
 
 	//////////////////////////////////////////////////////////////
 	//             Included Template Files                      //
@@ -2948,77 +2199,9 @@
 	// Javascript native subtleCrypto lib based library used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
 	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
-	const siteColor = 'red';
-
-	// Set Title to link to Home without dropping offline dbase.
-	document.getElementById("titletext").onclick = function() {
-		// Clear storage object for security.
-		offlineData = {};
-		//showPage('offline_home');
-		showPage('enter_offlinedbase_pass');
-	}
 
 
-	//////////////////////////////////////////////////////////////
-	//                The onload Function                       //
-	//////////////////////////////////////////////////////////////
 
-	//The load event is fired when the whole page has loaded.
-	window.onload = async function() {
-		// Initial server online check.
-		await updateOnlineStatus();
-		addListenersToAllCopyToClick();
-	}
-
-	//////////////////////////////////////////////////////////////
-	//                    Security Reset                        //
-	//////////////////////////////////////////////////////////////
-
-	function resetSecurityAndUI() {
-		// Reset Browser Access edit buttons.
-		document.getElementById("editdata_button").style.display = "inline";
-		document.getElementById("delete_button").style.display = "inline";
-		document.getElementById("save_button").style.display = "none";
-		// Keep access plaintext display disabled.
-		showEditDisabledUI();
-		// Hide running byte total.
-		document.getElementById("browserdata_length_label").innerHTML = '';
-		document.getElementById("editdata_length_label").innerHTML = '';
-		document.getElementById("uploaddata_length_label").innerHTML = '';
-		// Clear Store Upload file input.
-		document.getElementById('store_upload_input').value = null;
-		// Hide Store Upload commit button
-		document.getElementById("store_upload_commit_button").style.display = "none";
-		// Hide READY TO COMMIT message.
-		document.getElementById("store_upload_readytocommit").style.display = "none";
-		// Delete plaintext outdisplay which is shown at the end of the Browser Access Flow.
-		document.getElementById("access_data_outputdisplay").value = '';
-		// Clear fingerprint held for delete.
-		document.getElementById("fingerprint_holder").value = '';
-		// Check if we're online and inform user if we are or not.
-		updateOnlineStatus();
-		// Hide password RE-Entry check warnings (passlock flow).
-		hidePassCheckFailWarnings();
-		// Reset delete overlay
-		deleteCheckHide('overlay_delete_cmd');
-		deleteCheckHide('overlay_delete_browser');
-	}
-
-	//////////////////////////////////////////////////////////////
-	//           	UI Manipulation Functions	         		//
-	//////////////////////////////////////////////////////////////
-
-	// Change UI to show Edit button, activate textarea input.
-	function showEditEnabledUI() {
-		document.getElementById('access_data_outputdisplay').disabled = false;
-		document.getElementById('access_data_outputdisplay').style.color = siteColor;
-	}// showEditEnabledUI()
-
-	// Change UI to hide Edit button, deactivate textarea input.
-	function showEditDisabledUI() {
-		document.getElementById('access_data_outputdisplay').disabled = true;
-		document.getElementById('access_data_outputdisplay').style.color = 'gray';
-	}// showEditDisabledUI()
 
 	// Catch File Ingest
 	// listener is placed inline of the html
@@ -3057,21 +2240,6 @@
 		document.getElementById('store_upload_input').value = null;
 		console.log("File input contents: " + document.getElementById('store_upload_input').value);
 	}
-
-	// Randomly generate a single Multi Encrypted Datarecord worth of junk data.
-	function getRandMultiEncryptedDatarecord() {
-		// This value that will convert to 1024 base64 chars.
-		const randarray = window.crypto.getRandomValues(new Uint8Array(MULTI_ENCRYPTED_DATARECORD_LENGTH_BYTES));
-		return randarray.toBase64();
-	}// getRandMultiEncryptedDatarecord()
-
-	// Randomly generate 43 base64 chars of junk data.
-	function getRandFingerprint() {
-		// 32 bytes is the output of SHA-256
-		const randarray = window.crypto.getRandomValues(new Uint8Array(FINGERPRINT_LENGTH_BYTES));
-		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
-		return randarray.toBase64({omitPadding: true});
-	}// getRandFingerprint()
 
 
 
