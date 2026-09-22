@@ -1,5 +1,50 @@
 // This <script> seems to turn on syntax highlighting.
 
+
+	// catchUpload() is executed from the HTML UI when a user uploads a file.
+	// The file is interpreted as raw bytes before being converted to base64 and fed into UI data handling pipeline.
+	//
+	// Catch File Ingest
+	async function catchUpload(event) {
+		// Set incoming File object to variable file.
+		const file = event.target.files[0];
+		// Create a FileReader object: reader.
+		const reader = new FileReader();
+		// Read in file as raw bytes.
+		reader.readAsArrayBuffer(file);
+		// Fire an event (this async function) once the reader object has complted reading in the file.
+		reader.onload = async function(e) {
+			// Access data that was just read into file reader.
+			let fileDataBuffer = e.target.result;
+			const fileDataUint8 = new Uint8Array(fileDataBuffer);
+			let filedata64 = fileDataUint8.toBase64();
+			// Input Data Length Check
+			if (checkInputLengthUpload(fileDataBuffer)) {
+
+				// Function wrapper so it works with online and offline function sets.
+				await saveFileData(filedata64);
+		
+				// Show button.
+				document.getElementById("store_upload_commit_button").style.display = "inline";
+				document.getElementById("store_upload_input").style.border = "";
+				// Tell user we are READY TO COMMIT. 
+				document.getElementById("store_upload_readytocommit").style.display = "inline";
+				// add red warning text
+				document.getElementById("store_upload_warning").style.display = "none";
+			}else{
+				// Data Length too long! Show Warning.
+				// hide continue button
+				document.getElementById("store_upload_commit_button").style.display = "none";
+				// make border red
+				document.getElementById("store_upload_input").style.border = "thick solid red";
+				// add red warning text
+				document.getElementById("store_upload_warning").style.display = "inline";
+			}
+		}
+		// Clear file ingress data.
+		document.getElementById('store_upload_input').value = null;
+	}// catchUpload()
+
 	//////////////////////////////////////////////////////////////
 	//               Security Reset - Main Site                 //
 	//////////////////////////////////////////////////////////////
