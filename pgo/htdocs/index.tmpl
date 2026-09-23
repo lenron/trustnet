@@ -29,35 +29,36 @@
 
 	/* Insert CSS code common to main, readonly, and standalone.html offline database versions of the site. */
 	/* This code will be used for main, readonly while offline standalone.html will be TMPL_INCLUDE'd below */
-	<TMPL_INCLUDE NAME="css_commmon.tmpl">
-
+	<TMPL_INCLUDE NAME="common_css.tmpl">
 
 </style>
 <body>
-	<!--------------------------HEADER----------------------------!>
+	<!-----------------------------------------------------SITE HEADER----------------------------------------------------------------------------------!>
 	<div class="header" id="header">
 		<div class="header_content" id="header_left">
 			<div class="header_title">
+				<!-- Reload page when Title is clicked in Main/Readonly site versions, offline uses showPage(). -->
 				<a href="https://<TMPL_VAR NAME=origin>" id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
 			<div class="header_label" style="">
-				<!-- Header links use javascript:void, instructing browser to not leave the current page, which is handled by our function showPage() -->
-				<a id="contact_link" href="javascript:void(0);" onclick="showPage('faq_site')">FAQ</a>
+				<!-- Header links use javascript:void, instructing browser to not leave the current page, which is handled by our function showPage(). -->
+				<a id="contact_link" href="javascript:void(0);" onclick="saveThenShowPage('faq_site')">FAQ</a>
 			</div>
 			<div class="header_label" style="">
-				<a id="dev_site_link" href="javascript:void(0);" onclick="showPage('dev_site')">DEV_SITE</a>
+				<a id="dev_site_link" href="javascript:void(0);" onclick="saveThenShowPage('dev_site')">DEV_SITE</a>
 			</div>
 			<div class="header_label" style="">
-				<a id="contact_link" href="javascript:void(0);" onclick="showPage('contact_page_captcha')">CONTACT</a>
+				<a id="contact_link" href="javascript:void(0);" onclick="saveThenShowPage('contact_page_captcha')">CONTACT</a>
 			</div>
 		</div>
 	</div>
-	
+	<!-----------------------------------------------------SITE HEADER----------------------------------------------------------------------------------!>
 
-	<!--------------------------MAIN PAGE--------------------------------------------------------------------------------------------------------------------------------------------------------!>
+	<!-----------------------------------------------------MAIN PAGE------------------------------------------------------------------------------------!>
 	<div class="main_page" id="main_page">
+		<!--------------------------SITEWIDE STATUS & WARNINGS---------------------------!>
 		<!--------------------------Last Synced Status---------------------------!>
 		<div id='read_only_div' style="display:<TMPL_VAR NAME=show_last_updated>; justify-content:space-between; flex-direction: row;">
 			<div id="main_site_link" style="display:flex; justify-content:space-between; margin:10px;">
@@ -76,12 +77,9 @@
 			<h1 id="" style="color:red " >YOUR DATA SESSION WILL EXPIRE IN 30 SECONDS.</h1>
 			<button class="obf_button" id='' style="flex-grow:1" onclick="resetTimeoutAndWarning()">EXTEND SESSION</button>
 		</div>
-		<!--------------------------Offline Database Warning----------------------------!>
-		<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
-			<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS NOW FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
-		</div>
+		<!--------------------------SITEWIDE STATUS & WARNINGS---------------------------!>
 
-		<!-- Code included here in display:none - 'off' until user clicks header link. -->
+		<!-- FAQ, Dev Site page navigation is handled with showPage. We can include it here in 'off' state, waiting for user to click header link. -->
 		<!--------------------------DEV SITE----------------------------!>
 		<TMPL_INCLUDE NAME="dev_site_html.tmpl">
 		<!--------------------------FAQ SITE----------------------------!>
@@ -90,17 +88,19 @@
 		<!--------------------------Div Housing for Flow Pages----------------------------!>
 		<div class="center_html" id="center_html" style="">
 
-
 			<TMPL_INCLUDE NAME="common_html.tmpl">
 
+		</div>
+		<!--------------------------------------------Center HTML----------------------------------------------------!>
 
-		</div> <!--------------------------------------------Center HTML----------------------------------------------------!>
-	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
+	</div>
+	<!--------------------------------------------MAIN PAGE----------------------------------------------------!>
+
+	<!--------------------------------------------SITE FOOTER----------------------------------------------------!>
 	<div style="display:flex; flex-direction:column;">
 			<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="saveThenShowPage('offline_dbase_2options');">CREATE OFFLINE DATABASE</button>
 	</div>
-
-</div><!--------------------------------------------MAIN PAGE----------------------------------------------------!>
+	<!--------------------------------------------SITE FOOTER----------------------------------------------------!>
 
 </body>
 <script>
@@ -864,7 +864,7 @@
 		--site-type-color: red;
 	}
 
-	<TMPL_INCLUDE NAME="css_commmon.tmpl">
+	<TMPL_INCLUDE NAME="common_css.tmpl">
 
 
 </style>
