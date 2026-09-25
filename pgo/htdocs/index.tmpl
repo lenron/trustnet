@@ -11,6 +11,18 @@
 </head>
 <style>
 
+	/* MAIN SITE
+	/* There are 3 versions of the site, Online, Readonly, and Offline. The Offline version works as one standalone file that runs in a browser,
+	/* and needs no internet connection. The Offline can be generated from either the Online or Readonly versions of the site,
+	/* both of which hold the standalone.html offline database code inside a heredoc which is stored in function downloadStandalone() at the end of this file. */
+
+	/* Perl HTML::Templates are used to manage generation and deployment of each of the 3 site versions. TMPL_VAR values are injected from perl and
+	/* generally differentiate Online and Readonly site versions. TMPL_INCLUDE values don't change and serve to import code that is re-used while
+	/* helping to manage the codebase as well as allowing syntax highlighting to work all the time in those included .tmpl files.
+	/* The Offline Database standalone.html code is generated from a file nearly identical to this one called offline_standalone.tmpl
+	/* which is kept similar in order to preserve the readable structure. */
+
+	/* generated offline  from both Online and Readonly versions of the site. 
 	/* Three versions of the site online, readonly, and offline are available. */
 	/* The online site stores data in a traditional SQL database. The readonly serves as backup access to data. */
 	/* And the offline is intended to work as a standalone file on a secure system while also allowing users to upload data encrypted offline to the online database. */
