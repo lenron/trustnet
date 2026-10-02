@@ -94,6 +94,10 @@
 		<div id="stale_flow_div" style="display:none; justify-content:space-between; margin:10px;">
 			<label id="stale_flow_label" style="" >STALE FLOW! BACKING INTO A FLOW CAN CAUSE ISSUE! PLEASE START AT HOME.</label>
 		</div>
+		<!--------------------------STOP NAV WARNING---------------------------!>
+		<div id="stop_nav_div" style="display:none; justify-content:space-between; margin:10px; ">
+			<label id="stop_nav_label" style="color:red; " >NAVIGATION HALTED!<br>Backing from Browser Access flow end page is diallowed in order to preserve Edit functionality.</label>
+		</div>
 		<!--------------------------SITEWIDE STATUS & WARNINGS---------------------------!>
 
 		<!-- FAQ, Dev Site page navigation is handled with showPage. We include it here in 'off' state, ready for user to click header link. -->
@@ -170,6 +174,10 @@
 		showPage("home");
 	}
 
+	// Clear data when user leaves Edit page.
+	function resetData(){
+		resetPasslock();
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							 Passlock and User Data Handling Functions                                    //
@@ -513,6 +521,9 @@
 			showPage('failed_to_access');
 		}else{
 			showPage('access_plaintext');
+			// Activate flag so if user hits back button, we'll be able to catch it.
+			activateStopNavFlag();
+			startObserving();
 			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
 			holdFpForDelete(fingerprint);
 			await decryptAndShowPlaintext(multiEncryptedDatarecord);

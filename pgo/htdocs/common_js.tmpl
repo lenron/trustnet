@@ -78,7 +78,9 @@
 		// Reset delete overlay
 		deleteCheckHide('overlay_delete_cmd');
 		deleteCheckHide('overlay_delete_browser');
-		hideStaleFlowWarning()
+		hideStaleFlowWarning();
+		deactivateStopNavFlag();
+		hideStopNavWarning();
 	}// resetSecurityAndUI()
 
 	//////////////////////////////////////////////////////////////
@@ -218,6 +220,19 @@
 	// Listen for the popstate event which is usually fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	window.addEventListener('popstate', (event) => {
+
+		console.log(event);
+		// Show dynamic page when user hits back button.
+		//showPage(event.state.page);
+
+		if (onAccessEditPage_f === true) {
+			// Inform user they will not be able to edit if they navigate away from this page. That data will become stale.
+			console.log("stopped navigation away from page. now what?");
+			showStopNavWarning();
+		} else {
+			showPage(event.state.page);
+		}
+/*
 		// Use event.state or window.location to update content
 		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
 			showPage(event.state.page);
@@ -226,7 +241,20 @@
 			// we don't want to flicker as we're history.go()ing back programmatically if the user clicks back after completing a flow job.
 			showPageFlag = 'true';
 		}
+*/
 	});
+
+	let onAccessEditPage_f = false;
+
+	function deactivateStopNavFlag(){
+		console.log("DE-ativating stop nav flag.");
+		onAccessEditPage_f = false;
+	}
+
+	function activateStopNavFlag(){
+		console.log("activating stop nav flag.");
+		onAccessEditPage_f = true;
+	}
 
 	// In order for custom back functionality to work, we have to manually save the page the user is navigating away from (which we want to be able to go back to) whenever they click/activate a button.
 	function saveCurrentStateToHistorySoBackWillWork() {
@@ -526,6 +554,49 @@
 		const b64 = fingerprint.toBase64({omitPadding: true});
 		return b64;
 	}// computeFingerprint()
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	// Observation functions for clearing data when user moves away from plaintext Edit page. //
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Select the node that will be observed for mutations
+	const accessFlowEndNode = document.getElementById("access_plaintext");
+
+	// Options for the observer (which mutations to observe)
+	const config = { attributes: true, attributeFilter: ['style'] }
+
+	// Callback function to execute when mutations are observed
+	const callback = (mutationList, observer) => {
+		for (const mutation of mutationList) {
+			if (mutation.attributeName === 'style') {
+				console.log("Leaving Plaintext Edit page! Clearing data for security.");
+				// Site type agnostic clear data function.
+				resetData();
+				stopObserving();
+			}
+		}
+	};
+
+	// Create an observer instance linked to the callback function
+	const observer = new MutationObserver(callback);
+
+	function startObserving(){
+		// Start observing the target node for configured mutations
+		observer.observe(accessFlowEndNode, config);
+	}
+
+	function stopObserving(){
+		// Later, you can stop observing
+		observer.disconnect();
+	}
+
+	function hideStopNavWarning(){
+		document.getElementById('stop_nav_div').style.display = 'none';
+	}
+
+	function showStopNavWarning(){
+		document.getElementById('stop_nav_div').style.display = 'flex';
+	}
 
 	function hideStaleFlowWarning(){
 		document.getElementById('stale_flow_div').style.display = 'none';
