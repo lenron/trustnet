@@ -78,6 +78,7 @@
 		// Reset delete overlay
 		deleteCheckHide('overlay_delete_cmd');
 		deleteCheckHide('overlay_delete_browser');
+		hideStaleFlowWarning()
 	}// resetSecurityAndUI()
 
 	//////////////////////////////////////////////////////////////
@@ -484,6 +485,8 @@
 	//	Output structure:	43 base64 char string
 	//
 	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
+
+		//const codewordLower = codeword.toLowerCase();
 		let codewordLower;
 		// Convert codeword to lowercase.
 		try {
@@ -492,13 +495,17 @@
 			if (error instanceof TypeError) {
 				// Looks like the user backed onto a stale page and tried to execute without codeword which is unreachable in sanctioned flows.
 				console.log("Error: Out of order execution!");
-				// site specific function wrapper.
+				// Throw the error to break out of execution path.
+				// Now that we're not going to be hooked back into wrong function loop, go home.
+				showStaleFlowWarning();
 				//goHome();
+				throw error;
 			} else {
 				// Let the error throw normally if this isn't a TypeError.
 				throw error;
 			}
 		}
+
 		// Create a new TextEncoder object.
 		const enc = new TextEncoder();
 		// Convert human readable plaintext string to Uint8Array.
@@ -519,6 +526,14 @@
 		const b64 = fingerprint.toBase64({omitPadding: true});
 		return b64;
 	}// computeFingerprint()
+
+	function hideStaleFlowWarning(){
+		document.getElementById('stale_flow_div').style.display = 'none';
+	}
+
+	function showStaleFlowWarning(){
+		document.getElementById('stale_flow_div').style.display = 'flex';
+	}
 
 
 	// Randomly generate a single Multi Encrypted Datarecord worth of junk data.

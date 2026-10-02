@@ -47,6 +47,10 @@
 	<div id="offline_status_div" style="display:flex; justify-content:space-between; margin:10px;">
 		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
 	</div>
+	<!--------------------------STALE FLOW WARNING---------------------------!>
+	<div id="stale_flow_div" style="display:none; justify-content:space-between; margin:10px;">
+		<label id="stale_flow_label" style="" >STALE FLOW! BACKING INTO A FLOW CAN CAUSE ISSUE! PLEASE START AT HOME.</label>
+	</div>
 	<!--------------------------Offline Database Warning----------------------------!>
 	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
 		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
@@ -442,9 +446,8 @@
 		//const fingerprintAndData = await computeFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const multiEncryptedDatarecord = await encryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['data']);
-		let storeResponse;
 		// Select encrypted or regular offline database.
-		storeResponse = await storeOfflineDBase(fingerprint, multiEncryptedDatarecord);
+		let storeResponse = await storeOfflineDBase(fingerprint, multiEncryptedDatarecord);
 		//console.log("CMD Offline Store outcome: " + storeResponse);
 
 		// Check that data stored properly.
@@ -530,6 +533,7 @@
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
 
 		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+			resetOfflineData();
 			showPage('failed_to_access');
 		}else{
 			showPage('access_file');
@@ -538,7 +542,7 @@
 		}
 		// Replace goBack function with security reset and we should be secure right?
 		// Always reset plaintext data holder each time flow is completed.
-		resetOfflineData();
+		//resetOfflineData();
 	}
 
 	async function attemptSyncToOnline(inputId) {
@@ -548,8 +552,6 @@
 		// First load encrypted data from offline database.
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
-		// Replace goBack function with security reset and we should be secure right?
-		resetOfflineData();
 
 		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
 			showPage('failed_to_access'); // Access fail is valid here?
@@ -611,6 +613,7 @@
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
 		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+			resetOfflineData();
 			showPage('failed_to_access');
 		}else{
 			showPage('access_plaintext');
@@ -618,7 +621,7 @@
 		}
 		// Replace goBack function with security reset and we should be secure right?
 		// Always reset plaintext data holder each time flow is completed.
-		resetOfflineData();
+		//resetOfflineData();
 	}
 
 	async function decryptAndShowPlaintextOffline(multiEncryptedDatarecord) {
