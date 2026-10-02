@@ -484,8 +484,21 @@
 	//	Output structure:	43 base64 char string
 	//
 	async function computeFingerprint(codeword, obf1000Pass, ctrPass) {
+		let codewordLower;
 		// Convert codeword to lowercase.
-		const codewordLower = codeword.toLowerCase();
+		try {
+			codewordLower = codeword.toLowerCase();
+		} catch (error) { 
+			if (error instanceof TypeError) {
+				// Looks like the user backed onto a stale page and tried to execute without codeword which is unreachable in sanctioned flows.
+				console.log("Error: Out of order execution!");
+				// site specific function wrapper.
+				//goHome();
+			} else {
+				// Let the error throw normally if this isn't a TypeError.
+				throw error;
+			}
+		}
 		// Create a new TextEncoder object.
 		const enc = new TextEncoder();
 		// Convert human readable plaintext string to Uint8Array.

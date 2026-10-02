@@ -105,7 +105,7 @@
 	// Set Title to link to Home without dropping offline dbase.
 	document.getElementById("titletext").onclick = function() {
 		// Clear storage object for security.
-		offlineData = {};
+		resetOfflineData();
 		showPage('enter_offlinedbase_pass');
 	}
 
@@ -133,6 +133,10 @@
 		offlineData['data'] = filedata;
 	}
 
+	// Offline database is different because database password page.
+	function goHome(){
+		showPage("enter_offlinedbase_pass");
+	}
 
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
@@ -434,7 +438,7 @@
 	} // checkData()
 
 	async function attemptCMDStore() {
-		goBackProgrammaticallyXandDontFireShowPage(7);
+		//goBackProgrammaticallyXandDontFireShowPage(7);
 		//const fingerprintAndData = await computeFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const multiEncryptedDatarecord = await encryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['data']);
@@ -455,6 +459,9 @@
 			// Doesn't look like server stored data properly, report fail.
 			showPage('store_failed');
 		}
+		// Replace goBack function with security reset and we should be secure right?
+		// Always reset plaintext data holder each time flow is completed.
+		resetOfflineData();
 	} // attemptCMDStore()
 
 	async function attemptBrowserStoreBackWrapper(inputId) {
@@ -465,11 +472,11 @@
 	async function attemptBrowserStore(inputId, fromWrapper) {
 		if (fromWrapper === 'true') {
 			// Got here from edit, use go back value for Access flow.
-			goBackProgrammaticallyXandDontFireShowPage(3);
+			//goBackProgrammaticallyXandDontFireShowPage(3);
 			showPageFlag = 'true';
 		} else {
 			// Got here from Store flow.
-			goBackProgrammaticallyXandDontFireShowPage(9);
+			//goBackProgrammaticallyXandDontFireShowPage(9);
 		}
 		extractInputData(inputId);
 		//const fingerprintAndData = await computeFpAndDataForStore();
@@ -498,6 +505,9 @@
 			// Doesn't look like server stored data properly, report fail.
 			showPage('store_failed');
 		}
+		// Replace goBack function with security reset and we should be secure right?
+		// Always reset plaintext data holder each time flow is completed.
+		resetOfflineData();
 	}
 
 	async function editData() {
@@ -514,7 +524,7 @@
 	}
 
 	async function attemptCMDAccess() {
-		goBackProgrammaticallyXandDontFireShowPage(3);
+		//goBackProgrammaticallyXandDontFireShowPage(3);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		// Add additional parameter?
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
@@ -526,15 +536,20 @@
 			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
 			decryptAndDownloadFileOffline(multiEncryptedDatarecord);
 		}
+		// Replace goBack function with security reset and we should be secure right?
+		// Always reset plaintext data holder each time flow is completed.
+		resetOfflineData();
 	}
 
 	async function attemptSyncToOnline(inputId) {
-		goBackProgrammaticallyXandDontFireShowPage(2);
+		//goBackProgrammaticallyXandDontFireShowPage(2);
 		// Get ctrPass - pass2.
 		extractInputData(inputId);
 		// First load encrypted data from offline database.
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
+		// Replace goBack function with security reset and we should be secure right?
+		resetOfflineData();
 
 		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
 			showPage('failed_to_access'); // Access fail is valid here?
@@ -545,6 +560,9 @@
 			//syncEncDataToServer(multiEncryptedDatarecord);
 			storeDataToServer(fingerprint, multiEncryptedDatarecord);
 		}
+		// Replace goBack function with security reset and we should be secure right?
+		// Always reset plaintext data holder each time flow is completed.
+		resetOfflineData();
 	}
 
 	// Return either pass or fail to show outcome of store, pass or fail to user.
@@ -584,7 +602,7 @@
 	}// decryptAndDownloadFileOffline()
 
 	async function attemptBrowserAccess(inputId) {
-		goBackProgrammaticallyXandDontFireShowPage(4);
+		//goBackProgrammaticallyXandDontFireShowPage(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		extractInputData(inputId);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
@@ -598,6 +616,9 @@
 			showPage('access_plaintext');
 			await decryptAndShowPlaintextOffline(multiEncryptedDatarecord);
 		}
+		// Replace goBack function with security reset and we should be secure right?
+		// Always reset plaintext data holder each time flow is completed.
+		resetOfflineData();
 	}
 
 	async function decryptAndShowPlaintextOffline(multiEncryptedDatarecord) {

@@ -11,7 +11,8 @@
 </head>
 <style>
 
-	/* MAIN SITE
+	/* MAIN SITE */
+
 	/* There are 3 versions of the site, Online, Readonly, and Offline. The Offline version works as one standalone file that runs in a browser,
 	/* and needs no internet connection. The Offline can be generated from either the Online or Readonly versions of the site,
 	/* both of which hold the standalone.html offline database code inside a heredoc which is stored in function downloadStandalone() at the end of this file. */
@@ -152,12 +153,17 @@
 	// - Might merge with common
 	// - Need to devise wise way to use an if to filter out server comms functions that we wish to prune for security and otherwise.
 	<TMPL_INCLUDE NAME="online_server_comms.tmpl">
-	// Javascript native subtleCrypto lib based library used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
+	// Our custom library (based on subtleCrypto) used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
 	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
 	// Function call wrapper that allows online and offline use of catchUpload.
 	async function saveFileData(filedata){
 		passlockedData['data'] = await passlockEncrypt(filedata);
+	}
+
+	// Offline database is different because database password page.
+	function goHome(){
+		showPage("home");
 	}
 
 
@@ -400,7 +406,7 @@
 	}// computeFpAndDataForStore()
 
 	async function attemptCMDStore() {
-		goBackProgrammaticallyXandDontFireShowPage(7);
+		//goBackProgrammaticallyXandDontFireShowPage(7);
 		const fingerprintAndData = await computeFpAndDataForStore();
 		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
@@ -413,14 +419,14 @@
 	}
 
 	async function attemptBrowserStore(inputId, fromWrapper) {
-		// This ugly conditional is necessary for back functionality.
+		// This conditional is necessary for back functionality.
 		if (fromWrapper === 'true') {
 			// Got here from edit, use go back value for Access flow.
-			goBackProgrammaticallyXandDontFireShowPage(3);
+			//goBackProgrammaticallyXandDontFireShowPage(3);
 			showPageFlag = 'true';
 		} else {
 			// Got here from Store flow.
-			goBackProgrammaticallyXandDontFireShowPage(9);
+			//goBackProgrammaticallyXandDontFireShowPage(9);
 		}
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
@@ -450,13 +456,16 @@
 	}// computeFpForAccess()
 
 	async function attemptCMDAccess() {
-		goBackProgrammaticallyXandDontFireShowPage(3);
+		//goBackProgrammaticallyXandDontFireShowPage(3);
 		const fingerprint = await computeFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
 		const multiEncryptedDatarecord = await serverLoad(fingerprint);
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
+			await resetPasslock();
 			showPage('too_many_access_failures');
 		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+			// Don't automatically resetPasslock for third option - that disallows users from Editing.
+			await resetPasslock();
 			showPage('failed_to_access');
 		}else{
 			showPage('access_file');
@@ -464,8 +473,8 @@
 			holdFpForDelete(fingerprint);
 			await decryptAndDownloadFile(multiEncryptedDatarecord);
 		}
-		// Delete passlock for secruity.
-		resetPasslock();
+		// Delete passlock for security.
+		//await resetPasslock();
 	}// attemptCMDAccess()
 
 	async function decryptAndDownloadFile(multiEncryptedDatarecord) {
@@ -485,18 +494,19 @@
 	}// decryptAndDownloadFile()
 
 	async function attemptBrowserAccess(inputId) {
-		goBackProgrammaticallyXandDontFireShowPage(4);
+		//goBackProgrammaticallyXandDontFireShowPage(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprint = await computeFpForAccess();
 		const multiEncryptedDatarecord = await serverLoad(fingerprint);
 		// Report outcome of Access attempt.
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
+			await resetPasslock();
 			showPage('too_many_access_failures');
-			resetPasslock();
 		}else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+			// Don't automatically resetPasslock for third option - that disallows users from Editing.
+			await resetPasslock();
 			showPage('failed_to_access');
-			resetPasslock();
 		}else{
 			showPage('access_plaintext');
 			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
@@ -539,7 +549,7 @@
 	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
 	// Output: functionality.
 	async function attemptDelete() {
-		goBackProgrammaticallyXandDontFireShowPage(4);
+		//goBackProgrammaticallyXandDontFireShowPage(4);
 		// Load from server
 		const fingerprint = getStoredFp();
 		const deleteResponse = await serverDelete(fingerprint);
@@ -626,8 +636,6 @@
 		// All user passwords should be ready at this point. Compute Fingerprint.
 		const fingerprint = await computeFpForAccess();
 		const multiEncryptedDatarecord = await serverLoad(fingerprint);
-		// Change history 'pointer' to top of flow once job/operation executed.
-		goBackProgrammaticallyXandDontFireShowPage(3);
 		// Check that data is valid.
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
 			showPage('too_many_access_failures');
@@ -855,15 +863,15 @@
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Offline Database code generation function.
+	// 
 	// Once the 2 offline databases (encrypted, unencrypted) and their corresponding pointers are ready,
 	// this function is called which will deposit those datas into the code for the offline database below.
 	// 
 	// Generates standalone html file from static code held in multiline string below:
 	function downloadStandalone(offlineDatabaseUnenc, offlineDatabaseUnencPointer, offlineDatabaseEnc, offlineDatabaseEncPointer) {
 
-// !@# = search for this spot (turn on/off syntax highlighting)
-
-		// standalone.html static code.
+		// standalone.html code
 		const standaloneCode = `
 			<TMPL_INCLUDE NAME="offline_standalone.tmpl">
 		`;
