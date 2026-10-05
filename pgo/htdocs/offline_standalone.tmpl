@@ -110,13 +110,6 @@
 	const siteColor = 'red';
 	const hideReadonlyButtons = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
 
-	// Set Title to link to Home without dropping offline dbase.
-	document.getElementById("titletext").onclick = function() {
-		// Clear storage object for security.
-		resetOfflineData();
-		showPage('enter_offlinedbase_pass');
-	}
-
 	//////////////////////////////////////////////////////////////
 	//             Included Template Files                      //
 	//////////////////////////////////////////////////////////////
@@ -143,7 +136,7 @@
 
 	// Offline database is different because database password page.
 	function goHome(){
-		showPage("enter_offlinedbase_pass");
+		switchSite("enter_offlinedbase_pass");
 	}
 
 	// Clear data when user leaves Edit page.

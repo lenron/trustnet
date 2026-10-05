@@ -335,6 +335,24 @@
 		}
 	}// showPage()
 
+	//////////////////////////////////////////////////////////////
+	// Set Title to link to Home without reloading.
+	document.getElementById("titletext").onclick = function() {
+		// Clear storage object for security.
+		//resetData();
+		//showPage('home');
+
+		//switchSite('home');
+		goHome();
+	}
+
+	// Switch site from main to dev and back.
+	function switchSite(targetSite){
+		resetData();
+		saveThenShowPage(targetSite);
+	}
+
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							activatable_by_enter functionality								     		  //
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////

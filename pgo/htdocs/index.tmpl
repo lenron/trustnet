@@ -51,19 +51,22 @@
 		<div class="header_content" id="header_left">
 			<div class="header_title">
 				<!-- Reload page when Title is clicked in Main/Readonly site versions, offline uses showPage(). -->
-				<a href="https://<TMPL_VAR NAME=origin>" id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>
+				<!--<a href="https://<TMPL_VAR NAME=origin>" id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>-->
+			</div>
+			<div class="header_title">
+				<a id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>
 			</div>
 		</div>
 		<div class="header_content" id="header_right">
 			<div class="header_label" style="">
 				<!-- Header links use javascript:void, instructing browser to not leave the current page, which is handled by our function showPage(). -->
-				<a id="contact_link" href="javascript:void(0);" onclick="saveThenShowPage('faq_site')">FAQ</a>
+				<a id="contact_link" href="javascript:void(0);" onclick="switchSite('faq_site')">FAQ</a>
 			</div>
 			<div class="header_label" style="">
-				<a id="dev_site_link" href="javascript:void(0);" onclick="saveThenShowPage('dev_site')">DEV_SITE</a>
+				<a id="dev_site_link" href="javascript:void(0);" onclick="switchSite('dev_site')">DEV_SITE</a>
 			</div>
 			<div class="header_label" style="">
-				<a id="contact_link" href="javascript:void(0);" onclick="saveThenShowPage('contact_page_captcha')">CONTACT</a>
+				<a id="contact_link" href="javascript:void(0);" onclick="switchSite('contact_page_captcha')">CONTACT</a>
 			</div>
 		</div>
 	</div>
@@ -171,7 +174,7 @@
 
 	// Offline database is different because database password page.
 	function goHome(){
-		showPage("home");
+		switchSite("home");
 	}
 
 	// Clear data when user leaves Edit page.

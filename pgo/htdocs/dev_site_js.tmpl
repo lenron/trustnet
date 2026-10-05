@@ -4,34 +4,12 @@
 	//						Dev Site                                                 //
 	///////////////////////////////////////////////////////////////////////////////////
 
-	// HMTL is set up in 2 divs that sit alongside each other where only 1 is meant to be on at once.
-	// This toggle page function switches controls the display property of those divs, effectively switching to Dev Site and back.
-	// Can be used to add FAQ, mail sections if needed.
-	//
-	// Maybe change this to include an input parameter 'dev_site', 'faq', etc. if we move to that.
-	let main_page = true;
-	function toggleDevSite() {
-		if (main_page) {
-			// Switch to Dev site. Change link name to MAIN_SITE
-			document.getElementById("dev_site_toggle_link").innerHTML = "MAIN_SITE";
-			document.getElementById("dev_site").style.display = "flex";
-			document.getElementById("main_page").style.display = "none";
-			main_page = false;
-		} else {
-			// Switch to Main site. Change link name to DEV_SITE
-			document.getElementById("dev_site_toggle_link").innerHTML = "DEV_SITE";
-			document.getElementById("dev_site").style.display = "none";
-			document.getElementById("main_page").style.display = "flex";
-			main_page = true;
-		}
-	}
-
 	/////////////// 
 	function turnOffPinkBar() {
-		document.getElementById('openssl_sidebar_text').style.color = '#54c597';
-		document.getElementById('gcm1000_sidebar_text').style.color = '#54c597';
-		document.getElementById('aesctr_sidebar_text').style.color = '#54c597';
-		document.getElementById('triple_sidebar_text').style.color = '#54c597';
+		document.getElementById('openssl_sidebar_text').style.color = siteColor;
+		document.getElementById('gcm1000_sidebar_text').style.color = siteColor;
+		document.getElementById('aesctr_sidebar_text').style.color = siteColor;
+		document.getElementById('triple_sidebar_text').style.color = siteColor;
 	}
 
 	function turnOnPinkBarOpenSSL() {
@@ -70,29 +48,63 @@
 	});
 
 	// Add listeners for focus events for each cleartext + ciphertext window.
+	// OpenSSL
 	document.getElementById('openssl_cleartext').addEventListener("focus", (event) => {
 		activateEncOpenSSL();
 	});
 	document.getElementById('openssl_ciphertext').addEventListener("focus", (event) => {
 		activateDecOpenSSL();
 	});
+	document.getElementById('openssl_password').addEventListener("focus", (event) => {
+		if (openSSLEncrypt_f) {
+			showActiveEncOpenSSL();
+		}
+	});
+	// GCM-1000
 	document.getElementById('gcm1000_cleartext').addEventListener("focus", (event) => {
 		activateEncOBF1000();
 	});
 	document.getElementById('gcm1000_ciphertext').addEventListener("focus", (event) => {
 		activateDecOBF1000();
 	});
+	document.getElementById('gcm1000_password').addEventListener("focus", (event) => {
+		if (gcm1000Encrypt_f) {
+			showActiveEncOBF1000();
+		}
+	});
+	// AES-CTR
 	document.getElementById('aesctr_cleartext').addEventListener("focus", (event) => {
 		activateEncAESCTR();
 	});
 	document.getElementById('aesctr_ciphertext').addEventListener("focus", (event) => {
 		activateDecAESCTR();
 	});
+	document.getElementById('aesctr_password').addEventListener("focus", (event) => {
+		if (aesctrEncrypt_f) {
+			showActiveEncAESCTR();
+		}
+	});
+	// Triple Cipher
 	document.getElementById('triple_cleartext').addEventListener("focus", (event) => {
 		activateEncTriple();
 	});
 	document.getElementById('triple_ciphertext').addEventListener("focus", (event) => {
 		activateDecTriple();
+	});
+	document.getElementById('triple_password_1').addEventListener("focus", (event) => {
+		if (tripleEncrypt_f) {
+			showActiveEncTriple();
+		}
+	});
+	document.getElementById('triple_password_2').addEventListener("focus", (event) => {
+		if (tripleEncrypt_f) {
+			showActiveEncTriple();
+		}
+	});
+	document.getElementById('triple_password_3').addEventListener("focus", (event) => {
+		if (tripleEncrypt_f) {
+			showActiveEncTriple();
+		}
 	});
 
 	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
@@ -205,13 +217,8 @@
 		document.getElementById('openssl_outcome_message').style.visibility = 'hidden';
 	}
 
-	function activateEncOpenSSL() {
-		// Set flag
-		openSSLEncrypt_f = true;
-
-		// Turn off decryption error.
-		document.getElementById('openssl_outcome_message').style.visibility = 'hidden';
-
+	// Needed so if user clicks password the section will show that it is activated.
+	function showActiveEncOpenSSL() {
 		// Disable decrypt.
 		// Change button text to disabled color.
 		document.getElementById('openssl_dec_button').style.color = 'dimgray';
@@ -226,12 +233,22 @@
 		// Change button text to enabled color.
 		document.getElementById('openssl_enc_button').style.color = 'lime';
 		// Change outline, label to enabled color.
-		document.getElementById('openssl_cleartext_label').style.color = '#54c597';
-		document.getElementById('openssl_cleartext').style.color = '#54c597';
-		document.getElementById('openssl_cleartext').style.borderColor = '#54c597';
+		document.getElementById('openssl_cleartext_label').style.color = siteColor;
+		document.getElementById('openssl_cleartext').style.color = siteColor;
+		document.getElementById('openssl_cleartext').style.borderColor = siteColor;
 		// Enable cleartext textarea.
 		document.getElementById('openssl_cleartext').disabled = false;
+	}
 
+	function activateEncOpenSSL() {
+		// Set flag
+		openSSLEncrypt_f = true;
+
+		// Turn off decryption error.
+		document.getElementById('openssl_outcome_message').style.visibility = 'hidden';
+
+		// Use function for code re-use. showActive functions used for when user clicks password.
+		showActiveEncOpenSSL();
 		// Focus newly active textarea
 		document.getElementById('openssl_cleartext').focus();
 
@@ -250,9 +267,9 @@
 		// Change button text to enabled color.
 		document.getElementById('openssl_dec_button').style.color = 'lime';
 		// Change outline, label to diabled color.
-		document.getElementById('openssl_ciphertext_label').style.color = '#54c597';
-		document.getElementById('openssl_ciphertext').style.color = '#54c597';
-		document.getElementById('openssl_ciphertext').style.borderColor = '#54c597';
+		document.getElementById('openssl_ciphertext_label').style.color = siteColor;
+		document.getElementById('openssl_ciphertext').style.color = siteColor;
+		document.getElementById('openssl_ciphertext').style.borderColor = siteColor;
 		// Enable cleartext textarea.
 		document.getElementById('openssl_ciphertext').disabled = false;
 
@@ -350,13 +367,7 @@
 		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
 	}
 
-	function activateEncOBF1000() {
-		// Set flag
-		gcm1000Encrypt_f = true;
-
-		// Turn off decryption error.
-		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
-
+	function showActiveEncOBF1000() {
 		// Disable decrypt.
 		// Change button text to disabled color.
 		document.getElementById('gcm1000_dec_button').style.color = 'dimgray';
@@ -371,11 +382,21 @@
 		// Change button text to enabled color.
 		document.getElementById('gcm1000_enc_button').style.color = 'lime';
 		// Change outline, label to enabled color.
-		document.getElementById('gcm1000_cleartext_label').style.color = '#54c597';
-		document.getElementById('gcm1000_cleartext').style.color = '#54c597';
-		document.getElementById('gcm1000_cleartext').style.borderColor = '#54c597';
+		document.getElementById('gcm1000_cleartext_label').style.color = siteColor;
+		document.getElementById('gcm1000_cleartext').style.color = siteColor;
+		document.getElementById('gcm1000_cleartext').style.borderColor = siteColor;
 		// Enable cleartext textarea.
 		document.getElementById('gcm1000_cleartext').disabled = false;
+	}
+
+	function activateEncOBF1000() {
+		// Set flag
+		gcm1000Encrypt_f = true;
+
+		// Turn off decryption error.
+		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
+
+		showActiveEncOBF1000();
 
 		// Focus newly active textarea
 		document.getElementById('gcm1000_cleartext').focus();
@@ -395,9 +416,9 @@
 		// Change button text to enabled color.
 		document.getElementById('gcm1000_dec_button').style.color = 'lime';
 		// Change outline, label to diabled color.
-		document.getElementById('gcm1000_ciphertext_label').style.color = '#54c597';
-		document.getElementById('gcm1000_ciphertext').style.color = '#54c597';
-		document.getElementById('gcm1000_ciphertext').style.borderColor = '#54c597';
+		document.getElementById('gcm1000_ciphertext_label').style.color = siteColor;
+		document.getElementById('gcm1000_ciphertext').style.color = siteColor;
+		document.getElementById('gcm1000_ciphertext').style.borderColor = siteColor;
 		// Enable cleartext textarea.
 		document.getElementById('gcm1000_ciphertext').disabled = false;
 
@@ -498,13 +519,7 @@
 		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
 	}
 
-	function activateEncAESCTR() {
-		// Set flag
-		aesctrEncrypt_f = true;
-
-		// Turn off decryption error.
-		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
-
+	function showActiveEncAESCTR() {
 		// Disable decrypt.
 		// Change button text to disabled color.
 		document.getElementById('aesctr_dec_button').style.color = 'dimgray';
@@ -519,11 +534,21 @@
 		// Change button text to enabled color.
 		document.getElementById('aesctr_enc_button').style.color = 'lime';
 		// Change outline, label to enabled color.
-		document.getElementById('aesctr_cleartext_label').style.color = '#54c597';
-		document.getElementById('aesctr_cleartext').style.color = '#54c597';
-		document.getElementById('aesctr_cleartext').style.borderColor = '#54c597';
+		document.getElementById('aesctr_cleartext_label').style.color = siteColor;
+		document.getElementById('aesctr_cleartext').style.color = siteColor;
+		document.getElementById('aesctr_cleartext').style.borderColor = siteColor;
 		// Enable cleartext textarea.
 		document.getElementById('aesctr_cleartext').disabled = false;
+	}
+
+	function activateEncAESCTR() {
+		// Set flag
+		aesctrEncrypt_f = true;
+
+		// Turn off decryption error.
+		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
+
+		showActiveEncAESCTR();
 
 		// Focus newly active textarea
 		document.getElementById('aesctr_cleartext').focus();
@@ -543,9 +568,9 @@
 		// Change button text to enabled color.
 		document.getElementById('aesctr_dec_button').style.color = 'lime';
 		// Change outline, label to diabled color.
-		document.getElementById('aesctr_ciphertext_label').style.color = '#54c597';
-		document.getElementById('aesctr_ciphertext').style.color = '#54c597';
-		document.getElementById('aesctr_ciphertext').style.borderColor = '#54c597';
+		document.getElementById('aesctr_ciphertext_label').style.color = siteColor;
+		document.getElementById('aesctr_ciphertext').style.color = siteColor;
+		document.getElementById('aesctr_ciphertext').style.borderColor = siteColor;
 		// Enable cleartext textarea.
 		document.getElementById('aesctr_ciphertext').disabled = false;
 
@@ -637,13 +662,7 @@
 		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
 	}
 
-	function activateEncTriple() {
-		// Set flag
-		tripleEncrypt_f = true;
-
-		// Turn off decryption error.
-		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
-
+	function showActiveEncTriple() {
 		// Disable decrypt.
 		// Change button text to disabled color.
 		document.getElementById('triple_dec_button').style.color = 'dimgray';
@@ -658,11 +677,21 @@
 		// Change button text to enabled color.
 		document.getElementById('triple_enc_button').style.color = 'lime';
 		// Change outline, label to enabled color.
-		document.getElementById('triple_cleartext_label').style.color = '#54c597';
-		document.getElementById('triple_cleartext').style.color = '#54c597';
-		document.getElementById('triple_cleartext').style.borderColor = '#54c597';
+		document.getElementById('triple_cleartext_label').style.color = siteColor;
+		document.getElementById('triple_cleartext').style.color = siteColor;
+		document.getElementById('triple_cleartext').style.borderColor = siteColor;
 		// Enable cleartext textarea.
 		document.getElementById('triple_cleartext').disabled = false;
+	}
+
+	function activateEncTriple() {
+		// Set flag
+		tripleEncrypt_f = true;
+
+		// Turn off decryption error.
+		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
+
+		showActiveEncTriple();
 
 		// Focus newly active textarea
 		document.getElementById('triple_cleartext').focus();
@@ -682,9 +711,9 @@
 		// Change button text to enabled color.
 		document.getElementById('triple_dec_button').style.color = 'lime';
 		// Change outline, label to diabled color.
-		document.getElementById('triple_ciphertext_label').style.color = '#54c597';
-		document.getElementById('triple_ciphertext').style.color = '#54c597';
-		document.getElementById('triple_ciphertext').style.borderColor = '#54c597';
+		document.getElementById('triple_ciphertext_label').style.color = siteColor;
+		document.getElementById('triple_ciphertext').style.color = siteColor;
+		document.getElementById('triple_ciphertext').style.borderColor = siteColor;
 		// Enable cleartext textarea.
 		document.getElementById('triple_ciphertext').disabled = false;
 
