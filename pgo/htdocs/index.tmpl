@@ -46,34 +46,34 @@
 
 </style>
 <body>
-	<!-----------------------------------------------------SITE HEADER----------------------------------------------------------------------------------!>
-	<div class="header" id="header">
-		<div class="header_content" id="header_left">
-			<div class="header_title">
-				<!-- Reload page when Title is clicked in Main/Readonly site versions, offline uses showPage(). -->
-				<!--<a href="https://<TMPL_VAR NAME=origin>" id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>-->
-			</div>
-			<div class="header_title">
-				<a id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>
-			</div>
-		</div>
-		<div class="header_content" id="header_right">
-			<div class="header_label" style="">
-				<!-- Header links use javascript:void, instructing browser to not leave the current page, which is handled by our function showPage(). -->
-				<a id="contact_link" href="javascript:void(0);" onclick="switchSite('faq_site')">FAQ</a>
-			</div>
-			<div class="header_label" style="">
-				<a id="dev_site_link" href="javascript:void(0);" onclick="switchSite('dev_site')">DEV_SITE</a>
-			</div>
-			<div class="header_label" style="">
-				<a id="contact_link" href="javascript:void(0);" onclick="switchSite('contact_page_captcha')">CONTACT</a>
-			</div>
-		</div>
-	</div>
-	<!-----------------------------------------------------SITE HEADER----------------------------------------------------------------------------------!>
-
 	<!-----------------------------------------------------MAIN PAGE------------------------------------------------------------------------------------!>
 	<div class="main_page" id="main_page">
+		<!-----------------------------------------------------SITE HEADER----------------------------------------------------------------------------------!>
+		<div class="header" id="header">
+			<div class="header_content" id="header_left">
+				<div class="header_title">
+					<!-- Reload page when Title is clicked in Main/Readonly site versions, offline uses showPage(). -->
+					<!--<a href="https://<TMPL_VAR NAME=origin>" id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>-->
+				</div>
+				<div class="header_title">
+					<a id="titletext" style="font-size:30px; text-decoration:underline;" ><TMPL_VAR NAME=titletext></a>
+				</div>
+			</div>
+			<div class="header_content" id="header_right">
+				<div class="header_label" style="">
+					<!-- Header links use javascript:void, instructing browser to not leave the current page, which is handled by our function showPage(). -->
+					<a id="contact_link" href="javascript:void(0);" onclick="switchSite('faq_site')">FAQ</a>
+				</div>
+				<div class="header_label" style="">
+					<a id="dev_site_link" href="javascript:void(0);" onclick="switchSite('dev_site')">DEV_SITE</a>
+				</div>
+				<div class="header_label" style="">
+					<a id="contact_link" href="javascript:void(0);" onclick="switchSite('contact_page_captcha')">CONTACT</a>
+				</div>
+			</div>
+		</div>
+		<!-----------------------------------------------------SITE HEADER----------------------------------------------------------------------------------!>
+
 		<!--------------------------SITEWIDE STATUS & WARNINGS---------------------------!>
 		<!--------------------------Last Synced Status---------------------------!>
 		<div id='read_only_div' style="display:<TMPL_VAR NAME=show_last_updated>; justify-content:space-between; flex-direction: row;">
@@ -103,14 +103,13 @@
 		</div>
 		<!--------------------------SITEWIDE STATUS & WARNINGS---------------------------!>
 
-		<!-- FAQ, Dev Site page navigation is handled with showPage. We include it here in 'off' state, ready for user to click header link. -->
-		<!--------------------------DEV SITE----------------------------!>
-		<TMPL_INCLUDE NAME="dev_site_html.tmpl">
-		<!--------------------------FAQ SITE----------------------------!>
-		<TMPL_INCLUDE NAME="faq_html.tmpl">
-
 		<!-- Centers content on the page. -->
 		<div class="center_html" id="center_html" style="">
+			<!-- FAQ, Dev Site page navigation is handled with showPage. We include it here in 'off' state, ready for user to click header link. -->
+			<!--------------------------DEV SITE----------------------------!>
+			<TMPL_INCLUDE NAME="dev_site_html.tmpl">
+			<!--------------------------FAQ SITE----------------------------!>
+			<TMPL_INCLUDE NAME="faq_html.tmpl">
 
 			<!-- HTML for both main/readonly and offline included here. -->
 			<TMPL_INCLUDE NAME="common_html.tmpl">
@@ -118,14 +117,14 @@
 		</div>
 		<!--------------------------------------------Center HTML----------------------------------------------------!>
 
+		<!--------------------------------------------SITE FOOTER----------------------------------------------------!>
+		<div style="display:flex; flex-direction:column;">
+			<button id="go_offline_button" style="" onclick="saveThenShowPage('offline_dbase_2options');">CREATE OFFLINE DATABASE</button>
+		</div>
+		<!--------------------------------------------SITE FOOTER----------------------------------------------------!>
+
 	</div>
 	<!--------------------------------------------MAIN PAGE----------------------------------------------------!>
-
-	<!--------------------------------------------SITE FOOTER----------------------------------------------------!>
-	<div style="display:flex; flex-direction:column;">
-		<button id="go_offline_button" style="display:inline; flex-grow:1" onclick="saveThenShowPage('offline_dbase_2options');">CREATE OFFLINE DATABASE</button>
-	</div>
-	<!--------------------------------------------SITE FOOTER----------------------------------------------------!>
 
 </body>
 <script>

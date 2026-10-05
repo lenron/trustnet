@@ -22,68 +22,66 @@
 
 </style>
 <body>
-	<!--------------------------HEADER----------------------------!>
-	<div class="header" id="header">
-		<div class="header_content" id="header_left">
-			<div class="header_title">
-				<a id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-OFFLINEWORD</a>
-			</div>
-		</div>
-		<div class="header_content" id="header_right">
-			<div class="header_label" style="">
-				<a id="contact_link" href="javascript:void(0);" onclick="showPage('faq_site')">FAQ</a>
-			</div>
-			<div class="header_label" style="">
-				<a id="dev_site_link" href="javascript:void(0);" onclick="showPage('dev_site')">DEV_SITE</a>
-			</div>
-			<div class="header_label" style="">
-				<a id="contact_link" href="javascript:void(0);" onclick="showPage('contact_page_captcha')">CONTACT</a>
-			</div>
-
-		</div>
-	</div>
-
-	<!--------------------------Online Status---------------------------!>
-	<div id="offline_status_div" style="display:flex; justify-content:space-between; margin:10px;">
-		<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
-	</div>
-	<!--------------------------STALE FLOW WARNING---------------------------!>
-	<div id="stale_flow_div" style="display:none; justify-content:space-between; margin:10px;">
-		<label id="stale_flow_label" style="" >STALE FLOW! BACKING INTO A FLOW CAN CAUSE ISSUE! PLEASE START AT HOME.</label>
-	</div>
-	<!--------------------------STOP NAV WARNING---------------------------!>
-	<div id="stop_nav_div" style="display:none; justify-content:space-between; margin:10px; ">
-		<label id="stop_nav_label" style="color:red; " >NAVIGATION HALTED!<br>Backing from Browser Access flow end page is diallowed in order to preserve Edit functionality.</label>
-	</div>
-	<!--------------------------Offline Database Warning----------------------------!>
-	<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
-		<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
-	</div>
-
-	<!--------------------------MAIN PAGE--------------------------------------------------------------------------------------------------------------------------------------------------------!>
+	<!--------------------------MAIN PAGE---------------------------------------------------------------------------------------------------------!>
 	<div class="main_page" id="main_page">
+		<!--------------------------HEADER----------------------------!>
+		<div class="header" id="header">
+			<div class="header_content" id="header_left">
+				<div class="header_title">
+					<a id="titletext" style="font-size:30px; text-decoration:underline;" >PGO-OFFLINEWORD</a>
+				</div>
+			</div>
+			<div class="header_content" id="header_right">
+				<div class="header_label" style="">
+					<a id="contact_link" href="javascript:void(0);" onclick="showPage('faq_site')">FAQ</a>
+				</div>
+				<div class="header_label" style="">
+					<a id="dev_site_link" href="javascript:void(0);" onclick="showPage('dev_site')">DEV_SITE</a>
+				</div>
+				<div class="header_label" style="">
+					<a id="contact_link" href="javascript:void(0);" onclick="showPage('contact_page_captcha')">CONTACT</a>
+				</div>
 
-		<!--------------------------DEV SITE----------------------------!>
-		<TMPL_INCLUDE NAME="dev_site_html.tmpl">
-		<!--------------------------FAQ SITE----------------------------!>
-		<TMPL_INCLUDE NAME="faq_html.tmpl">
+			</div>
+		</div>
+
+		<!--------------------------Online Status---------------------------!>
+		<div id="offline_status_div" style="display:flex; justify-content:space-between; margin:10px;">
+			<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
+		</div>
+		<!--------------------------STALE FLOW WARNING---------------------------!>
+		<div id="stale_flow_div" style="display:none; justify-content:space-between; margin:10px;">
+			<label id="stale_flow_label" style="" >STALE FLOW! BACKING INTO A FLOW CAN CAUSE ISSUE! PLEASE START AT HOME.</label>
+		</div>
+		<!--------------------------STOP NAV WARNING---------------------------!>
+		<div id="stop_nav_div" style="display:none; justify-content:space-between; margin:10px; ">
+			<label id="stop_nav_label" style="color:red; " >NAVIGATION HALTED!<br>Backing from Browser Access flow end page is diallowed in order to preserve Edit functionality.</label>
+		</div>
+		<!--------------------------Offline Database Warning----------------------------!>
+		<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
+			<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
+		</div>
 
 		<!--------------------------Div Housing for Flow Pages----------------------------!>
 		<div class="center_html" id="center_html" style="">
+			<!--------------------------DEV SITE----------------------------!>
+			<TMPL_INCLUDE NAME="dev_site_html.tmpl">
+			<!--------------------------FAQ SITE----------------------------!>
+			<TMPL_INCLUDE NAME="faq_html.tmpl">
 
 			<TMPL_INCLUDE NAME="common_html.tmpl">
 
 		</div> <!-------------------------------------------- Center HTML----------------------------------------------------!>
-	</div><!-------------------------------------------- Main Site ----------------------------------------------------!>
 
-	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
-	<div style="display:flex; flex-direction:column;">
-		<div id="savetodisk_warning" style="background-color:gray; display:none; flex-direction:column;">
-			<h2>NEW DATA HAS BEEN STORED TO MEMORY. IN ORDER TO SAVE TO DISK PLEASE CLICK THIS BUTTON TO SAVE CURRENTLY RUNNING HTML TO A FILE. THIS WILL ALLOW YOUR DATA TO PERSIST THROUGH REBOOTS.</h2>
-			<button id='' style="align-self:center;" onclick="saveToDisk(); saveThenShowPage('offline_home')">SAVE DATA TO DISK</button>
+		<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
+		<div style="display:flex; flex-direction:column;">
+			<div id="savetodisk_warning" style="background-color:gray; display:none; flex-direction:column;">
+				<h2>NEW DATA HAS BEEN STORED TO MEMORY. IN ORDER TO SAVE TO DISK PLEASE CLICK THIS BUTTON TO SAVE CURRENTLY RUNNING HTML TO A FILE. THIS WILL ALLOW YOUR DATA TO PERSIST THROUGH REBOOTS.</h2>
+				<button id='' style="align-self:center;" onclick="saveToDisk(); saveThenShowPage('offline_home')">SAVE DATA TO DISK</button>
+			</div>
 		</div>
-	</div>
-	<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
+		<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
+	</div><!-------------------------------------------- Main Site ----------------------------------------------------!>
 
 </body>
 <!----------------------------------JAVASCRIPT-------------------------------------!>
