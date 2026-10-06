@@ -36,7 +36,7 @@
 			<div class="flow_pages show_page_activatable home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center;">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button hide_readonly_buttons" id='' style="flex-grow:1; " onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
@@ -47,7 +47,7 @@
 				<h2>FOR SECURITY PLEASE ENTER ALL PASSWORDS AND DATA IN UNDER 5 MINUTES.</h2>
 				<h2>YOU MAY ALSO SEE THIS ERROR IF YOU USED BACK. IN ORDER TO EXECUTE PROPERLY, STORE AND ACCESS FLOWS MUST BE COMPLETED WITHOUT NAVIGATING AWAY FROM MAIN SITE.</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button hide_readonly_buttons" id='' style="flex-grow:1; " onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
 			</div>
@@ -166,8 +166,8 @@
 				</div>
 				<div class="button_pair" id="" style="display:flex">
 					<button class="" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS DATA</button>
-					<button class="" id='' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="saveThenShowPage('store_codeword')">STORE DATA</button>
-					<button class="" id='' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="showDeleteOverlay('overlay_delete_cmd')">DELETE DATA</button>
+					<button class=" hide_readonly_buttons" id='' style="flex-grow:1; " onclick="saveThenShowPage('store_codeword')">STORE DATA</button>
+					<button class=" hide_readonly_buttons" id='' style="flex-grow:1; " onclick="showDeleteOverlay('overlay_delete_cmd')">DELETE DATA</button>
 				</div>
 			</div>
 			<!---------------------------END CMD LINE Access Flow-----------------------!>
@@ -192,8 +192,8 @@
 					<div id='edit_input_warning' style="flex-grow:1;display:none;">
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
-					<button class="" id='editdata_button' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="editData()">EDIT DATA</button>
-					<button class="" id='delete_button' style="flex-grow:1; display:var(--hide-readonly-store-buttons);" onclick="showDeleteOverlay('overlay_delete_browser')">DELETE DATA</button>
+					<button class=" hide_readonly_buttons" id='editdata_button' style="flex-grow:1; " onclick="editData()">EDIT DATA</button>
+					<button class=" hide_readonly_buttons" id='delete_button' style="flex-grow:1; " onclick="showDeleteOverlay('overlay_delete_browser')">DELETE DATA</button>
 				</div>
 			</div>
 			<!---------------------------END BROWSER Access Flow-----------------------!>

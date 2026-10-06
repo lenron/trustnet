@@ -4,27 +4,52 @@
 <meta content="utf-8" http-equiv="encoding" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <head>
+<!-- Import Orbitron font from google. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 </head>
+<!---------------------CSS STYLE Section - Where CSS code which modifies how HTML code looks lives.-------------------------------------------------------------------!>
 <style>
 
 	/* OFFLINE DATABASE */
 
-	/* Set color variable to offline red for both online and readonly site versions. */
+	/* There are 3 versions of the site, Online/Readonly and Offline which are maintained in two different code sets: index.tmpl (Online/Readonly) and offline_standalone.tmpl. */
+
+	/* The Online/Readonly versions differ in two ways:
+	/*   - Each use a different base color (Online Green: #54c597 and Readonly Blue: #4491d5)
+	/*   - Store operations are removed from Readonly. */
+
+	/* The Offline version works as one standalone file that fully runs in a browser, hiding data in a block of random text that lives in an HTML DOM object and thus needs no internet connection.
+	/* The Offline site which holds the Offline Database can be generated from either the Online or Readonly versions of the site.
+	/* Code for the Offline site, standalone.html, is stored in a heredoc which is located in function downloadStandalone() at the end of this file. */
+
+	/* Perl HTML::Templates are used to manage generation and deployment of each of the site versions. TMPL_VAR values are injected from perl and
+	/* generally differentiate Online and Readonly site versions. TMPL_INCLUDE values don't change and serve to import code that is re-used while
+	/* helping to manage the codebase as well as allowing syntax highlighting to work in those included .tmpl files.
+	/* The Offline Database standalone.html code is generated from a file nearly identical to this one called offline_standalone.tmpl
+	/* which is kept similar in order to preserve readable structure. */
+
+	/* We use a perl module HTML::Template which helps with code reuse / readability / maintainability. */
+	/* TMPL_VAR values are injected from the perl script while TMPL_INCLUDE inserts all the code in a separate file at the location in this file */
+
+	/* Set CSS color variable depending on which site this is. So down in the heredoc this will be set to red for the offline database and readonly will be chosen from perl. */
+	/* Currently needed to do it this way so that offline database will be red no matter which site type generated it: online or readonly. */
 	:root {
 		--site-type-color: red;
+		--hide-readonly-store-buttons: <TMPL_VAR NAME=hide_readonly_store_buttons>;
 	}
 
+	/* Insert CSS code common to main, readonly, and standalone.html offline database versions of the site. */
 	<TMPL_INCLUDE NAME="common_css.tmpl">
 
+</style><!---------------------------------------------END STYLE/CSS--------------------------------------------------------------------!>
 
-</style>
+<!-----------------------------------------------------HTML BODY - Where HTML code lives.------------------------------------------------------------------------------------!>
 <body>
-	<!--------------------------MAIN PAGE---------------------------------------------------------------------------------------------------------!>
+	<!-----------------------------------------------------MAIN PAGE------------------------------------------------------------------------------------!>
 	<div class="main_page" id="main_page">
-		<!--------------------------HEADER----------------------------!>
+		<!-----------------------------------------------------SITE HEADER----------------------------------------------------------------------------------!>
 		<div class="header" id="header">
 			<div class="header_content" id="header_left">
 				<div class="header_title">
@@ -33,6 +58,7 @@
 			</div>
 			<div class="header_content" id="header_right">
 				<div class="header_label" style="">
+					<!-- Header links use javascript:void, instructing browser to not leave the current page. We handle navigation by changing visibility of HTML using showPage() and related functions. -->
 					<a id="contact_link" href="javascript:void(0);" onclick="switchSite('faq_site')">FAQ</a>
 				</div>
 				<div class="header_label" style="">
@@ -41,10 +67,10 @@
 				<div class="header_label" style="">
 					<a id="contact_link" href="javascript:void(0);" onclick="switchSite('contact_page_captcha')">CONTACT</a>
 				</div>
-
 			</div>
-		</div>
+		</div><!-----------------------------------------------------END SITE HEADER----------------------------------------------------------------------------------!>
 
+		<!--------------------------SITEWIDE STATUS & WARNINGS---------------------------!>
 		<!--------------------------Online Status---------------------------!>
 		<div id="offline_status_div" style="display:flex; justify-content:space-between; margin:10px;">
 			<label id="offline_label" style="" >YOU'RE OFFLINE. SERVER WILL NOT BE UPDATED WITH ANY NEW SAVES.</label>
@@ -61,41 +87,48 @@
 		<div id="full_offline_dbase_warning_div" style="display:flex; justify-content:space-between;">
 			<label id="full_offline_dbase_warning" style="display:none; color:red;" >YOUR OFFLINE DATABASE IS FULL. ADDITIONAL STORES WILL NOT BE SAVED TO IT. IF ADDITIONAL STORAGE IS NEEDED, PLEASE INITIALIZE A NEW OFFLINE DATABASE (AFTER PROPERLY STORING THIS ONE).</label>
 		</div>
+		<!--------------------------END SITEWIDE STATUS & WARNINGS---------------------------!>
 
 		<!--------------------------Div Housing for Flow Pages----------------------------!>
+		<!-- Holds all show_page_activatable divs which function as 'pages' the user can navigate to. These divs are centered on the page. -->
 		<div class="center_html" id="center_html" style="">
+			<!-- FAQ, Dev Site page navigation is handled with showPage. We include it here in 'off' state, ready for user to click header link. -->
 			<!--------------------------DEV SITE----------------------------!>
 			<TMPL_INCLUDE NAME="dev_site_html.tmpl">
 			<!--------------------------FAQ SITE----------------------------!>
 			<TMPL_INCLUDE NAME="faq_html.tmpl">
 
+			<!-- HTML for both main/readonly and offline included here. -->
 			<TMPL_INCLUDE NAME="common_html.tmpl">
 
-		</div> <!-------------------------------------------- Center HTML----------------------------------------------------!>
+		</div><!--------------------------------------------END Center HTML----------------------------------------------------!>
 
-		<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
+		<!--------------------------------------------SITE FOOTER----------------------------------------------------!>
 		<div style="display:flex; flex-direction:column;">
 			<div id="savetodisk_warning" style="background-color:gray; display:none; flex-direction:column;">
 				<h2>NEW DATA HAS BEEN STORED TO MEMORY. IN ORDER TO SAVE TO DISK PLEASE CLICK THIS BUTTON TO SAVE CURRENTLY RUNNING HTML TO A FILE. THIS WILL ALLOW YOUR DATA TO PERSIST THROUGH REBOOTS.</h2>
 				<button id='' style="align-self:center;" onclick="saveToDisk(); saveThenShowPage('offline_home')">SAVE DATA TO DISK</button>
 			</div>
-		</div>
-		<!-------------------------------------------- Footer Buttons ----------------------------------------------------!>
-	</div><!-------------------------------------------- Main Site ----------------------------------------------------!>
+		</div><!--------------------------------------------END SITE FOOTER----------------------------------------------------!>
 
-</body>
-<!----------------------------------JAVASCRIPT-------------------------------------!>
-<!----------------------------------JAVASCRIPT-------------------------------------!>
-<!----------------------------------JAVASCRIPT-------------------------------------!>
+	</div><!--------------------------------------------END MAIN PAGE----------------------------------------------------!>
+
+</body><!--------------------------------------------END HTML BODY----------------------------------------------------!>
+
+<!-----------------------------------------------------SCRIPT is where Javascript code lives.------------------------------------------------------------------------------------!>
 <script>
-	//////////////////////////////////////////////////////////////
-	//              OFFLINE DATABASE SITE                       //
-	//////////////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//              OFFLINE DATABASE SITE                                                                                                   //
+	//                                                                                                                                      //
+	// Common code that is used by all site versions reside in TMPL_INCLUDE files.                                                          //
+	// Code that must be different lives in either this: index.tmpl or offline_standalone.tmpl which holds the Offline version of the site. //
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 	//////////////////////////////////////////////////////////////
 	//                The onload Function                       //
 	//////////////////////////////////////////////////////////////
-
 	//The load event is fired when the whole page has loaded.
 	window.onload = async function() {
 		// Initial server online check.
@@ -104,8 +137,10 @@
 		showPage('enter_offlinedbase_pass');
 	}
 
-	// Allows things to switch to offline database variable for both main, readonly site versions.
+	// These variables allow switching to offline database variable value in offline_standalone.tmpl code set while preserving main/readonly site differences.
 	const siteColor = 'red';
+	// This could be replaced with just the TMPL_VAR call. Serves for readability I guess.
+	// TMPL_VAR calls are properly injected with values from perl even in TMPL_INCLUDEs that are included inside other TMPL_INCLUDEs.
 	const hideReadonlyButtons = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
 
 	//////////////////////////////////////////////////////////////
@@ -127,18 +162,22 @@
 	// Javascript native subtleCrypto lib based library used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
 	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
-	// Function call wrapper that allows online and offline use of catchUpload.
-	async function saveFileData(filedata){
-		offlineData['data'] = filedata;
-	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Wrappers that allow a single function to be called that has differing function between main and offlinse site versions. //
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
 	// Offline database is different because database password page.
-	function goHome(){
+	function goHome() {
 		switchSite("enter_offlinedbase_pass");
 	}
 
+	// Function call wrapper that allows online and offline use of catchUpload.
+	async function saveFileData(filedata) {
+		offlineData['data'] = filedata;
+	}
+
 	// Clear data when user leaves Edit page.
-	function resetData(){
+	function resetData() {
 		resetOfflineData();
 	}
 
