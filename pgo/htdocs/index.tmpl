@@ -162,7 +162,7 @@
 	// Fetch based server communication functions that interact with an online server.
 	// - Might merge with common
 	// - Need to devise wise way to use an if to filter out server comms functions that we wish to prune for security and otherwise.
-	<TMPL_INCLUDE NAME="online_server_comms.tmpl">
+	<TMPL_INCLUDE NAME="server_comms.tmpl">
 	// Our custom library (based on subtleCrypto) used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
 	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
@@ -420,7 +420,6 @@
 	}// computeFpAndDataForStore()
 
 	async function attemptCMDStore() {
-		//goBackProgrammaticallyXandDontFireShowPage(7);
 		const fingerprintAndData = await computeFpAndDataForStore();
 		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
@@ -436,11 +435,9 @@
 		// This conditional is necessary for back functionality.
 		if (fromWrapper === 'true') {
 			// Got here from edit, use go back value for Access flow.
-			//goBackProgrammaticallyXandDontFireShowPage(3);
 			showPageFlag = 'true';
 		} else {
 			// Got here from Store flow.
-			//goBackProgrammaticallyXandDontFireShowPage(9);
 		}
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
@@ -470,7 +467,6 @@
 	}// computeFpForAccess()
 
 	async function attemptCMDAccess() {
-		//goBackProgrammaticallyXandDontFireShowPage(3);
 		const fingerprint = await computeFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
 		const multiEncryptedDatarecord = await serverLoad(fingerprint);
@@ -508,7 +504,6 @@
 	}// decryptAndDownloadFile()
 
 	async function attemptBrowserAccess(inputId) {
-		//goBackProgrammaticallyXandDontFireShowPage(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprint = await computeFpForAccess();
@@ -566,7 +561,6 @@
 	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
 	// Output: functionality.
 	async function attemptDelete() {
-		//goBackProgrammaticallyXandDontFireShowPage(4);
 		// Load from server
 		const fingerprint = getStoredFp();
 		const deleteResponse = await serverDelete(fingerprint);

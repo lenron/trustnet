@@ -33,13 +33,13 @@
 			</div>
 			<div class="header_content" id="header_right">
 				<div class="header_label" style="">
-					<a id="contact_link" href="javascript:void(0);" onclick="showPage('faq_site')">FAQ</a>
+					<a id="contact_link" href="javascript:void(0);" onclick="switchSite('faq_site')">FAQ</a>
 				</div>
 				<div class="header_label" style="">
-					<a id="dev_site_link" href="javascript:void(0);" onclick="showPage('dev_site')">DEV_SITE</a>
+					<a id="dev_site_link" href="javascript:void(0);" onclick="switchSite('dev_site')">DEV_SITE</a>
 				</div>
 				<div class="header_label" style="">
-					<a id="contact_link" href="javascript:void(0);" onclick="showPage('contact_page_captcha')">CONTACT</a>
+					<a id="contact_link" href="javascript:void(0);" onclick="switchSite('contact_page_captcha')">CONTACT</a>
 				</div>
 
 			</div>
@@ -123,7 +123,7 @@
 	// Fetch based server communication functions that interact with an online server.
 	// - Might merge with common
 	// - Need to devise wise way to use an if to filter out server comms functions that we wish to prune for security and otherwise.
-	<TMPL_INCLUDE NAME="online_server_comms.tmpl">
+	<TMPL_INCLUDE NAME="server_comms.tmpl">
 	// Javascript native subtleCrypto lib based library used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
 	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
@@ -356,7 +356,7 @@
 	function resetOfflineData() {
 		offlineData = {};
 	}
-
+	// please change function name.
 	async function superCheckEncPassword() {
 		resetOfflineData();
 		extractInputData('set_offlineDBasePass_input');
@@ -417,6 +417,14 @@
 	// Extract, encrypt, and store data at inputId to global passlockedData Object.
 	function extractInputData(inputId) {
 		const keyword = extractKeyword(inputId);
+		// Show error page if a stale flow is detected. Navigating away from a flow should cause it to delete data.
+		// This is intended to check if data is deleted so an error page explaining to the user what to do can be shown.
+		console.log("keyword: ", keyword);
+		console.log(offlineData['codeword']);
+		if (keyword !== 'codeword' && offlineData['codeword'] === undefined) {
+			saveThenShowPage('timed_out_home');
+			throw new Error("STALE FLOW ERROR.");
+		}
 		console.log("Extracting keyword: " + keyword);
 		const plaintextData = extractPlaintextData(inputId);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
@@ -436,13 +444,12 @@
 		}else{
 			showPassCheckFailWarnings();
 			// Re-iterated password doesn't match original.
-			throw Error("Offline Passwords are different!");
+			throw new Error("Offline Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
 		}
 	} // checkData()
 
 	async function attemptCMDStore() {
-		//goBackProgrammaticallyXandDontFireShowPage(7);
 		//const fingerprintAndData = await computeFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const multiEncryptedDatarecord = await encryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['data']);
@@ -475,11 +482,9 @@
 	async function attemptBrowserStore(inputId, fromWrapper) {
 		if (fromWrapper === 'true') {
 			// Got here from edit, use go back value for Access flow.
-			//goBackProgrammaticallyXandDontFireShowPage(3);
 			showPageFlag = 'true';
 		} else {
 			// Got here from Store flow.
-			//goBackProgrammaticallyXandDontFireShowPage(9);
 		}
 		extractInputData(inputId);
 		//const fingerprintAndData = await computeFpAndDataForStore();
@@ -527,7 +532,6 @@
 	}
 
 	async function attemptCMDAccess() {
-		//goBackProgrammaticallyXandDontFireShowPage(3);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		// Add additional parameter?
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
@@ -540,13 +544,9 @@
 			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
 			decryptAndDownloadFileOffline(multiEncryptedDatarecord);
 		}
-		// Replace goBack function with security reset and we should be secure right?
-		// Always reset plaintext data holder each time flow is completed.
-		//resetOfflineData();
 	}
 
 	async function attemptSyncToOnline(inputId) {
-		//goBackProgrammaticallyXandDontFireShowPage(2);
 		// Get ctrPass - pass2.
 		extractInputData(inputId);
 		// First load encrypted data from offline database.
@@ -604,7 +604,6 @@
 	}// decryptAndDownloadFileOffline()
 
 	async function attemptBrowserAccess(inputId) {
-		//goBackProgrammaticallyXandDontFireShowPage(4);
 		// Encrypt and save OpenSSL password to passlockedData object.
 		extractInputData(inputId);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);

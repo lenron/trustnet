@@ -232,16 +232,6 @@
 		} else {
 			showPage(event.state.page);
 		}
-/*
-		// Use event.state or window.location to update content
-		if (showPageFlag === 'true') { // Don't show page flicker to user as flow job is completing.
-			showPage(event.state.page);
-		} else {
-			// Skip showPage for this popstate:
-			// we don't want to flicker as we're history.go()ing back programmatically if the user clicks back after completing a flow job.
-			showPageFlag = 'true';
-		}
-*/
 	});
 
 	let onAccessEditPage_f = false;
@@ -277,19 +267,6 @@
 		saveCurrentStateToHistorySoBackWillWork();
 		showPage(activateThisPage);
 	}// saveThenShowPage()
-
-	// If true, activate showPage when popstate event fires. We set to false when we set the back 'pointer' programmatically.
-	let showPageFlag = 'true';
-	// For overall security and because the passlock system wasn't designed for users to browser back into it,
-	// once a 'flow' completes, we move the history pointer so that if they do hit back, it will take them to the home page.
-	// Browser security design disallow the removal of history records, which would be a cleaner solution than this function.
-	// Programmers can add entries to history, but cannot remove them. This function is a workaround that needs to be tuned for each usage.
-	function goBackProgrammaticallyXandDontFireShowPage(numPlaces) {
-		// Don't flicker between multiple pages as the history pointer is programmatically moved to the home page.
-		showPageFlag = 'false';
-		// Move the pointer back a variable number of places. Each case of this number was found by trial and error.
-		history.go(-numPlaces);
-	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							          Show Page                                                           //
