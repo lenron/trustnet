@@ -1,4 +1,12 @@
 // This <script> turns on syntax highlighting.
+////////////////////////////////////////////////////////////////////
+//  core_crypto.tmpl
+//  
+//  Contains:
+//    - MEDRecord Cryptosystem Documentation
+//    - MEDRecord Cryptosystem Library
+//    - 
+////////////////////////////////////////////////////////////////////
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//                                   The MEDRecord Cryptosystem                                                              //
@@ -13,7 +21,7 @@
 	// To modify data a user may enter the 4 passwords previously used to store the data they intend to change (or delete).
 	//
 	// The online database is meant to be accessible from anywhere in the world and mirrored on read-only backup sites intending
-	// greater than 5 9's uptime for reachability of data (if not modification access provided we stick with monolithic write design).
+	// greater than 5 9's uptime for reachability of data (given monolithic write design).
 	//
 	// The offline database is meant to work in a browser with zero internet access, storing data to a block of base64 characters
 	// in order to obfuscate the exact location of user data (providing cryptographic obfuscation). Users may also transfer encrypted
@@ -900,6 +908,11 @@
 		return dataBytesWithSalt;
 	}// addStringLiteralSalted()
 
+
+	////////////////////////////////////////////////////////
+	//				2Byte Functions                       //
+	////////////////////////////////////////////////////////
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Add a 2ByteHeader representing the length of the data and also pad with random filler to satisfy output length of 1000 base64 chars.
 	//  OBF-1000 Internal Function - both source and destination.
@@ -1275,7 +1288,6 @@
 		return saltAndDataUint8.toBase64();
 	}// encryptAESCTR()
 
-
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality: Decrypts AES-CTR encrypted ciphertext using the plaintext and password input parameters.
 	//
@@ -1468,11 +1480,13 @@
 		return await utf8DecryptOpenSSL(obf1000Decrypted, opensslPass);
 	}// decryptTriple()
 
+	// Helper function that converts utf8 encoded (readable) text to base64.
 	function utf8ToBase64(inputUtf8) {
 		const inputUint8 = new TextEncoder().encode(inputUtf8);
 		return inputUint8.toBase64();
 	}
 
+	// Helper function that converts base64 to utf8 encoded (readable) text.
 	function base64ToUtf8(input64) {
 		const inputUint8 = Uint8Array.fromBase64(input64);
 		const inputUtf8 = new TextDecoder().decode(inputUint8);
@@ -1490,56 +1504,6 @@
 		const plaintext64 = await decryptOpenSSL(ciphertext, password);
 		return base64ToUtf8(plaintext64);
 	}// utf8DecryptOpenSSL()
-
-
-	////////////////////////////////////////////////////////
-	//				2Byte Functions                       //
-	////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-	////////////////////////////////////////////////////////
-	//				7Byte Functions                       //
-	////////////////////////////////////////////////////////
-
-	// Find set of bytes that compute to targetValue.
-	function find7ByteSetForValue(targetValue) {
-		let computedValue;
-		let sevenByteUint8;
-		do{
-			// Roll 7 random bytes.
-			sevenByteUint8 = window.crypto.getRandomValues(new Uint8Array(7));
-			computedValue = eval7ByteValue(sevenByteUint8);
-		}while(computedValue != targetValue);
-		return sevenByteUint8;
-	}// find7ByteSetForValue()
-
-	// Convert 7Byte array into mathematical expression then evaluate it.
-	function eval7ByteValue(sevenByteUint8) {
-		// Start with empty expression.
-		let mathExpression = "";
-		// Index is useful as byte order determines whether to convert to number or symbol so use 'base' for loop:
-		for(let i=0; i < 7; i++) {
-			if (i % 2 === 0) {
-				// Even index bytes --+  numbers
-				mathExpression += sevenByteUint8[i];
-			}else{
-				// Odd index bytes --+ symbols
-				if (sevenByteUint8[i] % 2 === 0) {
-					// Even bytes convert to (+)
-					mathExpression += "+";
-				}else{
-					// Odd bytes convert to (-)
-					mathExpression += "-";
-				}
-			}
-		}
-		return Math.abs(eval(mathExpression));
-	}// eval7ByteValue()
 
 	//////////////////////////////////////////
 	//		Misc Functions					//
