@@ -135,7 +135,7 @@
 		await updateOnlineStatus();
 		addListenersToAllCopyToClick();
 		showPage('enter_offlinedbase_pass');
-	}
+	}// window.onload
 
 	// These variables allow switching to offline database variable value in offline_standalone.tmpl code set while preserving main/readonly site differences.
 	const siteColor = 'red';
@@ -196,7 +196,7 @@
 		// Compile replacement database. 
 		// <Data in database until recordStart> + <fingerprint data> + <MED data> + <Data in database until recordEnd>
 		return offlineDatabase.substring(0, recordStart) + fingerprint + multiEncryptedDatarecord + offlineDatabase.substring(recordEnd);
-	}
+	}// storeFingerprintAndDataToOfflineDBase()
 
 	// Used for delete, RandDAta is needed to backfill keeping offlineDatabase the same length.
 	// Used for store when fingerprint exists.
@@ -209,7 +209,7 @@
 		}
 		const recordEnd = fingerprintStartIndex + FINGERPRINT_AND_MEDRECORD_LENGTH_BASE64;
 		return offlineDatabase.substring(0, fingerprintStartIndex) + fingerprint + newData + offlineDatabase.substring(recordEnd);
-	}
+	}// replaceFingerprintAndData()
 
 	// Selects either Unencrypted or Encrypted database pointer based on if user inputted an offline database password at the start of the Flow.
 	async function getOfflineDBasePointer() {
@@ -220,7 +220,7 @@
 			const encPointer = document.getElementById("offline_dbase_enc_pointer").innerHTML;
 			return await decryptTriple(offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], encPointer);
 		}
-	}
+	}// getOfflineDBasePointer()
 
 	// Returns either Unencrypted or Encrypted full offline database depending if user entered an offline database password.
 	async function getOfflineDBase() {
@@ -233,7 +233,7 @@
 			const encOfflineDatabase = document.getElementById("offline_dbase_enc").innerHTML;
 			return await decryptAESCTR(encOfflineDatabase, offlineData['offlineDBasePass']);
 		}
-	}
+	}// getOfflineDBase()
 
 	// Saves pointer to memory-stored HTML.
 	async function setOfflineDBasePointer(pointer) {
@@ -243,7 +243,7 @@
 		}else{
 			document.getElementById("offline_dbase_enc_pointer").innerHTML = await encryptTriple(offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], offlineData['offlineDBasePass'], pointer);
 		}
-	}
+	}// setOfflineDBasePointer()
 
 	// Saves full database to its home in html memory.
 	async function setOfflineDBase(dbase) {
@@ -253,8 +253,9 @@
 		}else{
 			document.getElementById("offline_dbase_enc").innerHTML = await encryptAESCTR(dbase, offlineData['offlineDBasePass']);
 		}
-	}
+	}// setOfflineDBase()
 
+	// Check that fingerprint is the correct length and is composed of only base64 characters.
 	function checkFingerprintAndData(fingerprint, multiEncryptedDatarecord) {
 		if (!checkFingerprintIsValid(fingerprint)) {
 			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.');
@@ -267,8 +268,9 @@
 		}else{
 			console.log("DATA IS VALID!");
 		}
-	}
+	}// checkFingerprintAndData()
 
+	// Determine which database (encrypted or uncrypted) we're currently using.
 	function getOfflineDatabaseType() {
 		// To determine which database pointer to return, first check if user entered an Offline Database password.
 		if (offlineData['offlineDBasePass'] === undefined) {
@@ -276,8 +278,9 @@
 		}else{
 			return "encrypted";
 		}
-	} 
+	}// getOfflineDatabaseType()
 
+	// If pointer is over 999 return false.
 	function checkIfOfflineDBaseIsFull(pointer) {
 		// Check if offline database is full.
 		if (pointer > MAX_POINTER_VALUE) {//999 is ok because we should still be able to store to the last location in the 1000 record databaase. 
@@ -288,16 +291,16 @@
 			document.getElementById("full_offline_dbase_warning").style.display = "none";
 			return false;
 		}
-	}
+	}// checkIfOfflineDBaseIsFull()
 
+	// -1 will indicate that the fingerprint was not found.
 	function fingerprintExists(fingerprint, offlineDatabase) {
-		// -1 will indicate that the fingerprint was not found.
 		if (offlineDatabase.indexOf(fingerprint) >= 0) {
 			return true;
 		}else{
 			return false;
 		}
-	}
+	}// fingerprintExists()
 
 	// Store single record to the offline database selected by if user enters offline database password or not.
 	async function storeOfflineDBase(fingerprint, multiEncryptedDatarecord) {
@@ -324,7 +327,7 @@
 		// Save pointer and offline database to in-memory HTML. ENC or UNENC determined by if an offline database ENC password was entered at flow start.
 		await setOfflineDBasePointer(pointer);
 		await setOfflineDBase(replacement_offlineDatabase);
-	}
+	}// storeOfflineDBase()
 
 	// Try to load record at fingerprint. Works on both ENC and UNENC offline databases.
 	async function attemptLoadOfflineDBase(fingerprint) {
@@ -347,15 +350,16 @@
 		const dataEndIndex = fingerprintEndIndex + MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64;
 		// Get the data between fingerprintEndIndex and dataEndIndex.
 		return offlineDatabase.substring(fingerprintEndIndex, dataEndIndex);
-	}
+	}// getRecordOfflineDBase()
 
+	// Check fingerprint validity for deleteRecordOfflineDBase()
 	function checkFingerprint(fingerprint) {
 		if (!checkFingerprintIsValid(fingerprint)) {
 			throw new Error('Attempt to DELETE single record in offline dbase failed! FINGERPRINT is invalid.');
 		}else{
 			console.log("Delete Offline Database record attempt: FINGERPRINT IS VALID!");
 		}
-	}
+	}// checkFingerprint()
 
 	// Random data is generated and 'backfilled' increasing security and keeping Offline Database length the same.
 	async function deleteRecordOfflineDBase(fingerprint) {
@@ -391,18 +395,20 @@
 	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////
 
-	// Reset user data storage object.
+	// Reset user data storage object, clearing passwords and data.
 	function resetOfflineData() {
 		offlineData = {};
 	}
-	// please change function name.
-	async function superCheckEncPassword() {
+
+	// Offline database home page will use this function to extract the password for the encrypted offline database.
+	async function extractOfflineDatabasePassword() {
 		resetOfflineData();
 		extractInputData('set_offlineDBasePass_input');
-		await verifyOfflineDBasePasswordLength();
-	}
+		await verifyOfflineDatabasePassword();
+	}// extractOfflineDatabasePassword()
 
-	async function verifyOfflineDBasePasswordLength() {
+	// Check length and then verify the user entered offline database password.
+	async function verifyOfflineDatabasePassword() {
 		if (offlineData['offlineDBasePass'] === undefined || offlineData['offlineDBasePass'] === '') {
 			console.log('caught empty ENC password');
 			document.getElementById('emptyPassWarning').style.display = 'inline';
@@ -417,7 +423,7 @@
 				showPage('wrong_offlinedbase_password');
 			}
 		}
-	}
+	}// verifyOfflineDatabasePassword()
 
 	// Try to decrypt pointer to check if Enc password is correct.
 	async function checkEncPassword() {
@@ -430,23 +436,28 @@
 			return false;
 		}
 		return true;
-	}
+	}// checkEncPassword()
 
-	// Use regex to extract keyword from input ID.
+	// Input ids that hold passwords to be extracted are constructed in a regular way so that the password they hold can be easily extracted by our passlock system.
+	// Example for ctrPass: access_ctrPass_input
+	// Looking at the above Element ID, we can see that this input will hold the ctrPass (AES-CTR password) and resides in the Access Flow as a result of our regular naming scheme.
+	// We can then use this function to extract the corresponding value.
 	function extractKeyword(inputId) {
+		// Use regex to extract keyword from input ID.
 		const regex = new RegExp(/^\\w+_(\\w+)_\\w+$/);
 		const match = inputId.match(regex);
 		return match[1];
-	}
+	}// extractKeyword()
 
 	//Function that extracts user password from html and deletes it from the html source.
 	function extractPlaintextData(inputId) {
 		const plaintextData = document.getElementById(inputId).value;
 		document.getElementById(inputId).value = ""; //delete password from html
 		return plaintextData;
-	}
+	}// extractPlaintextData()
 
-
+	// Online version of initFlow() creates a passlock and saves it to server.
+	// We need this function to use the same HTML code for both online index.tmpl and offline_standalone.tmpl implementations.
 	async function initFlow(inputId) {
 		extractInputData(inputId);
 	}// initFlow()
@@ -460,7 +471,7 @@
 		// This is intended to check if data is deleted so an error page explaining to the user what to do can be shown.
 		console.log("keyword: ", keyword);
 		console.log(offlineData['codeword']);
-		if (keyword !== 'codeword' && offlineData['codeword'] === undefined) {
+		if (keyword !== 'offlineDBasePass' && keyword !== 'codeword' && offlineData['codeword'] === undefined) {
 			saveThenShowPage('timed_out_home');
 			throw new Error("STALE FLOW ERROR.");
 		}
@@ -470,7 +481,7 @@
 		offlineData[keyword] = plaintextData;
 		console.log("Password gathering object: offlineData: ");
 		console.log(offlineData);
-	}
+	}// extractInputData()
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
 	function checkData(inputId, nextPageId) {
@@ -486,8 +497,10 @@
 			throw new Error("Offline Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
 		}
-	} // checkData()
+	}// checkData()
 
+	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
+	// This offline function also handles showing errors and reminder to save to disk.
 	async function attemptCMDStore() {
 		//const fingerprintAndData = await computeFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
@@ -511,20 +524,10 @@
 		// Replace goBack function with security reset and we should be secure right?
 		// Always reset plaintext data holder each time flow is completed.
 		resetOfflineData();
-	} // attemptCMDStore()
+	}// attemptCMDStore()
 
-	async function attemptBrowserStoreBackWrapper(inputId) {
-		console.log('back wrapper hit.');
-		await attemptBrowserStore(inputId, 'true');
-	}
-
-	async function attemptBrowserStore(inputId, fromWrapper) {
-		if (fromWrapper === 'true') {
-			// Got here from edit, use go back value for Access flow.
-			showPageFlag = 'true';
-		} else {
-			// Got here from Store flow.
-		}
+	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
+	async function attemptBrowserStore(inputId) {
 		extractInputData(inputId);
 		//const fingerprintAndData = await computeFpAndDataForStore();
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
@@ -555,8 +558,9 @@
 		// Replace goBack function with security reset and we should be secure right?
 		// Always reset plaintext data holder each time flow is completed.
 		resetOfflineData();
-	}
+	}// attemptBrowserStore()
 
+	// Modify the UI to allow the user to Edit data they have just Accessed (page at the end of the Access Flow).
 	async function editData() {
 		document.getElementById('access_data_outputdisplay').disabled = false;
 		// Turn on textarea so user can edit.
@@ -568,8 +572,9 @@
 		// Show single SAVE button
 		document.getElementById("save_button").style.display = "inline";
 		// Show them again on save? Or go to store success/fail?
-	}
+	}// editData()
 
+	// Attempt to access a MEDRecord at fingerprint location in the offline database, then display outcome to user (file download).
 	async function attemptCMDAccess() {
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		// Add additional parameter?
@@ -583,8 +588,9 @@
 			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
 			decryptAndDownloadFileOffline(multiEncryptedDatarecord);
 		}
-	}
+	}// attemptCMDAccess()
 
+	// Attempt to store a MEDRecord from the offline database to the online server.
 	async function attemptSyncToOnline(inputId) {
 		// Get ctrPass - pass2.
 		extractInputData(inputId);
@@ -604,7 +610,7 @@
 		// Replace goBack function with security reset and we should be secure right?
 		// Always reset plaintext data holder each time flow is completed.
 		resetOfflineData();
-	}
+	}// attemptSyncToOnline()
 
 	// Return either pass or fail to show outcome of store, pass or fail to user.
 	// Legacy code probably needs full rewrite.
@@ -629,7 +635,7 @@
 		}
 	}// syncDataToServer()
 
-
+	// Process an Accessed MEDRecord: decrypt it then pack the decrypted data into a file for user download.
 	async function decryptAndDownloadFileOffline(multiEncryptedDatarecord) {
 		const decryptedData  = await decryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], multiEncryptedDatarecord);
 			// bytes is Uint8Array
@@ -642,11 +648,11 @@
 			a.click();
 	}// decryptAndDownloadFileOffline()
 
+	// Attempt to access a MEDRecord at fingerprint location, then display outcome to user (Browser Access).
 	async function attemptBrowserAccess(inputId) {
 		// Encrypt and save OpenSSL password to passlockedData object.
 		extractInputData(inputId);
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
-		//console.log("fingerprint:" + fingerprint + " offlineData[codeword]:" + offlineData['codeword'] + " offlineData[obf1000Pass]:" + offlineData['obf1000Pass'] + " offlineData[ctrPass]:" + offlineData['ctrPass']);
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
@@ -660,11 +666,9 @@
 			startObserving();
 			await decryptAndShowPlaintextOffline(multiEncryptedDatarecord);
 		}
-		// Replace goBack function with security reset and we should be secure right?
-		// Always reset plaintext data holder each time flow is completed.
-		//resetOfflineData();
-	}
+	}// attemptBrowserAccess()
 
+	// Decrypt a MEDRecord that has been Accessed, show that plaintext to user via browser.
 	async function decryptAndShowPlaintextOffline(multiEncryptedDatarecord) {
 		let decryptedData;
 		try {
@@ -676,8 +680,9 @@
 		}
 		// Reveal plaintext to user.
 		document.getElementById("access_data_outputdisplay").value = decryptedData;
-	}
+	}// decryptAndShowPlaintextOffline()
 
+	// Compute a fingerprint using collected user passwords, then delete the data stored at that fingerprint.
 	async function attemptDelete() {
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const deleteResponse = await deleteRecordOfflineDBase(fingerprint);
@@ -721,7 +726,7 @@
 		document.body.appendChild(element);
 		element.click();
 		document.body.removeChild(element);
-	}
+	}// saveToDisk()
 
 	////////////////////////////////////////////////////////////////////////
 	//                   Check Functions                                  //
@@ -736,7 +741,7 @@
 		}else{
 			return false;
 		}
-	}
+	}// checkFingerprintIsValid()
 
 	// Returns true if input has precisely MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 (1024) base64 chars.
 	function checkDataIsValid(data) {
@@ -746,7 +751,7 @@
 		}else{
 			return false;
 		}
-	}
+	}// checkDataIsValid()
 
 	// Input: input is a string.
 	// Output: Returns false if non-base58 characters are detected.

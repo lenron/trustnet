@@ -292,8 +292,8 @@
 		passlockedData[keyword] = await utf8EncryptOpenSSL(plaintextData, passlock);
 	}// initFlow()
 
+	// Clear all inputs that exist in this HTML document.
 	function clearInputs(){
-		// Clear all inputs that exist in this HTML document.
 		let inputElements = document.getElementsByTagName('input');
 		console.log("Clearing all input elements. Found this many: ", inputElements.length);
 		for (let i=0; i < inputElements.length; i++) {
@@ -327,7 +327,7 @@
 		}, FOUR_MINUTES_THIRTY_SECONDS); // Set timer to 4:30 allowing 30 seconds for user to react to warning.
 	}// setTimeoutAndWarning()
 
-	// Cleear running timers then set them. Turn off warning.
+	// Clear running timers then set them. Turn off warning.
 	function resetTimeoutAndWarning() {
 		// Turn off warning.
 		document.getElementById("timeout_warning_overlay").style.display = "none";
@@ -339,8 +339,12 @@
 		serverExtendPasslock(browserId);
 	}// resetTimeoutAndWarning()
 
-	// Use regex to extract keyword from input ID.
+	// Input ids that hold passwords to be extracted are constructed in a regular way so that the password they hold can be easily extracted by our passlock system.
+	// Example for ctrPass: access_ctrPass_input
+	// Looking at the above Element ID, we can see that this input will hold the ctrPass (AES-CTR password) and resides in the Access Flow as a result of our regular naming scheme.
+	// We can then use this function to extract the corresponding value.
 	function extractKeyword(inputId) {
+		// Use regex to extract keyword from input ID.
 		const regex = new RegExp(/^\w+_(\w+)_\w+$/);
 		const match = inputId.match(regex);
 		return match[1];
@@ -391,9 +395,10 @@
 		return encryptedPassword;
 	}// passlockEncrypt()
 
-	async function passlockDecrypt(encryptedPasslock) {
+	// Use the existing passlock to decrypt the passlock encrypted data.
+	async function passlockDecrypt(passlockEncryptedData) {
 		const passlock = await getPasslock();
-		const plaintextData = await utf8DecryptOpenSSL(encryptedPasslock, passlock);
+		const plaintextData = await utf8DecryptOpenSSL(passlockEncryptedData, passlock);
 		return plaintextData;
 	}// passlockDecrypt()
 
@@ -409,6 +414,7 @@
 		return plaintextSet;
 	}// passlockDecryptSet()
 
+	// Use the passlock to decrypt the complete set of passwords/data, then use those passwords to encrypt plaintext data and generate the corresponding fingerprint and MEDRecord.
 	async function computeFpAndDataForStore() {
 		// Get plaintext passwords for encryption.
 		const plaintextSet = await passlockDecryptSet();
@@ -424,26 +430,15 @@
 		return fingerprintAndData;
 	}// computeFpAndDataForStore()
 
+	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
 	async function attemptCMDStore() {
 		const fingerprintAndData = await computeFpAndDataForStore();
 		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 	}// attemptCMDStore()
 
-	// Looks like this is only needed for Access->Edit?
-	async function attemptBrowserStoreBackWrapper(inputId) {
-		console.log('back wrapper hit.');
-		await attemptBrowserStore(inputId, 'true');
-	}
-
-	async function attemptBrowserStore(inputId, fromWrapper) {
-		// This conditional is necessary for back functionality.
-		if (fromWrapper === 'true') {
-			// Got here from edit, use go back value for Access flow.
-			showPageFlag = 'true';
-		} else {
-			// Got here from Store flow.
-		}
+	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
+	async function attemptBrowserStore(inputId) {
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprintAndData = await computeFpAndDataForStore();
@@ -451,11 +446,11 @@
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], inputId);
 	}// attemptBrowserStore()
 
+	// Modify the UI to allow the user to Edit data they have just Accessed (page at the end of the Access Flow).
 	async function editData() {
 		document.getElementById('access_data_outputdisplay').disabled = false;
 		// Turn on textarea so user can edit.
 		document.getElementById('access_data_outputdisplay').focus();
-		// 
 		showEditEnabledUI();
 		// Hide both existing buttons
 		document.getElementById("editdata_button").style.display = "none";
@@ -464,6 +459,7 @@
 		document.getElementById("save_button").style.display = "inline";
 	}// editData()
 
+	// Use passwords gathered from the Access Flow to compute a fingerprint that will be used to attempt to access a MEDRecord.
 	async function computeFpForAccess() {
 		// Get plaintext passwords for encryption.
 		const plaintextSet = await passlockDecryptSet();
@@ -471,6 +467,7 @@
 		return fingerprint;
 	}// computeFpForAccess()
 
+	// Query online server, attempt to access a MEDRecord at fingerprint location, then display outcome to user (file download).
 	async function attemptCMDAccess() {
 		const fingerprint = await computeFpForAccess();
 		//console.log("CMD Access. fingerprint: " + fingerprint);
@@ -488,16 +485,14 @@
 			holdFpForDelete(fingerprint);
 			await decryptAndDownloadFile(multiEncryptedDatarecord);
 		}
-		// Delete passlock for security.
-		//await resetPasslock();
 	}// attemptCMDAccess()
 
+	// Process an Accessed MEDRecord: decrypt it then pack the decrypted data into a file for user download.
 	async function decryptAndDownloadFile(multiEncryptedDatarecord) {
 		// Get set of decrypted user passwords.
 		const plaintextSet = await passlockDecryptSet();
 		// Not adding try/catch here. I think it would be more helpful to know what failed instead as it would likely be not a password entry error since there was data to operate on (fingerprint loaded data).
 		const decryptedData  = await decryptDouble(plaintextSet['obf1000Pass'], plaintextSet['ctrPass'], multiEncryptedDatarecord);
-
 			// bytes is Uint8Array
 			const bytes = Uint8Array.fromBase64(decryptedData);
 			// Produce file for user to decrypt.
@@ -508,6 +503,7 @@
 			a.click();
 	}// decryptAndDownloadFile()
 
+	// Query online server, attempt to access a MEDRecord at fingerprint location, then display outcome to user (Browser Access).
 	async function attemptBrowserAccess(inputId) {
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
@@ -532,6 +528,8 @@
 		}
 	}// attemptBrowserAccess()
 
+	// Upon Access Flow completion, the fingerprint is stored in the HTML in case user wants to delete their data.
+	// This function returns that stored fingerprint.
 	function getStoredFp() {
 		const fingerprint = document.getElementById("fingerprint_holder").value;
 		// Clear fingerprint held for delete. Always do this?
@@ -539,15 +537,16 @@
 		return fingerprint;
 	}// getStoredFp()
 
+	// This function stores a fingerprint in HTML for Delete functionality.
 	function holdFpForDelete(fingerprint) {
 		// Set fingerprint holder to fingerprint.
 		document.getElementById("fingerprint_holder").value = fingerprint;
 		console.log("fingerprint now held in HTML: " + document.getElementById("fingerprint_holder").value);
 	}// holdFpForDelete()
 
+	// Decrypt a MEDRecord that has been Accessed, show that plaintext to user via browser.
 	async function decryptAndShowPlaintext(multiEncryptedDatarecord) {
 		const plaintextSet = await passlockDecryptSet();
-		//const decryptedData  = await decryptTriple(plaintextSet['obf1000Pass'], plaintextSet['ctrPass'], plaintextSet['opensslpass'], multiEncryptedDatarecord);
 		let decryptedData;
 		try {
 			decryptedData = await decryptTriple(plaintextSet['obf1000Pass'], plaintextSet['ctrPass'], plaintextSet['opensslpass'], multiEncryptedDatarecord);
@@ -609,7 +608,6 @@
 	}// storeDataToServer()
 
 
-
 	///////////////////////////////////////////////////////////////////////////////////
 	//                       Offline Database Generation                             //
 	///////////////////////////////////////////////////////////////////////////////////
@@ -628,7 +626,6 @@
 	// If the Unencrypted offline database is to be used, please choose NO PASSWORD.
 	// 
 	///////////////////////////////////////////////////////////////////////////////////
-
 
 	// Object to gather set of records to be stored in a new offline database (Option 1).
 	let recordListForNewOfflineDBase = {};
