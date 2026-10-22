@@ -9,14 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 </head>
-<!---------------------CSS STYLE Section - Where CSS code which modifies how HTML code looks lives.-------------------------------------------------------------------!>
+<!---------------------CSS STYLE Section - Where CSS code, which modifies how HTML code looks, lives.-------------------------------------------------------------------!>
 <style>
 
 	/* MAIN SITE */
 
 	/* There are 3 versions of the site, Online/Readonly and Offline which are maintained in two different code sets: index.tmpl (Online/Readonly) and offline_standalone.tmpl. */
 
-	/* The Online/Readonly versions differ in two ways:
+	/* The Online and Readonly versions differ in two ways:
 	/*   - Each use a different base color (Online Green: #54c597 and Readonly Blue: #4491d5)
 	/*   - Store operations are removed from Readonly. */
 
@@ -106,21 +106,16 @@
 			<TMPL_INCLUDE NAME="dev_site_html.tmpl">
 			<!--------------------------FAQ SITE----------------------------!>
 			<TMPL_INCLUDE NAME="faq_html.tmpl">
-
 			<!-- HTML for both main/readonly and offline included here. -->
 			<TMPL_INCLUDE NAME="common_html.tmpl">
-
 		</div><!--------------------------------------------END Center HTML----------------------------------------------------!>
 
 		<!--------------------------------------------SITE FOOTER----------------------------------------------------!>
 		<div style="display:flex; flex-direction:column;">
 			<button id="go_offline_button" style="" onclick="saveThenShowPage('offline_dbase_2options');">CREATE OFFLINE DATABASE</button>
 		</div><!--------------------------------------------END SITE FOOTER----------------------------------------------------!>
-
 	</div><!--------------------------------------------END MAIN PAGE----------------------------------------------------!>
-
 </body><!--------------------------------------------END HTML BODY----------------------------------------------------!>
-
 <!-----------------------------------------------------SCRIPT is where Javascript code lives.------------------------------------------------------------------------------------!>
 <script>
 

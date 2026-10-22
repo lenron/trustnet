@@ -2,14 +2,18 @@
 /* common_css.tmpl */
 /* Includes CSS for all 3 sites. */
 
+	/* The 'universal selector' (*) matches all elements in this HTML document. */
 	* {
+		/* Unless explicitly changed elsewhere, set all text to use Orbitron font. */
 		font-family: "Orbitron", serif;
 		font-optical-sizing: auto;
 		font-weight: 600;
 		font-style: normal;
+		/* :root sets this variable */
 		color: var(--site-type-color);
 	}
 
+	/* Match <html>, <body> elements. */
 	html, body {
 		background-color: #272727;
 		height: 100vh;
@@ -17,6 +21,7 @@
 		padding: 0;
 	}
 
+	/* Match each element containing the 'main_page' class. */
 	.main_page {
 		height: 100%;
 		background-color: #272727;
@@ -39,6 +44,7 @@
 		display: flex;
 	}
 
+	/* Change cursor from the arror cursor to the hand 'pointer' cursor when user hovers their cursor over elements containing the header_title class. */
 	.header_title:hover {
 		cursor: pointer;
 	}
@@ -82,7 +88,6 @@
 		border-radius: 15px;
 	}
 
-	/*input[type="password"] {*/
 	.main_site_password_input {
 		height: 80px;
 		width: 95%;
@@ -96,6 +101,7 @@
 		border-radius: 20px;
 	}
 
+	/* Match each <a> tagged element in the page. */
 	a {
 		font-family: Arial, Helvetica, sans-serif;
 		font-size: 16px;
@@ -108,7 +114,7 @@
 		color: black;
 	}
 
-	/* Change the textareas inside divs with 'flow_pages' class to the following: */
+	/* Match each textarea within an element that contains the 'flow_pages' class. */
 	.flow_pages textarea {
 		width: 95%;
 		height: 150px;
@@ -184,14 +190,6 @@
 	/* Apply hover to specific div */
 	#decrypt_click_store:hover {
 		cursor: copy;
-	}
-
-	.openssl_encrypt_flowchart {
-		background-image: url('./svg_images/openssl_encrypt_flowchart.drawio.svg');
-	}
-
-	.openssl_decrypt_flowchart {
-		background-image: url('./svg_images/openssl_decrypt_flowchart.drawio.svg');
 	}
 
 	/* Makes the background color blend from orange to #AEE850 */
@@ -334,9 +332,8 @@
 		border-color: var(--site-type-color);
 		color: var(--site-type-color);
 		border-radius: 10px;
-		/* Use the first font installed on your system. */
+		/* Use the first font in this list (starting with Consolas) that is installed on user's system. */
 		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
-		/*font-family: Liberation Mono;*/
 		height: 100%;
 	}
 
@@ -347,11 +344,11 @@
 		border-color: var(--site-type-color);
 		color: var(--site-type-color);
 		border-radius: 10px;
-		/* Use the first font installed on your system. */
+		/* Use the first font in this list (starting with Consolas) that is installed on user's system. */
 		font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
 	}
 
-	/* Turn of store buttons for Readonly site. */
+	/* Turn off store buttons for Readonly site. */
 	.hide_readonly_buttons {
 		display: var(--hide-readonly-store-buttons);
 	}

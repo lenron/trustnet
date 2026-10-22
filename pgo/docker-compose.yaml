@@ -9,8 +9,8 @@ services:
       - mariadb_login
       - mariadb_pw
     # Uncomment port on if accessing through localhost, which includes the simple cloudflare tunnel -> pgo setup.
-    #ports:
-      #- "80:80"
+    ports:
+      - "80:80"
     volumes:
       - type: bind
         source: ./htdocs

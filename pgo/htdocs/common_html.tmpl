@@ -12,7 +12,7 @@
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkCaptcha()">CONTINUE</button>
 				</div>
-			</div>
+			</div><!-----------------------END CONTACT PAGE - CAPTCHA----------------------------!>
 
 			<!--------------------------CONTACT PAGE----------------------------!>
 			<div class="flow_pages show_page_activatable " id="contact_page" style="display:none">
@@ -24,7 +24,7 @@
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="submitContactMessage()">CONTINUE</button>
 				</div>
-			</div>
+			</div><!---------------------END CONTACT PAGE----------------------------!>
 
 			<!--------------------------CONTACT THANKS----------------------------!>
 			<div class="flow_pages show_page_activatable " id="contact_thanks" style="display:none">
@@ -32,17 +32,42 @@
 					<label>CONTACT PAGE</label>
 				</div>
 				<h2>THANK YOU FOR YOUR MESSAGE!</h2>
-			</div>
+			</div><!---------------------END CONTACT THANKS----------------------------!>
 
-<!------------------------------------ONLINE FLOW--------------------------------------------------------------------------!>
-			<!--------------------------HOME----------------------------!>
+			<!--------------------------ONLINE HOME----------------------------!>
 			<div class="flow_pages show_page_activatable home" id="home" style="align-self:center; display:flex; flex-direction:column; justify-content:center;">
 				<h2>SECURELY STORE DATA AND ACCESS FROM ANY WEB BROWSER</h2>
 				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
 					<button class="obf_button hide_readonly_buttons" id='' style="flex-grow:1; " onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
-			</div>
+			</div><!---------------------END ONLINE HOME----------------------------!>
+
+			<!--------------------------OFFLINE HOME----------------------------!>
+			<div class="flow_pages show_page_activatable home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
+				<h2 style="color:red">OFFLINE HOME</h2>
+				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
+					<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
+					<button class="obf_button" id='go_offlinesync_flow' style="flex-grow:1" onclick="saveThenShowPage('offlinesync_codeword')">SYNC STORED DATA TO ONLINE DATABASE</button>
+				</div>
+			</div><!---------------------END OFFLINE HOME----------------------------!>
+
+			<!--------------------------OFFLINE DATABASE ENTER DATABASE PASSWORD-----------------------!>
+			<div class="flow_pages show_page_activatable" id="enter_offlinedbase_pass" style="display:none; ">
+				<label id='emptyPassWarning' style='color:magenta; display:none; '>Please enter a password or choose NO PASSWORD.</label>
+				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
+				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
+				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
+					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="resetOfflineData(); saveThenShowPage('offline_home')">NO PASSWORD</button>
+					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="extractOfflineDatabasePassword()">PASSWORD READY</button>
+				</div>
+			</div><!----------------------END OFFLINE DATABASE ENTER DATABASE PASSWORD-----------------------!>
+
+			<!---------------------------OFFLINE DATABASE PASSWORD ENTRY FAIL-----------------------!>
+			<div class="flow_pages show_page_activatable" id="wrong_offlinedbase_password" style="display:none">
+				<h2>&#10060; OFFLINE DATABASE PASSWORD ENTERED INCORRECTLY!</h2>
+			</div><!----------------------END OFFLINE DATABASE PASSWORD ENTRY FAIL-----------------------!>
 
 			<!--------------------------TIMED OUT HOME----------------------------!>
 			<div class="flow_pages show_page_activatable home" id="timed_out_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; ">
@@ -53,10 +78,10 @@
 					<button class="obf_button hide_readonly_buttons" id='' style="flex-grow:1; " onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
 					<button class="obf_button" id='' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
 				</div>
-			</div>
+			</div><!----------------------END TIMED OUT HOME----------------------------!>
 
-<!----------------------------Online Access--------------------------------------------------------------!>
-			<!---------------------------Codeword-----------------------!>
+<!---------------------------------------ACCESS FLOW----------------------------------------------------------------------------------------------------!>
+			<!---------------------------ACCESS codeword-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="access_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
@@ -68,9 +93,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('home')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initFlow('access_codeword_input');saveThenShowPage('access_obf1000Pass')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!----------------------END ACCESS codeword-----------------------!>
 
-			<!---------------------------obf1000Pass-----------------------!>
+			<!--------------------------ACCESS obf1000Pass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="access_obf1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
@@ -82,9 +107,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_codeword')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_obf1000Pass_input');saveThenShowPage('access_ctrPass');">CONTINUE</button>
 				</div>
-			</div>
+			</div><!--------------------END ACCESS obf1000Pass-----------------------!>
 
-			<!---------------------------ctrPass-----------------------!>
+			<!-------------------------ACCESS ctrPass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="access_ctrPass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
@@ -96,9 +121,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_obf1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('access_ctrPass_input');saveThenShowPage('access_choose');">CONTINUE</button>
 				</div>
-			</div>
+			</div><!--------------------END ACCESS ctrPass-----------------------!>
 
-			<!---------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
+			<!---------------------------!CHOICE: ACCESS via BROWSER or CMD LINE!-----------------------!>
 			<div class="flow_pages show_page_activatable" id="access_choose" style="display:none">
 				<label>ACCESS DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ACCESS YOUR DATA</h2>
@@ -118,10 +143,10 @@
 						<label class="coolpink" style="align-self:center;">More Secure</label>
 					</div>
 				</div>
-			</div>
+			</div><!---------------------!END CHOICE: ACCESS via BROWSER or CMD LINE!-----------------------!>
 
-			<!---------------------------BROWSER Chosen: -----------------------!>
-			<!---------------------------OpenSSL Pass-----------------------!>
+			<!---------------------------!ACCESS via BROWSER CHOSEN!-------------------------!>
+			<!---------------------------ACCESS opensslPass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="access_opensslpass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>ACCESS FLOW</label>
@@ -133,10 +158,10 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptBrowserAccess('access_opensslpass_input');">ACCESS DATA</button>
 				</div>
-			</div>
+			</div><!----------------------END ACCESS opensslPass-----------------------!>
 
-			<!---------------------------Outcome-----------------------!>
-			<!---------------------------File Download-----------------------!>
+			<!---------------------------!ACCESS via CMD LINE CHOSEN!-------------------------!>
+			<!---------------------------ACCESS FILE DOWNLOAD-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="access_file" style="display:none">
 				<h2>&#10004; SUCCESS</h2>
 				<label>File should automatically download.</label>
@@ -172,10 +197,25 @@
 					<button class=" hide_readonly_buttons" id='' style="flex-grow:1; " onclick="saveThenShowPage('store_codeword')">STORE DATA</button>
 					<button class=" hide_readonly_buttons" id='' style="flex-grow:1; " onclick="showDeleteOverlay('overlay_delete_cmd')">DELETE DATA</button>
 				</div>
-			</div>
-			<!---------------------------END CMD LINE Access Flow-----------------------!>
+			</div><!-----------------------END ACCESS FILE DOWNLOAD-----------------------!>
+			<!---------------------------END !ACCESS via CMD LINE CHOSEN!-----------------------!>
 
-			<!-------------------------ACCESS - FLOW END - BROWSER SHOW PLAINTEXT-------------------------!>
+			<!---------------------------!ACCESS via BROWSER CHOSEN!-------------------------!>
+			<!---------------------------ACCESS opensslPass-----------------------!>
+			<div class="flow_pages show_page_activatable passlock" id="access_opensslpass" style="display:none">
+				<div style="display:flex; flex-direction:row; justify-content:space-between;">
+					<label>ACCESS FLOW</label>
+					<label>PASS 3</label>
+				</div>
+				<h2>ENTER PASSWORD 3</h2>
+				<input class="main_site_password_input"autocomplete="off" type="password" value="" id="access_opensslpass_input" style="">
+				<div class="button_pair" id="" style="display:flex;">
+					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('access_choose')">BACK</button>
+					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptBrowserAccess('access_opensslpass_input');">ACCESS DATA</button>
+				</div>
+			</div><!----------------------END ACCESS opensslPass-----------------------!>
+
+			<!-------------------------ACCESS BROWSER PLAINTEXT-------------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="access_plaintext" style="display:none">
 				<h2>&#10004; SUCCESS</h2>
 				<label>result:</label>
@@ -198,41 +238,41 @@
 					<button class=" hide_readonly_buttons" id='editdata_button' style="flex-grow:1; " onclick="editData()">EDIT DATA</button>
 					<button class=" hide_readonly_buttons" id='delete_button' style="flex-grow:1; " onclick="showDeleteOverlay('overlay_delete_browser')">DELETE DATA</button>
 				</div>
-			</div>
-			<!---------------------------END BROWSER Access Flow-----------------------!>
+			</div><!----------------------END ACCESS BROWSER PLAINTEXT-------------------------!>
+			<!---------------------------END !ACCESS via BROWSER CHOSEN!-----------------------!>
 
-			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
+			<!----------------------------FAILED TO ACCESS-----------------------------------------!>
 			<div class="flow_pages show_page_activatable" id="failed_to_access" style="display:none">
 				<h2>&#10060; FAILED TO ACCESS</h2>
-			</div>
+			</div><!---------------------END FAILED TO ACCESS-----------------------------------------!>
 
-			<!----------------------------FAILED TO ACCESS--------------------------------------------------------------!>
+			<!----------------------------TOO MANY ACCESSES FILTER-----------------------------------------!>
 			<div class="flow_pages show_page_activatable" id="too_many_access_failures" style="display:none">
 				<h2>&#10060; YOU'VE FAILED TO ACCESS TOO MANY TIMES TODAY.</h2>
 				<h2>You may attempt accessing data tomorrow.</h2>
-			</div>
+			</div><!----------------------END TOO MANY ACCESSES FILTER-----------------------------------------!>
 
-			<!---------------------------Password Entry Error-----------------------!>
+			<!---------------------------PASSWORD ENTRY ERROR-----------------------!>
 			<div class="flow_pages show_page_activatable" id="password_entry_error" style="display:none">
 				<h2>&#10060; PASSWORD 3 IS INCORRECT!</h2>
-			</div>
+			</div><!---------------------END PASSWORD ENTRY ERROR-----------------------!>
+
+			<!----------------------------SUCCESSFULLY DELETED DATA------------------------------!>
+			<div class="flow_pages show_page_activatable" id="delete_success" style="display:none">
+				<h2>&#10004; SUCCESSFULLY DELETED DATA</h2>
+			</div><!----------------------END SUCCESSFULLY DELETED DATA------------------------------!>
+
+			<!----------------------------FAILED TO DELETE--------------------------------------!>
+			<div class="flow_pages show_page_activatable" id="delete_failed" style="display:none">
+				<h2>&#10060; FAILED TO DELETE</h2>
+			</div><!-----------------------END FAILED TO DELETE--------------------------------------!>
 
 			<!------------------Fingerprint Holder for Delete------------------------------!>
 			<input id="fingerprint_holder" autocomplete="off" value="" style="display:none">
+<!------------------------------------END ACCESS FLOW----------------------------------------------------------------------------------------------------!>
 
-			<!----------------------------Successfully Deleted Data--------------------------------------------------------------!>
-			<div class="flow_pages show_page_activatable" id="delete_success" style="display:none">
-				<h2>&#10004; SUCCESSFULLY DELETED DATA</h2>
-			</div>
-
-			<!----------------------------Failed to Delete--------------------------------------------------------------!>
-			<div class="flow_pages show_page_activatable" id="delete_failed" style="display:none">
-				<h2>&#10060; FAILED TO DELETE</h2>
-			</div>
-<!----------------------------END Access--------------------------------------------------------------!>
-
-<!----------------------------Online Store--------------------------------------------------------------!>
-			<!---------------------------Codeword-----------------------!>
+<!------------------------------------STORE FLOW---------------------------------------------------------------------------------------------------------!>
+			<!---------------------------STORE codeword-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -244,9 +284,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('home')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initFlow('store_codeword_input');saveThenShowPage('store_obf1000Pass')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!---------------------END STORE codeword-----------------------!>
 
-			<!---------------------------obf1000Pass-----------------------!>
+			<!---------------------------STORE obf1000Pass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_obf1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -258,9 +298,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_codeword')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_obf1000Pass_input');saveThenShowPage('store_ctrPass');">CONTINUE</button>
 				</div>
-			</div>
+			</div><!----------------------END STORE obf1000Pass-----------------------!>
 
-			<!---------------------------ctrPass-----------------------!>
+			<!---------------------------STORE ctrPass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_ctrPass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -272,9 +312,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_obf1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_ctrPass_input');saveThenShowPage('store_choose');">CONTINUE</button>
 				</div>
-			</div>
+			</div><!---------------------END STORE ctrPass-----------------------!>
 
-			<!---------------------------BRANCH: CMD LINE or BROWSER-----------------------!>
+			<!---------------------------!CHOICE: STORE using BROWSER or CMD LINE!-----------------------!>
 			<div class="flow_pages show_page_activatable" id="store_choose" style="display:none">
 				<label>STORE DATA</label>
 				<h2 style="align-self:center;">CHOOSE WHERE TO ENCRYPT YOUR DATA</h2>
@@ -294,10 +334,10 @@
 						<label class="coolpink" style="align-self:center;">More Secure</label>
 					</div>
 				</div>
-			</div>
+			</div><!-----------------------END !CHOICE: STORE using BROWSER or CMD LINE!-----------------------!>
 
-			<!---------------------------CMD LINE Chosen: -----------------------!>
-			<!---------------------------Check Codeword-----------------------!>
+			<!---------------------------!STORE using CMD LINE CHOSEN!-----------------------!>
+			<!---------------------------STORE CHECK codeword-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_codeword_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -310,9 +350,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkData('store_codeword_cmdcheckinput', 'store_obf1000Pass_cmdcheck')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!----------------------END STORE CHECK codeword-----------------------!>
 
-			<!---------------------------Check obf1000Pass-----------------------!>
+			<!---------------------------STORE CHECK obf1000Pass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_obf1000Pass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -325,9 +365,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_codeword_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkData('store_obf1000Pass_cmdcheckinput', 'store_ctrPass_cmdcheck')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!----------------------END STORE CHECK obf1000Pass-----------------------!>
 
-			<!---------------------------Check ctrPass-----------------------!>
+			<!---------------------------STORE CHECK ctrPass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_ctrPass_cmdcheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -340,9 +380,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_obf1000Pass_cmdcheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkData('store_ctrPass_cmdcheckinput', 'store_upload')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!-----------------------END STORE CHECK ctrPass-----------------------!>
 
-			<!---------------------------FILE UPLOAD-----------------------!>
+			<!---------------------------STORE FILE UPLOAD-----------------------!>
 			<div class="flow_pages show_page_activatable" id="store_upload" style="display:none">
 				<label>STORE DATA</label>
 				<h2>UPLOAD FILE</h3>
@@ -372,11 +412,11 @@
 					<button class="" id='' style="width:250px;" onclick="saveThenShowPage('store_ctrPass_cmdcheck')">BACK</button>
 					<button class="" id='store_upload_commit_button' style="flex-grow:1;display:none;color:orange" onclick="attemptCMDStore()">COMMIT DATA TO SERVER</button>
 				</div>
-			</div>
-			<!---------------------------END CMD LINE Store Flow-----------------------!>
+			</div><!------------------------END STORE FILE UPLOAD-----------------------!>
+			<!---------------------------END !STORE using CMD LINE CHOSEN!-----------------------!>
 
-			<!---------------------------BRWOSER Chosen: -----------------------!>
-			<!---------------------------OpenSSL Pass-----------------------!>
+			<!---------------------------!STORE using BROWSER CHOSEN!-----------------------!>
+			<!---------------------------STORE opensslPass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_opensslpass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -388,9 +428,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_choose')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('store_opensslpass_input');saveThenShowPage('store_codeword_browsercheck');">CONTINUE</button>
 				</div>
-			</div>
+			</div><!-----------------------END STORE opensslPass-----------------------!>
 
-			<!---------------------------Check Codeword-----------------------!>
+			<!---------------------------STORE CHECK codeword-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_codeword_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -403,9 +443,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_opensslpass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkData('store_codeword_browsercheckinput', 'store_obf1000Pass_browsercheck')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!------------------------END STORE CHECK codeword-----------------------!>
 
-			<!---------------------------Check obf1000Pass-----------------------!>
+			<!---------------------------STORE CHECK obf1000Pass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_obf1000Pass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -418,9 +458,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_codeword_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkData('store_obf1000Pass_browsercheckinput', 'store_ctrPass_browsercheck')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!-----------------------END STORE CHECK obf1000Pass-----------------------!>
 
-			<!---------------------------Check ctrPass-----------------------!>
+			<!---------------------------STORE CHECK ctrPass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_ctrPass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -433,9 +473,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_obf1000Pass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkData('store_ctrPass_browsercheckinput', 'store_opensslpass_browsercheck')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!-----------------------END STORE CHECK ctrPass-----------------------!>
 
-			<!---------------------------Check OpenSSL Pass-----------------------!>
+			<!---------------------------STORE CHECK OpenSSL Pass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_opensslpass_browsercheck" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -448,9 +488,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('store_ctrPass_browsercheck')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="checkData('store_opensslpass_browsercheckinput', 'store_data')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!-----------------------END STORE CHECK OpenSSL Pass-----------------------!>
 
-			<!---------------------------Enter Data-----------------------!>
+			<!---------------------------STORE ENTER DATA-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="store_data" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>STORE FLOW</label>
@@ -465,46 +505,45 @@
 						<h2 id='' style="color:red;">TOO MUCH DATA</h2>
 					</div>
 				</div>
-			</div>
-			<!---------------------------END BROWSER Store Flow-----------------------!>
+			</div><!-----------------------END STORE ENTER DATA-----------------------!>
+			<!---------------------------END !STORE using BROWSER CHOSEN!-----------------------!>
 
-			<!---------------------------Edit Success-----------------------!>
+			<!---------------------------EDIT SUCCESS-----------------------!>
 			<div class="flow_pages show_page_activatable" id="edit_success" style="display:none">
 				<h2>&#10004; SECRET DATA SUCCESSFULLY EDITED AND SAVED TO DATABASE</h2>
-			</div>
+			</div><!----------------------END EDIT SUCCESS-----------------------!>
 
-			<!---------------------------Store Success-----------------------!>
+			<!---------------------------STORE SUCCESS-----------------------!>
 			<div class="flow_pages show_page_activatable" id="store_success" style="display:none">
 				<h2>&#10004; SECRET DATA SUCCESSFULLY ENCRYPTED AND STORED</h2>
-			</div>
+			</div><!-----------------------END STORE SUCCESS-----------------------!>
 
-			<!---------------------------Stores Over 100 Fail-----------------------!>
+			<!---------------------------TOO MANY STORES FAIL-----------------------!>
 			<div class="flow_pages show_page_activatable" id="stores_over_100" style="display:none">
 				<h2>&#10060; STORE ERROR</h2>
 				<h2>You've reached your limit of 100 stores today.</h2>
-			</div>
+			</div><!----------------------END TOO MANY STORES FAIL-----------------------!>
 
-			<!---------------------------File Upload - NO SALT - Error-----------------------!>
+			<!---------------------------OUTER LAYER MUST BE OPENSSL FAIL-----------------------!>
 			<div class="flow_pages show_page_activatable" id="no_salt" style="display:none">
 				<h2>&#10060; The outer layer of encryption for a file upload MUST be encrypted with exact openssl command provided or it will NEVER DECRYPT PROPERLY!</h2>
 				<h2>openssl enc -aes-256-cbc -e -pbkdf2 -in yourfile.txt -out yourfile.enc</h2>
-			</div>
+			</div><!-----------------------END OUTER LAYER MUST BE OPENSSL FAIL-----------------------!>
 
-			<!---------------------------Store Fail-----------------------!>
+			<!---------------------------STORE FAIL-----------------------!>
 			<div class="flow_pages show_page_activatable" id="store_failed" style="display:none">
 				<h2>&#10060; STORE ERROR</h2>
-			</div>
+			</div><!----------------------END STORE FAIL-----------------------!>
 
-			<!---------------------------Over 50000 Store Fail-----------------------!>
+			<!---------------------------OVER 50000 STORES FAIL-----------------------!>
 			<div class="flow_pages show_page_activatable home" id="lockedout_50000" style="align-self:center; display:none; flex-direction:column; justify-content:center; ">
 				<h2>SECRETWORD IS LOCKEDOUT!</h2>
 				<h2>OVER 50,000 STORES REACHED!</h2>
-			</div>
-<!---------------------------END Store--------------------------------------------------------------!>
-<!---------------------------END Online Flow--------------------------------------------------------!>
+			</div><!----------------------END OVER 50000 STORES FAIL-----------------------!>
+<!---------------------------------END STORE FLOW---------------------------------------------------------------------------------------------------------!>
 
-<!---------------------------Offline Database Creation--------------------------------------------------------!>
-			<!---------------Offline Database 2 Options-----------------------------------------------!>
+<!---------------------------OFFLINE DATABASE CREATION FLOW-----------------------------------------------------------------------------------------------!>
+			<!--------------------------START OFFLINE DATABASE CREATION FLOW-----------------------------!>
 			<div class="flow_pages show_page_activatable" id="offline_dbase_2options" style="display:none">
 				<h2 style="align-self:center;">CHOOSE HOW TO CREATE YOUR OFFLINE DATABASE</h2>
 				<div class="" id="" style="display:flex;">
@@ -523,9 +562,9 @@
 						<label class="coolpink" style="align-self:center;">MOST Secure</label>
 					</div>
 				</div>
-			</div>
+			</div><!--------------------END START OFFLINE DATABASE CREATION FLOW--------------------------------------!>
 
-			<!---------------------------EXISTING DATA Codeword-----------------------!>
+			<!------------------OFFLINE DATABASE CREATION - EXISTING DATA codeword---------------------------------------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="newofflinedatabase_exisitingdata_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>OFFLINE DATABASE - EXISTING DATA FLOW</label>
@@ -536,9 +575,9 @@
 				<div class="button_pair" id="" style="display:flex;">
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="initFlow('existingdata_codeword_input');saveThenShowPage('newofflinedatabase_existingdata_obf1000Pass')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!---------------END OFFLINE DATABASE CREATION - EXISTING DATA codeword---------------------------------------------------!>
 
-			<!---------------------------EXISTING DATA obf1000Pass-----------------------!>
+			<!----------------OFFLINE DATABASE CREATION - EXISTING DATA obf1000Pass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="newofflinedatabase_existingdata_obf1000Pass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>OFFLINE DATABASE - EXISTING DATA FLOW</label>
@@ -550,9 +589,9 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('existingdata_obf1000Pass_input');saveThenShowPage('newofflinedatabase_existingdata_ctrPass');">CONTINUE</button>
 				</div>
-			</div>
+			</div><!------------END OFFLINE DATABASE CREATION - EXISTING DATA obf1000Pass-----------------------!>
 
-			<!---------------------------EXISTING DATA ctrPass-----------------------!>
+			<!---------------OFFLINE DATABASE CREATION - EXISTING DATA ctrPass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="newofflinedatabase_existingdata_ctrPass" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 					<label>OFFLINE DATABASE - EXISTING DATA FLOW</label>
@@ -564,16 +603,17 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_existingdata_obf1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="getOnlineRecordForNewOfflineDBase('existingdata_ctrPass_input');">CONTINUE</button>
 				</div>
-			</div>
-			<!--------------------------EXISTING DATA Record Added-----------------------!>
+			</div><!-----------END OFFLINE DATABASE CREATION - EXISTING DATA ctrPass-----------------------!>
+
+			<!-----------OFFLINE DATABASE CREATION - EXISTING DATA RECORD ADDED-----------------------!>
 			<div class="flow_pages show_page_activatable" id="newofflinedatabase_existingdata_record_added" style="display:none">
 				<h2>RECORD ADDED! YOU NOW HAVE <span id="numRecordsAdded" style="color:magenta; "></span> READY TO ADD TO A NEW OFFLINE DATABASE.</h2>
 				<h2>ADD MORE RECORDS?</h2>
 				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
 				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineDatabase_pass_or_no_filled');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
-			</div>
+			</div><!--------END OFFLINE DATABASE CREATION - EXISTING DATA RECORD ADDED-----------------------!>
 
-			<!--------------------------EXISTING DATA Use ENC Pass Database?-----------------------!>
+			<!---------------OFFLINE DATABASE CREATION - EXISTING DATA - WHICH DATABASE?-----------------------!>
 			<div class="flow_pages show_page_activatable" id="offlineDatabase_pass_or_no_filled" style="display:none; ">
 				<h2>YOU HAVE COMPLETED FILLING YOUR SET OF EXISTING DATA THAT WILL SOON BE ADDED TO A NEW OFFLINE DATABASE.</h2>
 				<h2>WOULD YOU LIKE TO ENCRYPT YOUR OFFLINE DATABASE WITH A PASSWORD?</h2>
@@ -582,9 +622,9 @@
 					<button class="obf_button" id='' style="flex-grow:1" onclick="createAndFillOfflineDBase('unencrypted', 'offlineDBasePass_input_filled');">NO PASSWORD</button>
 					<button class="obf_button activatable_by_enter" id='' style="flex-grow:1;" onclick="createAndFillOfflineDBase('encrypted', 'offlineDBasePass_input_filled');">PASSWORD READY</button>
 				</div>
-			</div>
+			</div><!------------END OFFLINE DATABASE CREATION - EXISTING DATA - WHICH DATABASE?-----------------------!>
 
-			<!--------------------------EXISTING DATA Use ENC Pass Database?-----------------------!>
+			<!---------------OFFLINE DATABASE CREATION - EMPTY CHOSEN - WHICH DATABASE?-----------------------!>
 			<div class="flow_pages show_page_activatable" id="offlineDatabase_pass_or_no_empty" style="display:none; ">
 				<h2><span style="color:magenta; ">MOST SECURE</span> OPTION CHOSEN - GENERATE AN EMPTY OFFLINE DATABASE.</h2>
 				<h2>WOULD YOU LIKE TO ENCRYPT YOUR OFFLINE DATABASE WITH A PASSWORD?</h2>
@@ -593,21 +633,21 @@
 					<button class="obf_button" id='' style="flex-grow:1" onclick="createAndFillOfflineDBase('unencrypted', 'offlineDBasePass_input_empty');">NO PASSWORD</button>
 					<button class="obf_button activatable_by_enter" id='' style="flex-grow:1;" onclick="createAndFillOfflineDBase('encrypted', 'offlineDBasePass_input_empty');">PASSWORD READY</button>
 				</div>
-			</div>
+			</div><!------------END OFFLINE DATABASE CREATION - EMPTY CHOSEN - WHICH DATABASE?-----------------------!>
 
-			<!---------------------------EXISTING DATA Failed to Access-----------------------!>
+			<!---------------------OFFLINE DATABASE CREATION - EXISTING DATA - FAILED TO ACCESS-----------------------!>
 			<div class="flow_pages show_page_activatable" id="failed_to_access_for_new_offline_database_creation" style="display:none">
 				<h2>&#10060; FAILED TO ACCESS EXISTING DATA FOR OFFLINE DATABASE CREATION.</h2>
 				<h2>TOTAL ADDED: <span class="numRecordsAdded" id="failedtoaccess_numRecordsAdded" style="color:magenta; "></span></h2>
 				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('newofflinedatabase_exisitingdata_codeword')">CONTINUE ADDING RECORDS</button>
 				<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlineDatabase_pass_or_no_filled');">ALL RECORDS ENTERED. CREATE A NEW OFFLINE DATABASE WITH THEM!</button>
-			</div>
+			</div><!------------------END OFFLINE DATABASE CREATION - EXISTING DATA - FAILED TO ACCESS-----------------------!>
 
-			<!---------------------------EXISTING DATA Too many records-----------------------!>
+			<!---------------------OFFLINE DATABASE CREATION - EXISTING DATA - TOO MANY RECORDS-----------------------!>
 			<div class="flow_pages show_page_activatable" id="too_many_records" style="display:none">
 				<h2>&#10060; MORE RECORDS ADDED THAN SPACE AVAILABLE IN AN OFFLINE DATABASE!</h2>
 				<h2>&#10060; THIS SHOULD NEVER RUN!</h2>
-			</div>
+			</div><!-----------------END OFFLINE DATABASE CREATION - EXISTING DATA - TOO MANY RECORDS-----------------------!>
 
 			<!---------------------------PASSLOCK ERROR: DENIED-----------------------!>
 			<div class="flow_pages show_page_activatable" id="passlock_error_deny" style="display:none">
@@ -617,19 +657,9 @@
 			</div>
 
 
-<!----------------------------Offline Flow Start--------------------------------------------------------------!>
-			<!--------------------------OFFLINE HOME----------------------------!>
-			<div class="flow_pages show_page_activatable home" id="offline_home" style="align-self:center; display:none; flex-direction:column; justify-content:center; color:#54c597">
-				<h2 style="color:red">OFFLINE HOME</h2>
-				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='go_offlinestore_flow' style="flex-grow:1" onclick="saveThenShowPage('store_codeword')">STORE SECRET DATA</button>
-					<button class="obf_button" id='go_offlineaccess_flow' style="flex-grow:1" onclick="saveThenShowPage('access_codeword')">ACCESS SECRET DATA</button>
-					<button class="obf_button" id='go_offlinesync_flow' style="flex-grow:1" onclick="saveThenShowPage('offlinesync_codeword')">SYNC STORED DATA TO ONLINE DATABASE</button>
-				</div>
-			</div>
 
-<!----------------------------Offline SYNC TO ONLINE--------------------------------------------------------------!>
-			<!---------------------------SYNC TO ONLINE Codeword-----------------------!>
+<!----------------------------OFFLINE DATABASE SYNC TO ONLINE FLOW------------------------------------------------------------------------------------------!>
+			<!---------------------------SYNC TO ONLINE codeword-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="offlinesync_codeword" style="display:none">
 				<div style="display:flex; flex-direction:row; justify-content:space-between;">
 				<h2 style="color:red">OFFLINE FLOW</h2>
@@ -642,7 +672,7 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offline_home')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('offlinesync_codeword_input'); saveThenShowPage('offlinesync_obf1000Pass')">CONTINUE</button>
 				</div>
-			</div>
+			</div><!---------------------END SYNC TO ONLINE codeword-----------------------!>
 
 			<!---------------------------SYNC TO ONLINE obf1000Pass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="offlinesync_obf1000Pass" style="display:none">
@@ -657,7 +687,7 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_codeword')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="extractInputData('offlinesync_obf1000Pass_input'); saveThenShowPage('offlinesync_ctrPass');">CONTINUE</button>
 				</div>
-			</div>
+			</div><!----------------------END SYNC TO ONLINE obf1000Pass-----------------------!>
 
 			<!---------------------------SYNC TO ONLINE ctrPass-----------------------!>
 			<div class="flow_pages show_page_activatable passlock" id="offlinesync_ctrPass" style="display:none">
@@ -672,26 +702,12 @@
 					<button class="" id='' style="flex-grow:1;" onclick="saveThenShowPage('offlinesync_obf1000Pass')">BACK</button>
 					<button class="activatable_by_enter" id='' style="flex-grow:1;" onclick="attemptSyncToOnline('offlinesync_ctrPass_input')">SYNC TO ONLINE</button>
 				</div>
-			</div>
+			</div><!-----------------------END SYNC TO ONLINE ctrPass-----------------------!>
 
-			<!---------------------------Store Success-----------------------!>
+			<!---------------------------SYNC TO ONLINE SUCCESS-----------------------!>
 			<div class="flow_pages show_page_activatable" id="sync_success" style="display:none">
 				<h2>&#10004; SECRET DATA SUCCESSFULLY SYNCED TO ONLINE SERVER</h2>
-			</div>
+			</div><!-----------------------END SYNC TO ONLINE SUCCESS-----------------------!>
+<!------------------------END OFFLINE DATABASE SYNC TO ONLINE FLOW------------------------------------------------------------------------------------------!>
 
-			<!--------------------------OFFLINE DATABASE ENTER DATABASE PASSWORD-----------------------!>
-			<div class="flow_pages show_page_activatable" id="enter_offlinedbase_pass" style="display:none; ">
-				<label id='emptyPassWarning' style='color:magenta; display:none; '>Please enter a password or choose NO PASSWORD.</label>
-				<h2>IF YOU SECURED YOUR OFFLINE DATABASE WITH A PASSWORD, PLEASE ENTER IT NOW.</h2>
-				<input class="main_site_password_input" autocomplete="off" type="password" value="" id="set_offlineDBasePass_input" style="">
-				<div class="home_buttons" id="" style="display:flex; justify-content:center;">
-					<button class="obf_button" id='didnotuse_encpassword_button' style="flex-grow:1" onclick="resetOfflineData(); saveThenShowPage('offline_home')">NO PASSWORD</button>
-					<button class="obf_button activatable_by_enter" id='yes_password_button' style="flex-grow:1;" onclick="extractOfflineDatabasePassword()">PASSWORD READY</button>
-				</div>
-			</div>
-
-			<!---------------------------Offline Database Password Fail-----------------------!>
-			<div class="flow_pages show_page_activatable" id="wrong_offlinedbase_password" style="display:none">
-				<h2>&#10060; OFFLINE DATABASE PASSWORD ENTERED INCORRECTLY!</h2>
-			</div>
 
