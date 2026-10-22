@@ -54,7 +54,7 @@
 	//               Security Reset - Main Site                 //
 	//////////////////////////////////////////////////////////////
 
-	// Reset state variables, etc. that could be security concern.
+	// Reset state variables, etc. that could be a security concern.
 	function resetSecurityAndUI() {
 		// Reset EDIT functionality buttons.
 		document.getElementById("editdata_button").style.display = hideReadonlyButtons;
@@ -113,17 +113,16 @@
 		// Accept case insensitive.
 		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
 		if (enteredCaptchaValue === 'blue') {
-			saveCurrentStateToHistorySoBackWillWork();
-			showPage('contact_page');
+			saveThenShowPage('contact_page');
 		}
-	}
+	}// checkCaptcha()
 
 	// Submit user message to site owners.
 	function submitContactMessage() {
 		const contactMessage = document.getElementById('contact_textarea').value;
 		serverSendContactMessage(contactMessage);
 		showPage('contact_thanks');
-	}
+	}// submitContactMessage()
 
 	/////////////////////////////////////////////////////////////////
 	//                  Copy to Click Functions                    //
@@ -142,7 +141,7 @@
 		for (let i = 0; i < decryptElements.length; i++) {
 			decryptElements[i].addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
 		}
-	}
+	}// addListenersToAllCopyToClick()
 
 	// Copy command line OpenSSL command to clipboard as user clicks div.
 	async function copyEncryptOpenSslCmdToClipboard() {
@@ -159,7 +158,7 @@
 		} catch (error) {
 			console.error(error.message);
 		}
-	}
+	}// copyEncryptOpenSslCmdToClipboard()
 
 	// Copy command line OpenSSL command to clipboard as user clicks div.
 	async function copyDecryptOpenSslCmdToClipboard() {
@@ -176,7 +175,7 @@
 		} catch (error) {
 			console.error(error.message);
 		}
-	}
+	}// copyDecryptOpenSslCmdToClipboard()
 
 	// Show immediate UI change so user knows their clipboard was modified.
 	function showEncryptCommandCopied() {
@@ -184,7 +183,7 @@
 		for (const element of messageElements) {
 			element.style.display = 'inline';
 		}
-	}
+	}// showEncryptCommandCopied()
 
 	// Show immediate UI change so user knows their clipboard was modified.
 	function hideEncryptCommandCopied() {
@@ -192,7 +191,7 @@
 		for (const element of messageElements) {
 			element.style.display = 'none';
 		}   
-	}
+	}// hideEncryptCommandCopied()
 
 	// Show immediate UI change so user knows their clipboard was modified.
 	function showDecryptCommandCopied() {
@@ -200,7 +199,7 @@
 		for (const element of messageElements) {
 			element.style.display = 'inline';
 		}
-	}
+	}// showDecryptCommandCopied()
 
 	// Show immediate UI change so user knows their clipboard was modified.
 	function hideDecryptCommandCopied() {
@@ -208,19 +207,19 @@
 		for (const element of messageElements) {
 			element.style.display = 'none';
 		}   
-	}
+	}// hideDecryptCommandCopied()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							Browser Back functionality										     		  //
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Harnessing the browser's back functionality is complexity rooted in browser security decisions and the
-	// functional opacity that brings. You are disallowed from things like deleting history records as a user moves
-	// through a custom interface, so workarounds are needed. Because of the opacity of how this works in the browser,
-	// testing and tuning was required to get it to work - there was no straightforward theory available.
+	// With a dynamic website browser back functionality must be implemented by hand. Extensive use of our custom function
+	// showPage() makes this relatively easy to implement by using a wrapper to save the state of the site as
+	// a user transistions between pages we want to be distinct. We can then listen for 'popstate' events which
+	// are thrown when a user hits their browser's back button and dynamically return them to the previous page.
 	//
 	// The goal is to map the back button to the last page of the UI a user was on.
-	// This is achieved in 2 steps: creating a record in history for every page we want the user to be able to go back to.
-	// And making sure that the proper page is returned to upon a user activating browser back function.
+	// This is achieved in 2 steps: First by creating a record in history for every page we want the user to be able to go back to,
+	// second by making sure that the user returns to the proper page upon activating the browser back function.
 	//
 	// Listen for the popstate event which is usually fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
@@ -230,24 +229,29 @@
 		// Show dynamic page when user hits back button.
 		//showPage(event.state.page);
 
+		// Check if we're on the Edit page (where user plaintext data will be visible) and halt user from using back on this page.
 		if (onAccessEditPage_f === true) {
 			// Inform user they will not be able to edit if they navigate away from this page. That data will become stale.
 			console.log("stopped navigation away from page. now what?");
 			showStopNavWarning();
-		} else {
+		} else { // Otherwise function normally.
 			showPage(event.state.page);
 		}
 	});
 
+	// User plaintext data is accessible on the Edit page so for security we disallow back functionality on that page.
+	// This flag tells us if user is currently on that page.
 	let onAccessEditPage_f = false;
 
+	// Setter function used to deactivate nav flag.
 	function deactivateStopNavFlag(){
-		console.log("DE-ativating stop nav flag.");
+		console.log("DE-activating stop nav flag.");
 		onAccessEditPage_f = false;
 	}
 
+	// Setter function used to activate nav flag.
 	function activateStopNavFlag(){
-		console.log("activating stop nav flag.");
+		console.log("Activating stop nav flag.");
 		onAccessEditPage_f = true;
 	}
 
@@ -412,22 +416,27 @@
 	/////////////////////////////////////////////////////////////////////////
 	//					Check Functions									   //
 	/////////////////////////////////////////////////////////////////////////
+	// Some functions used here reside in either index.tmpl or offline_standalone.tmpl
+	// because offline_standalone.tmpl is held in a heredoc which makes the regex used slightly different.
+	/////////////////////////////////////////////////////////////////////////
 
-	function checkDataLength(data, length) {
-		// Return fail if data length surpasses length.
-		if (data.length > length) {
+	// Make sure data length doesn't exceed limits.
+	function checkDataLength(data, lengthLimit) {
+		// Return fail if the length of input parameter: data is not less than input parameter: length.
+		if (data.length > lengthLimit) {
 			console.log("Data length Invalid!");
 			return false;
 		} else {
 			return true;
 		}
-	}
+	}// checkDataLength()
 
+	// check that data is of length: length and consists of only base64 chars.
 	function checkLengthAndBase64(data, length){
 		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
 			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
 		} 
-	}
+	}// checkLengthAndBase64()
 
 	// Input: input is a string.
 	// Output: Returns false if the input length (in bytes) is over OPENSSL_INPUT_LIMIT_BYTES: 686
@@ -463,6 +472,7 @@
 		}
 	}// checkInputLengthUpload()
 
+	// Check that both fingerprint and data are valid.
 	function checkFingerprintAndData(fingerprint, multiEncryptedDatarecord) {
 		if (!checkFingerprintIsValid(fingerprint)) {
 			throw new Error('Attempt to store failed! FINGERPRINT is invalid.');
@@ -474,7 +484,7 @@
 		}else{
 			console.log("DATA IS VALID!");
 		}
-	}
+	}// checkFingerprintAndData()
 
 	// Called on change of text area, checks length of that text area and shows warning if input data too long.
 	function checkDataInputLength(input_id) {
@@ -606,7 +616,6 @@
 		document.getElementById('stale_flow_div').style.display = 'flex';
 	}
 
-
 	// Randomly generate a single Multi Encrypted Datarecord worth of junk data.
 	function getRandMultiEncryptedDatarecord() {
 		// This value that will convert to 1024 base64 chars.
@@ -621,3 +630,4 @@
 		// omitPadding used here to remove a single '=' char, leaving us with a length of 43 for fingerprints.
 		return randarray.toBase64({omitPadding: true});
 	}// getRandFingerprint()
+
