@@ -97,12 +97,9 @@
 			<TMPL_INCLUDE NAME="dev_site_html.tmpl">
 			<!--------------------------FAQ SITE----------------------------!>
 			<TMPL_INCLUDE NAME="faq_html.tmpl">
-
 			<!-- HTML for both main/readonly and offline included here. -->
 			<TMPL_INCLUDE NAME="common_html.tmpl">
-
 		</div><!--------------------------------------------END Center HTML----------------------------------------------------!>
-
 		<!--------------------------------------------SITE FOOTER----------------------------------------------------!>
 		<div style="display:flex; flex-direction:column;">
 			<div id="savetodisk_warning" style="background-color:gray; display:none; flex-direction:column;">
@@ -110,12 +107,8 @@
 				<button id='' style="align-self:center;" onclick="saveToDisk(); saveThenShowPage('offline_home')">SAVE DATA TO DISK</button>
 			</div>
 		</div><!--------------------------------------------END SITE FOOTER----------------------------------------------------!>
-
 	</div><!--------------------------------------------END MAIN PAGE----------------------------------------------------!>
-
 </body><!--------------------------------------------END HTML BODY----------------------------------------------------!>
-
-<!-----------------------------------------------------SCRIPT is where Javascript code lives.------------------------------------------------------------------------------------!>
 <script>
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,17 +162,17 @@
 	// Offline database is different because database password page.
 	function goHome() {
 		switchSite("enter_offlinedbase_pass");
-	}
+	}// goHome()
 
 	// Function call wrapper that allows online and offline use of catchUpload.
 	async function saveFileData(filedata) {
 		offlineData['data'] = filedata;
-	}
+	}// saveFileData()
 
 	// Clear data when user leaves Edit page.
 	function resetData() {
 		resetOfflineData();
-	}
+	}// resetData()
 
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
@@ -398,7 +391,7 @@
 	// Reset user data storage object, clearing passwords and data.
 	function resetOfflineData() {
 		offlineData = {};
-	}
+	}// resetOfflineData()
 
 	// Offline database home page will use this function to extract the password for the encrypted offline database.
 	async function extractOfflineDatabasePassword() {
@@ -697,14 +690,13 @@
 		}
 	}//attemptDelete()
 
-
 	function clearSaveToDiskReminder() {
 		document.getElementById("savetodisk_warning").style.display = "none";
-	}
+	}// clearSaveToDiskReminder()
 
 	function setSaveToDiskReminder() {
 		document.getElementById("savetodisk_warning").style.display = "flex";
-	}
+	}// setSaveToDiskReminder()
 
 	// Gonna need this functionality in order to store to disk.
 	//
@@ -713,7 +705,6 @@
 	function saveToDisk() {
 		// Clear reminder flag first or it will be active in saved file.
 		clearSaveToDiskReminder();
-
 		// This line doesn't get applied with the innerHTML call below so add it manually.
 		let allhtml = "<!DOCTYPE HTML>";
 		// This will grab a copy of the currently running HTML.
