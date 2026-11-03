@@ -1,15 +1,16 @@
 // This <script> seems to turn on syntax highlighting.
-//////////////////////////////////////////////
-// dev_site_js.tmpl
-//
-// Includes javascript functions used dev site.
-//////////////////////////////////////////////
+//////////////////////////////////////////////////
+// dev_site_js.tmpl                             //
+//                                              //
+// Includes javascript functions used dev site. //
+//////////////////////////////////////////////////
 
 	///////////////////////////////////////////////////////////////////////////////////
 	//						Magenta Scroll Bar Highlighting                          //
 	///////////////////////////////////////////////////////////////////////////////////
-
 	// The magenta highlight on the sidebar is turned on and off as the user scrolls the page.
+	//
+	// This function turns off all pink bars.
 	function turnOffPinkBar() {
 		document.getElementById('openssl_sidebar_text').style.color = siteColor;
 		document.getElementById('gcm1000_sidebar_text').style.color = siteColor;
@@ -17,6 +18,7 @@
 		document.getElementById('triple_sidebar_text').style.color = siteColor;
 	}// turnOffPinkBar()
 
+	// This set of functions each turn on their corresponding bar.
 	function turnOnPinkBarOpenSSL() {
 		document.getElementById('openssl_sidebar_text').style.color = 'magenta';
 	}// turnOnPinkBarOpenSSL()
@@ -30,9 +32,11 @@
 		document.getElementById('triple_sidebar_text').style.color = 'magenta';
 	}// turnOnPinkBarTriple()
 
-	// A read-only property scrollY of the Window interface returns the number of pixels by which the document is currently scrolled vertically. (paraphrasing MDN https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY)
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY
+	// A read-only property scrollY of the Window interface returns the number of pixels by which the document is currently scrolled vertically.
 	// So, the further the user scrolls from the top of the page, the larger the value will be.
-	// We use this value to set the location of the 'pink bar' which is intended to indicate to the user which section they are in. 
+	// We use this value to set the location of the 'pink bar' which is indicates to the user which section they are in. 
 	// This listener fires an unnammed function which sets the pink bar in real-time.
 	window.addEventListener("scroll", (event) => {
 		let scroll = window.scrollY;
@@ -50,75 +54,86 @@
 			turnOffPinkBar();
 			turnOnPinkBarTriple();
 		}
-	});
+	}); // Scroll Listener
 
-	// Listeners are used for each textarea so that operation can be performed when these windows are focused.
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// When a user focuses a window we 'activate' it, immediately taking input in that window as plaintext for encrypt or ciphertext for decrypt (depending on the window). 
+	// This set of listeners handle activating the proper function for the window that was focused.
+	//
 	// OpenSSL
-	document.getElementById('openssl_cleartext').addEventListener("focus", (event) => {
+	document.getElementById('openssl_plaintext').addEventListener("focus", (event) => {
 		activateEncOpenSSL();
 	});
 	document.getElementById('openssl_ciphertext').addEventListener("focus", (event) => {
 		activateDecOpenSSL();
 	});
 	document.getElementById('openssl_password').addEventListener("focus", (event) => {
+		// When password input field is focused, choose either encrypt or decrypt side based on current state.
+		// True here indicates encrypt side.
 		if (openSSLEncrypt_f) {
 			showActiveEncOpenSSL();
 		}
 	});
 	// GCM-1000
-	document.getElementById('gcm1000_cleartext').addEventListener("focus", (event) => {
+	document.getElementById('gcm1000_plaintext').addEventListener("focus", (event) => {
 		activateEncOBF1000();
 	});
 	document.getElementById('gcm1000_ciphertext').addEventListener("focus", (event) => {
 		activateDecOBF1000();
 	});
 	document.getElementById('gcm1000_password').addEventListener("focus", (event) => {
+		// True here indicates encrypt side.
 		if (gcm1000Encrypt_f) {
 			showActiveEncOBF1000();
 		}
 	});
 	// AES-CTR
-	document.getElementById('aesctr_cleartext').addEventListener("focus", (event) => {
+	document.getElementById('aesctr_plaintext').addEventListener("focus", (event) => {
 		activateEncAESCTR();
 	});
 	document.getElementById('aesctr_ciphertext').addEventListener("focus", (event) => {
 		activateDecAESCTR();
 	});
 	document.getElementById('aesctr_password').addEventListener("focus", (event) => {
+		// True here indicates encrypt side.
 		if (aesctrEncrypt_f) {
 			showActiveEncAESCTR();
 		}
 	});
 	// Triple Cipher
-	document.getElementById('triple_cleartext').addEventListener("focus", (event) => {
+	document.getElementById('triple_plaintext').addEventListener("focus", (event) => {
 		activateEncTriple();
 	});
 	document.getElementById('triple_ciphertext').addEventListener("focus", (event) => {
 		activateDecTriple();
 	});
 	document.getElementById('triple_password_1').addEventListener("focus", (event) => {
+		// True here indicates encrypt side.
 		if (tripleEncrypt_f) {
 			showActiveEncTriple();
 		}
 	});
 	document.getElementById('triple_password_2').addEventListener("focus", (event) => {
+		// True here indicates encrypt side.
 		if (tripleEncrypt_f) {
 			showActiveEncTriple();
 		}
 	});
 	document.getElementById('triple_password_3').addEventListener("focus", (event) => {
+		// True here indicates encrypt side.
 		if (tripleEncrypt_f) {
 			showActiveEncTriple();
 		}
 	});
 
-	// Use global flag so a combo function executeOpenSSL can be used oninput for 3 html locations.
+	// Use global flag stateful variable so combo functions executeOpenSSL, etc. can be used with the focus event.
+	// Keeps track of which side (enc or dec) is active so execute<type> functions work for operating on both.
 	let openSSLEncrypt_f = true;
 	let gcm1000Encrypt_f = true;
 	let aesctrEncrypt_f = true;
 	let tripleEncrypt_f = true;
 
-	// Show / hide tooltip functionality.
+	// Set of functions that show/hide tooltips.
 	function showTipOpenSSL () {
 		document.getElementById('openssl_tooltip').style.display = "inline";
 	}
@@ -148,82 +163,106 @@
 	//					OpenSSL HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 
-	// Wrapper function allowing human readable text to be encrypted.
-	async function utf8EncryptOpenSSL(cleartext, password) {
-		const cleartext64 = utf8ToBase64(cleartext);
-		return await encryptOpenSSL(cleartext64, password);
+	// Wrapper/converter function allowing human readable text to be encrypted (base functions operate on base64).
+	async function utf8EncryptOpenSSL(plaintext, password) {
+		const plaintext64 = utf8ToBase64(plaintext);
+		return await encryptOpenSSL(plaintext64, password);
 	}// utf8EncryptOpenSSL()
 
-	// Wrapper function allowing human readable text to be decrypted.
+	// Wrapper/converter function allowing decryption directly to human readable text (base functions operate on base64).
 	async function utf8DecryptOpenSSL(ciphertext, password) {
-		const cleartext64 = await decryptOpenSSL(ciphertext, password);
-		return base64ToUtf8(cleartext64);
+		const plaintext64 = await decryptOpenSSL(ciphertext, password);
+		return base64ToUtf8(plaintext64);
 	}// utf8DecryptOpenSSL()
 
-	// Handles passing in data to core crypto functions then displaying the outcome of processing that data.
+	// Passes data to core crypto functions in order to be encrypted or decrypted, then displays the outcome of processing that data.
 	async function executeOpenSSL() {
-		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
+		// Encrypt/Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (openSSLEncrypt_f === true) { // Encrypt function
 			// Gather inputs.
-			const cleartext = document.getElementById('openssl_cleartext').value;
+			const plaintext = document.getElementById('openssl_plaintext').value;
 			const password = document.getElementById('openssl_password').value;
-			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			// If encrypt fails, display outcome to user instead of erroring.
 			try {
-				document.getElementById('openssl_ciphertext').value = await utf8EncryptOpenSSL(cleartext, password);
+				// Execute crypto function with wrapper, enabling enc/dec of human readable text. Place result in corresponding textarea.
+				document.getElementById('openssl_ciphertext').value = await utf8EncryptOpenSSL(plaintext, password);
+				// Make outcome message visible.
 				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('openssl_outcome_message').style.color = 'lime';
+				// Place specified text inside this element.
 				document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
 			} catch (error) {
 				console.log(error);
+				// Make outcome message visible.
 				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('openssl_outcome_message').style.color = 'red';
+				// Place specified text inside this element.
 				document.getElementById('openssl_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				// Only show correct ciphertext.
 				document.getElementById('openssl_ciphertext').value = '';
 			}
 		} else { // Decrypt function
 			// Gather inputs.
 			const ciphertext = document.getElementById('openssl_ciphertext').value;
 			const password = document.getElementById('openssl_password').value;
-			// Execute
+			// If decrypt fails, display outcome to user instead of erroring.
 			try {
-				document.getElementById('openssl_cleartext').value = await utf8DecryptOpenSSL(ciphertext, password);
+				// Execute crypto function with wrapper, enabling enc/dec of human readable text. Place result in corresponding textarea.
+				document.getElementById('openssl_plaintext').value = await utf8DecryptOpenSSL(ciphertext, password);
+				// Make outcome message visible.
 				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('openssl_outcome_message').style.color = 'lime';
+				// Place specified text inside this element.
 				document.getElementById('openssl_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
 			} catch (error) {
 				console.log(error);
-				//document.getElementById('openssl_outcome_message').style.display = 'inline';
+				// Make outcome message visible.
 				document.getElementById('openssl_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('openssl_outcome_message').style.color = 'red';
+				// Place specified text inside this element.
 				document.getElementById('openssl_outcome_message').innerHTML = 'Decryption unsuccessful';
-				document.getElementById('openssl_cleartext').value = '';
+				// Only show correct plaintext.
+				document.getElementById('openssl_plaintext').value = '';
 			}
 		}
-		// Deactivate pending execution timer.
+		// Deactivate pending timer before creating a new one.
 		clearTimeout(timeoutIdOpenSSL)
+		// Create timer that will turn off outcome message after 2 seconds.
 		timeoutIdOpenSSL = setTimeout(() => {
+			// Turn off outcome message.
 			turnOffOpenSSLDecryptOutcomeMessage();
 		}, 2000); 
-		// Show length value AFTER execution.
+		// Compute length value after execution (when we have the correct values to check the length of).
 		setLengthOpenSSL();
 	}// executeOpenSSL()
 
-	// By keeping track of a timeout ID, we can turn off the message before time has elapsed if the function is executed before timeout ends.
+	// By keeping track of a timeout ID, we can turn off the message before time has elapsed when the function is executed before timeout ends.
 	let timeoutIdOpenSSL;
-	// Show the length of cleartext and ciphertext in the UI.
+	// Compute then show the length of plaintext and ciphertext in the UI.
 	function setLengthOpenSSL() {
 		// Cleartext 
-		const cleartext = document.getElementById('openssl_cleartext').value;
-		const cleartextByteSize = new Blob([cleartext]).size;
-		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
-		document.getElementById('openssl_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		const plaintext = document.getElementById('openssl_plaintext').value;
+		// Compute the number of bytes used to represent displayed text.
+		const plaintextByteSize = new Blob([plaintext]).size;
+		// Compile string text to be shown.
+		const plaintext_bytesize_string = "Bytes: " + plaintextByteSize;
+		// Display string text.
+		document.getElementById('openssl_plaintext_bytesize_label').innerHTML = plaintext_bytesize_string;
 		// Ciphertext
 		const ciphertext = document.getElementById('openssl_ciphertext').value;
+		// Compute the number of bytes used to represent displayed text.
 		const ciphertextByteSize = new Blob([ciphertext]).size;
+		// Compile string text to be shown.
 		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
+		// Display string text.
 		document.getElementById('openssl_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}// setLengthOpenSSL()
 
+	// Turn off outcome message.
 	function turnOffOpenSSLDecryptOutcomeMessage() {
 		document.getElementById('openssl_outcome_message').style.visibility = 'hidden';
 	}// turnOffOpenSSLDecryptOutcomeMessage()
@@ -233,7 +272,7 @@
 		// Disable decrypt.
 		// Change button text to disabled color.
 		document.getElementById('openssl_dec_button').style.color = 'dimgray';
-		// Change outline, label to diabled color.
+		// Change outline, label to disabled color.
 		document.getElementById('openssl_ciphertext_label').style.color = 'gray';
 		document.getElementById('openssl_ciphertext').style.color = 'gray';
 		document.getElementById('openssl_ciphertext').style.borderColor = 'gray';
@@ -244,11 +283,11 @@
 		// Change button text to enabled color.
 		document.getElementById('openssl_enc_button').style.color = 'lime';
 		// Change outline, label to enabled color.
-		document.getElementById('openssl_cleartext_label').style.color = siteColor;
-		document.getElementById('openssl_cleartext').style.color = siteColor;
-		document.getElementById('openssl_cleartext').style.borderColor = siteColor;
-		// Enable cleartext textarea.
-		document.getElementById('openssl_cleartext').disabled = false;
+		document.getElementById('openssl_plaintext_label').style.color = siteColor;
+		document.getElementById('openssl_plaintext').style.color = siteColor;
+		document.getElementById('openssl_plaintext').style.borderColor = siteColor;
+		// Enable plaintext textarea.
+		document.getElementById('openssl_plaintext').disabled = false;
 	}// showActiveEncOpenSSL()
 
 	// Activate Encrypt UI when user focuses the Encrypt side textarea.
@@ -260,13 +299,10 @@
 		// Use function for code re-use. showActive functions used for when user clicks password.
 		showActiveEncOpenSSL();
 		// Focus newly active textarea
-		document.getElementById('openssl_cleartext').focus();
+		document.getElementById('openssl_plaintext').focus();
 		// Execute crypto on button click.
 		executeOpenSSL();
 	}// activateEncOpenSSL()
-
-// PGO Green: #54c597
-// PGO Readonly Blue: #4491d5
 
 	// Activate Decrypt UI.
 	function activateDecOpenSSL() {
@@ -275,21 +311,21 @@
 		// Enable decrypt - ciphertext.
 		// Change button text to enabled color.
 		document.getElementById('openssl_dec_button').style.color = 'lime';
-		// Change outline, label to diabled color.
+		// Change outline, label to disabled color.
 		document.getElementById('openssl_ciphertext_label').style.color = siteColor;
 		document.getElementById('openssl_ciphertext').style.color = siteColor;
 		document.getElementById('openssl_ciphertext').style.borderColor = siteColor;
-		// Enable cleartext textarea.
+		// Enable plaintext textarea.
 		document.getElementById('openssl_ciphertext').disabled = false;
-		// Disable encrypt - cleartext.
+		// Disable encrypt - plaintext.
 		// Change button text to disabled color.
 		document.getElementById('openssl_enc_button').style.color = 'dimgray';
 		// Change outline, label to enabled color.
-		document.getElementById('openssl_cleartext_label').style.color = 'gray';
-		document.getElementById('openssl_cleartext').style.color = 'gray';
-		document.getElementById('openssl_cleartext').style.borderColor = 'gray';
+		document.getElementById('openssl_plaintext_label').style.color = 'gray';
+		document.getElementById('openssl_plaintext').style.color = 'gray';
+		document.getElementById('openssl_plaintext').style.borderColor = 'gray';
 		// Disable ciphertext textarea.
-		document.getElementById('openssl_cleartext').disabled = true;
+		document.getElementById('openssl_plaintext').disabled = true;
 		// Focus newly active textarea
 		document.getElementById('openssl_ciphertext').focus();
 		// Execute crypto on button click.
@@ -300,81 +336,106 @@
 	//					OBF-1000 HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 
-	// Wrapper function allowing human readable text to be encrypted.
-	async function utf8EncryptOBF1000(cleartext, password) {
-		const cleartext64 = utf8ToBase64(cleartext);
-		return await encryptOBF1000(cleartext64, password, false);
+	// Wrapper/converter function allowing human readable text to be encrypted (base functions operate on base64).
+	async function utf8EncryptOBF1000(plaintext, password) {
+		const plaintext64 = utf8ToBase64(plaintext);
+		return await encryptOBF1000(plaintext64, password, false);
 	}// utf8EncryptOBF1000()
 
-	// Wrapper function allowing human readable text to be decrypted.
+	// Wrapper/converter function allowing decryption directly to human readable text (base functions operate on base64).
 	async function utf8DecryptOBF1000(ciphertext, password) {
-		const cleartext64 = await decryptOBF1000(ciphertext, password, false);
-		return base64ToUtf8(cleartext64);
+		const plaintext64 = await decryptOBF1000(ciphertext, password, false);
+		return base64ToUtf8(plaintext64);
 	}// utf8DecryptOBF1000()
 
-	// Handles passing in data to core crypto functions then displaying the outcome of processing that data.
+	// Passes data to core crypto functions in order to be encrypted or decrypted, then displays the outcome of processing that data.
 	async function executeOBF1000() {
-		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
+		// Encrypt/Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (gcm1000Encrypt_f === true) { // Encrypt function
 			// Gather inputs.
-			const cleartext = document.getElementById('gcm1000_cleartext').value;
+			const plaintext = document.getElementById('gcm1000_plaintext').value;
 			const password = document.getElementById('gcm1000_password').value;
-			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			// If encrypt fails, display outcome to user instead of erroring.
 			try {
-				document.getElementById('gcm1000_ciphertext').value = await utf8EncryptOBF1000(cleartext, password);
+				// Execute crypto function with wrapper, enabling enc/dec of human readable text. Place result in corresponding textarea.
+				document.getElementById('gcm1000_ciphertext').value = await utf8EncryptOBF1000(plaintext, password);
+				// Make outcome message visible.
 				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('gcm1000_outcome_message').style.color = 'lime';
+				// Place specified text inside this element.
 				document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
 			} catch (error) {
 				console.log(error);
+				// Make outcome message visible.
 				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('gcm1000_outcome_message').style.color = 'red';
+				// Place specified text inside this element.
 				document.getElementById('gcm1000_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				// Only show correct ciphertext.
 				document.getElementById('gcm1000_ciphertext').value = '';
 			}
 		} else { // Decrypt function
 			// Gather inputs.
 			const ciphertext = document.getElementById('gcm1000_ciphertext').value;
 			const password = document.getElementById('gcm1000_password').value;
-			// Execute
+			// If decrypt fails, display outcome to user instead of erroring.
 			try {
-				document.getElementById('gcm1000_cleartext').value = await utf8DecryptOBF1000(ciphertext, password);
+				// Execute crypto function with wrapper, enabling enc/dec of human readable text. Place result in corresponding textarea.
+				document.getElementById('gcm1000_plaintext').value = await utf8DecryptOBF1000(ciphertext, password);
+				// Make outcome message visible.
 				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('gcm1000_outcome_message').style.color = 'lime';
+				// Place specified text inside this element.
 				document.getElementById('gcm1000_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
 			} catch (error) {
 				console.log(error);
+				// Make outcome message visible.
 				document.getElementById('gcm1000_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('gcm1000_outcome_message').style.color = 'red';
+				// Place specified text inside this element.
 				document.getElementById('gcm1000_outcome_message').innerHTML = 'Decryption unsuccessful';
-				document.getElementById('gcm1000_cleartext').value = '';
+				// Only show correct plaintext.
+				document.getElementById('gcm1000_plaintext').value = '';
 			}
 		}
-		// Deactivate pending execution timer.
+		// Deactivate pending timer before creating a new one.
 		clearTimeout(timeoutIdGCM)
+		// Create timer that will turn off outcome message after 2 seconds.
 		timeoutIdGCM = setTimeout(() => {
+			// Turn off outcome message.
 			turnOffOBF1000DecryptOutcomeMessage();
 		}, 2000); 
-		// Show length value AFTER execution.
+		// Compute length value after execution (when we have the correct values to check the length of).
 		setLengthOBF1000();
 	}// executeOBF1000()
 
 	// By keeping track of a timeout ID, we can turn off the message before time has elapsed if the function is executed before timeout ends.
 	let timeoutIdGCM;
-	// Show the length of cleartext and ciphertext in the UI.
+	// Compute then show the length of plaintext and ciphertext in the UI.
 	function setLengthOBF1000() {
 		// Cleartext 
-		const cleartext = document.getElementById('gcm1000_cleartext').value;
-		const cleartextByteSize = new Blob([cleartext]).size;
-		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
-		document.getElementById('gcm1000_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		const plaintext = document.getElementById('gcm1000_plaintext').value;
+		// Compute the number of bytes used to represent displayed text.
+		const plaintextByteSize = new Blob([plaintext]).size;
+		// Compile string text to be shown.
+		const plaintext_bytesize_string = "Bytes: " + plaintextByteSize;
+		// Display string text.
+		document.getElementById('gcm1000_plaintext_bytesize_label').innerHTML = plaintext_bytesize_string;
 		// Ciphertext
 		const ciphertext = document.getElementById('gcm1000_ciphertext').value;
+		// Compute the number of bytes used to represent displayed text.
 		const ciphertextByteSize = new Blob([ciphertext]).size;
+		// Compile string text to be shown.
 		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
+		// Display string text.
 		document.getElementById('gcm1000_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}// setLengthOBF1000()
 
+	// Turn off outcome message.
 	function turnOffOBF1000DecryptOutcomeMessage() {
 		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
 	}// turnOffOBF1000DecryptOutcomeMessage()
@@ -384,7 +445,7 @@
 		// Disable decrypt.
 		// Change button text to disabled color.
 		document.getElementById('gcm1000_dec_button').style.color = 'dimgray';
-		// Change outline, label to diabled color.
+		// Change outline, label to disabled color.
 		document.getElementById('gcm1000_ciphertext_label').style.color = 'gray';
 		document.getElementById('gcm1000_ciphertext').style.color = 'gray';
 		document.getElementById('gcm1000_ciphertext').style.borderColor = 'gray';
@@ -394,11 +455,11 @@
 		// Change button text to enabled color.
 		document.getElementById('gcm1000_enc_button').style.color = 'lime';
 		// Change outline, label to enabled color.
-		document.getElementById('gcm1000_cleartext_label').style.color = siteColor;
-		document.getElementById('gcm1000_cleartext').style.color = siteColor;
-		document.getElementById('gcm1000_cleartext').style.borderColor = siteColor;
-		// Enable cleartext textarea.
-		document.getElementById('gcm1000_cleartext').disabled = false;
+		document.getElementById('gcm1000_plaintext_label').style.color = siteColor;
+		document.getElementById('gcm1000_plaintext').style.color = siteColor;
+		document.getElementById('gcm1000_plaintext').style.borderColor = siteColor;
+		// Enable plaintext textarea.
+		document.getElementById('gcm1000_plaintext').disabled = false;
 	}// showActiveEncOBF1000()
 
 	// Activate Encrypt UI when user focuses the Encrypt side textarea.
@@ -409,13 +470,10 @@
 		document.getElementById('gcm1000_outcome_message').style.visibility = 'hidden';
 		showActiveEncOBF1000();
 		// Focus newly active textarea
-		document.getElementById('gcm1000_cleartext').focus();
+		document.getElementById('gcm1000_plaintext').focus();
 		// Execute crypto on button click.
 		executeOBF1000();
 	}// activateEncOBF1000()
-
-// Secretword Green: #54c597
-// Secretword Readonly Blue: #4491d5
 
 	// Activate Decrypt UI.
 	function activateDecOBF1000() {
@@ -424,21 +482,21 @@
 		// Enable decrypt - ciphertext.
 		// Change button text to enabled color.
 		document.getElementById('gcm1000_dec_button').style.color = 'lime';
-		// Change outline, label to diabled color.
+		// Change outline, label to disabled color.
 		document.getElementById('gcm1000_ciphertext_label').style.color = siteColor;
 		document.getElementById('gcm1000_ciphertext').style.color = siteColor;
 		document.getElementById('gcm1000_ciphertext').style.borderColor = siteColor;
-		// Enable cleartext textarea.
+		// Enable plaintext textarea.
 		document.getElementById('gcm1000_ciphertext').disabled = false;
-		// Disable encrypt - cleartext.
+		// Disable encrypt - plaintext.
 		// Change button text to disabled color.
 		document.getElementById('gcm1000_enc_button').style.color = 'dimgray';
 		// Change outline, label to enabled color.
-		document.getElementById('gcm1000_cleartext_label').style.color = 'gray';
-		document.getElementById('gcm1000_cleartext').style.color = 'gray';
-		document.getElementById('gcm1000_cleartext').style.borderColor = 'gray';
+		document.getElementById('gcm1000_plaintext_label').style.color = 'gray';
+		document.getElementById('gcm1000_plaintext').style.color = 'gray';
+		document.getElementById('gcm1000_plaintext').style.borderColor = 'gray';
 		// Disable ciphertext textarea.
-		document.getElementById('gcm1000_cleartext').disabled = true;
+		document.getElementById('gcm1000_plaintext').disabled = true;
 		// Focus newly active textarea
 		document.getElementById('gcm1000_ciphertext').focus();
 		// Execute crypto on button click.
@@ -449,83 +507,106 @@
 	//					AES-CTR HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 
-	// Wrapper function allowing human readable text to be encrypted.
-	async function utf8EncryptAESCTR(cleartext, password) {
-		const cleartext64 = utf8ToBase64(cleartext);
-		return await encryptAESCTR(cleartext64, password, false);
+	// Wrapper/converter function allowing human readable text to be encrypted (base functions operate on base64).
+	async function utf8EncryptAESCTR(plaintext, password) {
+		const plaintext64 = utf8ToBase64(plaintext);
+		return await encryptAESCTR(plaintext64, password, false);
 	}// utf8EncryptAESCTR()
 
-	// Wrapper function allowing human readable text to be decrypted.
+	// Wrapper/converter function allowing decryption directly to human readable text (base functions operate on base64).
 	async function utf8DecryptAESCTR(ciphertext, password) {
-		const cleartext64 = await decryptAESCTR(ciphertext, password, false);
-		return base64ToUtf8(cleartext64);
+		const plaintext64 = await decryptAESCTR(ciphertext, password, false);
+		return base64ToUtf8(plaintext64);
 	}// utf8DecryptAESCTR()
 
-	// Handles passing in data to core crypto functions then displaying the outcome of processing that data.
+	// Passes data to core crypto functions in order to be encrypted or decrypted, then displays the outcome of processing that data.
 	async function executeAESCTR() {
-		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
+		// Encrypt/Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (aesctrEncrypt_f === true) { // Encrypt function
 			// Gather inputs.
-			const cleartext = document.getElementById('aesctr_cleartext').value;
+			const plaintext = document.getElementById('aesctr_plaintext').value;
 			const password = document.getElementById('aesctr_password').value;
-			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			// If encrypt fails, display outcome to user instead of erroring.
 			try {
-				//document.getElementById('aesctr_ciphertext').value = await encryptAESCTR(cleartext, password, 'utf8');
-				document.getElementById('aesctr_ciphertext').value = await utf8EncryptAESCTR(cleartext, password);
+				// Execute crypto function with wrapper, enabling enc/dec of human readable text. Place result in corresponding textarea.
+				document.getElementById('aesctr_ciphertext').value = await utf8EncryptAESCTR(plaintext, password);
+				// Make outcome message visible.
 				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('aesctr_outcome_message').style.color = 'lime';
+				// Place specified text inside this element.
 				document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
 			} catch (error) {
 				console.log(error);
+				// Make outcome message visible.
 				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('aesctr_outcome_message').style.color = 'red';
+				// Place specified text inside this element.
 				document.getElementById('aesctr_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				// Only show correct ciphertext.
 				document.getElementById('aesctr_ciphertext').value = '';
 			}
 		} else { // Decrypt function
 			// Gather inputs.
 			const ciphertext = document.getElementById('aesctr_ciphertext').value;
 			const password = document.getElementById('aesctr_password').value;
-			// Execute
+			// If decrypt fails, display outcome to user instead of erroring.
 			try {
-				//document.getElementById('aesctr_cleartext').value = await decryptAESCTR(ciphertext, password, 'utf8');
-				document.getElementById('aesctr_cleartext').value = await utf8DecryptAESCTR(ciphertext, password);
+				// Execute crypto function with wrapper, enabling enc/dec of human readable text. Place result in corresponding textarea.
+				document.getElementById('aesctr_plaintext').value = await utf8DecryptAESCTR(ciphertext, password);
+				// Make outcome message visible.
 				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('aesctr_outcome_message').style.color = 'lime';
+				// Place specified text inside this element.
 				document.getElementById('aesctr_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
 			} catch (error) {
 				console.log(error);
+				// Make outcome message visible.
 				document.getElementById('aesctr_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('aesctr_outcome_message').style.color = 'red';
+				// Place specified text inside this element.
 				document.getElementById('aesctr_outcome_message').innerHTML = 'Decryption unsuccessful';
-				document.getElementById('aesctr_cleartext').value = '';
+				// Only show correct plaintext.
+				document.getElementById('aesctr_plaintext').value = '';
 			}
 		}
-		// Deactivate pending execution timer.
+		// Deactivate pending timer before creating a new one.
 		clearTimeout(timeoutIdCTR)
+		// Create timer that will turn off outcome message after 2 seconds.
 		timeoutIdCTR = setTimeout(() => {
+			// Turn off outcome message.
 			turnOffAESCTRDecryptOutcomeMessage();
 		}, 2000); 
-		// Show length value AFTER execution.
+		// Compute length value after execution (when we have the correct values to check the length of).
 		setLengthAESCTR();
 	}// executeAESCTR()
 
 	// By keeping track of a timeout ID, we can turn off the message before time has elapsed if the function is executed before timeout ends.
 	let timeoutIdCTR;
-	// Show the length of cleartext and ciphertext in the UI.
+	// Compute then show the length of plaintext and ciphertext in the UI.
 	function setLengthAESCTR() {
 		// Cleartext 
-		const cleartext = document.getElementById('aesctr_cleartext').value;
-		const cleartextByteSize = new Blob([cleartext]).size;
-		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
-		document.getElementById('aesctr_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		const plaintext = document.getElementById('aesctr_plaintext').value;
+		// Compute the number of bytes used to represent displayed text.
+		const plaintextByteSize = new Blob([plaintext]).size;
+		// Compile string text to be shown.
+		const plaintext_bytesize_string = "Bytes: " + plaintextByteSize;
+		// Display string text.
+		document.getElementById('aesctr_plaintext_bytesize_label').innerHTML = plaintext_bytesize_string;
 		// Ciphertext
 		const ciphertext = document.getElementById('aesctr_ciphertext').value;
+		// Compute the number of bytes used to represent displayed text.
 		const ciphertextByteSize = new Blob([ciphertext]).size;
+		// Compile string text to be shown.
 		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
+		// Display string text.
 		document.getElementById('aesctr_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}// setLengthAESCTR()
 
+	// Turn off outcome message.
 	function turnOffAESCTRDecryptOutcomeMessage() {
 		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
 	}// turnOffAESCTRDecryptOutcomeMessage()
@@ -535,7 +616,7 @@
 		// Disable decrypt.
 		// Change button text to disabled color.
 		document.getElementById('aesctr_dec_button').style.color = 'dimgray';
-		// Change outline, label to diabled color.
+		// Change outline, label to disabled color.
 		document.getElementById('aesctr_ciphertext_label').style.color = 'gray';
 		document.getElementById('aesctr_ciphertext').style.color = 'gray';
 		document.getElementById('aesctr_ciphertext').style.borderColor = 'gray';
@@ -545,11 +626,11 @@
 		// Change button text to enabled color.
 		document.getElementById('aesctr_enc_button').style.color = 'lime';
 		// Change outline, label to enabled color.
-		document.getElementById('aesctr_cleartext_label').style.color = siteColor;
-		document.getElementById('aesctr_cleartext').style.color = siteColor;
-		document.getElementById('aesctr_cleartext').style.borderColor = siteColor;
-		// Enable cleartext textarea.
-		document.getElementById('aesctr_cleartext').disabled = false;
+		document.getElementById('aesctr_plaintext_label').style.color = siteColor;
+		document.getElementById('aesctr_plaintext').style.color = siteColor;
+		document.getElementById('aesctr_plaintext').style.borderColor = siteColor;
+		// Enable plaintext textarea.
+		document.getElementById('aesctr_plaintext').disabled = false;
 	}// showActiveEncAESCTR()
 
 	// Activate Encrypt UI when user focuses the Encrypt side textarea.
@@ -560,13 +641,10 @@
 		document.getElementById('aesctr_outcome_message').style.visibility = 'hidden';
 		showActiveEncAESCTR();
 		// Focus newly active textarea
-		document.getElementById('aesctr_cleartext').focus();
+		document.getElementById('aesctr_plaintext').focus();
 		// Execute crypto on button click.
 		executeAESCTR();
 	}// activateEncAESCTR()
-
-// PGO Green: #54c597
-// PGO Readonly Blue: #4491d5
 
 	// Activate Decrypt UI.
 	function activateDecAESCTR() {
@@ -575,21 +653,21 @@
 		// Enable decrypt - ciphertext.
 		// Change button text to enabled color.
 		document.getElementById('aesctr_dec_button').style.color = 'lime';
-		// Change outline, label to diabled color.
+		// Change outline, label to disabled color.
 		document.getElementById('aesctr_ciphertext_label').style.color = siteColor;
 		document.getElementById('aesctr_ciphertext').style.color = siteColor;
 		document.getElementById('aesctr_ciphertext').style.borderColor = siteColor;
-		// Enable cleartext textarea.
+		// Enable plaintext textarea.
 		document.getElementById('aesctr_ciphertext').disabled = false;
-		// Disable encrypt - cleartext.
+		// Disable encrypt - plaintext.
 		// Change button text to disabled color.
 		document.getElementById('aesctr_enc_button').style.color = 'dimgray';
 		// Change outline, label to enabled color.
-		document.getElementById('aesctr_cleartext_label').style.color = 'gray';
-		document.getElementById('aesctr_cleartext').style.color = 'gray';
-		document.getElementById('aesctr_cleartext').style.borderColor = 'gray';
+		document.getElementById('aesctr_plaintext_label').style.color = 'gray';
+		document.getElementById('aesctr_plaintext').style.color = 'gray';
+		document.getElementById('aesctr_plaintext').style.borderColor = 'gray';
 		// Disable ciphertext textarea.
-		document.getElementById('aesctr_cleartext').disabled = true;
+		document.getElementById('aesctr_plaintext').disabled = true;
 		// Focus newly active textarea
 		document.getElementById('aesctr_ciphertext').focus();
 		// Execute crypto on button click.
@@ -601,26 +679,34 @@
 	//					Triple HTML handling									 //
 	///////////////////////////////////////////////////////////////////////////////
 
-	// Handles passing in data to core crypto functions then displaying the outcome of processing that data.
+	// Passes data to core crypto functions in order to be encrypted or decrypted, then displays the outcome of processing that data.
 	async function executeTriple() {
-		// Encrypt / Decrypt buttons set this flag which determines encrypt or decrypt function.
+		// Encrypt/Decrypt buttons set this flag which determines encrypt or decrypt function.
 		if (tripleEncrypt_f === true) { // Encrypt function
 			// Gather inputs.
-			const cleartext = document.getElementById('triple_cleartext').value;
+			const plaintext = document.getElementById('triple_plaintext').value;
 			const password1GCM = document.getElementById('triple_password_1').value;
 			const password2CTR = document.getElementById('triple_password_2').value;
 			const password3OpenSSL = document.getElementById('triple_password_3').value;
-			// If both cleartext and password are empty, do nothing: want user to see blank slate till they enter something.
+			// If encrypt fails, display outcome to user instead of erroring.
 			try {
-				document.getElementById('triple_ciphertext').value = await encryptTriple(password1GCM, password2CTR, password3OpenSSL, cleartext);
+				// Execute crypto function with wrapper, enabling enc/dec of human readable text. Place result in corresponding textarea.
+				document.getElementById('triple_ciphertext').value = await encryptTriple(password1GCM, password2CTR, password3OpenSSL, plaintext);
+				// Make outcome message visible.
 				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('triple_outcome_message').style.color = 'lime';
+				// Place specified text inside this element.
 				document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY ENCRYPTED';
 			} catch (error) {
 				console.log(error);
+				// Make outcome message visible.
 				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('triple_outcome_message').style.color = 'red';
+				// Place specified text inside this element.
 				document.getElementById('triple_outcome_message').innerHTML = 'Error: Encryption unsuccessful';
+				// Only show correct ciphertext.
 				document.getElementById('triple_ciphertext').value = '';
 			}
 		} else { // Decrypt function
@@ -629,45 +715,62 @@
 			const password1GCM = document.getElementById('triple_password_1').value;
 			const password2CTR = document.getElementById('triple_password_2').value;
 			const password3OpenSSL = document.getElementById('triple_password_3').value;
-			// Execute
+			// If decrypt fails, display outcome to user instead of erroring.
 			try {
-				document.getElementById('triple_cleartext').value = await decryptTriple(password1GCM, password2CTR, password3OpenSSL, ciphertext);
+				// Execute crypto function with wrapper, enabling enc/dec of human readable text. Place result in corresponding textarea.
+				document.getElementById('triple_plaintext').value = await decryptTriple(password1GCM, password2CTR, password3OpenSSL, ciphertext);
+				// Make outcome message visible.
 				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('triple_outcome_message').style.color = 'lime';
+				// Place specified text inside this element.
 				document.getElementById('triple_outcome_message').innerHTML = 'SUCCESSFULLY DECRYPTED';
 			} catch (error) {
 				console.log(error);
+				// Make outcome message visible.
 				document.getElementById('triple_outcome_message').style.visibility = 'visible';
+				// Set the text color.
 				document.getElementById('triple_outcome_message').style.color = 'red';
+				// Place specified text inside this element.
 				document.getElementById('triple_outcome_message').innerHTML = 'Decryption unsuccessful';
-				document.getElementById('triple_cleartext').value = '';
+				// Only show correct plaintext.
+				document.getElementById('triple_plaintext').value = '';
 			}
 		}
-		// Deactivate pending execution timer.
+		// Deactivate pending timer before creating a new one.
 		clearTimeout(timeoutIdTriple)
+		// Create timer that will turn off outcome message after 2 seconds.
 		timeoutIdTriple = setTimeout(() => {
+			// Turn off outcome message.
 			turnOffTripleDecryptOutcomeMessage();
 		}, 2000); 
-		// Show length AFTER execution.
+		// Compute length value after execution (when we have the correct values to check the length of).
 		setLengthTriple();
 	}// executeTriple()
 
 	// By keeping track of a timeout ID, we can turn off the message before time has elapsed if the function is executed before timeout ends.
 	let timeoutIdTriple;
-	// Show the length of cleartext and ciphertext in the UI.
+	// Compute then show the length of plaintext and ciphertext in the UI.
 	function setLengthTriple() {
 		// Cleartext 
-		const cleartext = document.getElementById('triple_cleartext').value;
-		const cleartextByteSize = new Blob([cleartext]).size;
-		const cleartext_bytesize_string = "Bytes: " + cleartextByteSize;
-		document.getElementById('triple_cleartext_bytesize_label').innerHTML = cleartext_bytesize_string;
+		const plaintext = document.getElementById('triple_plaintext').value;
+		// Compute the number of bytes used to represent displayed text.
+		const plaintextByteSize = new Blob([plaintext]).size;
+		// Compile string text to be shown.
+		const plaintext_bytesize_string = "Bytes: " + plaintextByteSize;
+		// Display string text.
+		document.getElementById('triple_plaintext_bytesize_label').innerHTML = plaintext_bytesize_string;
 		// Ciphertext
 		const ciphertext = document.getElementById('triple_ciphertext').value;
+		// Compute the number of bytes used to represent displayed text.
 		const ciphertextByteSize = new Blob([ciphertext]).size;
+		// Compile string text to be shown.
 		const ciphertext_bytesize_string = "Bytes: " + ciphertextByteSize;
+		// Display string text.
 		document.getElementById('triple_ciphertext_bytesize_label').innerHTML = ciphertext_bytesize_string;
 	}// setLengthTriple()
 
+	// Turn off outcome message.
 	function turnOffTripleDecryptOutcomeMessage() {
 		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
 	}// turnOffTripleDecryptOutcomeMessage()
@@ -677,7 +780,7 @@
 		// Disable decrypt.
 		// Change button text to disabled color.
 		document.getElementById('triple_dec_button').style.color = 'dimgray';
-		// Change outline, label to diabled color.
+		// Change outline, label to disabled color.
 		document.getElementById('triple_ciphertext_label').style.color = 'gray';
 		document.getElementById('triple_ciphertext').style.color = 'gray';
 		document.getElementById('triple_ciphertext').style.borderColor = 'gray';
@@ -687,11 +790,11 @@
 		// Change button text to enabled color.
 		document.getElementById('triple_enc_button').style.color = 'lime';
 		// Change outline, label to enabled color.
-		document.getElementById('triple_cleartext_label').style.color = siteColor;
-		document.getElementById('triple_cleartext').style.color = siteColor;
-		document.getElementById('triple_cleartext').style.borderColor = siteColor;
-		// Enable cleartext textarea.
-		document.getElementById('triple_cleartext').disabled = false;
+		document.getElementById('triple_plaintext_label').style.color = siteColor;
+		document.getElementById('triple_plaintext').style.color = siteColor;
+		document.getElementById('triple_plaintext').style.borderColor = siteColor;
+		// Enable plaintext textarea.
+		document.getElementById('triple_plaintext').disabled = false;
 	}// showActiveEncTriple()
 
 	// Activate Encrypt UI when user focuses the Encrypt side textarea.
@@ -702,13 +805,10 @@
 		document.getElementById('triple_outcome_message').style.visibility = 'hidden';
 		showActiveEncTriple();
 		// Focus newly active textarea
-		document.getElementById('triple_cleartext').focus();
+		document.getElementById('triple_plaintext').focus();
 		// Execute crypto on button click.
 		executeTriple();
 	}// activateEncTriple()
-
-// PGO Green: #54c597
-// PGO Readonly Blue: #4491d5
 
 	// Activate Decrypt UI.
 	function activateDecTriple() {
@@ -717,21 +817,21 @@
 		// Enable decrypt - ciphertext.
 		// Change button text to enabled color.
 		document.getElementById('triple_dec_button').style.color = 'lime';
-		// Change outline, label to diabled color.
+		// Change outline, label to disabled color.
 		document.getElementById('triple_ciphertext_label').style.color = siteColor;
 		document.getElementById('triple_ciphertext').style.color = siteColor;
 		document.getElementById('triple_ciphertext').style.borderColor = siteColor;
-		// Enable cleartext textarea.
+		// Enable plaintext textarea.
 		document.getElementById('triple_ciphertext').disabled = false;
-		// Disable encrypt - cleartext.
+		// Disable encrypt - plaintext.
 		// Change button text to disabled color.
 		document.getElementById('triple_enc_button').style.color = 'dimgray';
 		// Change outline, label to enabled color.
-		document.getElementById('triple_cleartext_label').style.color = 'gray';
-		document.getElementById('triple_cleartext').style.color = 'gray';
-		document.getElementById('triple_cleartext').style.borderColor = 'gray';
+		document.getElementById('triple_plaintext_label').style.color = 'gray';
+		document.getElementById('triple_plaintext').style.color = 'gray';
+		document.getElementById('triple_plaintext').style.borderColor = 'gray';
 		// Disable ciphertext textarea.
-		document.getElementById('triple_cleartext').disabled = true;
+		document.getElementById('triple_plaintext').disabled = true;
 		// Focus newly active textarea
 		document.getElementById('triple_ciphertext').focus();
 		// Execute crypto on button click.

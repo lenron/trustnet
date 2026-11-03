@@ -78,12 +78,12 @@
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="openssl_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+								<label id="openssl_plaintext_label" style="align-self:flex-end;">Cleartext:</label>
 								<div id="" style="display:flex; flex-direction:column; justify-content:flex-end; ">
-									<label id="openssl_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
+									<label id="openssl_plaintext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
-							<textarea value="" id="openssl_cleartext" style="" oninput="executeOpenSSL()"></textarea>
+							<textarea value="" id="openssl_plaintext" style="" oninput="executeOpenSSL()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:32px;">
 							<button class="" id='openssl_enc_button' style="flex-grow:1; " onclick="activateEncOpenSSL()">Encrypt<br>------></button>
@@ -139,12 +139,12 @@
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="gcm1000_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+								<label id="gcm1000_plaintext_label" style="align-self:flex-end;">Cleartext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="gcm1000_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
+									<label id="gcm1000_plaintext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
-							<textarea value="" id="gcm1000_cleartext" style="" rows="8" oninput="executeOBF1000()"></textarea>
+							<textarea value="" id="gcm1000_plaintext" style="" rows="8" oninput="executeOBF1000()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
 							<button class="" id='gcm1000_enc_button' style="flex-grow:1; " onclick="activateEncOBF1000()">Encrypt<br>------></button>
@@ -199,12 +199,12 @@
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="aesctr_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+								<label id="aesctr_plaintext_label" style="align-self:flex-end;">Cleartext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="aesctr_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
+									<label id="aesctr_plaintext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
-							<textarea value="" id="aesctr_cleartext" style="" rows="8" oninput="executeAESCTR()"></textarea>
+							<textarea value="" id="aesctr_plaintext" style="" rows="8" oninput="executeAESCTR()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
 							<button class="" id='aesctr_enc_button' style="flex-grow:1; " onclick="activateEncAESCTR()">Encrypt<br>------></button>
@@ -260,12 +260,12 @@
 					<div class="textarea_div_heightcontrol" id="" style="display:flex; flex-direction:row; ">
 						<div id="" style="display:flex; flex-direction:column; flex-grow:5; ">
 							<div id="" style="display:flex; flex-direction:row; justify-content:space-between; ">
-								<label id="triple_cleartext_label" style="align-self:flex-end;">Cleartext:</label>
+								<label id="triple_plaintext_label" style="align-self:flex-end;">Cleartext:</label>
 								<div id="" style="display:flex; flex-direction:column;  ">
-									<label id="triple_cleartext_bytesize_label" style="color:gray; ">Bytes:</label>
+									<label id="triple_plaintext_bytesize_label" style="color:gray; ">Bytes:</label>
 								</div>
 							</div>
-							<textarea value="" id="triple_cleartext" style="" rows="8" oninput="executeTriple()"></textarea>
+							<textarea value="" id="triple_plaintext" style="" rows="8" oninput="executeTriple()"></textarea>
 						</div>
 						<div id="" style="display:flex; flex-direction:column; flex-grow:1; margin-left:5px; margin-right:5px; margin-top:33px;">
 							<button class="" id='triple_enc_button' style="flex-grow:1; " onclick="activateEncTriple()">Encrypt<br>------></button>

@@ -1,15 +1,13 @@
 // This <script> seems to turn on syntax highlighting.
-//////////////////////////////////////////////
-// common_js.tmpl
-//
-// Includes all javascript functions used by all 3 versions of the site.
-//////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+// common_js.tmpl                                                        //
+//                                                                       //
+// Includes all javascript functions used by all 3 versions of the site. //
+///////////////////////////////////////////////////////////////////////////
 
 
 	// catchUpload() is executed from the HTML UI when a user uploads a file.
 	// The file is interpreted as raw bytes before being converted to base64 and fed into UI data handling pipeline.
-	//
-	// Catch File Ingest
 	async function catchUpload(event) {
 		// Set incoming File object to variable file.
 		const file = event.target.files[0];
@@ -26,7 +24,7 @@
 			// Input Data Length Check
 			if (checkInputLengthUpload(fileDataBuffer)) {
 
-				// Function wrapper so it works with online and offline function sets.
+				// Function wrapper so this function works with online and offline base index files.
 				await saveFileData(filedata64);
 		
 				// Show button.
