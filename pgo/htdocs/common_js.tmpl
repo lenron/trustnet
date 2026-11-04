@@ -5,7 +5,6 @@
 // Includes all javascript functions used by all 3 versions of the site. //
 ///////////////////////////////////////////////////////////////////////////
 
-
 	// catchUpload() is executed from the HTML UI when a user uploads a file.
 	// The file is interpreted as raw bytes before being converted to base64 and fed into UI data handling pipeline.
 	async function catchUpload(event) {
@@ -23,12 +22,11 @@
 			let filedata64 = fileDataUint8.toBase64();
 			// Input Data Length Check
 			if (checkInputLengthUpload(fileDataBuffer)) {
-
 				// Function wrapper so this function works with online and offline base index files.
 				await saveFileData(filedata64);
-		
 				// Show button.
 				document.getElementById("store_upload_commit_button").style.display = "inline";
+				// Remove border.
 				document.getElementById("store_upload_input").style.border = "";
 				// Tell user we are READY TO COMMIT. 
 				document.getElementById("store_upload_readytocommit").style.display = "inline";
@@ -36,11 +34,11 @@
 				document.getElementById("store_upload_warning").style.display = "none";
 			}else{
 				// Data Length too long! Show Warning.
-				// hide continue button
+				// Hide continue button.
 				document.getElementById("store_upload_commit_button").style.display = "none";
-				// make border red
+				// Make border red.
 				document.getElementById("store_upload_input").style.border = "thick solid red";
-				// add red warning text
+				// Add red warning text.
 				document.getElementById("store_upload_warning").style.display = "inline";
 			}
 		}
@@ -49,14 +47,14 @@
 	}// catchUpload()
 
 	//////////////////////////////////////////////////////////////
-	//               Security Reset - Main Site                 //
+	//                    Security Reset                        //
 	//////////////////////////////////////////////////////////////
-
 	// Reset state variables, etc. that could be a security concern.
 	function resetSecurityAndUI() {
-		// Reset EDIT functionality buttons.
+		// Reset EDIT functionality buttons. Readonly site hides buttons using variable set in index/offline_standalone.
 		document.getElementById("editdata_button").style.display = hideReadonlyButtons;
 		document.getElementById("delete_button").style.display = hideReadonlyButtons;
+		// Hide save button.
 		document.getElementById("save_button").style.display = "none";
 		// Return Access Success page to default input disabled state.
 		showEditDisabledUI();
@@ -78,9 +76,10 @@
 		updateOnlineStatus();
 		// Hide password RE-Entry check warnings (passlock flow).
 		hidePassCheckFailWarnings();
-		// Reset delete overlay
+		// Reset delete overlay.
 		deleteCheckHide('overlay_delete_cmd');
 		deleteCheckHide('overlay_delete_browser');
+		// Reset 
 		hideStaleFlowWarning();
 		deactivateStopNavFlag();
 		hideStopNavWarning();
@@ -566,50 +565,50 @@
 	////////////////////////////////////////////////////////////////////////////////////////////
 	// Observation functions for clearing data when user moves away from plaintext Edit page. //
 	////////////////////////////////////////////////////////////////////////////////////////////
-
-	// Select the node that will be observed for mutations
+	//
+	// This div (flow_page) will be 'observed'. When the user navigates away, data will be cleared.
 	const accessFlowEndNode = document.getElementById("access_plaintext");
-
-	// Options for the observer (which mutations to observe)
-	const config = { attributes: true, attributeFilter: ['style'] }
-
-	// Callback function to execute when mutations are observed
-	const callback = (mutationList, observer) => {
+	// The display style will be observed as it changes from flex to none as the user navigates away from 'access_plaintext' Edit page.
+	const observationConfig = {attributes: true, attributeFilter: ['style']}
+	// Create observer object pointing to the callback function to be used when attribute change is observed.
+	const observerObj = new MutationObserver(observationCallback);
+	// Define the callback function that will be executed on the observed node.
+	// mutationList is a MutationRecord read-only interface object that is filled/handled by native JS automatically.
+	const observationCallback = (mutationList, observerObj) => {
+		// Loop through each detected mutation.
 		for (const mutation of mutationList) {
+			// Clear plaintext data once change in style is detected.
 			if (mutation.attributeName === 'style') {
 				console.log("Leaving Plaintext Edit page! Clearing data for security.");
-				// Site type agnostic clear data function.
+				// Clear user data.
 				resetData();
+				// Disable observation functionality.
 				stopObserving();
 			}
 		}
 	};
-
-	// Create an observer instance linked to the callback function
-	const observer = new MutationObserver(callback);
-
+	// Now that everything is set up, a function is ready to start the observation of target node with configured options, callback.
+	// Called from index.tmpl or offline_standalone.tmpl by a UI handler function.
 	function startObserving(){
-		// Start observing the target node for configured mutations
-		observer.observe(accessFlowEndNode, config);
-	}
+		// Start observing the target node for configured mutations.
+		observerObj.observe(accessFlowEndNode, observationConfig);
+	}// startObserving()
 
+	// Halt observation functionality.
 	function stopObserving(){
-		// Later, you can stop observing
-		observer.disconnect();
-	}
+		observerObj.disconnect();
+	}// stopObserving()
 
+	// Set of functions used to handle show/hide warning explaining why navigation has been halted (back button function halted) on the Edit page.
 	function hideStopNavWarning(){
 		document.getElementById('stop_nav_div').style.display = 'none';
 	}
-
 	function showStopNavWarning(){
 		document.getElementById('stop_nav_div').style.display = 'flex';
 	}
-
 	function hideStaleFlowWarning(){
 		document.getElementById('stale_flow_div').style.display = 'none';
 	}
-
 	function showStaleFlowWarning(){
 		document.getElementById('stale_flow_div').style.display = 'flex';
 	}
