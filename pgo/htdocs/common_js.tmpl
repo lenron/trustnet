@@ -5,6 +5,18 @@
 // Includes all javascript functions used by all 3 versions of the site. //
 ///////////////////////////////////////////////////////////////////////////
 
+	// Dynamically return home when SECRETWORD is clicked in order to avoid reloading the site unintentionally.
+	document.getElementById("titletext").onclick = function() {
+		// Works for both main index and offline_standalone.
+		goHome();
+	}
+
+	// Switch site to Main, FAQ, Dev Site, or Contact page.
+	function switchSite(targetSite){
+		resetData();
+		saveThenShowPage(targetSite);
+	}
+
 	// catchUpload() is executed from the HTML UI when a user uploads a file.
 	// The file is interpreted as raw bytes before being converted to base64 and fed into UI data handling pipeline.
 	async function catchUpload(event) {
@@ -49,7 +61,7 @@
 	//////////////////////////////////////////////////////////////
 	//                    Security Reset                        //
 	//////////////////////////////////////////////////////////////
-	// Reset state variables, etc. that could be a security concern.
+	// Reset state variables, UI.
 	function resetSecurityAndUI() {
 		// Reset EDIT functionality buttons. Readonly site hides buttons using variable set in index/offline_standalone.
 		document.getElementById("editdata_button").style.display = hideReadonlyButtons;
@@ -79,7 +91,7 @@
 		// Reset delete overlay.
 		deleteCheckHide('overlay_delete_cmd');
 		deleteCheckHide('overlay_delete_browser');
-		// Reset 
+		// Reset 'Stop Navigation' warning on Edit page.
 		hideStaleFlowWarning();
 		deactivateStopNavFlag();
 		hideStopNavWarning();
@@ -109,38 +121,43 @@
 		let enteredCaptchaValue = document.getElementById('captcha_input').value;
 		// Accept case insensitive.
 		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
+		// The answer to our captcha question: 'The color of the sky is?'.
 		if (enteredCaptchaValue === 'blue') {
+			// Proceed upon correct answer.
 			saveThenShowPage('contact_page');
 		}
 	}// checkCaptcha()
 
 	// Submit user message to site owners.
 	function submitContactMessage() {
+		// Extract message from textarea.
 		const contactMessage = document.getElementById('contact_textarea').value;
 		serverSendContactMessage(contactMessage);
 		showPage('contact_thanks');
 	}// submitContactMessage()
 
-	/////////////////////////////////////////////////////////////////
-	//                  Copy to Click Functions                    //
-	/////////////////////////////////////////////////////////////////
-
-	// Adds a copy to click listener to each HTML element that contains the respective class.
+	////////////////////////////////////////////////////////////////////
+	//                  Click to Copy Functionality                   //
+	////////////////////////////////////////////////////////////////////
+	// Click to copy functionality which copys the command line openssl commands to the clipboard for convenience.
+	//
+	// Adds a click to copy listener to each HTML element that contains the respective class.
 	function addListenersToAllCopyToClick() {
-		// Add encrypt elements.
+		// Add listener to each HTML element containing the encrypt command.
 		let encryptElements = document.getElementsByClassName('encrypt_copy_to_click');
 		for (let i = 0; i < encryptElements.length; i++) {
+			// When any of these HTML elements become clicked, run this function.
 			encryptElements[i].addEventListener("click", () => copyEncryptOpenSslCmdToClipboard());
 		}
-
-		// Add decrypt elements.
+		// Add listener to each HTML element containing the decrypt command.
 		let decryptElements = document.getElementsByClassName('decrypt_copy_to_click');
 		for (let i = 0; i < decryptElements.length; i++) {
+			// When any of these HTML element become clicked, run this function.
 			decryptElements[i].addEventListener("click", () => copyDecryptOpenSslCmdToClipboard());
 		}
 	}// addListenersToAllCopyToClick()
 
-	// Copy command line OpenSSL command to clipboard as user clicks div.
+	// Copy command line OpenSSL command to clipboard. This function runs when user clicks an HTML element containing its corresponding listener which was added above.
 	async function copyEncryptOpenSslCmdToClipboard() {
 		try {
 			// Copy command to clipboard.
@@ -148,8 +165,9 @@
 			console.log("OpenSSL encrypt command copied to clipboard.");
 			// Display message indicating command was copied to clipboard.
 			showEncryptCommandCopied();
-			// Undisplay message in 5 seconds after showing it.
+			// Remove message 5 seconds after initial display.
 			setTimeout(() => {
+				// Remove message.
 				hideEncryptCommandCopied();
 			}, FIVE_SECONDS); 
 		} catch (error) {
@@ -157,7 +175,7 @@
 		}
 	}// copyEncryptOpenSslCmdToClipboard()
 
-	// Copy command line OpenSSL command to clipboard as user clicks div.
+	// Copy command line OpenSSL command to clipboard. This function runs when user clicks an HTML element containing its corresponding listener which was added above.
 	async function copyDecryptOpenSslCmdToClipboard() {
 		try {
 			// Copy command to clipboard.
@@ -165,8 +183,9 @@
 			console.log("OpenSSL decrypt command copied to clipboard.");
 			// Display message indicating command was copied to clipboard.
 			showDecryptCommandCopied();
-			// Undisplay message in 5 seconds after showing it.
+			// Remove message 5 seconds after initial display.
 			setTimeout(() => {
+				// Remove message.
 				hideDecryptCommandCopied();
 			}, FIVE_SECONDS); 
 		} catch (error) {
@@ -174,33 +193,41 @@
 		}
 	}// copyDecryptOpenSslCmdToClipboard()
 
-	// Show immediate UI change so user knows their clipboard was modified.
+	// Show immediate UI change so user can see copy was successful and their clipboard was modified.
 	function showEncryptCommandCopied() {
+		// Compile an array of elements that contain the input class parameter.
 		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		// Display all elements in compiled array.
 		for (const element of messageElements) {
 			element.style.display = 'inline';
 		}
 	}// showEncryptCommandCopied()
 
-	// Show immediate UI change so user knows their clipboard was modified.
+	// Remove message indicating command was copied to clipboard.
 	function hideEncryptCommandCopied() {
+		// Compile an array of elements that contain the input class parameter.
 		const messageElements = document.getElementsByClassName("copied_encrypt_command_inform_class");
+		// Display all elements in compiled array.
 		for (const element of messageElements) {
 			element.style.display = 'none';
 		}   
 	}// hideEncryptCommandCopied()
 
-	// Show immediate UI change so user knows their clipboard was modified.
+	// Show immediate UI change so user can see copy was successful and their clipboard was modified.
 	function showDecryptCommandCopied() {
+		// Compile an array of elements that contain the input class parameter.
 		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		// Display all elements in compiled array.
 		for (const element of messageElements) {
 			element.style.display = 'inline';
 		}
 	}// showDecryptCommandCopied()
 
-	// Show immediate UI change so user knows their clipboard was modified.
+	// Remove message indicating command was copied to clipboard.
 	function hideDecryptCommandCopied() {
+		// Compile an array of elements that contain the input class parameter.
 		const messageElements = document.getElementsByClassName("copied_decrypt_command_inform_class");
+		// Display all elements in compiled array.
 		for (const element of messageElements) {
 			element.style.display = 'none';
 		}   
@@ -221,7 +248,6 @@
 	// Listen for the popstate event which is usually fired by user activating browser back button.
 	// Once popstate is fired we navigate back to the page that was saved by the saveCurrentStateToHistorySoBackWillWork() function.
 	window.addEventListener('popstate', (event) => {
-
 		console.log(event);
 		// Show dynamic page when user hits back button.
 		//showPage(event.state.page);
@@ -277,34 +303,33 @@
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							          Show Page                                                           //
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Pages are defined by the 'flow_pages' class which is held by HTML div that holds DOM elements needed for that page's functionality.
-	// Moving through the UI is accomplished by manipulating which 'page' is currently shown to the user;
-	// the page to be made active is shown while all others are hidden. 
+	// Dynamic functionality for this site is built around showPage(). Each navigable 'page' contains the class show_page_activatable.
+	// When a new page is displayed (as flex), all other pages are turned off (style.display set to 'none').
 	// 
-	// Global variable to keep track of the page we're on. Start on home page.
+	// Global variable to keep track of the page we're on. Will be re-set at page load by online or offline main index file via goHome().
 	let currentPage = 'home';
 	// Hide all other pages, then show activateThisPage page. 
-	// Input: Target is the element ID of a div containing class: flow_pages
+	// Input: Target is the element ID of a div containing class: show_page_activatable
 	function showPage(activateThisPage) {
 		// This global variable keeps track of the page the user is currently on. Needed for activatable-by-enter and harnessing browser back.
 		currentPage = activateThisPage;
 		// Reset UI warnings and clear all HTML input data as user moves through the interface.
 		resetSecurityAndUI();
-		// Fill flow_page_divs array with set of objects (divs) that contain the flow_pages class.
-		//let flow_page_divs = document.getElementsByClassName('flow_pages');
-		let flow_page_divs = document.getElementsByClassName('show_page_activatable');
+		// Fill show_page_activatable_divs array with set of objects (divs) that contain the show_page_activatable class.
+		let show_page_activatable_divs = document.getElementsByClassName('show_page_activatable');
 		// Hide all of the flow pages.
-		for (let i = 0; i < flow_page_divs.length; i++) {
-			flow_page_divs[i].style.display = "none";
+		for (let i = 0; i < show_page_activatable_divs.length; i++) {
+			// Hide the page -- make invisible by setting display style to none.
+			show_page_activatable_divs[i].style.display = "none";
 		}
 		// Show the page -- make visible by changing display style from none to flex.
 		document.getElementById(activateThisPage).style.display = "flex";
-		// Focus input or textbox (for convenience).
+		// Focus input or textbox (for convenience). This site is designed so there is only one input or textarea per show_page_activatable page.
 		let inputs_array = document.getElementById(activateThisPage).getElementsByTagName('input');
 		let textareas_array = document.getElementById(activateThisPage).getElementsByTagName('textarea');
-		// There is only 1 input or 1 textarea per div in our setup.
 		// If we found more than zero inputs in the array, focus the first and only one.
 		if (inputs_array.length > 0) {
+			// Focus the input.
 			inputs_array[0].focus();
 		}else if (textareas_array.length > 0) {
 			// Otherwise, we should find 1 textarea to focus if we need to focus anything.
@@ -312,44 +337,25 @@
 		}else{
 			// If there's no input, focus the button with 'activatable_by_enter' class (used to select the 'default' option (BRWOSER) at UI branch.
 			const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
+			// Don't error if we didn't find it.
 			if (buttonObj !== null) {
+				// Focus the button object.
 				document.getElementById(buttonObj.id).focus();
 			}
 		}
 	}// showPage()
 
-	//////////////////////////////////////////////////////////////
-	// Set Title to link to Home without reloading.
-	document.getElementById("titletext").onclick = function() {
-		// Clear storage object for security.
-		//resetData();
-		//showPage('home');
-
-		//switchSite('home');
-		goHome();
-	}
-
-	// Switch site from main to dev and back.
-	function switchSite(targetSite){
-		resetData();
-		saveThenShowPage(targetSite);
-	}
-
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							activatable_by_enter functionality								     		  //
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// To empower the user to move through the interface quickly, we implement a class: activatable_by_enter.
-	// The global variable currentPage holds the page currently in view of the user. When enter is clicked,
-	// the following anonymous function will utilize querySelector to search for DOM objects containing the
-	// activatable_by_enter class. The button containing this class will then be clicked.
+	// In order to move through the interface quickly, we implement a class: activatable_by_enter.
+	// When enter is pressed the following function will search for objects containing the class: activatable_by_enter.
+	// If a button containing this class is found, it will be clicked.
 	// 
-	// In simple terms, users can hit enter while the input they're typing in is focused in order to move to the next page in the interface.
-	// 
-	// Globally detect when user hits ENTER on their keyboard.
+	// Detect when user hits ENTER on their keyboard.
 	window.addEventListener("keydown", function(event) {
 		if (event.key === "Enter") {
-			// If focused element is an input, enter clicks the button containing the class: activatable_by_enter
+			// If focused element is an input (inputs are autofocused in showPage()), click the button containing the class: activatable_by_enter.
 			if (document.activeElement.tagName == "INPUT") {
 				// Select all DOM objects containing the class: activatable_by_enter
 				const buttonObj = document.getElementById(currentPage).querySelector('.activatable_by_enter');
@@ -362,7 +368,7 @@
 				// https://stackoverflow.com/questions/50403457/focus-method-triggers-button-click-event
 				// Prevent strange behavior where "the default action is performed on the newly focused element".
 				event.preventDefault();
-				// Without it the Branch screen was getting 'pre-clicked' when enter was pressed on previous Page.
+				// Without it the Browser or CMD Line Branch Page was getting 'pre-clicked' when enter was pressed on previous Page.
 			}else{
 				// Focused element isn't an Input, do nothng I guess?
 			}
@@ -570,8 +576,6 @@
 	const accessFlowEndNode = document.getElementById("access_plaintext");
 	// The display style will be observed as it changes from flex to none as the user navigates away from 'access_plaintext' Edit page.
 	const observationConfig = {attributes: true, attributeFilter: ['style']}
-	// Create observer object pointing to the callback function to be used when attribute change is observed.
-	const observerObj = new MutationObserver(observationCallback);
 	// Define the callback function that will be executed on the observed node.
 	// mutationList is a MutationRecord read-only interface object that is filled/handled by native JS automatically.
 	const observationCallback = (mutationList, observerObj) => {
@@ -587,7 +591,10 @@
 			}
 		}
 	};
-	// Now that everything is set up, a function is ready to start the observation of target node with configured options, callback.
+	// Create observer object pointing to the callback function to be used when attribute change is observed.
+	const observerObj = new MutationObserver(observationCallback);
+
+	// This function is ready to start the observation of target node with configured options and callback function target now that everything is set up.
 	// Called from index.tmpl or offline_standalone.tmpl by a UI handler function.
 	function startObserving(){
 		// Start observing the target node for configured mutations.
