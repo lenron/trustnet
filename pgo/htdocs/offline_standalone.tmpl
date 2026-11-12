@@ -120,13 +120,15 @@
 
 
 	//////////////////////////////////////////////////////////////
-	//                The onload Function                       //
+	//                The Onload Function                       //
 	//////////////////////////////////////////////////////////////
-	//The load event is fired when the whole page has loaded.
+	// This event is fired after page elements have loaded.
 	window.onload = async function() {
 		// Initial server online check.
-		await updateOnlineStatus();
+		updateOnlineStatus();
+		// Set up all copy to click listeners.
 		addListenersToAllCopyToClick();
+		// Don't start flow unless everything seems to have loaded properly. All pages start with style.display = none for security.
 		showPage('enter_offlinedbase_pass');
 	}// window.onload
 
