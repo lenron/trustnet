@@ -132,45 +132,39 @@
 		showPage('enter_offlinedbase_pass');
 	}// window.onload
 
-	// These variables allow switching to offline database variable value in offline_standalone.tmpl code set while preserving main/readonly site differences.
-	const siteColor = 'red';
-	// This could be replaced with just the TMPL_VAR call. Serves for readability I guess.
-	// TMPL_VAR calls are properly injected with values from perl even in TMPL_INCLUDEs that are included inside other TMPL_INCLUDEs.
-	const hideReadonlyButtons = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
-
 	//////////////////////////////////////////////////////////////
 	//             Included Template Files                      //
 	//////////////////////////////////////////////////////////////
-	// This isn't cpp code but they would call these header files.
-	// So, the top of the javascript seems like a good place for them?
-	// The alternative is interspersed or at the end or something, both of which 
-	// seem like worse options for code structure predictability/findability.
-	//
-	// Dev site javascript functions. Handles UI & crypto wrapper functions.
-	<TMPL_INCLUDE NAME="dev_site_js.tmpl">
 	// Javascript functions that are common to both main site index.html as well as offline database standalone.html.
 	<TMPL_INCLUDE NAME="common_js.tmpl">
+	// Javascript native subtleCrypto lib based library used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
+	<TMPL_INCLUDE NAME="core_crypto.tmpl">
+	// Dev site javascript functions. Handles UI & crypto wrapper functions.
+	<TMPL_INCLUDE NAME="dev_site_js.tmpl">
 	// Fetch based server communication functions that interact with an online server.
 	// - Might merge with common
 	// - Need to devise wise way to use an if to filter out server comms functions that we wish to prune for security and otherwise.
 	<TMPL_INCLUDE NAME="server_comms.tmpl">
-	// Javascript native subtleCrypto lib based library used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
-	<TMPL_INCLUDE NAME="core_crypto.tmpl">
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//             Site Specific Variables                      //
+	//////////////////////////////////////////////////////////////
+	// These variables allow switching to offline database variable value in offline_standalone.tmpl code set while preserving main/readonly site differences.
+	const siteColor = 'red';
+
+	//////////////////////////////////////////////////////////////
+	//             Site Specific Function Switches              //
+	//////////////////////////////////////////////////////////////
 	// Wrappers that allow a single function to be called that has differing function between main and offlinse site versions. //
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Offline database is different because database password page.
 	function goHome() {
 		switchSite("enter_offlinedbase_pass");
 	}// goHome()
-
 	// Function call wrapper that allows online and offline use of catchUpload.
 	async function saveFileData(filedata) {
 		offlineData['data'] = filedata;
 	}// saveFileData()
-
 	// Clear data when user leaves Edit page.
 	function resetData() {
 		resetOfflineData();

@@ -68,8 +68,8 @@
 	// Reset state variables, UI.
 	function resetSecurityAndUI() {
 		// Reset EDIT functionality buttons. Readonly site hides buttons using variable set in index/offline_standalone.
-		document.getElementById("editdata_button").style.display = hideReadonlyButtons;
-		document.getElementById("delete_button").style.display = hideReadonlyButtons;
+		document.getElementById("editdata_button").style.display = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
+		document.getElementById("delete_button").style.display = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
 		// Hide save button.
 		document.getElementById("save_button").style.display = "none";
 		// Return Access Success page to default input disabled state.

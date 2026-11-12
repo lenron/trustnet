@@ -161,9 +161,6 @@
 	//////////////////////////////////////////////////////////////
 	// These variables allow switching to offline database variable value in offline_standalone.tmpl code set while preserving main/readonly site differences.
 	const siteColor = '#<TMPL_VAR NAME=page_type_color>';
-	// This could be replaced with just the TMPL_VAR call. Serves for readability I guess.
-	// TMPL_VAR calls are injected with values from perl even in TMPL_INCLUDEs that are included inside other TMPL_INCLUDEs.
-	const hideReadonlyButtons = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
 
 	//////////////////////////////////////////////////////////////
 	//             Site Specific Function Switches              //
