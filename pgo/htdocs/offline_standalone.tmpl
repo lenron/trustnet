@@ -249,19 +249,19 @@
 	}// setOfflineDBase()
 
 	// Check that fingerprint is the correct length and is composed of only base64 characters.
-	function checkFingerprintAndData(fingerprint, multiEncryptedDatarecord) {
-		if (!checkFingerprintIsValid(fingerprint)) {
+	function validateFingerprintAndData(fingerprint, multiEncryptedDatarecord) {
+		if (!validateFingerprint(fingerprint)) {
 			throw new Error('Attempt to store to offline dbase failed! FINGERPRINT is invalid.');
 		}else{
 			console.log("FINGERPRINT IS VALID!");
 		}
 
-		if (!checkDataIsValid(multiEncryptedDatarecord)) {
+		if (!validateData(multiEncryptedDatarecord)) {
 			throw new Error('Attempt to store to offline dbase failed! DATA is invalid.');
 		}else{
 			console.log("DATA IS VALID!");
 		}
-	}// checkFingerprintAndData()
+	}// validateFingerprintAndData()
 
 	// Determine which database (encrypted or uncrypted) we're currently using.
 	function getOfflineDatabaseType() {
@@ -298,7 +298,7 @@
 	// Store single record to the offline database selected by if user enters offline database password or not.
 	async function storeOfflineDBase(fingerprint, multiEncryptedDatarecord) {
 		// Reject invalid data.
-		checkFingerprintAndData(fingerprint, multiEncryptedDatarecord);
+		validateFingerprintAndData(fingerprint, multiEncryptedDatarecord);
 		// Retrieve the database and pointer for the Flow we are in.
 		let pointer = await getOfflineDBasePointer();
 		//console.log("pointer value: " + pointer);
@@ -346,17 +346,17 @@
 	}// getRecordOfflineDBase()
 
 	// Check fingerprint validity for deleteRecordOfflineDBase()
-	function checkFingerprint(fingerprint) {
-		if (!checkFingerprintIsValid(fingerprint)) {
+	function validateFingerprint(fingerprint) {
+		if (!validateFingerprint(fingerprint)) {
 			throw new Error('Attempt to DELETE single record in offline dbase failed! FINGERPRINT is invalid.');
 		}else{
 			console.log("Delete Offline Database record attempt: FINGERPRINT IS VALID!");
 		}
-	}// checkFingerprint()
+	}// validateFingerprint()
 
 	// Random data is generated and 'backfilled' increasing security and keeping Offline Database length the same.
 	async function deleteRecordOfflineDBase(fingerprint) {
-		checkFingerprint(fingerprint);
+		validateFingerprint(fingerprint);
 		// Select either ENC or UNENC pointer, offline database depending on if user entered ENC passowrd.
 		let offlineDatabase = await getOfflineDBase();
 		// Find record in offline dbase if it exists.
@@ -407,7 +407,7 @@
 			document.getElementById('emptyPassWarning').style.display = 'inline';
 		}else{
 			console.log('ENC password has successfully been entered.');
-			const encPassCorrect = await checkEncPassword();
+			const encPassCorrect = await validateEncPassword();
 			if (encPassCorrect) {
 				// returned true, Enc password correct.
 				showPage('offline_home');
@@ -419,7 +419,7 @@
 	}// verifyOfflineDatabasePassword()
 
 	// Try to decrypt pointer to check if Enc password is correct.
-	async function checkEncPassword() {
+	async function validateEncPassword() {
 		try{
 			// Will attempt decrypt of pointer.
 			await getOfflineDBasePointer();
@@ -429,7 +429,7 @@
 			return false;
 		}
 		return true;
-	}// checkEncPassword()
+	}// validateEncPassword()
 
 	// Input ids that hold passwords to be extracted are constructed in a regular way so that the password they hold can be easily extracted by our passlock system.
 	// Example for ctrPass: access_ctrPass_input
@@ -477,7 +477,7 @@
 	}// extractInputData()
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
-	function checkData(inputId, nextPageId) {
+	function validateInputData(inputId, nextPageId) {
 		saveCurrentStateToHistorySoBackWillWork();
 		const keyword = extractKeyword(inputId);
 		const plaintextPass = extractPlaintextData(inputId);
@@ -490,7 +490,7 @@
 			throw new Error("Offline Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
 		}
-	}// checkData()
+	}// validateInputData()
 
 	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
 	// This offline function also handles showing errors and reminder to save to disk.
@@ -573,7 +573,7 @@
 		// Add additional parameter?
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
 
-		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !validateBase64Chars(multiEncryptedDatarecord)) {
 			resetOfflineData();
 			showPage('failed_to_access');
 		}else{
@@ -591,7 +591,7 @@
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
 
-		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !validateBase64Chars(multiEncryptedDatarecord)) {
 			showPage('failed_to_access'); // Access fail is valid here?
 		}else{
 			//showPage('access_file');
@@ -649,7 +649,7 @@
 		// First attempt loading from offline dbase. Can return 'miss'.
 		const multiEncryptedDatarecord = await attemptLoadOfflineDBase(fingerprint);
 		// Report outcome of Access attempt.
-		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		if (multiEncryptedDatarecord === 'miss' || multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !validateBase64Chars(multiEncryptedDatarecord)) {
 			resetOfflineData();
 			showPage('failed_to_access');
 		}else{
@@ -724,7 +724,7 @@
 	////////////////////////////////////////////////////////////////////////
 
 	// Returns true if input has precisely FINGERPRINT_LENGTH_BASE64 (43) base64 chars.
-	function checkFingerprintIsValid(fingerprint) {
+	function validateFingerprint(fingerprint) {
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH_BASE64 can be passed in.
 		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${FINGERPRINT_LENGTH_BASE64}}$\`); // !@#
 		if (regex.test(fingerprint)) {
@@ -732,21 +732,21 @@
 		}else{
 			return false;
 		}
-	}// checkFingerprintIsValid()
+	}// validateFingerprint()
 
 	// Returns true if input has precisely MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 (1024) base64 chars.
-	function checkDataIsValid(data) {
+	function validateData(data) {
 		const regex = new RegExp(\`^[A-Za-z0-9+/=]{\${MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64}}$\`); // !@#
 		if (regex.test(data)) {
 			return true;
 		}else{
 			return false;
 		}
-	}// checkDataIsValid()
+	}// validateData()
 
 	// Input: input is a string.
 	// Output: Returns false if non-base58 characters are detected.
-	function checkBase64Chars(input) {
+	function validateBase64Chars(input) {
 		// From the first char(^) to the last($), match base64 chars.
 		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
 		if (regex.test(input)) {
@@ -756,7 +756,7 @@
 			// Return false/invalid
 			return false;
 		}
-	}//checkBase64Chars()
+	}//validateBase64Chars()
 
 
 </script>

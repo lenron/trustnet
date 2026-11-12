@@ -1395,10 +1395,10 @@
 		// OBF-1000 step.
 		const obf1000Encrypted = await encryptOBF1000(fileDataBase64, obf1000Pass);
 		// AES-CTR step.
-		checkLengthAndBase64(obf1000Encrypted, AES_CTR_INPUT_LIMIT_BASE64);
+		validateLengthAndBase64(obf1000Encrypted, AES_CTR_INPUT_LIMIT_BASE64);
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		// Check output before returning data.
-		checkLengthAndBase64(ctrEncrypted, MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64);
+		validateLengthAndBase64(ctrEncrypted, MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64);
 		return ctrEncrypted;
 	}// encryptDouble()
 
@@ -1422,13 +1422,13 @@
 		// OpenSSL step.
 		const opensslEncrypted = await utf8EncryptOpenSSL(plaintextData, opensslPass);
 		// OBF-1000 step.
-		checkLengthAndBase64(opensslEncrypted, OBF_1000_INPUT_LIMIT_BASE64);
+		validateLengthAndBase64(opensslEncrypted, OBF_1000_INPUT_LIMIT_BASE64);
 		const obf1000Encrypted = await encryptOBF1000(opensslEncrypted, obf1000Pass);
 		// AES-CTR step.
-		checkLengthAndBase64(obf1000Encrypted, AES_CTR_INPUT_LIMIT_BASE64);
+		validateLengthAndBase64(obf1000Encrypted, AES_CTR_INPUT_LIMIT_BASE64);
 		const ctrEncrypted = await encryptAESCTR(obf1000Encrypted, ctrPass);
 		// Check output before returning data.
-		checkLengthAndBase64(ctrEncrypted, MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64);
+		validateLengthAndBase64(ctrEncrypted, MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64);
 		return ctrEncrypted;
 	}// encryptTriple()
 
@@ -1532,3 +1532,4 @@
 // Secretword Green: #54c597
 // Secretword Readonly Blue: #4491d5
 
+// END core_crypto.tmpl

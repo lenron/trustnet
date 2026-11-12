@@ -175,7 +175,7 @@
 			if (responseObj.access_response === "TOO_MANY_ACCESS_FAILURES" || responseObj.access_response === "NOT_FOUND") {
 				console.log("serverLoad Error: " + responseObj.access_response);
 				return responseObj.access_response;
-			} else if (responseObj.access_response.length === MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 && checkBase64Chars(responseObj.access_response)) { // Data looks good.
+			} else if (responseObj.access_response.length === MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 && validateBase64Chars(responseObj.access_response)) { // Data looks good.
 				console.log("serverLoad: Successfully loaded encrypted data.");
 				console.log("loadResponse: " + responseObj.access_response);
 				return responseObj.access_response;
@@ -420,7 +420,7 @@
 			}
 			// Now that we've cleared the error check, we can proceed with processing the response.
 			const responseObj = await fetchResponseObject.json();
-			if (responseObj.passlock.length === PASSLOCK_LENGTH && checkUUIDChars(responseObj.passlock)) { // Data looks good.
+			if (responseObj.passlock.length === PASSLOCK_LENGTH && validateUUIDChars(responseObj.passlock)) { // Data looks good.
 				return responseObj.passlock;
 			}else{
 				throw Error("serverGetPasslock: Failed to load passlock.");
@@ -432,6 +432,4 @@
 		}
 	}// serverGetPasslock()
 
-
-
-
+// END server_comms.tmpl

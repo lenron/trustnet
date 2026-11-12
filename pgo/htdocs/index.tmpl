@@ -128,53 +128,55 @@
 
 
 	//////////////////////////////////////////////////////////////
-	//                The onload Function                       //
+	//                The Onload Function                       //
 	//////////////////////////////////////////////////////////////
-	//The load event is fired when the whole page has loaded.
+	// This event is fired after page elements have loaded.
 	window.onload = async function() {
 		// Initial server online check.
 		await updateOnlineStatus();
-		// Count every time a unique visitor accesses this site.
+		// Count every time a unique visitor accesses this site (which may have just happened as the page was just loaded by someone).
 		serverCountUniqueVisitors();
 		// Set up all copy to click listeners.
 		addListenersToAllCopyToClick();
 	}
 
-	// These variables allow switching to offline database variable value in offline_standalone.tmpl code set while preserving main/readonly site differences.
-	const siteColor = '#<TMPL_VAR NAME=page_type_color>';
-	// This could be replaced with just the TMPL_VAR call. Serves for readability I guess.
-	// TMPL_VAR calls are properly injected with values from perl even in TMPL_INCLUDEs that are included inside other TMPL_INCLUDEs.
-	const hideReadonlyButtons = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
-
 	//////////////////////////////////////////////////////////////
 	//             Included Template Files                      //
 	//////////////////////////////////////////////////////////////
-	//
-	// Dev site javascript functions. Handles UI & crypto wrapper functions.
-	<TMPL_INCLUDE NAME="dev_site_js.tmpl">
-	// Javascript functions that are common to both main site index.html as well as offline database standalone.html.
+	// Javascript functions that are common to both main site index.tmpl as well as offline_standalone.tmpl.
 	<TMPL_INCLUDE NAME="common_js.tmpl">
-	// Fetch based server communication functions that interact with an online server.
-	// - Might merge with common
-	// - Need to devise wise way to use an if to filter out server comms functions that we wish to prune for security and otherwise.
-	<TMPL_INCLUDE NAME="server_comms.tmpl">
 	// Our custom library (based on subtleCrypto) used for Multi Encrypted Datarecord (MEDrecord) encryption/decryption.
 	<TMPL_INCLUDE NAME="core_crypto.tmpl">
+	// Dev site javascript functions. Handles UI & crypto wrapper functions.
+	<TMPL_INCLUDE NAME="dev_site_js.tmpl">
+	// Fetch based server communication functions that interact with an online server.
+	// - Might merge with common
+	// - Need to devise wise way to use an if to filter out server comms functions that we wish to prune for security and otherwise? Do we need this level of keeping users from using these functions?
+	<TMPL_INCLUDE NAME="server_comms.tmpl">
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Wrappers that allow a single function to be called that has differing function between main and offlinse site versions. //
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//             Site Specific Variables                      //
+	//////////////////////////////////////////////////////////////
+	// These variables allow switching to offline database variable value in offline_standalone.tmpl code set while preserving main/readonly site differences.
+	const siteColor = '#<TMPL_VAR NAME=page_type_color>';
+	// This could be replaced with just the TMPL_VAR call. Serves for readability I guess.
+	// TMPL_VAR calls are injected with values from perl even in TMPL_INCLUDEs that are included inside other TMPL_INCLUDEs.
+	const hideReadonlyButtons = '<TMPL_VAR NAME=hide_readonly_store_buttons>';
+
+	//////////////////////////////////////////////////////////////
+	//             Site Specific Function Switches              //
+	//////////////////////////////////////////////////////////////
+	// Wrappers that allow a single function to be called that has differing function between main and offlinse site versions.
 	//
 	// Offline database home is the encrypted offline database page: enter_offlinedbase_pass
 	function goHome(){
 		switchSite("home");
 	}
-
 	// Function call wrapper that allows online and offline use of catchUpload.
+	// Offline site version does not implement passlock.
 	async function saveFileData(filedata){
 		passlockedData['data'] = await passlockEncrypt(filedata);
 	}
-
 	// Used to clear data when user leaves Edit page.
 	// Offline site version does not implement passlock, uses offlineData{} instead.
 	function resetData(){
@@ -244,7 +246,7 @@
 		}
 
 		const passlock = await serverGetPasslock(browserId);
-		if (passlock.length !== PASSLOCK_LENGTH || !checkUUIDChars(passlock)) { // Data doesn't look like a passlock.
+		if (passlock.length !== PASSLOCK_LENGTH || !validateUUIDChars(passlock)) { // Data doesn't look like a passlock.
 			//showPage("unable_to_retrieve_passlock");
 			throw Error("Unable to retrieve passlock!");
 		}else{
@@ -367,7 +369,7 @@
 	}// extractInputData()
 
 	// Checks existing encrypted pass at index vs reiteration step encrypted value.
-	async function checkData(inputId, nextPageId) {
+	async function validateInputData(inputId, nextPageId) {
 		saveCurrentStateToHistorySoBackWillWork();
 		const keyword = extractKeyword(inputId);
 		const plaintextPass = extractPlaintextData(inputId);
@@ -381,7 +383,7 @@
 			throw Error("Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
 		}
-	}// checkData()
+	}// validateInputData()
 
 	// Use previously generated passlock to encrypt input.
 	async function passlockEncrypt(plaintextPassword) {
@@ -428,7 +430,7 @@
 	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
 	async function attemptCMDStore() {
 		const fingerprintAndData = await computeFpAndDataForStore();
-		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
+		validateFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 	}// attemptCMDStore()
 
@@ -437,7 +439,7 @@
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
 		const fingerprintAndData = await computeFpAndDataForStore();
-		checkFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
+		validateFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], inputId);
 	}// attemptBrowserStore()
 
@@ -470,7 +472,7 @@
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
 			await resetPasslock();
 			showPage('too_many_access_failures');
-		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !validateBase64Chars(multiEncryptedDatarecord)) {
 			// Don't automatically resetPasslock for third option - that disallows users from Editing.
 			await resetPasslock();
 			showPage('failed_to_access');
@@ -508,7 +510,7 @@
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
 			await resetPasslock();
 			showPage('too_many_access_failures');
-		}else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		}else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !validateBase64Chars(multiEncryptedDatarecord)) {
 			// Don't automatically resetPasslock for third option - that disallows users from Editing.
 			await resetPasslock();
 			showPage('failed_to_access');
@@ -647,7 +649,7 @@
 		// Check that data is valid.
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
 			showPage('too_many_access_failures');
-		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !checkBase64Chars(multiEncryptedDatarecord)) {
+		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !validateBase64Chars(multiEncryptedDatarecord)) {
 			showPage('failed_to_access_for_new_offline_database_creation');
 		} else {
 			// Push fp, data to recordListForNewOfflineDBase collector object.
@@ -827,17 +829,17 @@
 	/////////////////////////////////////////////////////////////////////////
 
 	// Return true if input only contains uuid chars which are used for passlock and browserID.
-	function checkUUIDChars(input) {
+	function validateUUIDChars(input) {
 		const regex = new RegExp(/^[a-f0-9-]*$/);
 		if (regex.test(input)) {
 			return true;
 		}else{
 			return false;
 		}
-	}// checkUUIDChars()
+	}// validateUUIDChars()
 
 	// Return true if input only contains base64 chars, including padding char: '='
-	function checkBase64Chars(input) {
+	function validateBase64Chars(input) {
 		const regex = new RegExp(/^[a-zA-Z0-9+=\/]*$/);
 		if (regex.test(input)) {
 			// Return true/valid
@@ -846,10 +848,10 @@
 			// Return false/invalid
 			return false;
 		}
-	}// checkBase64Chars()
+	}// validateBase64Chars()
 
 	// Returns true if input has precisely FINGERPRINT_LENGTH_BASE64 (43) base64 chars.
-	function checkFingerprintIsValid(fingerprint) {
+	function validateFingerprint(fingerprint) {
 		// Need backticks to wrap regex inside constructor call so that global constant variable FINGERPRINT_LENGTH_BASE64 can be passed in.
 		const regex = new RegExp(`^[A-Za-z0-9+/=]{${FINGERPRINT_LENGTH_BASE64}}$`);
 		if (regex.test(fingerprint)) {
@@ -857,17 +859,17 @@
 		}else{
 			return false;
 		}
-	}// checkFingerprintIsValid()
+	}// validateFingerprint()
 
 	// Returns true if input has precisely MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 (1024) base64 chars.
-	function checkDataIsValid(data) {
+	function validateData(data) {
 		const regex = new RegExp(`^[A-Za-z0-9+/=]{${MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64}}$`);
 		if (regex.test(data)) {
 			return true;
 		}else{
 			return false;
 		}
-	}// checkDataIsValid()
+	}// validateData()
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

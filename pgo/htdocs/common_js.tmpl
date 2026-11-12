@@ -2,39 +2,43 @@
 ///////////////////////////////////////////////////////////////////////////
 // common_js.tmpl                                                        //
 //                                                                       //
-// Includes all javascript functions used by all 3 versions of the site. //
+// Includes javascript functions used by all 3 versions of the site.     //
 ///////////////////////////////////////////////////////////////////////////
 
-	// Dynamically return home when SECRETWORD is clicked in order to avoid reloading the site unintentionally.
+	// Dynamically return home when SECRETWORD is clicked in order to avoid reloading the site unintentionally. This used to be needed for offline database creation/holding, do we still need it?
 	document.getElementById("titletext").onclick = function() {
 		// Works for both main index and offline_standalone.
 		goHome();
 	}
 
-	// Switch site to Main, FAQ, Dev Site, or Contact page.
+	// Switch site to FAQ, Dev Site, Contact page, or back to Main.
 	function switchSite(targetSite){
+		// Clear user data for security.
 		resetData();
+		// Move to target site page.
 		saveThenShowPage(targetSite);
 	}
 
-	// catchUpload() is executed from the HTML UI when a user uploads a file.
+	// Executed from the HTML UI when a user uploads a file.
 	// The file is interpreted as raw bytes before being converted to base64 and fed into UI data handling pipeline.
 	async function catchUpload(event) {
-		// Set incoming File object to variable file.
+		// Set incoming File object to variable: file.
 		const file = event.target.files[0];
 		// Create a FileReader object: reader.
 		const reader = new FileReader();
-		// Read in file as raw bytes.
+		// Read in file data as raw bytes.
 		reader.readAsArrayBuffer(file);
-		// Fire an event (this async function) once the reader object has complted reading in the file.
-		reader.onload = async function(e) {
-			// Access data that was just read into file reader.
-			let fileDataBuffer = e.target.result;
+		// Fire an event (this async function) once the reader object has completed reading in the file.
+		reader.onload = async function(event) {
+			// Access data that was just read into file reader via event object.
+			let fileDataBuffer = event.target.result;
+			// Convert ArrayBuffer data into Uint8Array.
 			const fileDataUint8 = new Uint8Array(fileDataBuffer);
+			// Pack data into base64.
 			let filedata64 = fileDataUint8.toBase64();
-			// Input Data Length Check
-			if (checkInputLengthUpload(fileDataBuffer)) {
-				// Function wrapper so this function works with online and offline base index files.
+			// Set limit on input data length.
+			if (validateInputLengthUpload(fileDataBuffer)) {
+				// Store file data in site-specific gather object (passlockedData or offlineData), readying for conversion to MEDRecord.
 				await saveFileData(filedata64);
 				// Show button.
 				document.getElementById("store_upload_commit_button").style.display = "inline";
@@ -115,9 +119,8 @@
 	//////////////////////////////////////////////////////////////
 	//                Contact & Captcha Functions               //
 	//////////////////////////////////////////////////////////////
-
 	// Perform simple captcha check.
-	function checkCaptcha() {
+	function validateCaptcha() {
 		let enteredCaptchaValue = document.getElementById('captcha_input').value;
 		// Accept case insensitive.
 		enteredCaptchaValue = enteredCaptchaValue.toLowerCase();
@@ -126,7 +129,7 @@
 			// Proceed upon correct answer.
 			saveThenShowPage('contact_page');
 		}
-	}// checkCaptcha()
+	}// validateCaptcha()
 
 	// Submit user message to site owners.
 	function submitContactMessage() {
@@ -378,7 +381,6 @@
 	//////////////////////////////////////////////////////////////
 	//           	UI Manipulation Functions	         		//
 	//////////////////////////////////////////////////////////////
-
 	// Show overlay where user can DELETE record.
 	function showDeleteOverlay(targetId) {
 		document.getElementById(targetId).style.display = "flex";
@@ -417,14 +419,14 @@
 	}// codewordToLowerCase()
 
 	/////////////////////////////////////////////////////////////////////////
-	//					Check Functions									   //
+	//                Data Validation (Check) Functions                    //
 	/////////////////////////////////////////////////////////////////////////
-	// Some functions used here reside in either index.tmpl or offline_standalone.tmpl
-	// because offline_standalone.tmpl is held in a heredoc which makes the regex used slightly different.
-	/////////////////////////////////////////////////////////////////////////
-
-	// Make sure data length doesn't exceed limits.
-	function checkDataLength(data, lengthLimit) {
+	// Some data validation functions reside in index.tmpl & offline_standalone.tmpl because offline_standalone.tmpl is held in a
+	// heredoc which makes the regex used slightly different (backticks and template literals need to be escaped with \).
+	//
+	// Check that the length of input data is less than the parameter lengthLimit.
+	// Used with derived Site Constants in order to protect data pipeline.
+	function validateDataLength(data, lengthLimit) {
 		// Return fail if the length of input parameter: data is not less than input parameter: length.
 		if (data.length > lengthLimit) {
 			console.log("Data length Invalid!");
@@ -432,35 +434,19 @@
 		} else {
 			return true;
 		}
-	}// checkDataLength()
+	}// validateDataLength()
 
-	// check that data is of length: length and consists of only base64 chars.
-	function checkLengthAndBase64(data, length){
-		if (!checkDataLength(data, length) || !checkBase64Chars(data)){
+	// Check that data is of length: length and consists of only base64 chars.
+	// Used with derived Site Constants in order to protect data pipeline.
+	function validateLengthAndBase64(data, length){
+		if (!validateDataLength(data, length) || !validateBase64Chars(data)){
 			throw new Error('INVALID LENGTH OR NON-BASE64 CHARS FOUND ON INTERNAL DATAPATH!');
 		} 
-	}// checkLengthAndBase64()
-
-	// Input: input is a string.
-	// Output: Returns false if the input length (in bytes) is over OPENSSL_INPUT_LIMIT_BYTES: 686
-	function checkDataInputLengthWithRegex(input) {
-		// Get input size in bytes.
-		let size = new Blob([input]).size;
-		let difference = OPENSSL_INPUT_LIMIT_BYTES - size;
-		// Show running count of data length.
-		let size_string = "Byte length remaining: " + difference;
-		document.getElementById("browserdata_length_label").innerHTML = size_string;
-		document.getElementById("editdata_length_label").innerHTML = size_string;
-		if (size > OPENSSL_INPUT_LIMIT_BYTES) {
-			return false; // Length Check Failed.
-		}else{
-			return true; // Length Check Passed.
-		}
-	}// checkDataInputLengthWithRegex()
+	}// validateLengthAndBase64()
 
 	// Input: input is a string.
 	// Output: Returns false if the input length (in bytes) is over 544.
-	function checkInputLengthUpload(input) {
+	function validateInputLengthUpload(input) {
 		// show input size in bytes
 		let size = new Blob([input]).size;
 		let difference = OBF_1000_INPUT_LIMIT_BYTES - size;
@@ -473,26 +459,34 @@
 		}else{
 			return true; // Length Check Passed.
 		}
-	}// checkInputLengthUpload()
+	}// validateInputLengthUpload()
 
 	// Check that both fingerprint and data are valid.
-	function checkFingerprintAndData(fingerprint, multiEncryptedDatarecord) {
-		if (!checkFingerprintIsValid(fingerprint)) {
+	function validateFingerprintAndData(fingerprint, multiEncryptedDatarecord) {
+		if (!validateFingerprint(fingerprint)) {
 			throw new Error('Attempt to store failed! FINGERPRINT is invalid.');
 		}else{
 			console.log("FINGERPRINT IS VALID!");
 		}
-		if (!checkDataIsValid(multiEncryptedDatarecord)) {
+		if (!validateData(multiEncryptedDatarecord)) {
 			throw new Error('Attempt to store failed! DATA is invalid.');
 		}else{
 			console.log("DATA IS VALID!");
 		}
-	}// checkFingerprintAndData()
+	}// validateFingerprintAndData()
 
 	// Called on change of text area, checks length of that text area and shows warning if input data too long.
-	function checkDataInputLength(input_id) {
+	function validateDataInputLength(input_id) {
 		let input = document.getElementById(input_id).value;
-		if (checkDataInputLengthWithRegex(input)) {
+		// Get input size in bytes.
+		let size = new Blob([input]).size;
+		let difference = OPENSSL_INPUT_LIMIT_BYTES - size;
+		// Show running count of data length.
+		let size_string = "Byte length remaining: " + difference;
+		document.getElementById("browserdata_length_label").innerHTML = size_string;
+		document.getElementById("editdata_length_label").innerHTML = size_string;
+
+		if (size <= OPENSSL_INPUT_LIMIT_BYTES) {
 			// Length OK, turn off warning
 			document.getElementById("text_input_warning").style.display = "none";
 			// display button
@@ -513,7 +507,7 @@
 			// remove button
 			document.getElementById("save_button").style.display = "none";
 		}
-	}// checkDataInputLength()
+	}// validateDataInputLength()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality:  Produce a 'Fingerprint' which will be used as the Key in the Key-Value pair for storing a Multi Encrypted Datarecord.
@@ -635,3 +629,4 @@
 		return randarray.toBase64({omitPadding: true});
 	}// getRandFingerprint()
 
+// END common_js.tmpl
