@@ -1,10 +1,14 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-
 use Time::Piece;
 
+# pgolib.pl
+# Custom library for often used functions.
+# Consists of a single function to extract data from the first line of a file, and several logging functions.
+
 # Get first line of a file.
+# Used to extract the type of server this is (main or readonly) as well as mariadb login, password.
 sub get_first_line{
 	my $location = shift;
 	open my $first_line_fh, '<', $location or die "Cannot read server type from file: $!";
@@ -15,7 +19,7 @@ sub get_first_line{
 	return $first_line;
 }
 
-# Add log message - string passed into this function.
+# Add log message = the string passed into this function to the general log.
 sub add_log_message {
 	my $message = shift;
 	# Log all site accesses.
@@ -26,7 +30,7 @@ sub add_log_message {
 	close $log_fh;
 }
 
-# Add log message - string passed into this function.
+# Add log message = the string passed into this function to the online check log.
 sub add_onlinecheck_log_message {
 	my $message = shift;
 	# Get user IP.
@@ -42,7 +46,7 @@ sub add_onlinecheck_log_message {
 	close $log_fh
 }
 
-# Add log message - string passed into this function.
+# Add log message = the string passed into this function with the time and user ip.
 sub add_log_message_with_time_and_ip {
 	my $message = shift;
 	# Get user IP.
@@ -58,7 +62,7 @@ sub add_log_message_with_time_and_ip {
 	close $log_fh
 }
 
-# Add log message - string passed into this function.
+# Add log message = the string passed into this function to the passlock log.
 sub add_passlock_log {
 	my $message = shift;
 	# Log all site accesses.
@@ -69,7 +73,7 @@ sub add_passlock_log {
 	close $log_fh;
 }
 
-# Add log message - string passed into this function.
+# Add log message = the string passed into this function to the passlock log with time and user ip.
 sub add_passlock_log_with_time_and_ip {
 	my $message = shift;
 	# Get user IP.

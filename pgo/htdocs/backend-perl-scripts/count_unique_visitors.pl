@@ -2,10 +2,15 @@
 use strict;
 use warnings;
 
+# count_unique_visitors.pl
+# Used for DDOs, etc. filter protection for the site.
+# Takes a client IP and either stores a new record to MariaDB (if this is their first visit of the day) or increments the IP's count value (if it's not).
+
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+# Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.
@@ -38,7 +43,7 @@ if ($ip_query_response eq "IP_NOT_FOUND") {
 	print qq{{"ip_query_response":"IP_FOUND"}};
 }
 
-
+# Check if a user IP already exists in the daily database, indicating they have already visited today.
 sub check_ip_exists {
 	my $dbh = shift;
 	my $ip = shift;

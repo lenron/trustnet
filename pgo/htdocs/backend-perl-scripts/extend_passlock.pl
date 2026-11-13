@@ -2,10 +2,14 @@
 use strict;
 use warnings;
 
+# extend_passlock.pl
+# Extends the time before a passlock is deleted from this server. Activated by user clicking EXTEND PASSLOCK during the 30 second final countdown.
+
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+#Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.

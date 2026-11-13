@@ -2,11 +2,16 @@
 use strict;
 use warnings;
 
+# delete_passlock.pl
+# Accepts a request from the client to delete a browser_id-passlock record stored on this server, effectively ending the session.
+
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+# Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
+
 # Create CGI and json objects.
 my $q = CGI->new;
 my $json = JSON->new;
@@ -42,7 +47,6 @@ if ($q->param){
 	}
 }
 
-exit(0);
 
 
 

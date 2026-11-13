@@ -2,10 +2,15 @@
 use strict;
 use warnings;
 
+# delete.pl
+# Deletes record found at fingerprint location from MariaDB online database held on this server.
+# Fingerprint is extracted from json object which arrives via POST request from a client.
+
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+# Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.

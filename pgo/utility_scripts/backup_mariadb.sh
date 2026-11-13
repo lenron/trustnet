@@ -1,13 +1,20 @@
 #!/bin/bash
+
+# backup_mariadb.sh
+# Create a backup of this server's MariaDB SQL database.
+
+# Halt execution of this script if any command fails.
 set -e
 
+# Load environment variables.
 source $HOME/trustnet/pgo/secrets/utility_scripts.env
 
+# Set bash variables.
 MARIADB_DUMP="$HOME/trustnet/pgo/mariadb_backup_$(date +%F).sql.gz"
 ENCRYPTED_DUMP="$HOME/trustnet/pgo/htdocs/$LONG_DIRECTORY/mariadb_backup_$(date +%F).sql.gz.enc"
 
 # Run docker command inside container named pgo-mariadb: sudo docker exec -i pgo-mariadb
-#sudo docker exec -i pgo-mariadb mariadb-dump -u root -p'pwd' --single-transaction --all-databases | gzip > $MARIADB_DUMP
+# Execute mariadb-dump which creates a backup of the SQL database, then gzip it.
 sudo docker exec -i pgo-mariadb mariadb-dump -u root -p"$MARIADB_ROOT_PW" --single-transaction --all-databases | gzip > $MARIADB_DUMP
 
 # Encrypt using openssl and shared key.

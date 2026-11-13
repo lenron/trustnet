@@ -2,11 +2,15 @@
 use strict;
 use warnings;
 
+# save_contact_message.pl
+# Sends a contact email to admin and saves that same message to this server's MariaDB database.
+
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
 use HTML::Entities;
+# Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.

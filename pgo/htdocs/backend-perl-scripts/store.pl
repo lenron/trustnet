@@ -2,10 +2,15 @@
 use strict;
 use warnings;
 
+# store.pl
+# Accepts a fingerprint-MEDRecord key-value pair via POST from client and stores it to the MariaDB online database.
+# Various filtering are implemented to protect the site from DDOS, etc.
+
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+# Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.
@@ -22,7 +27,7 @@ my $stores_on_date_table = 'stores_on_date';
 
 # Did CGI catch an HTTP Request object ($q->param)?
 if ($q->param){
-# Leaving hard to compile test for now.
+# Test record (it's kinda hard to re-create one of these which is why it hasn't been deleted).
 #my $test = '{"fingerprint":"8774e15f162f4e3a8f03bc7d4c5845bf9bee9bc9c4155802366f90ae92b47c90","data":"RsmSMEJ3HPWbEMHeYmczY9RMEF9KsZCQZqeKMmGE5dUi6xrtavmNHV5T3sDgpziinMRNhRr9xJfAbwn36sV7ZUqefjHkUV4AYU13LzTVTwZcosaBJUFXmNzbp7Ta4qVBnqiWCe1vdVVCUBhCjwCFm6HntMj26BETP6x2rQwbd5X7i3YnmFiCy8CtdZLpGebKeBm6b4d22m5hr52pWxtGApZAuAhc6LtBNKFEP5Etv3yawn8sffwfbaK4wFRiAgpt4PmGKWGwqdSzpDTEi98r6BeHE2Ja67etiQUTjnmvfByGdwVkwsRumx8AV2ibZQ1rfyxMihACAu1qeX5YaMEUctbAm2BRYDMZyixSw49gZEUsX2AS9HzXW1PY2oFkkyhHtXHjQjy923eXanQ6QfFMUsnDdLVpSQ6cszgnuYakquc42qKbzR1cDbvtnU5qeQ9jYSJjcxHmSrF5GEtGsipW882eWztMZRtHcXoZVNfwN5gxv2NQYTbYBXpAx42t5NCcokPzLw9ifgiK5Sa2AxbFFF28u8MSERU67TE2fRwy2whYgWySsAoywpFEKkLoHFygaWNWXjua6Xr73UMY2WyTtU5MB1rCpAvUgeQwY441sZMTXqg5xydUuERzaSt5XALuRCufDzaE2XnY8zgTDPC59gDZPQuYUhz7bjFVPo7HE1maRgePHCu4WWKHuwbs2enYaHxf6cbBeoRq3ybG5siDYRBSNw1eowCztt6y9KZXWp2TxCrdBU75REg7tNKuyaevwMqK5w5VbCYEQsJewJR8UpqJdpVYQp44Mop8gLZxhYut16Tb5Zv7UdgByoPELF5Wdfphjj1DKcU2CGytfQLt5Wb38AxMygvPLiuWD1smdWkgMx4urAoSftSHa2YMngmjxVJKRdAHVYnoNcYLm9u2bp2jSkoci1jFbhya1HtB1AF7LPSL7XArDbTcjRsbdUbo4RUBxcQg9kvMricPDsU4fnfm3NGTEXzzb3burMm3"}';
 
 	# CGI term POSTDATA is used to get the entire raw body content (in JSON object form).
@@ -45,7 +50,7 @@ if ($q->param){
 		exit 0;
 	}
 
-	# Match exactly 43 base64 chars.      Match exactly 1024 base64 chars.
+	#       Match exactly 43 base64 chars.               Match exactly 1024 base64 chars.
 	if (!($fingerprint =~ /^[a-zA-Z0-9\+\/]{43}$/) || !($data =~ /^[a-zA-Z0-9\+\/=]{1024}$/)){
 		# Log denial due to incorrect data format.
 		add_log_message("ERROR: STORE DENIED: Incorrect data format.");
@@ -102,8 +107,8 @@ if ($q->param){
 		}
 	}
 } else {
-			print $q->header();
-			print "DONT TRY TO HACK ME";
+	print $q->header();
+	print "PLEASE REFRAIN FROM HACK ATTEMPTS";
 }
 
 # Get number of stores today for a given ip.

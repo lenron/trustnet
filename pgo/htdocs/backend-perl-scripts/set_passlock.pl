@@ -2,11 +2,21 @@
 use strict;
 use warnings;
 
+# set_passlock.pl
+# This file stores a key-value pair (browser_id=key, passlock=value) to this server's MariaDB database, effectively starting the 5min user session where they can enter passwords and Store or Access data.
+# An accessed passlock is used on the client side to encrypt/decrypt user plaintext data.
+# Passlocks are immediately deleted from the client upon use and can only be accessed from the online server with their corresponding browser_id key.
+# While the user client session is active (within the 5min time limit) they are able to query the server to access the passlock.
+# The browser_id (required to access its corresponding passlock) will be automatically deleted from the client using the javascript native timeout function.
+# The passlock will be automatically deleted from this server using MariaDB's event functionality (preset upon container creation).
+
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+# Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
+
 # Create CGI and json objects.
 my $q = CGI->new;
 my $json = JSON->new;

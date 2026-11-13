@@ -2,10 +2,14 @@
 use strict;
 use warnings;
 
+# get_passlock.pl
+# Resturns a stored passlock (if still active/valid) with a browser_id extracted from the json object POSTed to this endpoint from a client.
+
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+# Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.

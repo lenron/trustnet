@@ -2,10 +2,15 @@
 use strict;
 use warnings;
 
+# load.pl
+# Loads record from fingerprint location and sends that record to the client.
+# Fingerprint is extracted from json object which arrives via POST request from a client.
+
 use CGI qw(:standard escapeHTML);
 use DBI;
 use URI::Escape;
 use JSON;
+# Use custom library.
 require "/usr/local/apache2/htdocs/backend-perl-scripts/pgolib.pl";
 
 # Create CGI and json objects.
@@ -17,6 +22,7 @@ my $db_name = 'chatriwe_obf';
 my $db_username = get_first_line('/run/secrets/mariadb_login');
 my $db_pw = get_first_line('/run/secrets/mariadb_pw');
 my $access_failures_today_table = 'access_failures_today_per_ip';
+
 # Did CGI catch an HTTP Request object ($q->param)?
 if ($q->param){
 
@@ -24,6 +30,7 @@ if ($q->param){
 	my $posted_data_in_json_object_form = $q->param('POSTDATA');
 	# Decode json object into hash.
 	my $hash_ref = $json->decode($posted_data_in_json_object_form);
+	# Extract fingerprint using hash reference.
 	my $fingerprint = $hash_ref->{fingerprint};
 
 	add_log_message_with_time_and_ip("\nLOAD");

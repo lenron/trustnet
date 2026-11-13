@@ -123,7 +123,7 @@
 	//                                              MAIN / READONLY SITE                                                                    //
 	//                                                                                                                                      //
 	// Common code that is used by all site versions reside in TMPL_INCLUDE files.                                                          //
-	// Code that must be different lives in either this: index.tmpl or offline_standalone.tmpl which holds the Offline version of the site. //
+	// Code that must be different lives in either this: index.tmpl or offline_standalone.tmpl which holds the offline version of the site. //
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -165,6 +165,7 @@
 	//////////////////////////////////////////////////////////////
 	//             Site Specific Function Switches              //
 	//////////////////////////////////////////////////////////////
+	// These will have the same name but different contents as the offline_standalone.tmpl base index file.
 	// Wrappers that allow a single function to be called that has differing function between main and offlinse site versions.
 	//
 	// Offline database home is the encrypted offline database page: enter_offlinedbase_pass
@@ -556,13 +557,12 @@
 		document.getElementById("access_data_outputdisplay").value = decryptedData;
 	}// decryptAndShowPlaintext()
 
-	// Main Delete Function Handler
-	// Takes the inputs gathered from the user, processes them, communicates with the server, and produces output for the user as needed.
-	// Inputs: plaintext held in inputs hidden from the user until all data is ready for the server query.
-	// Output: functionality.
+	// Attempt to delete a record from online database.
+	// Accesses fingerprint stored in HTML (temporarily while user is on Edit page) and asks the server to delete the record.
 	async function attemptDelete() {
-		// Load from server
+		// Access fingerprint stored in HTML.
 		const fingerprint = getStoredFp();
+		// Ask online server to delete record stored at fingerprint location.
 		const deleteResponse = await serverDelete(fingerprint);
 		// Report delete outcome.
 		if (deleteResponse === "success") {
@@ -572,6 +572,7 @@
 			// Doesn't look like server stored data properly, report fail.
 			showPage('delete_failed');
 		}
+		// Clear user, passlock, state data.
 		await resetPasslock();
 	}// attemptDelete()
 
