@@ -1,4 +1,4 @@
--- MariaDB set up script for lenron-obf
+-- MariaDB set up script for obf. Will be ran on container creation as instructed by docker-compose.yaml.
 
 -- Select database to run commands on.
 USE chatriwe_obf;

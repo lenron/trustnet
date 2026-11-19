@@ -115,7 +115,7 @@
 	//              OFFLINE DATABASE SITE                                                                                                   //
 	//                                                                                                                                      //
 	// Common code that is used by all site versions reside in TMPL_INCLUDE files.                                                          //
-	// Code that must be different lives in either this: index.tmpl or offline_standalone.tmpl which holds the Offline version of the site. //
+	// Code that must be different lives in either index.tmpl or offline_standalone.tmpl (this file).                                       // 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -129,7 +129,7 @@
 		// Set up all copy to click listeners.
 		addListenersToAllCopyToClick();
 		// Don't start flow unless everything seems to have loaded properly. All pages start with style.display = none for security.
-		showPage('enter_offlinedbase_pass');
+		showPage('enter_offlinedbase_pass'); // Use a direct showPage() to NOT create a historical record.
 	}// window.onload
 
 	//////////////////////////////////////////////////////////////
@@ -157,7 +157,7 @@
 	//////////////////////////////////////////////////////////////
 	// Wrappers that allow a single function to be called that has differing function between main and offlinse site versions. //
 	//
-	// Offline database is different because database password page.
+	// Offline database is different - starts with offline database password entry (access either enc or unenc database).
 	function goHome() {
 		switchSite("enter_offlinedbase_pass");
 	}// goHome()
@@ -383,23 +383,29 @@
 	//         OFFLINE FLOWWALKER FUNCTIONALITY                 //
 	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////
+	// Since the offline site is meant to be used in a secure environment with no access to a server (where passlocks are stored) the passlock system is not used for the offline database.
 
-	// Reset user data storage object, clearing passwords and data.
+	// Reset user-data storage object, clearing passwords and data.
 	function resetOfflineData() {
 		offlineData = {};
 	}// resetOfflineData()
 
-	// Offline database home page will use this function to extract the password for the encrypted offline database.
+	// Extract encrypted offline database password from HTML.
 	async function extractOfflineDatabasePassword() {
+		// This is the start of the offline flow. Clear any existing data.
 		resetOfflineData();
+		// Extract encrypted offline database password from input field.
 		extractInputData('set_offlineDBasePass_input');
+		// Verify password matches the one used to encrypt this offline database.
 		await verifyOfflineDatabasePassword();
 	}// extractOfflineDatabasePassword()
 
-	// Check length and then verify the user entered offline database password.
+	// Verify that entered password matches the one used to encrypt this offline database.
 	async function verifyOfflineDatabasePassword() {
+		// Catch an empty password (e.g. user hit enter accidentally).
 		if (offlineData['offlineDBasePass'] === undefined || offlineData['offlineDBasePass'] === '') {
 			console.log('caught empty ENC password');
+			// Show empty password warning in UI.
 			document.getElementById('emptyPassWarning').style.display = 'inline';
 		}else{
 			console.log('ENC password has successfully been entered.');
@@ -414,10 +420,10 @@
 		}
 	}// verifyOfflineDatabasePassword()
 
-	// Try to decrypt pointer to check if Enc password is correct.
+	// Try to decrypt pointer in order to check if Enc password is correct.
 	async function validateEncPassword() {
 		try{
-			// Will attempt decrypt of pointer.
+			// Attempt to decrypt pointer.
 			await getOfflineDBasePointer();
 		}catch (error) {
 			console.log("Looks like enc password entered incorrectly. error: ");
@@ -427,108 +433,113 @@
 		return true;
 	}// validateEncPassword()
 
-	// Input ids that hold passwords to be extracted are constructed in a regular way so that the password they hold can be easily extracted by our passlock system.
+	// Input ids that hold passwords to be extracted are constructed in a regular way so their data can be uniformly accessed.
 	// Example for ctrPass: access_ctrPass_input
-	// Looking at the above Element ID, we can see that this input will hold the ctrPass (AES-CTR password) and resides in the Access Flow as a result of our regular naming scheme.
-	// We can then use this function to extract the corresponding value.
+	// Looking at the above Element ID, we can see that this input will hold the ctrPass (AES-CTR password) and resides in the Access Flow.
 	function extractKeyword(inputId) {
 		// Use regex to extract keyword from input ID.
 		const regex = new RegExp(/^\\w+_(\\w+)_\\w+$/);
 		const match = inputId.match(regex);
+		// Return the middle word, which is held in the 'match' array at index 1.
 		return match[1];
 	}// extractKeyword()
 
-	//Function that extracts user password from html and deletes it from the html source.
+/*
+	// Extract user data from HTML and then delete it from HTML source for security.
 	function extractPlaintextData(inputId) {
+		// Copy data from HTML to js variable.
 		const plaintextData = document.getElementById(inputId).value;
-		document.getElementById(inputId).value = ""; //delete password from html
+		// Delete data from HTML input field.
+		document.getElementById(inputId).value = "";
 		return plaintextData;
 	}// extractPlaintextData()
+*/
 
-	// Online version of initFlow() creates a passlock and saves it to server.
-	// We need this function to use the same HTML code for both online index.tmpl and offline_standalone.tmpl implementations.
+	// Wrapper for extractInputData needed for offline site in order to keep HTML uniform across all 3 sites.
 	async function initFlow(inputId) {
+		// Would have used this function call directly in HTML but then would need different HTML page for main/readonly and offline site versions.
 		extractInputData(inputId);
 	}// initFlow()
 
-	// Use separate storage object for offline secure data. Plaintext stored here.
+	// Different storage object than main used because offline site lacks passlock system.
 	let offlineData = {};
-	// Extract, encrypt, and store data at inputId to global passlockedData Object.
+	// Extract plaintext data from HTML object, then store it in offline storage object, readying for computation later.
 	function extractInputData(inputId) {
+		// Use regex to extract keyword from input ID.
 		const keyword = extractKeyword(inputId);
-		// Show error page if a stale flow is detected. Navigating away from a flow should cause it to delete data.
-		// This is intended to check if data is deleted so an error page explaining to the user what to do can be shown.
-		console.log("keyword: ", keyword);
-		console.log(offlineData['codeword']);
+		// Make sure user data is being gathered in order. Any out of order execution will result in error for security.
 		if (keyword !== 'offlineDBasePass' && keyword !== 'codeword' && offlineData['codeword'] === undefined) {
 			saveThenShowPage('timed_out_home');
 			throw new Error("STALE FLOW ERROR.");
 		}
 		console.log("Extracting keyword: " + keyword);
+		// Extract user data from HTML and then delete it from HTML source for security.
 		const plaintextData = extractPlaintextData(inputId);
-		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
+		// Save data to storage object for computation later.
 		offlineData[keyword] = plaintextData;
 		console.log("Password gathering object: offlineData: ");
 		console.log(offlineData);
 	}// extractInputData()
 
-	// Checks existing encrypted pass at index vs reiteration step encrypted value.
+	// Re-iteration check: validate that the password entered on the re-iteration step matches the original entry.
 	function validateInputData(inputId, nextPageId) {
 		saveCurrentStateToHistorySoBackWillWork();
+		// Get password entered on this re-iteration step.
 		const keyword = extractKeyword(inputId);
 		const plaintextPass = extractPlaintextData(inputId);
+		// Check that it matches the password entered in the original step.
 		if (offlineData[keyword] === plaintextPass) {
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
-			showPassCheckFailWarnings();
 			// Re-iterated password doesn't match original.
+			showPassCheckFailWarnings();
 			throw new Error("Offline Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
 		}
 	}// validateInputData()
 
+	// Attempt to store a command line encrypted file.
 	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
 	// This offline function also handles showing errors and reminder to save to disk.
 	async function attemptCMDStore() {
-		//const fingerprintAndData = await computeFpAndDataForStore();
+		// Use gathered passwords to compute a fingerprint.
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		// Encrypt user data with user passwords.
 		const multiEncryptedDatarecord = await encryptDouble(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['data']);
-		// Select encrypted or regular offline database.
+		// Store MEDRecord to fingerprint location inside offline database HTML object.
 		let storeResponse = await storeOfflineDBase(fingerprint, multiEncryptedDatarecord);
-		//console.log("CMD Offline Store outcome: " + storeResponse);
 
 		// Check that data stored properly.
-		// Load data at fingerprint, should be the encrypted data block we just stored.
+		// Load data at fingerprint, should be the encrypted data MEDRecord we just stored.
 		const loadResponse = await attemptLoadOfflineDBase(fingerprint);
 		// Report store outcome.
 		if (multiEncryptedDatarecord === loadResponse) {
-			// Data successfully stored to memory. Still needs saved to disk which must happen 'manually' by user.
+			// Data successfully stored to memory. Still needs saved to disk which must happen manually by user.
 			setSaveToDiskReminder();
 			showPage('store_success');
 		}else{
 			// Doesn't look like server stored data properly, report fail.
 			showPage('store_failed');
 		}
-		// Replace goBack function with security reset and we should be secure right?
 		// Always reset plaintext data holder each time flow is completed.
 		resetOfflineData();
 	}// attemptCMDStore()
 
+	// Attempt to store data from Browser.
 	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
 	async function attemptBrowserStore(inputId) {
 		extractInputData(inputId);
-		//const fingerprintAndData = await computeFpAndDataForStore();
+		// Use gathered passwords to compute a fingerprint.
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		// Encrypt user data with user passwords.
 		const multiEncryptedDatarecord = await encryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], offlineData['data']);
-		let storeResponse;
-		// Select encrypted or regular offline database.
-		storeResponse = await storeOfflineDBase(fingerprint, multiEncryptedDatarecord);
+		// Store MEDRecord to fingerprint location inside offline database HTML object.
+		let storeResponse = await storeOfflineDBase(fingerprint, multiEncryptedDatarecord);
 
-		//console.log("Browser Offline Store outcome: " + storeResponse);
+		// Check that data stored properly.
 		// Load data at fingerprint, should be the encrypted data block we just stored.
 		const loadResponse = await attemptLoadOfflineDBase(fingerprint);
-		//console.log("loadResponse: " + loadResponse);
 		// Report store outcome.
 		if (multiEncryptedDatarecord === loadResponse) {
 			showPage('store_success');
@@ -537,14 +548,13 @@
 			if (inputId === 'access_data_outputdisplay') {
 				showPage('edit_success');
 			}else{
-				// Data successfully stored to memory. Still needs saved to disk which must happen 'manually' by user.
+				// Data successfully stored to memory. Still needs saved to disk which must happen manually by user.
 				showPage('store_success');
 			}
 		}else{
 			// Doesn't look like server stored data properly, report fail.
 			showPage('store_failed');
 		}
-		// Replace goBack function with security reset and we should be secure right?
 		// Always reset plaintext data holder each time flow is completed.
 		resetOfflineData();
 	}// attemptBrowserStore()
@@ -601,8 +611,7 @@
 		resetOfflineData();
 	}// attemptSyncToOnline()
 
-	// Return either pass or fail to show outcome of store, pass or fail to user.
-	// Legacy code probably needs full rewrite.
+	// Attempt to store data to online server. Show outcome in UI.
 	async function storeDataToServer(fingerprint, multiEncryptedDatarecord) {
 		// Attempt to store a record to the server.
 		const storeResponse = await serverStore(fingerprint, multiEncryptedDatarecord);
@@ -622,7 +631,7 @@
 				showPage('sync_failed');
 			}
 		}
-	}// syncDataToServer()
+	}// storeDataToServer()
 
 	// Process an Accessed MEDRecord: decrypt it then pack the decrypted data into a file for user download.
 	async function decryptAndDownloadFileOffline(multiEncryptedDatarecord) {
@@ -660,20 +669,23 @@
 	// Decrypt a MEDRecord that has been Accessed, show that plaintext to user via browser.
 	async function decryptAndShowPlaintextOffline(multiEncryptedDatarecord) {
 		let decryptedData;
+		// Attempt decryption within a try-catch loop here since an incorrect password 3 will error and we would like to inform user of that instead of breaking flow.
 		try {
 			decryptedData  = await decryptTriple(offlineData['obf1000Pass'], offlineData['ctrPass'], offlineData['opensslpass'], multiEncryptedDatarecord);
 		}catch (error) {
-			// Would it make sense to catch a specific error?
-			// Assume there was a password entry error.
+			// Looks like a password entry error.
 			showPage("password_entry_error");
 		}
 		// Reveal plaintext to user.
 		document.getElementById("access_data_outputdisplay").value = decryptedData;
 	}// decryptAndShowPlaintextOffline()
 
+	// Attempt to delete a record.
 	// Compute a fingerprint using collected user passwords, then delete the data stored at that fingerprint.
 	async function attemptDelete() {
+		// Compute fingerprint from user passwords.
 		const fingerprint = await computeFingerprint(offlineData['codeword'], offlineData['obf1000Pass'], offlineData['ctrPass']);
+		// Attempt to delete MEDRecord at fingerprint location.
 		const deleteResponse = await deleteRecordOfflineDBase(fingerprint);
 		// Report delete outcome.
 		if (deleteResponse === "success") {
@@ -694,24 +706,26 @@
 		document.getElementById("savetodisk_warning").style.display = "flex";
 	}// setSaveToDiskReminder()
 
-	// Gonna need this functionality in order to store to disk.
-	//
-	// Grab currently running HTML and save it to standalone.html
-	// This saves the offline dbase in addition to creating and downloading a standalone version that can be used offline.
+	// Create a standalone.html (offline database) version of the site (composed of the currently running HTML) and store it to the local disk.
+	// This will contain data stored in the offline database (which is held in HTML variables).
 	function saveToDisk() {
-		// Clear reminder flag first or it will be active in saved file.
+		// Clear nag flag first or it will be active in saved file.
 		clearSaveToDiskReminder();
 		// This line doesn't get applied with the innerHTML call below so add it manually.
 		let allhtml = "<!DOCTYPE HTML>";
 		// This will grab a copy of the currently running HTML.
 		allhtml += document.querySelector("html").innerHTML;
-		//console.log(allhtml);
+		// Create placeholder element to be filled with HTML.
 		let element = document.createElement('a');
+		// Set the copy of running HTML to the placeholder element.
 		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(allhtml));
 		element.setAttribute('download', 'standalone.html');
 		element.style.display = 'none';
+		// Attach placeholder element to the running document so it can be manipulated.
 		document.body.appendChild(element);
+		// Click the invisible download button, downloading the just-created copy of standalone.html to the user's local disk.
 		element.click();
+		// Job's done, unlink the HTML copy from this document.
 		document.body.removeChild(element);
 	}// saveToDisk()
 

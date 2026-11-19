@@ -139,7 +139,7 @@
 		// Set up all copy to click listeners.
 		addListenersToAllCopyToClick();
 		// Don't start flow unless everything seems to have loaded properly. All pages start with style.display = none for security.
-		showPage('home');
+		showPage('home'); // Use a direct showPage() to NOT create a historical record.
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -160,6 +160,7 @@
 	//             Site Specific Variables                      //
 	//////////////////////////////////////////////////////////////
 	// These variables allow switching to offline database variable value in offline_standalone.tmpl code set while preserving main/readonly site differences.
+	// index.tmpl can be either green (main, #54c597) or blue (readonly, #4491d5).
 	const siteColor = '#<TMPL_VAR NAME=page_type_color>';
 
 	//////////////////////////////////////////////////////////////
@@ -171,29 +172,26 @@
 	// Offline database home is the encrypted offline database page: enter_offlinedbase_pass
 	function goHome(){
 		switchSite("home");
-	}
+	}// goHome()
 	// Function call wrapper that allows online and offline use of catchUpload.
 	// Offline site version does not implement passlock.
 	async function saveFileData(filedata){
 		passlockedData['data'] = await passlockEncrypt(filedata);
-	}
+	}// saveFileData()
 	// Used to clear data when user leaves Edit page.
 	// Offline site version does not implement passlock, uses offlineData{} instead.
 	function resetData(){
 		resetPasslock();
-	}
+	}// resetData()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//							 Passlock and User Data Handling Functions                                    //
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Passwords and storage data in the clear is passed through this web browser interface.
-	// In order to minimize exposure to this data the passlock system is used to temporarily encrypt cleartext data
-	// as the user moves through the interface.
-	// 
-	// The passlock system was devised to solve this problem.
+	// The passlock system encrypts user password/storage data as it flows through the browser for additional security.
 	// Two randomly generated UUIDs are used: a browser ID and the passlock itself.
-	// The passlock is used to encrypt user passwords and data as they move through the interface.
-	// The browser ID is used to access the passlock from the server.
+	// The passlock is used to encrypt user passwords and data as they move through the interface, then deleted.
+	// This existing passlock (required for decryption) is now only accessible from the server.
+	// The browser ID is used to access the passlock from the server, where the browser_id and passlock are stored as a key-value pair.
 	//
 	// The passlock cannot be stored in the browser (as that would enable an attacker to decrypt user data nullifying the passlock system),
 	// so after creation, it is stored on the server and retrieved using the browser ID as the user moves through the UI.
@@ -206,14 +204,13 @@
 
 	// Global browserId variable to be used for accessing passlock, 
 	let browserId = null;
-	// Keep track of running timeout.
+	// Keep track of running timeouts.
 	let timeoutId;
 	let warningTimeoutId;
 	// Create Object for passlocked passwords and data.
 	let passlockedData = {};
 	// Reset passlock global variables
 	async function resetPasslock() {
-		//console.log("resetPasslock called! Passlock has been reset.");
 		// Always clear passlocked data for security.
 		passlockedData = {};
 		// Clear running timeouts.
@@ -277,9 +274,6 @@
 		setTimeoutAndWarning();
 		// Reset old data and generate new passlock, browserId.
 		const passlock = await generatePasslock();
-		//console.log("new browserId: " + browserId);
-		//console.log("new passlock: " + passlock);
-
 		// Data will be stored at keyword's 'location'.
 		// Extract keyword using regex. could be: codeword, obf1000Pass, obf12pass, opensslpass
 		const keyword = extractKeyword(inputId);
@@ -336,31 +330,37 @@
 		serverExtendPasslock(browserId);
 	}// resetTimeoutAndWarning()
 
-	// Input ids that hold passwords to be extracted are constructed in a regular way so that the password they hold can be easily extracted by our passlock system.
+	// Input ids that hold passwords to be extracted are constructed in a regular way so their data can be uniformly accessed.
 	// Example for ctrPass: access_ctrPass_input
-	// Looking at the above Element ID, we can see that this input will hold the ctrPass (AES-CTR password) and resides in the Access Flow as a result of our regular naming scheme.
-	// We can then use this function to extract the corresponding value.
+	// Looking at the above Element ID, we can see that this input will hold the ctrPass (AES-CTR password) and resides in the Access Flow.
 	function extractKeyword(inputId) {
 		// Use regex to extract keyword from input ID.
 		const regex = new RegExp(/^\w+_(\w+)_\w+$/);
 		const match = inputId.match(regex);
+		// Return the middle word, which is held in the 'match' array at index 1.
 		return match[1];
 	}// extractKeyword()
 
-	//Function that extracts user password from html and deletes it from the html source.
+/*
+	// Extract user data from HTML and then delete it from HTML source for security.
 	function extractPlaintextData(inputId) {
+		// Copy data from HTML to js variable.
 		const plaintextData = document.getElementById(inputId).value;
-		document.getElementById(inputId).value = ""; //delete password from html
+		// Delete data from HTML input field.
+		document.getElementById(inputId).value = "";
 		return plaintextData;
 	}// extractPlaintextData()
+*/
 
-	// Extract, encrypt, and store data at inputId to global passlockedData Object.
+	// Extract plaintext data from HTML object, then store it in passlock storage object, readying for computation later.
 	async function extractInputData(inputId) {
-		const passwordType = extractKeyword(inputId);
+		// Use regex to extract keyword from input ID.
+		const passwordLabel = extractKeyword(inputId);
+		// Extract user data from HTML and then delete it from HTML source for security.
 		const plaintextData = extractPlaintextData(inputId);
 		// Encrypt user data using previously set passlock that will be retreived from server using browserId as long as we haven't timed out.
 		try {
-			passlockedData[passwordType] = await passlockEncrypt(plaintextData);
+			passlockedData[passwordLabel] = await passlockEncrypt(plaintextData);
 		} catch (error) {
 			showPage('passlock_error_deny');
 			//resetPasslock();
@@ -368,18 +368,20 @@
 		}
 	}// extractInputData()
 
-	// Checks existing encrypted pass at index vs reiteration step encrypted value.
+	// Re-iteration check: validate that the password entered on the re-iteration step matches the original entry.
 	async function validateInputData(inputId, nextPageId) {
 		saveCurrentStateToHistorySoBackWillWork();
+		// Get password entered on this re-iteration step.
 		const keyword = extractKeyword(inputId);
 		const plaintextPass = extractPlaintextData(inputId);
+		// Check that it matches the password entered in the original step.
 		const decryptedPass = await passlockDecrypt(passlockedData[keyword]);
 		if (decryptedPass === plaintextPass) {
 			// Password re-iterated successfully, continue to next page.
 			showPage(nextPageId);
 		}else{
-			showPassCheckFailWarnings();
 			// Re-iterated password doesn't match original.
+			showPassCheckFailWarnings();
 			throw Error("Passwords are different!");
 			// Failed to re-iterate, Stay on this page.
 		}
@@ -387,22 +389,31 @@
 
 	// Use previously generated passlock to encrypt input.
 	async function passlockEncrypt(plaintextPassword) {
+		// Retrieve passlock from online server.
 		const passlock = await getPasslock();
+		// Encrypt user password using this passlock.
 		const encryptedPassword = await utf8EncryptOpenSSL(plaintextPassword, passlock);
+		// Return encrypted user password.
 		return encryptedPassword;
 	}// passlockEncrypt()
 
 	// Use the existing passlock to decrypt the passlock encrypted data.
 	async function passlockDecrypt(passlockEncryptedData) {
+		// Retrieve passlock from online server.
 		const passlock = await getPasslock();
+		// Decrypt passlock-encrypted password.
 		const plaintextData = await utf8DecryptOpenSSL(passlockEncryptedData, passlock);
+		// Return plaintext data.
 		return plaintextData;
 	}// passlockDecrypt()
 
 	// Decrypt passlocked password set and return plaintext set.
 	async function passlockDecryptSet() {
+		// Retrieve passlock from online server.
 		const passlock = await getPasslock();
+		// Construct a temporary object.
 		let plaintextSet = {};
+		// Decrypt all passwords held in passlock gather object.
 		for(const keyword in passlockedData) {
 			plaintextSet[keyword] = await utf8DecryptOpenSSL(passlockedData[keyword], passlock);
 		}
@@ -411,35 +422,45 @@
 		return plaintextSet;
 	}// passlockDecryptSet()
 
+	// Use gathered passwords to compute a fingerprint and encrypt the user data.
 	// Use the passlock to decrypt the complete set of passwords/data, then use those passwords to encrypt plaintext data and generate the corresponding fingerprint and MEDRecord.
 	async function computeFpAndDataForStore() {
 		// Get plaintext passwords for encryption.
 		const plaintextSet = await passlockDecryptSet();
 		const fingerprintAndData = {};
 		fingerprintAndData['fingerprint'] = await computeFingerprint(plaintextSet['codeword'], plaintextSet['obf1000Pass'], plaintextSet['ctrPass']);
-		//Check for existence of 'key' in js Object.
+		// Check whether we're in Browser or CMD Line Flow.
 		if ('opensslpass' in passlockedData) {
-			//console.log("we found opensslpass in passlockedData");
+			// Browser Flow - Encrypt user data with user passwords.
 			fingerprintAndData['data'] = await encryptTriple(plaintextSet['obf1000Pass'], plaintextSet['ctrPass'], plaintextSet['opensslpass'], plaintextSet['data']);
 		}else{
+			// CMD Line Flow - Encrypt user data with user passwords.
 			fingerprintAndData['data'] = await encryptDouble(plaintextSet['obf1000Pass'], plaintextSet['ctrPass'], plaintextSet['data']);
 		}
 		return fingerprintAndData;
 	}// computeFpAndDataForStore()
 
+	// Attempt to store a command line encrypted file.
 	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
 	async function attemptCMDStore() {
+		// Use gathered passwords to compute a fingerprint and encrypt the user data.
 		const fingerprintAndData = await computeFpAndDataForStore();
+		// Check that data looks valid.
 		validateFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
+		// Send data to server and then handle errors or successful outcome.
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], 'cmd_store');
 	}// attemptCMDStore()
 
+	// Attempt to store data from Browser.
 	// Check fingerprint & data are valid then send to storeDataToServer which handles errors and displays the outcome to user.
 	async function attemptBrowserStore(inputId) {
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
+		// Use gathered passwords to compute a fingerprint and encrypt the user data.
 		const fingerprintAndData = await computeFpAndDataForStore();
+		// Check that data looks valid.
 		validateFingerprintAndData(fingerprintAndData['fingerprint'], fingerprintAndData['data']);
+		// Send data to server and then handle errors or successful outcome.
 		storeDataToServer(fingerprintAndData['fingerprint'], fingerprintAndData['data'], inputId);
 	}// attemptBrowserStore()
 
@@ -456,30 +477,39 @@
 		document.getElementById("save_button").style.display = "inline";
 	}// editData()
 
+	// Compute a fingerprint - online unique function needed to decrypt passlocked passwords.
 	// Use passwords gathered from the Access Flow to compute a fingerprint that will be used to attempt to access a MEDRecord.
 	async function computeFpForAccess() {
-		// Get plaintext passwords for encryption.
+		// Decrypt passlock-encrypted passwords so they can be used to compute a fingerprint.
 		const plaintextSet = await passlockDecryptSet();
+		// Use these plaintext passwords to compute a fingerprint.
 		const fingerprint = await computeFingerprint(plaintextSet['codeword'], plaintextSet['obf1000Pass'], plaintextSet['ctrPass']);
 		return fingerprint;
 	}// computeFpForAccess()
 
+	// Attempt to Access a command line encrypted file.
 	// Query online server, attempt to access a MEDRecord at fingerprint location, then display outcome to user (file download).
 	async function attemptCMDAccess() {
+		// Compute fingerprint from user passwords.
 		const fingerprint = await computeFpForAccess();
-		//console.log("CMD Access. fingerprint: " + fingerprint);
+		// Retrieve stored MEDRecord at fingerprint location.
 		const multiEncryptedDatarecord = await serverLoad(fingerprint);
+		// Handle error as indicated by server.
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
+			// Clear passlock for security.
 			await resetPasslock();
 			showPage('too_many_access_failures');
+		// Error if MEDRecord doesn't look valid.
 		} else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !validateBase64Chars(multiEncryptedDatarecord)) {
-			// Don't automatically resetPasslock for third option - that disallows users from Editing.
 			await resetPasslock();
 			showPage('failed_to_access');
-		}else{
+		// Access granted.
+		} else {
+			// Don't automatically resetPasslock for third option - that disallows users from Editing.
 			showPage('access_file');
 			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
 			holdFpForDelete(fingerprint);
+			// Decrypt MEDRecord, place in a file, then download that file to user disk.
 			await decryptAndDownloadFile(multiEncryptedDatarecord);
 		}
 	}// attemptCMDAccess()
@@ -494,42 +524,55 @@
 			const bytes = Uint8Array.fromBase64(decryptedData);
 			// Produce file for user to decrypt.
 			let blob = new Blob([bytes]);
+			// Create a placeholder element.
 			let a = document.createElement('a');
+			// Create an invisible link.
 			a.href = window.URL.createObjectURL(blob);
+			// Name the file to be downloaded.
 			a.download = 'yourfile.enc';
+			// Programmatically click the link, initiating file download.
 			a.click();
 	}// decryptAndDownloadFile()
 
+	// Attempt to Access plaintext data directly from a Browser.
 	// Query online server, attempt to access a MEDRecord at fingerprint location, then display outcome to user (Browser Access).
 	async function attemptBrowserAccess(inputId) {
 		// Encrypt and save OpenSSL password to passlockedData object.
 		await extractInputData(inputId);
+		// Compute fingerprint from user passwords.
 		const fingerprint = await computeFpForAccess();
+		// Retrieve stored MEDRecord at fingerprint location.
 		const multiEncryptedDatarecord = await serverLoad(fingerprint);
-		// Report outcome of Access attempt.
+		// Handle error as indicated by server.
 		if (multiEncryptedDatarecord === "TOO_MANY_ACCESS_FAILURES") {
+			// Clear passlock for security.
 			await resetPasslock();
 			showPage('too_many_access_failures');
+		// Error if MEDRecord doesn't look valid.
 		}else if (multiEncryptedDatarecord.length !== MULTI_ENCRYPTED_DATARECORD_LENGTH_BASE64 || !validateBase64Chars(multiEncryptedDatarecord)) {
-			// Don't automatically resetPasslock for third option - that disallows users from Editing.
 			await resetPasslock();
 			showPage('failed_to_access');
+		// Access granted.
 		}else{
+			// Don't automatically resetPasslock for third option - that disallows users from Editing.
 			showPage('access_plaintext');
 			// Activate flag so if user hits back button, we'll be able to catch it.
 			activateStopNavFlag();
+			// Initiate observation to delete user data if user navigates away from page as set up in common_js.tmpl.
 			startObserving();
 			// On successful Access, hold fingerprint in HTML in case user wants to delete their data.
 			holdFpForDelete(fingerprint);
+			// Decrypt MEDRecord, show plaintext to user via browser textarea.
 			await decryptAndShowPlaintext(multiEncryptedDatarecord);
 		}
 	}// attemptBrowserAccess()
 
+	// Return stored fingerprint in order to delete.
 	// Upon Access Flow completion, the fingerprint is stored in the HTML in case user wants to delete their data.
-	// This function returns that stored fingerprint.
 	function getStoredFp() {
+		// Retrieve fingerprint from HTML store location.
 		const fingerprint = document.getElementById("fingerprint_holder").value;
-		// Clear fingerprint held for delete. Always do this?
+		// Clear fingerprint held for delete.
 		document.getElementById("fingerprint_holder").value = '';
 		return fingerprint;
 	}// getStoredFp()
@@ -543,14 +586,14 @@
 
 	// Decrypt a MEDRecord that has been Accessed, show that plaintext to user via browser.
 	async function decryptAndShowPlaintext(multiEncryptedDatarecord) {
+		// Get set of decrypted user passwords.
 		const plaintextSet = await passlockDecryptSet();
 		let decryptedData;
+		// Attempt decryption within a try-catch loop here since an incorrect password 3 will error and we would like to inform user of that instead of breaking flow.
 		try {
 			decryptedData = await decryptTriple(plaintextSet['obf1000Pass'], plaintextSet['ctrPass'], plaintextSet['opensslpass'], multiEncryptedDatarecord);
 		}catch (error) {
-			console.log(error);
-			// Would it make sense to catch a specific error?
-			// Assume there was a password entry error.
+			// Looks like a password entry error.
 			showPage("password_entry_error");
 		}
 		// Reveal plaintext to user.
@@ -576,34 +619,33 @@
 		await resetPasslock();
 	}// attemptDelete()
 
-	// Return either pass or fail to show outcome of store, pass or fail to user.
-	// Legacy code probably needs full rewrite.
+	// Attempt to store data to online server. Show outcome in UI.
 	async function storeDataToServer(fingerprint, multiEncryptedDatarecord, inputId) {
 		// Attempt to store a record to the server.
 		const storeResponse = await serverStore(fingerprint, multiEncryptedDatarecord);
 		console.log("storeResponse: " + storeResponse);
+		// This user (IP) has reached their store limit for the day.
 		if (storeResponse === 'STORES_OVER_100') {
 			showPage('stores_over_100');
-		}else{
-			// Load data at fingerprint, should be the encrypted data block we just stored.
+		} else {
+			// Check that data was stored properly with a simple load of the store location (fingerprint).
 			const loadResponse = await serverLoad(fingerprint);
 			// Report store outcome.
 			if (multiEncryptedDatarecord === loadResponse) {
 				// We succeeded.
 				if (inputId === 'access_data_outputdisplay') {
 					showPage('edit_success');
-				}else{
+				} else {
 					// Server successfully stored data, report success.
 					showPage('store_success');
 				}
-			}else{
+			} else {
 				// Doesn't look like server stored data properly, report fail.
 				showPage('store_failed');
 			}
 		}
 		await resetPasslock();
 	}// storeDataToServer()
-
 
 	///////////////////////////////////////////////////////////////////////////////////
 	//                       Offline Database Generation                             //

@@ -509,6 +509,21 @@
 		}
 	}// validateDataInputLength()
 
+
+	//////////////////////////////////////////////////////////////////
+	//				Common Flowwalker Functions                     //
+	//////////////////////////////////////////////////////////////////
+
+	// Extract user data from HTML and then delete it from HTML source for security.
+	function extractPlaintextData(inputId) {
+		// Copy data from HTML to js variable.
+		const plaintextData = document.getElementById(inputId).value;
+		// Delete data from HTML input field.
+		document.getElementById(inputId).value = "";
+		return plaintextData;
+	}// extractPlaintextData()
+
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Base Functionality:  Produce a 'Fingerprint' which will be used as the Key in the Key-Value pair for storing a Multi Encrypted Datarecord.
 	//                      This is achieved by SHA-256 hashing inputs, concatenating them, and finally returning a hash of that concatenation.
