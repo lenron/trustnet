@@ -16,7 +16,7 @@
 # e - Stop running this script if any command returns exit status -- necessary for accurate reporting.
 # u - Error if script tries to reference an undefined variable.
 # o pipefail - Set this script's exit status to the last exit status of any command contained within it. Normal behavior is exit this script with the last exit status, which can mask errors.
-set -Eeuo pipefail
+set -Eeu
 
 REPO_URL="https://github.com/lenron/trustnet.git"
 INSTALL_DIR="$HOME/trustnet"
@@ -292,10 +292,10 @@ restart_server() {
 
 
 
-# Generate 32 psudorandom alphanumeric characters.
+# Generate 32 pseudorandom alphanumeric characters.
 generate_key() {
 	# Trim (tr) all non-alphanumeric chars (-dc), keeping 'a-zA-Z0-9' produced by /dev/urandom, stop once we have 32 chars.
-	tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32; cat >/dev/null
+	tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
 } # generate_key()
 
 # Take parameters as input.
