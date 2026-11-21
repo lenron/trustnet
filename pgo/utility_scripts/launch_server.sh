@@ -18,10 +18,10 @@
 # o pipefail - Set this script's exit status to the last exit status of any command contained within it. Normal behavior is exit this script with the last exit status, which can mask errors.
 set -Eeuo pipefail
 
-REPO_URL="${https://github.com/lenron/trustnet.git}"
-INSTALL_DIR="${$HOME/trustnet}"
-COMPOSE_DIR="${$INSTALL_DIR/pgo}"
-SOURCE_BRANCH="${main}"
+REPO_URL="https://github.com/lenron/trustnet.git"
+INSTALL_DIR="$HOME/trustnet"
+COMPOSE_DIR="$INSTALL_DIR/pgo"
+SOURCE_BRANCH="main"
 
 # -- output helpers -----------------------------------------------------------
 if [ -t 1 ]; then
@@ -546,7 +546,7 @@ EOF
 	sudo docker compose up -d # Not sure of exit status here. I think it will exit 1 on error?
 } # setup_docker_and_containers()
 
-create_proxy {
+create_proxy() {
 	# Create docker network proxy (if not already existing) for contianer communication here so 'external:proxy' doesn't need to be changed ever.
 	sudo docker network inspect proxy >/dev/null 2>&1 || sudo docker network create proxy
 }
