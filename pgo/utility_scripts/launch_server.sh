@@ -1,13 +1,304 @@
 #!/bin/bash
+#
+# Obf server popup script.
+#
+#   1. Create Logs directory, then give ownership to Apache so it can be used.
+#   2. Look for secrets directory and generate a new set of keys if not found (don't clobber existing keys if this script ran accidentally).
+#   3. Set up cronjobs which handle the auto backup system.
+#   4. Check that TLS is active. (Move this to first step?)
+#   5. Ensure Docker is setup, then deploy containers.
+#   6. Pull database from main server if this is a backup.
+#   7. Check that containers were set up properly.
+#   8. Check that server is active.
+#
 
-# Stop running this script if any command returns exit status -- necessary for accurate reporting.
-set -e
+# E - Inherit all error traps, some silent errors are possible if this is not set.
+# e - Stop running this script if any command returns exit status -- necessary for accurate reporting.
+# u - Error if script tries to reference an undefined variable.
+# o pipefail - Set this script's exit status to the last exit status of any command contained within it. Normal behavior is exit this script with the last exit status, which can mask errors.
+set -Eeuo pipefail
 
+REPO_URL="${https://github.com/lenron/trustnet.git}"
+INSTALL_DIR="${$HOME/trustnet}"
+COMPOSE_DIR="${$INSTALL_DIR/pgo}"
+SOURCE_BRANCH="${main}"
+
+# -- output helpers -----------------------------------------------------------
+if [ -t 1 ]; then
+    BOLD=$'\033[1m'; DIM=$'\033[2m'; GREEN=$'\033[32m'; YELLOW=$'\033[33m'
+    RED=$'\033[31m'; RESET=$'\033[0m'
+else
+    BOLD=""; DIM=""; GREEN=""; YELLOW=""; RED=""; RESET=""
+fi
+info() { printf '%s==>%s %s\n' "$GREEN" "$RESET" "$*"; }
+warn() { printf '%swarning:%s %s\n' "$YELLOW" "$RESET" "$*" >&2; }
+die()  { printf '%serror:%s %s\n' "$RED" "$RESET" "$*" >&2; exit 1; }
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# Any *unhandled* failure (set -Ee) lands here with an actionable note instead of
+# a bare non-zero exit. `die` exits explicitly and does not trigger this.
+on_error() {
+    local rc=$?
+    printf '\n%serror:%s the installer stopped unexpectedly (exit %s). The output above shows why.\n' \
+        "$RED" "$RESET" "$rc" >&2
+    printf '       Fix the issue and re-run this script — it resumes the parts already done.\n' >&2
+}
+trap on_error ERR
+
+# Ask a yes/no question, reading from the terminal even under `curl | bash`
+# (where stdin is the script). Defaults to "$2" when non-interactive.
+ask() {
+    local prompt="$1" default="${2:-y}" ans hint
+    [ "$default" = y ] && hint="Y/n" || hint="y/N"
+    if ! ( : </dev/tty ) 2>/dev/null; then
+        warn "non-interactive shell; assuming '$default' for: $prompt"
+        [ "$default" = y ]; return
+    fi
+    printf '%s%s%s [%s] ' "$BOLD" "$prompt" "$RESET" "$hint" >/dev/tty
+    read -r ans </dev/tty || ans=""
+    ans="${ans:-$default}"
+    case "$ans" in [Yy]*) return 0 ;; *) return 1 ;; esac
+}
+
+# -- distro / package manager detection --------------------------------------
+OS_ID=""; OS_LIKE=""; PKG=""; IS_WSL=0; SUDO=""
+# Extra os-release fields, captured only to pick Docker's upstream repo when
+# get.docker.com refuses a derivative it doesn't recognize (see install_docker).
+OS_PLATFORM_ID=""; OS_CODENAME=""; OS_UBUNTU_CODENAME=""
+
+detect_os() {
+    if [ -r /etc/os-release ]; then
+        # shellcheck disable=SC1091
+        . /etc/os-release
+        OS_ID="${ID:-}"; OS_LIKE="${ID_LIKE:-}"
+        OS_PLATFORM_ID="${PLATFORM_ID:-}"
+        OS_CODENAME="${VERSION_CODENAME:-}"
+        OS_UBUNTU_CODENAME="${UBUNTU_CODENAME:-}"
+    fi
+    if grep -qiE 'microsoft|wsl' /proc/version 2>/dev/null || [ -n "${WSL_DISTRO_NAME:-}" ]; then
+        IS_WSL=1
+    fi
+    case " $OS_ID $OS_LIKE " in
+        *" arch "*|*manjaro*)                 PKG=pacman ;;
+        *" ubuntu "*|*" debian "*)            PKG=apt ;;
+        *" fedora "*|*" rhel "*|*" centos "*) PKG=dnf ;;
+        *)  if   have apt-get; then PKG=apt
+            elif have dnf;     then PKG=dnf
+            elif have yum;     then PKG=yum
+            elif have pacman;  then PKG=pacman
+            fi ;;
+    esac
+    [ -n "$PKG" ] || die "could not detect a supported package manager (apt/dnf/yum/pacman). Install git + Docker manually, then re-run."
+    [ "$PKG" = dnf ] && ! have dnf && have yum && PKG=yum
+    if [ "$(id -u)" -ne 0 ]; then
+        have sudo || die "this script needs root for package installs — install sudo or run as root."
+        SUDO="sudo"
+    fi
+    local where="$OS_ID"; [ "$IS_WSL" -eq 1 ] && where="$OS_ID (WSL)"
+    info "Detected ${where:-linux} — using ${PKG}."
+}
+
+pkg_install() {
+    info "Installing: $*"
+    case "$PKG" in
+        apt)    $SUDO apt-get update -y && $SUDO apt-get install -y "$@" ;;
+        dnf)    $SUDO dnf install -y "$@" ;;
+        yum)    $SUDO yum install -y "$@" ;;
+        pacman) $SUDO pacman -Sy --needed --noconfirm "$@" ;;
+    esac
+}
+
+# -- git ----------------------------------------------------------------------
+ensure_git() {
+    have git && return
+    warn "git is not installed."
+    ask "Install git now?" y || die "git is required to clone the repo."
+    pkg_install git || die "git installation failed — see the output above."
+    have git || die "git installation reported success but 'git' is not on PATH."
+}
+
+clone_repo() {
+    if [ -d "$INSTALL_DIR/.git" ]; then
+        info "Updating existing checkout at $INSTALL_DIR"
+        local current_branch
+        current_branch=$(git -C "$INSTALL_DIR" symbolic-ref --quiet --short HEAD || true)
+        if [ -n "$current_branch" ] && [ "$current_branch" != "$SOURCE_BRANCH" ]; then
+            warn "existing checkout is on '$current_branch', not configured branch '$SOURCE_BRANCH'; leaving its branch unchanged."
+        fi
+        git -C "$INSTALL_DIR" pull --ff-only || warn "could not fast-forward; using the existing checkout."
+    else
+        [ -e "$INSTALL_DIR" ] && [ -n "$(ls -A "$INSTALL_DIR" 2>/dev/null)" ] \
+            && die "$INSTALL_DIR exists and is not a turnstone checkout. Set TURNSTONE_DIR to an empty path."
+        info "Cloning $REPO_URL branch $SOURCE_BRANCH into $INSTALL_DIR"
+        # Skip Git LFS smudge — the LFS objects are only diagram PNGs, not needed to run.
+        GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 --branch "$SOURCE_BRANCH" "$REPO_URL" "$INSTALL_DIR"
+    fi
+}
+
+
+# -- docker -------------------------------------------------------------------
+DOCKER="docker"
+
+# Fallback when get.docker.com won't install here. That script keys off $ID alone
+# (never ID_LIKE), so it aborts with "Unsupported distribution '<id>'" on every
+# derivative — Nobara, Linux Mint, Pop!_OS, AlmaLinux, Oracle Linux, … — even
+# though the family is clear. We already know the family from detect_os, so we add
+# Docker's official CE repo for the matching upstream and install the same
+# packages get.docker.com would (including the compose plugin the rest of run.sh
+# relies on).
+install_docker_ce_repo() {
+    local up
+    case "$PKG" in
+        apt)
+            local codename arch
+            # UBUNTU_CODENAME is set by Ubuntu and every Ubuntu-derived distro
+            # (Mint/Pop!_OS/Zorin/…) and never by pure Debian, so it both routes
+            # the family and gives the exact codename Docker's repo expects.
+            if [ -n "$OS_UBUNTU_CODENAME" ]; then
+                up=ubuntu; codename="$OS_UBUNTU_CODENAME"
+            else
+                up=debian; codename="$OS_CODENAME"
+            fi
+            [ -n "$codename" ] || die "couldn't determine the $up release codename for Docker's repo — install Docker manually and re-run."
+            arch="$(dpkg --print-architecture 2>/dev/null || echo amd64)"
+            info "Adding Docker's $up repository ($codename)."
+            $SUDO install -m 0755 -d /etc/apt/keyrings
+            curl -fsSL "https://download.docker.com/linux/$up/gpg" | $SUDO tee /etc/apt/keyrings/docker.asc >/dev/null
+            $SUDO chmod a+r /etc/apt/keyrings/docker.asc
+            printf 'deb [arch=%s signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/%s %s stable\n' \
+                "$arch" "$up" "$codename" | $SUDO tee /etc/apt/sources.list.d/docker.list >/dev/null
+            $SUDO apt-get update -y
+            $SUDO apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            ;;
+        dnf|yum)
+            # A Fedora spin and a RHEL clone can both carry "fedora" in ID_LIKE
+            # (Nobara's is "rhel centos fedora"), so ID_LIKE can't separate them.
+            # PLATFORM_ID can: Fedora is platform:fNN, Enterprise Linux platform:elN.
+            case "$OS_PLATFORM_ID" in
+                platform:f*)  up=fedora ;;
+                platform:el*) up=centos ;;
+                *) if [ -e /etc/fedora-release ]; then up=fedora; else up=centos; fi ;;
+            esac
+            info "Adding Docker's $up repository."
+            $SUDO curl -fsSL "https://download.docker.com/linux/$up/docker-ce.repo" \
+                -o /etc/yum.repos.d/docker-ce.repo \
+                || die "couldn't add Docker's $up repository — install Docker manually and re-run."
+            pkg_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            ;;
+    esac
+}
+
+# The distro IDs get.docker.com installs directly: it matches $ID against this
+# exact set (ignoring ID_LIKE) and aborts on anything else. Mirrors the dispatch
+# in get.docker.com, including its fedora-asahi-remix -> fedora alias.
+get_docker_com_supports() {
+    case "$1" in
+        ubuntu|debian|raspbian|centos|fedora|rhel|rocky|sles|fedora-asahi-remix) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+install_docker() {
+    case "$PKG" in
+        apt|dnf|yum)
+            # Decide up front which installer applies, rather than treating every
+            # get.docker.com failure as "unsupported distro": for an ID it knows,
+            # let it run and surface any real failure (network, apt lock, EOL) via
+            # die instead of masking it with the repo path. Only unrecognized
+            # derivatives (Nobara, Mint, …) — which it would just abort on — skip
+            # straight to adding Docker's repo ourselves.
+            if [ -n "$OS_ID" ] && ! get_docker_com_supports "$OS_ID"; then
+                info "get.docker.com doesn't support '$OS_ID' — using Docker's official repository directly."
+                install_docker_ce_repo
+            else
+                info "Installing Docker via the official get.docker.com script"
+                curl -fsSL https://get.docker.com | $SUDO sh \
+                    || die "get.docker.com failed to install Docker (see the output above). Fix the issue and re-run — the script resumes."
+            fi
+            ;;
+        pacman)
+            pkg_install docker docker-compose ;;
+    esac
+    # Best-effort: start the daemon and let the current user run docker.
+    if have systemctl; then
+        $SUDO systemctl enable --now docker 2>/dev/null || true
+    fi
+    if [ "$(id -u)" -ne 0 ] && getent group docker >/dev/null 2>&1; then
+        $SUDO usermod -aG docker "$USER" 2>/dev/null || true
+    fi
+}
+
+start_docker_daemon() {
+    if have systemctl; then
+        $SUDO systemctl start docker 2>/dev/null || true
+    elif have service; then
+        $SUDO service docker start 2>/dev/null || true
+    fi
+}
+
+# Resolve how to invoke docker (direct / via sudo) and make sure the daemon runs.
+ensure_docker_usable() {
+    if ! have docker; then
+        warn "Docker is not installed."
+        ask "Install Docker now?" y || die "Docker is required."
+        install_docker
+        have docker || die "Docker installation failed."
+    fi
+
+    docker info >/dev/null 2>&1 && { DOCKER="docker"; return; }
+
+    # Maybe the daemon just isn't running yet.
+    start_docker_daemon
+    docker info >/dev/null 2>&1 && { DOCKER="docker"; return; }
+
+    # Maybe we lack permission (not in the docker group yet, group change not
+    # active in this shell) — fall back to sudo for this run.
+    if [ "$(id -u)" -ne 0 ] && have sudo && sudo docker info >/dev/null 2>&1; then
+        DOCKER="sudo docker"
+        warn "Using 'sudo docker' for this run. To drop the sudo: 'sudo usermod -aG docker $USER' then log out and back in."
+        return
+    fi
+
+    if [ "$IS_WSL" -eq 1 ]; then
+        die "Docker isn't usable inside WSL. Install Docker Desktop on Windows and enable WSL integration for this distro (Settings -> Resources -> WSL integration), then re-run."
+    fi
+    die "Docker is installed but not usable — the daemon may be stopped or you lack permission. Try: 'sudo systemctl start docker', then re-run."
+}
+
+ensure_compose() {
+    $DOCKER compose version >/dev/null 2>&1 && return
+    warn "The Docker Compose v2 plugin is missing."
+    case "$PKG" in
+        apt|dnf|yum) ask "Install docker-compose-plugin?" y && pkg_install docker-compose-plugin || true ;;
+        pacman)      ask "Install docker-compose?" y && pkg_install docker-compose || true ;;
+    esac
+    $DOCKER compose version >/dev/null 2>&1 \
+        || die "'docker compose' is unavailable. Install Docker Compose v2 and re-run."
+}
+
+restart_server() {
+    info "Restarting server."
+    ( cd "$COMPOSE_DIR" && $DOCKER compose restart ) \
+        || warn "Server didn't restart. Run: cd $(printf '%q' "$COMPOSE_DIR") && $DOCKER compose restart"
+}
+
+
+
+
+
+
+
+
+
+
+
+# Generate 32 psudorandom alphanumeric characters.
 generate_key() {
 	# Trim (tr) all non-alphanumeric chars (-dc), keeping 'a-zA-Z0-9' produced by /dev/urandom, stop once we have 32 chars.
 	tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
 } # generate_key()
 
+# Take parameters as input.
 parse_parameters() {
 	# Require exactly 1 command line argument that is either 'main' or 'backup'.
 	# Double brackets are bash specific, 'generally safer to use', and better with regex using =~ operator:
@@ -23,6 +314,7 @@ parse_parameters() {
 	fi
 } # parse_parameters()
 
+# Create logs directory and hand over ownership to Apache user so this directory can be used automatically by the server.
 build_logs() {
 	# Set logs directory.
 	LOG_DIRECTORY="$HOME/trustnet/pgo/logs"
@@ -32,6 +324,7 @@ build_logs() {
 	sudo chown -R www-data $HOME/trustnet/pgo/logs
 } # build_logs()
 
+# Generate keys and build secrets directory if one doesn't already exist.
 build_secrets() {
 	SECRETS_DIRECTORY="$HOME/trustnet/pgo/secrets"
 	SMTP_CREDS_LOCATION="$SECRETS_DIRECTORY/email_creds"
@@ -140,6 +433,7 @@ build_secrets() {
 	fi
 } # build_secrets()
 
+# Setup automatic backup system.
 setup_crontabs() {
 	#####################
 	#   Crontab Setup   #
@@ -250,7 +544,14 @@ EOF
 	# Run docker compose file docker-compose.yaml which contains the 'Infrastructure as Code'.
 	# This will download container images for httpd (apache2) and MariaDB and run them in the background (-d option - detach).
 	sudo docker compose up -d # Not sure of exit status here. I think it will exit 1 on error?
-} # setup_docker()
+} # setup_docker_and_containers()
+
+create_proxy {
+	# Create docker network proxy (if not already existing) for contianer communication here so 'external:proxy' doesn't need to be changed ever.
+	sudo docker network inspect proxy >/dev/null 2>&1 || sudo docker network create proxy
+}
+
+
 
 #########################################################################################################################################
 # When we have a clearer picture of VPS / Prod Server, do an additional check here to make sure pgo is accessible on the open internet. #
@@ -259,6 +560,7 @@ check_server_is_up() {
 	echo "TBD - Here check that server is accessible on the open internet via prod URL."
 } # check_server_is_up()
 
+# Check if this is a backup server and initiate database pull from main server if so.
 if_backup_pull_database_from_main_server() {
 	# If we're a backup pull data from main server.
 	if [[ "$1" == "backup" ]]; then
@@ -272,6 +574,7 @@ if_backup_pull_database_from_main_server() {
 	fi
 } # if_backup_pull_database_from_main_server()
 
+# Check that containers are setup and running.
 test_containers() {
 	# Check if everything is set up. Report to user how it's going. 
 	echo -e "\n\nEverything should now be set up! RUNNING TEST SUITE..."
@@ -349,8 +652,20 @@ test_containers() {
 
 # Main Function - must go after function declarations it uses.
 main() {
+    printf '%s%sObf installer%s\n\n' "$BOLD" "$GREEN" "$RESET"
+
+    detect_os
+    ensure_git
+    clone_repo
+    ensure_docker_usable
+    ensure_compose
+
+    ROOTLESS=0
+    $DOCKER info 2>/dev/null | grep -qi 'rootless' && ROOTLESS=1
+
+	# Check for TLS first?
 	# Prepare Ubuntu to install programs. This also functions as a check for internet, etc.
-	sudo apt-get update -y && sudo apt-get upgrade -y
+	#sudo apt-get update -y && sudo apt-get upgrade -y
 	# Make sure input was gathered from user.
 	# "$@" passes in command line argument variables. Doesn't appear to cause problems if those vars aren't used in function!
 	parse_parameters "$@"
@@ -363,7 +678,17 @@ main() {
 	# Make sure TLS is active. -- To be determined how to do this - will depend on VPS setup.
 	check_tls "$@"
 	# Install Docker then create and start containers.
-	setup_docker_and_containers "$@"
+	#setup_docker_and_containers "$@"
+
+	create_proxy
+    info "Starting the Server…"
+    # Plain `up -d` (honoring compose.override.yaml) + --remove-orphans so a
+    # re-run that lowers the count also stops the now-excluded nodes.
+    if ! ( cd "$COMPOSE_DIR" && $DOCKER compose up -d --remove-orphans ); then
+        die "the stack failed to start (see output above). Inspect logs: cd $COMPOSE_DIR && $DOCKER compose logs"
+    fi
+    restart_server
+
 	# Check if this is a backup server and if so copy over the main database.
 	if_backup_pull_database_from_main_server "$@"
 	# Check container creation.
@@ -374,9 +699,14 @@ main() {
 	echo -e "\nLaunch script completed."
 }
 
+# Don't allow this script to be ran by other scripts? Not sure why this is important. Maybe for their setup it's important.
+if [[ "${BASH_SOURCE[0]:-$0}" == "$0" ]]; then
+    main "$@"
+fi
+
 # Execute main function. following with "$@" passes in to the function the command line arguments.
 # Then using "$@" on each internal function passes the arguments in to those functions 'as-is'
-main "$@"
+#main "$@"
 
 
 
