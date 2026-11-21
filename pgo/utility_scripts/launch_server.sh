@@ -295,7 +295,7 @@ restart_server() {
 # Generate 32 psudorandom alphanumeric characters.
 generate_key() {
 	# Trim (tr) all non-alphanumeric chars (-dc), keeping 'a-zA-Z0-9' produced by /dev/urandom, stop once we have 32 chars.
-	tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
+	tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32; cat >/dev/null
 } # generate_key()
 
 # Take parameters as input.
