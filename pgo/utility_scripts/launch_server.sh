@@ -343,23 +343,23 @@ build_secrets() {
 		MARIADB_ROOT_PASSWORD_LOCATION="$SECRETS_DIRECTORY/mariadb_root_pw"
 		ENV_LOCATION="$SECRETS_DIRECTORY/utility_scripts.env"
 
-		if [ -s "$SMTP_CREDS_LOCATION" ]; then
-			echo "SMTP credentials file looks OK."
-		else
+		#if [ -s "$SMTP_CREDS_LOCATION" ]; then
+			#echo "SMTP credentials file looks OK."
+		#else
 			# Fill email_creds with input generated from user.
-			echo "Now setting up SMTP for automatic email functionality."
-			read -p "Please enter SMTP server: " SMTP_SERVER
-			read -p "Please enter SMTP username: " SMTP_USERNAME
-			read -p "Please enter SMTP password/token: " SMTP_PASSWORD
-			read -p "Please enter SMTP port (probably 587): " SMTP_PORT
-			cat <<- EOF > $SMTP_CREDS_LOCATION
+			#echo "Now setting up SMTP for automatic email functionality."
+			#read -p "Please enter SMTP server: " SMTP_SERVER
+			#read -p "Please enter SMTP username: " SMTP_USERNAME
+			#read -p "Please enter SMTP password/token: " SMTP_PASSWORD
+			#read -p "Please enter SMTP port (probably 587): " SMTP_PORT
+			#cat <<- EOF > $SMTP_CREDS_LOCATION
 				# Variables for swaks email functionality. 
-				username:$SMTP_USERNAME
-				password:$SMTP_PASSWORD
-				server:$SMTP_SERVER
-				port:$SMTP_PORT
-			EOF
-		fi
+				#username:$SMTP_USERNAME
+				#password:$SMTP_PASSWORD
+				#server:$SMTP_SERVER
+				#port:$SMTP_PORT
+			#EOF
+		#fi
 
 		# Create and fill utility_scripts.env
 		if [ -s "$ENV_LOCATION" ]; then
