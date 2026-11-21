@@ -343,34 +343,38 @@ build_secrets() {
 		MARIADB_ROOT_PASSWORD_LOCATION="$SECRETS_DIRECTORY/mariadb_root_pw"
 		ENV_LOCATION="$SECRETS_DIRECTORY/utility_scripts.env"
 
-		#if [ -s "$SMTP_CREDS_LOCATION" ]; then
-			#echo "SMTP credentials file looks OK."
-		#else
+		if [ -s "$SMTP_CREDS_LOCATION" ]; then
+			echo "SMTP credentials file looks OK."
+		else
 			# Fill email_creds with input generated from user.
-			#echo "Now setting up SMTP for automatic email functionality."
-			#read -p "Please enter SMTP server: " SMTP_SERVER
-			#read -p "Please enter SMTP username: " SMTP_USERNAME
-			#read -p "Please enter SMTP password/token: " SMTP_PASSWORD
-			#read -p "Please enter SMTP port (probably 587): " SMTP_PORT
-			#cat <<- EOF > $SMTP_CREDS_LOCATION
+			echo "Now setting up SMTP for automatic email functionality."
+			read -p "Please enter SMTP server: " SMTP_SERVER
+			read -p "Please enter SMTP username: " SMTP_USERNAME
+			read -p "Please enter SMTP password/token: " SMTP_PASSWORD
+			read -p "Please enter SMTP port (probably 587): " SMTP_PORT
+			cat <<- EOF > $SMTP_CREDS_LOCATION
 				# Variables for swaks email functionality. 
-				#username:$SMTP_USERNAME
-				#password:$SMTP_PASSWORD
-				#server:$SMTP_SERVER
-				#port:$SMTP_PORT
-			#EOF
-		#fi
+				username:$SMTP_USERNAME
+				password:$SMTP_PASSWORD
+				server:$SMTP_SERVER
+				port:$SMTP_PORT
+			EOF
+		fi
+
+		info "SMTP done"
 
 		# Create and fill utility_scripts.env
 		if [ -s "$ENV_LOCATION" ]; then
 			echo "Utility scripts's .env file looks OK."
 		else
+			info "starting env building"
 			# Generate keys, add to utility_scripts.env file.
 			username_dir_access=$(generate_key)
 			password_dir_access=$(generate_key)
 			long_directory=$(generate_key)
 			shared_openssl_password=$(generate_key)
 			mariadb_root_pw=$(generate_key)
+			info "keys generated"
 			cat <<- EOF > $ENV_LOCATION
 				USERNAME_DIR_ACCESS=$username_dir_access
 				PASSWORD_DIR_ACCESS=$password_dir_access
@@ -378,6 +382,7 @@ build_secrets() {
 				SHARED_OPENSSL_PASSWORD=$shared_openssl_password
 				MARIADB_ROOT_PW=$mariadb_root_pw
 			EOF
+			info "keys copied to env file"
 			# Install htpasswd creator
 			sudo apt-get install apache2-utils -y
 			# Generate .htpasswd with generated keys.
