@@ -15,8 +15,7 @@
 # E - Inherit all error traps, some silent errors are possible if this is not set.
 # e - Stop running this script if any command returns exit status -- necessary for accurate reporting.
 # u - Error if script tries to reference an undefined variable.
-# o pipefail - Set this script's exit status to the last exit status of any command contained within it. Normal behavior is exit this script with the last exit status, which can mask errors.
-set -Eeu
+set -Eeuo pipefail
 
 REPO_URL="https://github.com/lenron/trustnet.git"
 INSTALL_DIR="$HOME/trustnet"
@@ -283,19 +282,17 @@ restart_server() {
 }
 
 
-
-
-
-
-
-
-
-
-
-# Generate 32 pseudorandom alphanumeric characters.
+# Generate 32 pseudorandom alphanumeric characters. This will cause set -o pipefail to error since head -c 32 closes the pipe at 32 chars.
 generate_key() {
 	# Trim (tr) all non-alphanumeric chars (-dc), keeping 'a-zA-Z0-9' produced by /dev/urandom, stop once we have 32 chars.
-	tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
+	#tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
+
+    # $1 = number of bytes → 2*$1 hex chars
+	$1 = 16 # 32 hex chars
+    if   have openssl; then openssl rand -hex "$1"
+    elif have python3; then python3 -c 'import secrets,sys; print(secrets.token_hex(int(sys.argv[1])))' "$1"
+    else head -c "$1" /dev/urandom | od -An -tx1 | tr -d ' \n'
+    fi
 } # generate_key()
 
 # Take parameters as input.
