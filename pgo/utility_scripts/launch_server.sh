@@ -287,17 +287,9 @@ restart_server() {
 }
 
 
-# Generate 32 pseudorandom alphanumeric characters. This will cause set -o pipefail to error since head -c 32 closes the pipe at 32 chars.
+# Generate 32 pseudorandom alphanumeric characters.
 generate_key() {
-	# Trim (tr) all non-alphanumeric chars (-dc), keeping 'a-zA-Z0-9' produced by /dev/urandom, stop once we have 32 chars.
-	#tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
-
-    # $1 = number of bytes → 2*$1 hex chars
-	NUM_CHARS=16 # 32 hex chars
-    if   have openssl; then openssl rand -hex "$NUM_CHARS"
-    elif have python3; then python3 -c 'import secrets,sys; print(secrets.token_hex(int(sys.argv[1])))' "$NUM_CHARS"
-    else head -c "$NUM_CHARS" /dev/urandom | od -An -tx1 | tr -d ' \n'
-    fi
+	openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | head -c 32
 } # generate_key()
 
 # Take parameters as input.
