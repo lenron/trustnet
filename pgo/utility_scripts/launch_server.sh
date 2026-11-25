@@ -2,6 +2,10 @@
 #
 # Obf server popup script.
 #
+# One line installer (with public repo):
+#   curl -fsSL https://raw.githubusercontent.com/lenron/trustnet/main/pgo/utility_scripts/launch_server.sh | bash -s -- main
+#   curl -fsSL https://raw.githubusercontent.com/lenron/trustnet/main/pgo/utility_scripts/launch_server.sh | bash -s -- backup
+#
 #   1. Create Logs directory, then give ownership to Apache so it can be used.
 #   2. Look for secrets directory and generate a new set of keys if not found (don't clobber existing keys if this script ran accidentally).
 #   3. Set up cronjobs which handle the auto backup system.
@@ -15,6 +19,7 @@
 # E - Inherit all error traps, some silent errors are possible if this is not set.
 # e - Stop running this script if any command returns exit status -- necessary for accurate reporting.
 # u - Error if script tries to reference an undefined variable.
+# o pipefail - Error if any piped (|) command exits with error status.
 set -Eeuo pipefail
 
 REPO_URL="https://github.com/lenron/trustnet.git"
@@ -325,6 +330,7 @@ build_logs() {
 build_secrets() {
 	SECRETS_DIRECTORY="$HOME/trustnet/pgo/secrets"
 	SMTP_CREDS_LOCATION="$SECRETS_DIRECTORY/email_creds"
+
 	if [[ $1 == "main" ]]; then
 		# Check for existence of /secrets and create if not 
 		if [ -d $SECRETS_DIRECTORY ]; then
@@ -340,27 +346,25 @@ build_secrets() {
 		MARIADB_ROOT_PASSWORD_LOCATION="$SECRETS_DIRECTORY/mariadb_root_pw"
 		ENV_LOCATION="$SECRETS_DIRECTORY/utility_scripts.env"
 
+		# -s if file exists and is not empty.
 		if [ -s "$SMTP_CREDS_LOCATION" ]; then
 			echo "SMTP credentials file looks OK."
 		else
-			# Fill email_creds with input generated from user.
+			# Fill empty file for email creds (to be filled manually by admin later).
 			echo "Now setting up SMTP for automatic email functionality."
-			read -p "Please enter SMTP server: " SMTP_SERVER
-			read -p "Please enter SMTP username: " SMTP_USERNAME
-			read -p "Please enter SMTP password/token: " SMTP_PASSWORD
-			read -p "Please enter SMTP port (probably 587): " SMTP_PORT
 			cat <<- EOF > $SMTP_CREDS_LOCATION
 				# Variables for swaks email functionality. 
-				username:$SMTP_USERNAME
-				password:$SMTP_PASSWORD
-				server:$SMTP_SERVER
-				port:$SMTP_PORT
+				username:
+				password:
+				server:
+				port:
 			EOF
 		fi
 
 		info "SMTP done"
 
 		# Create and fill utility_scripts.env
+		# This .env file holds keys for auto backup - restore functionality.
 		if [ -s "$ENV_LOCATION" ]; then
 			echo "Utility scripts's .env file looks OK."
 		else
@@ -428,9 +432,14 @@ build_secrets() {
 			# Maybe check all files too?
 			# Inform user they need secrets directory from main.
 			echo -e "Secrets directory not found! This server was specified as backup; please copy secrets directory and containing keys from main server into $SECRETS_DIRECTORY"
+			warn "Secrets directory not found! This server was specified as backup; please copy secrets directory and containing keys from main server into $SECRETS_DIRECTORY"
+			warn "Once secrets directory set up, please re-run this script."
+			# Exit with error status which should stop the script.
+			exit 1;
 		else
 			# If we're a backup and secrets directory exists, make sure email_creds is empty. All email set up to send from main server (contact.html not accessible on backup).
-			touch $SMTP_CREDS_LOCATION
+			#touch $SMTP_CREDS_LOCATION
+			info "Secrets directory found. Continuing..."
 		fi
 	fi
 } # build_secrets()
@@ -697,7 +706,12 @@ main() {
 	# Check server is running. -- TBD - will depend on final, VPS setup.
 	check_server_is_up "$@"
 	# Report that we reached the end of the script.
-	echo -e "\nLaunch script completed."
+	info "Launch script completed."
+
+	# $1 is first parameter.
+	if [[ $1 == "main" ]]; then
+		warn "Email needs manual setup. Please fill in email_creds file in secrets directory for it to work."
+	fi
 }
 
 # Don't allow this script to be ran by other scripts? Not sure why this is important. Maybe for their setup it's important.
