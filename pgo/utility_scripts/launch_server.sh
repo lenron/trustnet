@@ -293,10 +293,10 @@ generate_key() {
 	#tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
 
     # $1 = number of bytes → 2*$1 hex chars
-	$1 = 16 # 32 hex chars
-    if   have openssl; then openssl rand -hex "$1"
-    elif have python3; then python3 -c 'import secrets,sys; print(secrets.token_hex(int(sys.argv[1])))' "$1"
-    else head -c "$1" /dev/urandom | od -An -tx1 | tr -d ' \n'
+	NUM_CHARS = 16 # 32 hex chars
+    if   have openssl; then openssl rand -hex "NUM_CHARS"
+    elif have python3; then python3 -c 'import secrets,sys; print(secrets.token_hex(int(sys.argv[1])))' "NUM_CHARS"
+    else head -c "NUM_CHARS" /dev/urandom | od -An -tx1 | tr -d ' \n'
     fi
 } # generate_key()
 
